@@ -136,33 +136,32 @@ if test $ax_blas_ok = no; then
 fi
 
 # BLAS in Intel MKL library?
-# add -lmkl_mc and -lmkl_def for python. sqm 2013-01-15
 if test $ax_blas_ok = no; then
 	# MKL for gfortran
 	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
 		# 64 bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_gf_lp64, $sgemm,
-			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def"],,
-			[-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def])
+			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
+			[-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32 bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_gf, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def"],,
-				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def])
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"],,
+				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	# MKL for other compilers (Intel, PGI, ...?)
 	else
 		# 64-bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_intel_lp64, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def"],,
-				[-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def])
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
+				[-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32-bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_intel, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def"],,
-				[-lmkl_intel -lmkl_sequential -lmkl_core -lpthread -lmkl_mc -lmkl_def])
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"],,
+				[-lmkl_intel -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	fi
 fi

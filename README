@@ -45,7 +45,7 @@ Installation
   - Python version 2.5 or higher (optional, for make check)
   - common lisp / SBCL (optional, for common lisp script)
 
-* Build libcint via
+* Build libcint
     mkdir build; cd build
     ../configure <options>
     make
@@ -53,12 +53,12 @@ Installation
     make install
 
 * Use Intel MKL as BLAS library
-  - MKL version 10.2 or older
-    ./configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 -lmkl_intel_lp64 \
-        -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def -Wl,--end-group -lpthread"
-  - MKL version 10.3 or newer
-    ./configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 -lmkl_intel_lp64 \
-        -lmkl_sequential -lmkl_core -lmkl_avx -Wl,--end-group -lpthread"
+  - MKL version 10.2 or older or CPU without Intel AVX support
+    ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
+        -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,--end-group -lpthread"
+  - MKL version 10.3 or newer and CPU with Intel AVX support
+    ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
+        -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_avx -Wl,--end-group -lpthread"
   - Link flags of other MKL version refers to the online MKL link advisor
     http://software.intel.com/sites/products/mkl/
 
@@ -66,12 +66,14 @@ Installation
 Known bugs
 ----------
 
-* For gcc and MKL 10.3 (Intel Composer XE 2011), some spinor-GTO
-  integrals which invokes zgemm are incorrect.
-  Replacing the default link falg -lmkl_gf_lp64 to -lmkl_intel_lp64
-  can solve the problem.
-
-* "make check" may fail in the following tests
+* On 64-bit system, "make check" stop with error:
+    MKL FATAL ERROR: Cannot load libmkl_def.so
+  This problem is caused by the conflict between Python and MKL library.
+  Add -lmkl_mc -lmkl_def to MKL link flags to replace the default blas
+  link flags.  e.g.
+    ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
+        -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def \
+        -Wl,--end-group -lpthread"
 
 * "make check" may fail in the following tests
   - cint2e_sph
