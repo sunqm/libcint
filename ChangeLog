@@ -1,0 +1,5 @@
+Version 1.0 (2013/01/15):
+	* first release
+	* 1e/2e contracted cartensian/spheric/spinor GTO integarls
+	* common lisp script to generate integral code
+

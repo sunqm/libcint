@@ -1,0 +1,94 @@
+libcint
+=======
+
+version 1.0
+2013-01-15
+
+
+What is libcint
+---------------
+
+libcint is an open source library for computation of Gaussian type
+integrals.  It provides C/Fortran function to evaluate one-electron /
+two-electron integrals with Cartesian / spheric / spinor Gaussian type
+functions.
+
+
+Features
+--------
+
+* one electron integrals
+  - plain integrals such as overlap, kinetic integrals
+  - nuclear attraction
+  - nuclear attraction due to Gaussian nuclear model
+* two electron integrals
+  - Coulomb repulsion
+  - Gaunt interaction
+* Cartesian GTO
+  - integrals for 6d, 10f, 15g Gaussian functions
+* spheric GTO 
+  - integrals for 5d, 7f, 9g Gaussian functions
+* spinor GTO 
+  - integrals for J-adapted spinor Gaussian functions
+* common lisp script to automatically generate C code
+* thread safe
+
+
+Getting libcint
+---------------
+
+The latest version is available from:
+
+    git clone http://github.com/xxxxxxxxx
+
+
+Installation
+------------
+
+* Prerequisites
+  - BLAS library
+  - Python version 2.5 or higher (optional, for make check)
+  - common lisp / SBCL (optional, for common lisp script)
+
+* Build libcint via
+    mkdir build; cd build
+    ../configure <options>
+    make
+    make check  # optional
+    make install
+
+* Use Intel MKL as BLAS library
+  - MKL version 10.2 or older
+    ./configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 -lmkl_intel_lp64 \
+        -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def -Wl,--end-group -lpthread"
+  - MKL version 10.3 or newer
+    ./configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 -lmkl_intel_lp64 \
+        -lmkl_sequential -lmkl_core -lmkl_avx -Wl,--end-group -lpthread"
+  - Link flags of other MKL version refers to the online MKL link advisor
+    http://software.intel.com/sites/products/mkl/
+
+
+Known bugs
+----------
+
+* For gcc and MKL 10.3 (Intel Composer XE 2011), some spinor-GTO
+  integrals which invokes zgemm are incorrect.
+  Replacing the default link falg -lmkl_gf_lp64 to -lmkl_intel_lp64
+  can solve the problem.
+
+* "make check" may fail in the following tests
+
+* "make check" may fail in the following tests
+  - cint2e_sph
+  - cint2e_ig1_sph
+  - cint2e
+  - cint2e_sa10sp1
+  - cint2e_sa10sp1spsp2
+  - cint2e_spgsp1
+  - cint2e_g1spsp2
+  - cint2e_spgsp1spsp2
+
+
+Bug report
+----------
+Qiming Sun <osirpt.sun@gmail.com>
