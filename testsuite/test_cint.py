@@ -9,11 +9,15 @@ test libcint
 __author__ = "Qiming Sun <osirpt.sun@gmail.com>"
 __version__ = "$ 0.1 $"
 
+import sys
 import os
 import ctypes
 import numpy
 
-alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.so'
+if sys.platform == 'darwin':
+    alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.dylib'
+else:
+    alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.so'
 _cint = ctypes.cdll.LoadLibrary(alib)
 
 PTR_LIGHT_SPEED    = 0
