@@ -10,7 +10,7 @@ What is libcint
 
 libcint is an open source library for computation of Gaussian type
 integrals.  It provides C/Fortran function to evaluate one-electron /
-two-electron integrals with Cartesian / spheric / spinor Gaussian type
+two-electron integrals with Cartesian / real-spheric / spinor Gaussian type
 functions.
 
 
@@ -18,19 +18,14 @@ Features
 --------
 
 * one electron integrals
-  - plain integrals such as overlap, kinetic integrals
-  - nuclear attraction
   - nuclear attraction due to Gaussian nuclear model
 * two electron integrals
   - Coulomb repulsion
   - Gaunt interaction
-* Cartesian GTO
-  - integrals for 6d, 10f, 15g Gaussian functions
-* spheric GTO 
-  - integrals for 5d, 7f, 9g Gaussian functions
-* spinor GTO 
-  - integrals for J-adapted spinor Gaussian functions
-* common lisp script to automatically generate C code
+* Cartesian GTO:  6d, 10f, 15g Gaussian type functions
+* real-spheric GTO:  5d, 7f, 9g Gaussian type functions
+* spinor GTO:  J-adapted spinor Gaussian functions
+* common lisp script to generate C code
 * thread safe
 
 
@@ -39,7 +34,7 @@ Getting libcint
 
 The latest version is available from:
 
-    git clone http://github.com/xxxxxxxxx
+    git clone http://github.com/osirpt/libcint.git
 
 
 Installation
