@@ -21,7 +21,7 @@ AM_PROG_LIBTOOL([disable-static])
 AC_CHECK_HEADERS([stdlib.h math.h])
 
 AC_FUNC_MALLOC
-AC_CHECK_LIB([m], [sqrt pow])
+AC_CHECK_LIB([m], [sqrt])
 
 AC_ARG_ENABLE([auto-intor],
               [AS_HELP_STRING([--enable-auto-intor],
