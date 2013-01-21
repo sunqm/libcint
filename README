@@ -18,10 +18,10 @@ Features
 --------
 
 * one electron integrals
-  - nuclear attraction due to Gaussian nuclear model
+    - nuclear attraction due to Gaussian nuclear model
 * two electron integrals
-  - Coulomb repulsion
-  - Gaunt interaction
+    - Coulomb repulsion
+    - Gaunt interaction
 * Cartesian GTO:  6d, 10f, 15g Gaussian type functions
 * real-spheric GTO:  5d, 7f, 9g Gaussian type functions
 * spinor GTO:  J-adapted spinor Gaussian functions
@@ -34,16 +34,16 @@ Getting libcint
 
 The latest version is available from:
 
-    git clone http://github.com/osirpt/libcint.git
+    git clone [http://github.com/osirpt/libcint.git](http://github.com/osirpt/libcint.git)
 
 
 Installation
 ------------
 
 * Prerequisites
-  - BLAS library
-  - Python version 2.5 or higher (optional, for make check)
-  - common lisp / SBCL (optional, for common lisp script)
+    - BLAS library
+    - Python version 2.5 or higher (optional, for make check)
+    - common lisp / SBCL (optional, for common lisp script)
 
 * Build libcint
     mkdir build; cd build
@@ -53,21 +53,25 @@ Installation
     make install
 
 * Use Intel MKL as BLAS library
-  - MKL version 10.2 or older or CPU without Intel AVX support
-    ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
-        -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,--end-group -lpthread"
-  - MKL version 10.3 or newer and CPU with Intel AVX support
-    ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
-        -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_avx -Wl,--end-group -lpthread"
-  - Link flags of other MKL version refers to the online MKL link advisor
-    http://software.intel.com/sites/products/mkl/
+    - MKL version 10.2 or older or CPU without Intel AVX support
+      ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
+          -lmkl_intel_lp64 -lmkl_sequential -lmkl_core \
+          -Wl,--end-group -lpthread"
+    - MKL version 10.3 or newer and CPU with Intel AVX support
+      ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
+          -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_avx \
+          -Wl,--end-group -lpthread"
+    - Link flags of other MKL version refers to the online MKL link advisor
+      http://software.intel.com/sites/products/mkl/
 
 
 Known bugs
 ----------
 
 * On 64-bit system, "make check" stop with error:
+
     MKL FATAL ERROR: Cannot load libmkl_def.so
+
   This problem is caused by the conflict between Python and MKL library.
   Add -lmkl_mc -lmkl_def to MKL link flags to replace the default blas
   link flags.  e.g.
@@ -76,14 +80,14 @@ Known bugs
         -Wl,--end-group -lpthread"
 
 * "make check" may fail in the following tests
-  - cint2e_sph
-  - cint2e_ig1_sph
-  - cint2e
-  - cint2e_sa10sp1
-  - cint2e_sa10sp1spsp2
-  - cint2e_spgsp1
-  - cint2e_g1spsp2
-  - cint2e_spgsp1spsp2
+    - cint2e_sph
+    - cint2e_ig1_sph
+    - cint2e
+    - cint2e_sa10sp1
+    - cint2e_sa10sp1spsp2
+    - cint2e_spgsp1
+    - cint2e_g1spsp2
+    - cint2e_spgsp1spsp2
 
 
 Bug report

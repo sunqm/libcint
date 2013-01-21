@@ -5,17 +5,13 @@
  * blas-like functions
  */
 
+#include <string.h>
+
 #define OF_CMPLX        2
 
 void dset0(const int n, double *x)
 {
-        int i;
-/* for icc
- * #pragma simd
- * #pragma vector aligned
- */
-        for (i = 0; i < n; i++)
-                x[i] = 0;
+        memset(x, 0, sizeof(double) * n);
 }
 
 

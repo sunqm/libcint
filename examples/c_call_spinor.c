@@ -14,7 +14,7 @@ int main()
         double *env = malloc(sizeof(double) * 10000);
 
         int i, n, off;
-        off = 0;
+        off = PTR_ENV_START;
         for (i = 0; i < natm; i++) {
                 atm[CHARGE_OF + ATM_SLOTS * i] = i + 1;
                 atm[PTR_COORD + ATM_SLOTS * i] = off;

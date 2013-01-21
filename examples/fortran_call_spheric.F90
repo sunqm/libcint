@@ -18,6 +18,8 @@ integer,parameter :: PTR_COEFF  = 7
 integer,parameter :: GAUGE_OF   = 8
 integer,parameter :: BAS_SLOTS  = 8
 
+integer,parameter :: PTR_ENV_START = 20
+
 integer :: natm = 2
 integer :: nbas = 3
 integer,allocatable :: atm(:,:)
@@ -35,7 +37,7 @@ allocate (atm(ATM_SLOTS,natm))
 allocate (bas(BAS_SLOTS,nbas))
 allocate (env(10000))
 
-off = 0
+off = PTR_ENV_START
 do i = 1, natm
   atm(CHARGE_OF,i) = i
   atm(PTR_COORD,i) = off ! off is the offset in env

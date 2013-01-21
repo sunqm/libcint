@@ -94,11 +94,11 @@ f(buf, shls, atm, natm, bas, nbas, env);
   \end{itemize}
 \end{itemize}
 \begin{verbatim}
-env[bas[i*8+6]]   | env[bas[i*8+6]]+10 |     | env[bas[i*8+6]]+40
-env[bas[i*8+6]]+1 | env[bas[i*8+6]]+11 |     | env[bas[i*8+6]]+41
+env[bas[i*8+6]  ] | env[bas[i*8+6]+10] |     | env[bas[i*8+6]+40]
+env[bas[i*8+6]+1] | env[bas[i*8+6]+11] |     | env[bas[i*8+6]+41]
  .                |  .                 | ... |  .                
  .                |  .                 |     |  .                
-env[bas[i*8+6]]+9 | env[bas[i*8+6]]+19 |     | env[bas[i*8+6]]+49
+env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 \end{verbatim}
 \begin{verbatim}
 - `bas[i*8+7]` unused

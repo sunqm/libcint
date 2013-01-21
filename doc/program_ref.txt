@@ -9,16 +9,16 @@ C routine
 
     f(buf, shls, atm, natm, bas, nbas, env);
 
-  * buf:  column-major double precision array.
+* buf:  column-major double precision array.
     - for 1e integrals of shells (i,j), data are stored as `[i1j1 i2j1 ... ]`
     - for 2e integrals of shells (i,j|k,l), data are stored as  
       `[i1j1k1l1 i2j1k1l1 ... i1j2k1l1 ... i1j1k2l1 ... ]`
     - complex data are stored as two double elements, first is real,
       followed by imaginary, e.g. [Re Im Re Im ...]
-  * shls: 0-based basis/shell indices.
+* shls: 0-based basis/shell indices.
     - int[2] for 1e integrals
     - int[4] for 2e integrals
-  * atm:  int[natm*6], list of atoms. For ith atom, the 6 slots of atm[i] are
+* atm:  int[natm*6], list of atoms. For ith atom, the 6 slots of atm[i] are
     - `atm[i*6+0]` nuclear charge of atom i
     - `atm[i*6+1]` env offset to save coordinates
       (`env[atm[i*6+1]]`, `env[atm[i*6+1]+1]`, `env[atm[i*6+1]+2]`) are (x,y,z)
@@ -26,9 +26,9 @@ C routine
     - `atm[i*6+3]` unused
     - `atm[i*6+4]` unused
     - `atm[i*6+5]` unused
-  * natm: int, number of atoms, natm has no effect __except nuclear
+* natm: int, number of atoms, natm has no effect __except nuclear
     attraction__ integrals
-  * bas:  int[nbas*8], list of basis. For ith basis, the 8 slots of bas[i] are
+* bas:  int[nbas*8], list of basis. For ith basis, the 8 slots of bas[i] are
     - `bas[i*8+0]` 0-based index of corresponding atom
     - `bas[i*8+1]` angular momentum
     - `bas[i*8+2]` number of primitive GTO in basis i
@@ -43,41 +43,41 @@ C routine
       e.g. 10 primitive -> 5 contraction needs a $10\times 5$ array
 
 ~~~~~~~~
-env[bas[i*8+6]]   | env[bas[i*8+6]]+10 |     | env[bas[i*8+6]]+40
-env[bas[i*8+6]]+1 | env[bas[i*8+6]]+11 |     | env[bas[i*8+6]]+41
+env[bas[i*8+6]  ] | env[bas[i*8+6]+10] |     | env[bas[i*8+6]+40]
+env[bas[i*8+6]+1] | env[bas[i*8+6]+11] |     | env[bas[i*8+6]+41]
  .                |  .                 | ... |  .                
  .                |  .                 |     |  .                
-env[bas[i*8+6]]+9 | env[bas[i*8+6]]+19 |     | env[bas[i*8+6]]+49
+env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 ~~~~~~~~
 
     - `bas[i*8+7]` unused
-  * nbas: int, number of bases, nbas has no effect
-  * env:  double[], save the value of coordinates, exponents,
-    contraction coefficients
+* nbas: int, number of bases, nbas has no effect
+* env:  double[], save the value of coordinates, exponents,
+  contraction coefficients
 
 Fortran routine
 ---------------
 
     call f(buf, shls, atm, natm, bas, nbas, env)
 
-  * atm and bas are 2D integer array
+* atm and bas are 2D integer array
     - atm(1:6,i) is the (charge, offset_coord, nuclear_model, unused,
       unused, unused) of the ith atom
     - bas(1:8,i) is the (atom_index, angular, num_primitive_GTO,
       num_contract_GTO, kappa, offset_exponent, offset_coeff, unused) of
       the ith basis
-  * parameters are the same to the C function.
-    Note those offsets   atm(2,i)   bas(6,i)   bas(7,i)  are 0-based.
-  * buf is 2D/4D double precision/double complex array
+* parameters are the same to the C function.
+  Note those offsets   atm(2,i)   bas(6,i)   bas(7,i)  are 0-based.
+* buf is 2D/4D double precision/double complex array
 
 Supported angular momentum
 --------------------------
-  * 1e integrals $l_{max}$ = 6
-  * 2e integrals $l_{max}$ = 4
+* 1e integrals $l_{max}$ = 6
+* 2e integrals $l_{max}$ = 4
 
 Data ordering
 -------------
-  * for Cartesian GTO, the output data in buf are sorted as  
+* for Cartesian GTO, the output data in buf are sorted as  
 \begin{tabular}{l|l|l|l}
 \hline
     s shell & p shell & d shell & ... \\
@@ -92,7 +92,7 @@ Data ordering
             & ...     & ...     & \\
 \hline
 \end{tabular}
-  * for real spheric GTO, the output data in buf are sorted as  
+* for real spheric GTO, the output data in buf are sorted as  
 \begin{tabular}{l|l|l|l|l}
 \hline
     s shell & p shell & d shell     & f shell         & ... \\
@@ -108,7 +108,7 @@ Data ordering
             &         &             & ...             & \\
 \hline
 \end{tabular}
-  * for spinor GTO, the output data in buf correspond to  
+* for spinor GTO, the output data in buf correspond to  
 \begin{tabular}{l|l|l|l|l}
 \hline
     ... & kappa=0,p shell & kappa=1,p shell & kappa=0,d shell & ... \\
@@ -133,11 +133,11 @@ Tensor
 
   integrals like Gradients have tensor components. the output data is 
 
-  * 3-component tensor  
+* 3-component tensor  
     - X `buf(:,0)`
     - Y `buf(:,1)`
     - Z `buf(:,2)`
-  * 9-component tensor  
+* 9-component tensor  
     - XX `buf(:,0)`
     - XY `buf(:,1)`
     - XZ `buf(:,2)`
