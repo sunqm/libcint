@@ -34,7 +34,7 @@ Getting libcint
 
 The latest version is available from:
 
-    git clone [http://github.com/osirpt/libcint.git](http://github.com/osirpt/libcint.git)
+    git clone http://github.com/sunqm/libcint.git
 
 
 Installation
