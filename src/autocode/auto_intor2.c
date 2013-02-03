@@ -51,7 +51,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_ovlp, &c2s_sf_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ovlp)
@@ -95,7 +95,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_nuc_drv(opij, ng, 1,
+return cint1e_nuc_drv(opij, ng, 1.0,
 gout1e_cint1e_nuc, &c2s_sf_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_nuc)
@@ -218,7 +218,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_srsr, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_srsr)
@@ -269,7 +269,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_sr, &c2s_si_1ei,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_sr)
@@ -330,7 +330,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_srsp, &c2s_si_1ei,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_srsp)
@@ -388,7 +388,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_spsp, &c2s_sf_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_spsp)
@@ -439,7 +439,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_sp, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_sp)
@@ -526,7 +526,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 3;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_spspsp, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_spspsp)
@@ -577,7 +577,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_nuc_drv(opij, ng, 1,
+return cint1e_nuc_drv(opij, ng, 1.0,
 gout1e_cint1e_spnuc, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_spnuc)
@@ -638,7 +638,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_nuc_drv(opij, ng, 1,
+return cint1e_nuc_drv(opij, ng, 1.0,
 gout1e_cint1e_spnucsp, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_spnucsp)
@@ -699,7 +699,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[TENSOR] = 1;
-return cint1e_nuc_drv(opij, ng, 1,
+return cint1e_nuc_drv(opij, ng, 1.0,
 gout1e_cint1e_srnucsr, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_srnucsr)
@@ -729,10 +729,8 @@ double dri[3];
 dri[0] = ri[0] - env[PTR_COMMON_ORIG+0];
 dri[1] = ri[1] - env[PTR_COMMON_ORIG+1];
 dri[2] = ri[2] - env[PTR_COMMON_ORIG+2];
-G1E_D_J(g1, g0, i_l+1
-, j_l+0);
-G1E_D_I(g2, g0, i_l+1
-, j_l+0);
+G1E_D_J(g1, g0, i_l+1, j_l+0);
+G1E_D_I(g2, g0, i_l+1, j_l+0);
 n = ng[0] * ng[1] * 3;
 daxpy_(&n, &D1, g2, &INC1, g1, &INC1);
 G1E_RCI(g2, g0, i_l+0, j_l);
@@ -1036,10 +1034,8 @@ double *g3 = g2  + ng[0] * ng[1] * 3;
 double *g4 = g3  + ng[0] * ng[1] * 3;
 double s[9];
 G1E_D_J(g1, g0, i_l+0, j_l+0);
-G1E_D_J(g2, g0, i_l+0
-, j_l+1);
-G1E_D_I(g3, g0, i_l+0
-, j_l+1);
+G1E_D_J(g2, g0, i_l+0, j_l+1);
+G1E_D_I(g3, g0, i_l+0, j_l+1);
 n = ng[0] * ng[1] * 3;
 daxpy_(&n, &D1, g3, &INC1, g2, &INC1);
 G1E_D_J(g3, g2, i_l+0, j_l+0);
@@ -1083,7 +1079,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[TENSOR] = 3;
-return cint1e_rinv_drv(opij, ng, 1,
+return cint1e_rinv_drv(opij, ng, 1.0,
 gout1e_cint1e_sa01sp, &c2s_si_1ei,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_sa01sp)
@@ -1334,10 +1330,8 @@ rirj[2] = ri[2] - rj[2];
 c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
-G1E_D_J(g1, g0, i_l+2
-, j_l+0);
-G1E_D_I(g2, g0, i_l+2
-, j_l+0);
+G1E_D_J(g1, g0, i_l+2, j_l+0);
+G1E_D_I(g2, g0, i_l+2, j_l+0);
 n = ng[0] * ng[1] * 3;
 daxpy_(&n, &D1, g2, &INC1, g1, &INC1);
 G1E_R0I(g2, g0, i_l+1, j_l);
@@ -1511,7 +1505,7 @@ ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[POS_E2] = 1;
 ng[TENSOR] = 1;
-return cint2e_drv(opkijl, ng, 1,
+return cint2e_drv(opkijl, ng, 1.0,
 gout2e_cint2e_spsp1, &c2s_si_2e1, &c2s_sf_2e2,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_spsp1)
@@ -1697,7 +1691,7 @@ ng[GSHIFT] = 4;
 ng[POS_E1] = 4;
 ng[POS_E2] = 4;
 ng[TENSOR] = 1;
-return cint2e_drv(opkijl, ng, 1,
+return cint2e_drv(opkijl, ng, 1.0,
 gout2e_cint2e_spsp1spsp2, &c2s_si_2e1, &c2s_si_2e2,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_spsp1spsp2)
@@ -1775,7 +1769,7 @@ ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[POS_E2] = 1;
 ng[TENSOR] = 1;
-return cint2e_drv(opkijl, ng, 1,
+return cint2e_drv(opkijl, ng, 1.0,
 gout2e_cint2e_srsr1, &c2s_si_2e1, &c2s_sf_2e2,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_srsr1)
@@ -1961,7 +1955,7 @@ ng[GSHIFT] = 4;
 ng[POS_E1] = 4;
 ng[POS_E2] = 4;
 ng[TENSOR] = 1;
-return cint2e_drv(opkijl, ng, 1,
+return cint2e_drv(opkijl, ng, 1.0,
 gout2e_cint2e_srsr1srsr2, &c2s_si_2e1, &c2s_si_2e2,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_srsr1srsr2)

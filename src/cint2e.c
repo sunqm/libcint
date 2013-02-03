@@ -61,7 +61,7 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
         const double *ak = env + bas(PTR_EXP, k_sh);
         const double *al = env + bas(PTR_EXP, l_sh);
         int ip, jp, kp, lp, n;
-        int g_is_0;
+        int has_value = 0;
         int *const idx = (int *)malloc(sizeof(int) * nf * 3);
         double aij, dij, eij, rrij;
         double akl, dkl, ekl, rrkl;
@@ -90,7 +90,6 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
         rrij = square_dist(ri, rj);
         rrkl = square_dist(rk, rl);
 
-        g_is_0 = 1;
         n = nf * i_ctr * j_ctr * k_ctr * l_ctr * n_comp;
         dset0(n, gctr); 
         for (lp = 0; lp < bas(NPRIM_OF, l_sh); lp++) {
@@ -129,7 +128,7 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
                                                 }
                                                 continue;
                                         }
-                                        g_is_0 = 0;
+                                        has_value = 1;
                                         dij = exp(-eij);
 
                                         g0_2e(g, ng, ai[ip], aj[jp], ak[kp], al[lp],
@@ -164,7 +163,7 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
         }
         free(gctrk);
 
-        return g_is_0;
+        return has_value;
 }
 
 
@@ -194,15 +193,15 @@ int cint2e_drv(double *opkijl, int *ng, const double fac,
         const int nc = nf * i_ctr * j_ctr * k_ctr * l_ctr * ng[POS_E1];
         int ip, jp, kp, lp, nop;
         int n, n1, n2;
-        int g_is_0;
+        int has_value;
         double *const gctr = (double *)malloc(sizeof(double) * nc * ng[POS_E2] * ng[TENSOR]);
         double *pgctr = gctr;
         double *opij;
 
         ng[RYS_ROOTS] = (ng[0] + ng[1]) / 2;
 
-        g_is_0 = cint2e_loop(gctr, ng, fac, f_gout,
-                             shls, atm, bas, env);
+        has_value = cint2e_loop(gctr, ng, fac, f_gout,
+                                shls, atm, bas, env);
 
         int (*fcgtos)();
         if (f_e1_c2s == &c2s_sph_2e1) {
@@ -219,7 +218,7 @@ int cint2e_drv(double *opkijl, int *ng, const double fac,
         nop = ip * jp * kp * lp;
 
         if (f_e1_c2s == &c2s_sph_2e1 || f_e1_c2s == &c2s_cart_2e1) {
-                if (g_is_0) {
+                if (!has_value) {
                         dset0(nop * ng[TENSOR], opkijl);
                 } else {
                         for (n = 0; n < ng[TENSOR]; n++) {
@@ -229,7 +228,7 @@ int cint2e_drv(double *opkijl, int *ng, const double fac,
                         }
                 }
         } else {
-                if (g_is_0) {
+                if (!has_value) {
                         dset0(nop * OF_CMPLX * ng[TENSOR], opkijl);
                 } else {
                         n1 = ip * nfk * k_ctr * nfl * l_ctr * jp * OF_CMPLX;
@@ -246,7 +245,7 @@ int cint2e_drv(double *opkijl, int *ng, const double fac,
                 }
         }
         free(gctr);
-        return !g_is_0;
+        return has_value;
 }
 
 
@@ -378,6 +377,31 @@ int cint2e_sph(double *opkijl, const int *shls,
                           shls, atm, natm, bas, nbas, env);
 }
 
+int cint2e_cart(double *opkijl, const int *shls,
+                const int *atm, const int natm,
+                const int *bas, const int nbas, const double *env)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int k_sh = shls[2];
+        const int l_sh = shls[3];
+        const int i_l = bas(ANG_OF, i_sh);
+        const int j_l = bas(ANG_OF, j_sh);
+        const int k_l = bas(ANG_OF, k_sh);
+        const int l_l = bas(ANG_OF, l_sh);
+        int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+        // maximum l supported: l=4
+        ng[3] = j_l     + 1;     // 0:j_l
+        ng[2] = l_l     + 1;     // 0:l_l
+        ng[1] = k_l     + ng[2]; // 0:mmax, mmax = lk + ll, 0:k_l
+        ng[0] = i_l     + ng[3]; // 0:nmax, nmax = li + lj, 0:i_l
+
+        return cint2e_drv(opkijl, ng, 1, &gout2e,
+                          &c2s_cart_2e1, NULL,
+                          shls, atm, natm, bas, nbas, env);
+}
+
 
 /*
  * spinor <ki|jl> = (ij|kl); i,j\in electron 1; k,l\in electron 2
@@ -413,5 +437,6 @@ int cint2e(double *opkijl, const int *shls,
  * c to fortran interface
  */
 
+C2F_(cint2e_cart)
 C2F_(cint2e_sph)
 C2F_(cint2e)

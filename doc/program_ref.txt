@@ -1,6 +1,13 @@
 % Program Reference
 
 
+Overview of libcint usage
+=========================
+Preparing args
+--------------
+...
+
+
 Interface
 =========
 
@@ -159,7 +166,8 @@ function list
     - `cint1e_nuc_cart`    $$\langle i| V_{nuc} | j\rangle $$
     - `cint1e_kin_cart`    $$.5\langle i| \vec{p} \cdot \vec{p} j\rangle $$
     - `cint1e_ia01p_cart`  $$\langle i| \frac{\vec{r}}{r^3}| \times \vec{\nabla} j\rangle $$
-    - `cint1e_irxp_cart`   $$\langle i| \vec{r}_c \times \vec{\nabla} j\rangle $$
+    - `cint1e_irixp_cart`  $$\langle i| (\vec{r}-\vec{R}_i) \times \vec{\nabla} j\rangle $$
+    - `cint1e_ircxp_cart`  $$\langle i| (\vec{r}-\vec{R}_o) \times \vec{\nabla} j\rangle $$
     - `cint1e_iking_cart`  $$0.5i\langle \vec{p} \cdot \vec{p} i| U_gj\rangle $$
     - `cint1e_iovlpg_cart` $$i \langle i| U_gj\rangle $$
     - `cint1e_inucg_cart`  $$i \langle i| V_{nuc}| U_gj\rangle $$
@@ -179,7 +187,8 @@ function list
     - `cint1e_nuc_sph`    $$\langle  i| V_{nuc}| j\rangle $$
     - `cint1e_kin_sph`    $$0.5\langle i| \vec{p} \cdot pj\rangle $$
     - `cint1e_ia01p_sph`  $$\langle i| \frac{\vec{r}}{r^3}| \times \vec{\nabla} j\rangle $$
-    - `cint1e_irxp_sph`   $$\langle i| \vec{r}_c \times \vec{\nabla} j\rangle $$
+    - `cint1e_irixp_sph`  $$\langle i| (\vec{r}_c-\vec{R}_i) \times \vec{\nabla} j\rangle $$
+    - `cint1e_ircxp_sph`  $$\langle i| (\vec{r}_c-\vec{R}_o) \times \vec{\nabla} j\rangle $$
     - `cint1e_iking_sph`  $$0.5i\langle \vec{p} \cdot \vec{p} i| U_gj\rangle $$
     - `cint1e_iovlpg_sph` $$i\langle i| U_gj\rangle $$
     - `cint1e_inucg_sph`  $$i\langle i| V_{nuc}| U_gj\rangle $$

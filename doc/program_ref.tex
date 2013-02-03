@@ -14,6 +14,12 @@
 
 \tableofcontents
 
+\section{Overview of libcint usage}
+
+\subsection{Preparing args}
+
+\ldots{}
+
 \section{Interface}
 
 \subsection{C routine}
@@ -257,8 +263,11 @@ is
     \verb!cint1e_ia01p_cart!
     \[\langle i| \frac{\vec{r}}{r^3}| \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_irxp_cart!
-    \[\langle i| \vec{r}_c \times \vec{\nabla} j\rangle \]
+    \verb!cint1e_irixp_cart!
+    \[\langle i| (\vec{r}-\vec{R}_i) \times \vec{\nabla} j\rangle \]
+  \item
+    \verb!cint1e_ircxp_cart!
+    \[\langle i| (\vec{r}-\vec{R}_o) \times \vec{\nabla} j\rangle \]
   \item
     \verb!cint1e_iking_cart!
     \[0.5i\langle \vec{p} \cdot \vec{p} i| U_gj\rangle \]
@@ -302,8 +311,11 @@ is
     \verb!cint1e_ia01p_sph!
     \[\langle i| \frac{\vec{r}}{r^3}| \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_irxp_sph!
-    \[\langle i| \vec{r}_c \times \vec{\nabla} j\rangle \]
+    \verb!cint1e_irixp_sph!
+    \[\langle i| (\vec{r}_c-\vec{R}_i) \times \vec{\nabla} j\rangle \]
+  \item
+    \verb!cint1e_ircxp_sph!
+    \[\langle i| (\vec{r}_c-\vec{R}_o) \times \vec{\nabla} j\rangle \]
   \item
     \verb!cint1e_iking_sph!
     \[0.5i\langle \vec{p} \cdot \vec{p} i| U_gj\rangle \]

@@ -7,13 +7,14 @@
   '("cint1e_nuc_sph"    ( \| nuc \| ))
   '("cint1e_kin_sph"    (.5 \| p dot p))
   '("cint1e_ia01p_sph"  (#C(0 1) \| nabla-rinv \| cross p))
-  '("cint1e_irxp_sph"   (#C(0 1) \| rc cross p))
+  '("cint1e_irixp_sph"  (#C(0 1) \| ri cross p))
+  '("cint1e_ircxp_sph"  (#C(0 1) \| rc cross p))
   ;'("cint1e_a11_sph"    (r dot \| nabla-rinv \|) \, -1 r \| nabla-rinv)
   '("cint1e_iking_sph"  (#C(0 .5) p dot p \| g))
   '("cint1e_iovlpg_sph" (#C(0 1) \| g))
   '("cint1e_inucg_sph"  (#C(0 1) \| nuc \| g))
   ;'("cint2e_sph"        ( \, \| \, ))
-  '("cint2e_ig1_sph"    ( g \, \| \, ))
+  '("cint2e_ig1_sph"    (#C(0 1) g \, \| \, ))
 )
 
 (gen-cint "auto_intor2.c" 'spinor
@@ -55,12 +56,12 @@
   '("cint1e_nuc_cart"    ( \| nuc \| ))
   '("cint1e_kin_cart"    (.5 \| p dot p))
   '("cint1e_ia01p_cart"  (#C(0 1) \| nabla-rinv \| cross p))
-  '("cint1e_irxp_cart"   (#C(0 1) \| rc cross p))
+  '("cint1e_irixp_cart"   (#C(0 1) \| ri cross p))
+  '("cint1e_ircxp_cart"   (#C(0 1) \| rc cross p))
   '("cint1e_iking_cart"  (#C(0 .5) p dot p \| g))
   '("cint1e_iovlpg_cart" (#C(0 1) \| g))
   '("cint1e_inucg_cart"  (#C(0 1) \| nuc \| g))
-  '("cint2e_cart"        ( \, \| \, ))
-  '("cint2e_ig1_cart"    ( g \, \| \, ))
+  '("cint2e_ig1_cart"    (#C(0 1) g \, \| \, ))
 )
 
 (gen-cint "grad1.c" 'spheric

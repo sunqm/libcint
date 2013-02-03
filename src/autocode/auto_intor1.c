@@ -51,7 +51,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1,
+return cint1e_drv(opij, ng, 1.0,
 gout1e_cint1e_ovlp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ovlp_sph)
@@ -95,7 +95,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_nuc_drv(opij, ng, 1,
+return cint1e_nuc_drv(opij, ng, 1.0,
 gout1e_cint1e_nuc_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_nuc_sph)
@@ -180,10 +180,8 @@ double *g3 = g2  + ng[0] * ng[1] * 3;
 double *g4 = g3  + ng[0] * ng[1] * 3;
 double s[9];
 G1E_D_J(g1, g0, i_l+0, j_l+0);
-G1E_D_J(g2, g0, i_l+0
-, j_l+1);
-G1E_D_I(g3, g0, i_l+0
-, j_l+1);
+G1E_D_J(g2, g0, i_l+0, j_l+1);
+G1E_D_I(g3, g0, i_l+0, j_l+1);
 n = ng[0] * ng[1] * 3;
 daxpy_(&n, &D1, g3, &INC1, g2, &INC1);
 G1E_D_J(g3, g2, i_l+0, j_l+0);
@@ -218,12 +216,76 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_rinv_drv(opij, ng, 1,
+return cint1e_rinv_drv(opij, ng, 1.0,
 gout1e_cint1e_ia01p_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ia01p_sph)
+/* <i|OVLP |RI CROSS P j> */
+static void gout1e_cint1e_irixp_sph(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+int ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + ng[0] * ng[1] * 3;
+double *g2 = g1  + ng[0] * ng[1] * 3;
+double *g3 = g2  + ng[0] * ng[1] * 3;
+double *g4 = g3  + ng[0] * ng[1] * 3;
+double s[9];
+double drj[3];
+drj[0] = rj[0] - ri[0];
+drj[1] = rj[1] - ri[1];
+drj[2] = rj[2] - ri[2];
+G1E_D_J(g1, g0, i_l+0, j_l+0);
+G1E_RCJ(g2, g0, i_l+0, j_l+1);
+G1E_D_J(g3, g2, i_l+0, j_l+0);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (1*s[5]) + (-1*s[7]);
+gout[1] += + (1*s[6]) + (-1*s[2]);
+gout[2] += + (1*s[1]) + (-1*s[3]);
+gout += 3;
+}}
+int cint1e_irixp_sph(double *opij, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[1] = j_l + 2 + 1;
+ng[0] = i_l + 0 + ng[1];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 1;
+ng[TENSOR] = 3;
+return cint1e_drv(opij, ng, 1.0,
+gout1e_cint1e_irixp_sph, &c2s_sph_1e,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint1e_irixp_sph)
 /* <i|OVLP |RC CROSS P j> */
-static void gout1e_cint1e_irxp_sph(double *g, const int *ng,
+static void gout1e_cint1e_ircxp_sph(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls, const int *atm, const int *bas, const double *env) {
@@ -269,7 +331,7 @@ gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
 gout += 3;
 }}
-int cint1e_irxp_sph(double *opij, const int *shls,
+int cint1e_ircxp_sph(double *opij, const int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
@@ -282,10 +344,10 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_drv(opij, ng, 1,
-gout1e_cint1e_irxp_sph, &c2s_sph_1e,
+return cint1e_drv(opij, ng, 1.0,
+gout1e_cint1e_ircxp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
-C2F_(cint1e_irxp_sph)
+C2F_(cint1e_ircxp_sph)
 /* <P DOT P i|OVLP |G j> */
 static void gout1e_cint1e_iking_sph(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
@@ -554,9 +616,9 @@ s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
 }
-gout[0] = + (1*c[1]*s[2]) + (-1*c[2]*s[1]);
-gout[1] = + (1*c[2]*s[0]) + (-1*c[0]*s[2]);
-gout[2] = + (1*c[0]*s[1]) + (-1*c[1]*s[0]);
+gout[0] = + (-1*c[1]*s[2]) + (1*c[2]*s[1]);
+gout[1] = + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
+gout[2] = + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
 gout += 3;
 }}
 int cint2e_ig1_sph(double *opkijl, const int *shls,

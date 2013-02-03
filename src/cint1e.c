@@ -37,7 +37,7 @@ int cint1e_loop(double *gctr, const int *ng, const double fac,
         const double *ai = env + bas(PTR_EXP, i_sh);
         const double *aj = env + bas(PTR_EXP, j_sh);
         int ip, jp, n;
-        int g_is_0;
+        int has_value = 0;
         int *const idx = (int *)malloc(sizeof(int) * nf * 3);
         double aij, dij, eij, rrij;
         double *const g = (double *)malloc(sizeof(double) * ng[0] * ng[1] * 3 * ((1<<ng[GSHIFT])+1)); // +1 as buffer
@@ -48,7 +48,6 @@ int cint1e_loop(double *gctr, const int *ng, const double fac,
 
         rrij = square_dist(ri, rj);
 
-        g_is_0 = 1;
         n = nf * i_ctr * j_ctr * n_comp;
         dset0(n, gctr);
         for (jp = 0; jp < bas(NPRIM_OF, j_sh); jp++) {
@@ -59,7 +58,7 @@ int cint1e_loop(double *gctr, const int *ng, const double fac,
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
                         if (eij > EXPCUTOFF)
                                 continue;
-                        g_is_0 = 0;
+                        has_value = 1;
 
                         dij = SQRTPI * PI * exp(-eij) / (aij * sqrt(aij)) * fac;
                         g_ovlp(g, ng, ai[ip], aj[jp], ri, rj, dij);
@@ -79,7 +78,7 @@ int cint1e_loop(double *gctr, const int *ng, const double fac,
         free(gout);
         free(gctri);
 
-        return g_is_0;
+        return has_value;
 }
 
 
@@ -153,7 +152,7 @@ int cint1e_nuc_loop(double *gctr, const int *ng, const double fac,
         const double *ai = env + bas(PTR_EXP, i_sh);
         const double *aj = env + bas(PTR_EXP, j_sh);
         int ip, jp, i, n;
-        int g_is_0;
+        int has_value = 0;
         double tau;
         const double *cr;
         double (*f_nuc_mod)();
@@ -176,7 +175,6 @@ int cint1e_nuc_loop(double *gctr, const int *ng, const double fac,
 
         rrij = square_dist(ri, rj);
 
-        g_is_0 = 1;
         n = nf * i_ctr * j_ctr * n_comp;
         dset0(n, gctr);
         for (jp = 0; jp < bas(NPRIM_OF, j_sh); jp++) {
@@ -187,7 +185,7 @@ int cint1e_nuc_loop(double *gctr, const int *ng, const double fac,
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
                         if (eij > EXPCUTOFF)
                                 continue;
-                        g_is_0 = 0;
+                        has_value = 1;
 
                         rij[0] = (ai[ip] * ri[0] + aj[jp] * rj[0]) / aij;
                         rij[1] = (ai[ip] * ri[1] + aj[jp] * rj[1]) / aij;
@@ -218,7 +216,7 @@ int cint1e_nuc_loop(double *gctr, const int *ng, const double fac,
         free(gout);
         free(gctri);
 
-        return g_is_0;
+        return has_value;
 }
 
 
@@ -241,12 +239,12 @@ int cint1e_drv(double *opij, int *ng, const double fac,
         const int nc = nfi * nfj * i_ctr * j_ctr * ng[POS_E1];
         int ip, jp, nop;
         int n;
-        int g_is_0;
+        int has_value;
         double *const gctr = (double *)malloc(sizeof(double) * nc * ng[TENSOR]);
         double *pgctr = gctr;
 
-        g_is_0 = cint1e_loop(gctr, ng, fac, f_gout,
-                             shls, atm, bas, env);
+        has_value = cint1e_loop(gctr, ng, fac, f_gout,
+                                shls, atm, bas, env);
 
         if (f_c2s == c2s_sph_1e) {
                 ip = cgtos_spheric(i_sh, bas);
@@ -262,7 +260,7 @@ int cint1e_drv(double *opij, int *ng, const double fac,
                 nop = ip * jp * OF_CMPLX;
         }
 
-        if (g_is_0) {
+        if (!has_value) {
                 dset0(nop * ng[TENSOR], opij);
         } else {
                 for (n = 0; n < ng[TENSOR]; n++) {
@@ -272,7 +270,7 @@ int cint1e_drv(double *opij, int *ng, const double fac,
                 }
         }
         free(gctr);
-        return !g_is_0;
+        return has_value;
 }
 
 
@@ -295,13 +293,13 @@ int cint1e_rinv_drv(double *opij, int *ng, const double fac,
         const int nc = nfi * nfj * i_ctr * j_ctr * ng[POS_E1];
         int ip, jp, nop;
         int n;
-        int g_is_0;
+        int has_value;
         double *const gctr = (double *)malloc(sizeof(double) * nc * ng[TENSOR]);
         double *pgctr = gctr;
 
         ng[RYS_ROOTS] = (ng[0] + 1) / 2; // li + lj + 2
-        g_is_0 = cint1e_nuc_loop(gctr, ng, fac, f_gout, -1,
-                                 shls, atm, bas, env);
+        has_value = cint1e_nuc_loop(gctr, ng, fac, f_gout, -1,
+                                    shls, atm, bas, env);
 
         if (f_c2s == c2s_sph_1e) {
                 ip = cgtos_spheric(i_sh, bas);
@@ -317,7 +315,7 @@ int cint1e_rinv_drv(double *opij, int *ng, const double fac,
                 nop = ip * jp * OF_CMPLX;
         }
 
-        if (g_is_0) {
+        if (!has_value) {
                 dset0(nop * ng[TENSOR], opij);
         } else {
                 for (n = 0; n < ng[TENSOR]; n++) {
@@ -327,7 +325,7 @@ int cint1e_rinv_drv(double *opij, int *ng, const double fac,
                 }
         }
         free(gctr);
-        return !g_is_0;
+        return has_value;
 }
 
 
@@ -351,19 +349,19 @@ int cint1e_nuc_drv(double *opij, int *ng, const double fac,
         const int nc = nfi * nfj * i_ctr * j_ctr * ng[POS_E1];
         int ip, jp, nop;
         int i, n;
-        int g_is_0, is_0;
+        int has_value, neq_0;
         double *const gctr = (double *)malloc(sizeof(double) * nc * ng[TENSOR]);
         double *const gctr0 = (double *)malloc(sizeof(double) * nc * ng[TENSOR]);
         double *pgctr = gctr;
 
         ng[RYS_ROOTS] = (ng[0] + 1) / 2; // li + lj + 2
         dset0(nc * ng[TENSOR], gctr);
-        g_is_0 = 1;
+        has_value = 0;
         for (n = 0; n < natm; n++) {
-                is_0 = cint1e_nuc_loop(gctr0, ng, fac, f_gout, n,
-                                       shls, atm, bas, env);
-                if (!is_0) {
-                        g_is_0 = 0;
+                neq_0 = cint1e_nuc_loop(gctr0, ng, fac, f_gout, n,
+                                        shls, atm, bas, env);
+                if (neq_0) {
+                        has_value = 1;
                         for (i = 0; i < nc * ng[TENSOR]; i++) {
                                 gctr[i] += -abs(atm(CHARGE_OF,n)) * gctr0[i];
                         }
@@ -384,7 +382,7 @@ int cint1e_nuc_drv(double *opij, int *ng, const double fac,
                 nop = ip * jp * OF_CMPLX;
         }
 
-        if (g_is_0) {
+        if (!has_value) {
                 dset0(nop * ng[TENSOR], opij);
         } else {
                 for (n = 0; n < ng[TENSOR]; n++) {
@@ -395,7 +393,7 @@ int cint1e_nuc_drv(double *opij, int *ng, const double fac,
         }
         free(gctr0);
         free(gctr);
-        return !g_is_0;
+        return has_value;
 }
 
 
