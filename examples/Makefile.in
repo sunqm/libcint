@@ -220,7 +220,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -g -O2
 AM_CPPFLAGS = -I$(top_srcdir)/src/include
 AM_LDFLAGS = -L../src -lcint
 cartesian_c_SOURCES = c_call_cartesian.c

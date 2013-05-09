@@ -57,7 +57,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_drv(opij, ng, 1.0,
+return cint1e_drv(opij, ng, 1,
 gout1e_cint1e_ipovlp_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ipovlp_cart)
@@ -193,7 +193,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_nuc_drv(opij, ng, 1.0,
+return cint1e_nuc_drv(opij, ng, 1,
 gout1e_cint1e_ipnuc_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ipnuc_cart)
@@ -243,7 +243,7 @@ ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_rinv_drv(opij, ng, 1.0,
+return cint1e_rinv_drv(opij, ng, 1,
 gout1e_cint1e_iprinv_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_iprinv_cart)
@@ -287,7 +287,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_rinv_drv(opij, ng, 1.0,
+return cint1e_rinv_drv(opij, ng, 1,
 gout1e_cint1e_rinv_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_rinv_cart)
@@ -354,7 +354,7 @@ ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[POS_E2] = 1;
 ng[TENSOR] = 3;
-return cint2e_drv(opkijl, ng, 1.0,
+return cint2e_drv(opkijl, ng, 1,
 gout2e_cint2e_ip1_cart, &c2s_cart_2e1, &c2s_cart_2e2,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_ip1_cart)

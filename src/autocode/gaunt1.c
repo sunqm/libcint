@@ -97,7 +97,7 @@ ng[GSHIFT] = 2;
 ng[POS_E1] = 4;
 ng[POS_E2] = 4;
 ng[TENSOR] = 1;
-return cint2e_drv(opkijl, ng, 1.0,
+return cint2e_drv(opkijl, ng, 1,
 gout2e_cint2e_ssp1ssp2, &c2s_si_2e1i, &c2s_si_2e2i,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_ssp1ssp2)

@@ -51,7 +51,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_drv(opij, ng, 1.0,
+return cint1e_drv(opij, ng, 1,
 gout1e_cint1e_ovlp_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ovlp_cart)
@@ -95,7 +95,7 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
 ng[POS_E1] = 1;
 ng[TENSOR] = 1;
-return cint1e_nuc_drv(opij, ng, 1.0,
+return cint1e_nuc_drv(opij, ng, 1,
 gout1e_cint1e_nuc_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_nuc_cart)
@@ -180,8 +180,10 @@ double *g3 = g2  + ng[0] * ng[1] * 3;
 double *g4 = g3  + ng[0] * ng[1] * 3;
 double s[9];
 G1E_D_J(g1, g0, i_l+0, j_l+0);
-G1E_D_J(g2, g0, i_l+0, j_l+1);
-G1E_D_I(g3, g0, i_l+0, j_l+1);
+G1E_D_J(g2, g0, i_l+0
+, j_l+1);
+G1E_D_I(g3, g0, i_l+0
+, j_l+1);
 n = ng[0] * ng[1] * 3;
 daxpy_(&n, &D1, g3, &INC1, g2, &INC1);
 G1E_D_J(g3, g2, i_l+0, j_l+0);
@@ -216,12 +218,12 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_rinv_drv(opij, ng, 1.0,
+return cint1e_rinv_drv(opij, ng, 1,
 gout1e_cint1e_ia01p_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ia01p_cart)
-/* <i|OVLP |RI CROSS P j> */
-static void gout1e_cint1e_irixp_cart(double *g, const int *ng,
+/* <i|OVLP |R CROSS P j> */
+static void gout1e_cint1e_giao_irjxp_cart(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls, const int *atm, const int *bas, const double *env) {
@@ -242,12 +244,8 @@ double *g2 = g1  + ng[0] * ng[1] * 3;
 double *g3 = g2  + ng[0] * ng[1] * 3;
 double *g4 = g3  + ng[0] * ng[1] * 3;
 double s[9];
-double drj[3];
-drj[0] = rj[0] - ri[0];
-drj[1] = rj[1] - ri[1];
-drj[2] = rj[2] - ri[2];
 G1E_D_J(g1, g0, i_l+0, j_l+0);
-G1E_RCJ(g2, g0, i_l+0, j_l+1);
+G1E_R_J(g2, g0, i_l+0, j_l+1);
 G1E_D_J(g3, g2, i_l+0, j_l+0);
 for (n = 0; n < nf; n++) {
 ix = idx[n];
@@ -267,7 +265,7 @@ gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
 gout += 3;
 }}
-int cint1e_irixp_cart(double *opij, const int *shls,
+int cint1e_giao_irjxp_cart(double *opij, const int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
@@ -280,12 +278,12 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_drv(opij, ng, 1.0,
-gout1e_cint1e_irixp_cart, &c2s_cart_1e,
+return cint1e_drv(opij, ng, 1,
+gout1e_cint1e_giao_irjxp_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
-C2F_(cint1e_irixp_cart)
+C2F_(cint1e_giao_irjxp_cart)
 /* <i|OVLP |RC CROSS P j> */
-static void gout1e_cint1e_ircxp_cart(double *g, const int *ng,
+static void gout1e_cint1e_cg_irxp_cart(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls, const int *atm, const int *bas, const double *env) {
@@ -331,7 +329,7 @@ gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
 gout += 3;
 }}
-int cint1e_ircxp_cart(double *opij, const int *shls,
+int cint1e_cg_irxp_cart(double *opij, const int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
@@ -344,12 +342,158 @@ ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
-return cint1e_drv(opij, ng, 1.0,
-gout1e_cint1e_ircxp_cart, &c2s_cart_1e,
+return cint1e_drv(opij, ng, 1,
+gout1e_cint1e_cg_irxp_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
-C2F_(cint1e_ircxp_cart)
-/* <P DOT P i|OVLP |G j> */
-static void gout1e_cint1e_iking_cart(double *g, const int *ng,
+C2F_(cint1e_cg_irxp_cart)
+/* <i|NABLA-RINV |R j> */
+static void gout1e_cint1e_giao_a11part_cart(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+int ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + ng[0] * ng[1] * 3;
+double *g2 = g1  + ng[0] * ng[1] * 3;
+double *g3 = g2  + ng[0] * ng[1] * 3;
+double *g4 = g3  + ng[0] * ng[1] * 3;
+double s[9];
+G1E_R_J(g1, g0, i_l+0, j_l+0);
+G1E_D_J(g2, g0, i_l+0
+, j_l+1);
+G1E_D_I(g3, g0, i_l+0
+, j_l+1);
+n = ng[0] * ng[1] * 3;
+daxpy_(&n, &D1, g3, &INC1, g2, &INC1);
+G1E_R_J(g3, g2, i_l+0, j_l+0);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (1*s[0]);
+gout[1] += + (1*s[1]);
+gout[2] += + (1*s[2]);
+gout[3] += + (1*s[3]);
+gout[4] += + (1*s[4]);
+gout[5] += + (1*s[5]);
+gout[6] += + (1*s[6]);
+gout[7] += + (1*s[7]);
+gout[8] += + (1*s[8]);
+gout += 9;
+}}
+int cint1e_giao_a11part_cart(double *opij, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[1] = j_l + 2 + 1;
+ng[0] = i_l + 0 + ng[1];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 1;
+ng[TENSOR] = 9;
+return cint1e_rinv_drv(opij, ng, -0.5,
+gout1e_cint1e_giao_a11part_cart, &c2s_cart_1e,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint1e_giao_a11part_cart)
+/* <i|NABLA-RINV |RC j> */
+static void gout1e_cint1e_cg_a11part_cart(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+int ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + ng[0] * ng[1] * 3;
+double *g2 = g1  + ng[0] * ng[1] * 3;
+double *g3 = g2  + ng[0] * ng[1] * 3;
+double *g4 = g3  + ng[0] * ng[1] * 3;
+double s[9];
+double drj[3];
+drj[0] = rj[0] - env[PTR_COMMON_ORIG+0];
+drj[1] = rj[1] - env[PTR_COMMON_ORIG+1];
+drj[2] = rj[2] - env[PTR_COMMON_ORIG+2];
+G1E_RCJ(g1, g0, i_l+0, j_l+0);
+G1E_D_J(g2, g0, i_l+0
+, j_l+1);
+G1E_D_I(g3, g0, i_l+0
+, j_l+1);
+n = ng[0] * ng[1] * 3;
+daxpy_(&n, &D1, g3, &INC1, g2, &INC1);
+G1E_RCJ(g3, g2, i_l+0, j_l+0);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (1*s[0]);
+gout[1] += + (1*s[1]);
+gout[2] += + (1*s[2]);
+gout[3] += + (1*s[3]);
+gout[4] += + (1*s[4]);
+gout[5] += + (1*s[5]);
+gout[6] += + (1*s[6]);
+gout[7] += + (1*s[7]);
+gout[8] += + (1*s[8]);
+gout += 9;
+}}
+int cint1e_cg_a11part_cart(double *opij, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[1] = j_l + 2 + 1;
+ng[0] = i_l + 0 + ng[1];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 1;
+ng[TENSOR] = 9;
+return cint1e_rinv_drv(opij, ng, -0.5,
+gout1e_cint1e_cg_a11part_cart, &c2s_cart_1e,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint1e_cg_a11part_cart)
+/* <G i|NABLA-RINV CROSS P |j> */
+static void gout1e_cint1e_a01gp_cart(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls, const int *atm, const int *bas, const double *env) {
@@ -381,13 +525,18 @@ rirj[2] = ri[2] - rj[2];
 c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
-G1E_R0J(g1, g0, i_l+2, j_l+0);
-G1E_D_I(g2, g0, i_l+1, j_l);
-G1E_D_I(g3, g1, i_l+1, j_l);
-G1E_D_I(g4, g0, i_l+0, j_l);
-G1E_D_I(g5, g1, i_l+0, j_l);
-G1E_D_I(g6, g2, i_l+0, j_l);
-G1E_D_I(g7, g3, i_l+0, j_l);
+G1E_D_J(g1, g0, i_l+1, j_l+0);
+G1E_D_J(g2, g0, i_l+1
+, j_l+1);
+G1E_D_I(g3, g0, i_l+1
+, j_l+1);
+n = ng[0] * ng[1] * 3;
+daxpy_(&n, &D1, g3, &INC1, g2, &INC1);
+G1E_D_J(g3, g2, i_l+1, j_l+0);
+G1E_R0I(g4, g0, i_l+0, j_l);
+G1E_R0I(g5, g1, i_l+0, j_l);
+G1E_R0I(g6, g2, i_l+0, j_l);
+G1E_R0I(g7, g3, i_l+0, j_l);
 for (n = 0; n < nf; n++) {
 ix = idx[n];
 iy = idy[n];
@@ -419,12 +568,18 @@ s[23] = g0[ix] * g2[iy] * g5[iz];
 s[24] = g1[ix] * g0[iy] * g6[iz];
 s[25] = g0[ix] * g1[iy] * g6[iz];
 s[26] = g0[ix] * g0[iy] * g7[iz];
-gout[0] += + (1*c[1]*s[2]) + (1*c[1]*s[14]) + (1*c[1]*s[26]) + (-1*c[2]*s[1]) + (-1*c[2]*s[13]) + (-1*c[2]*s[25]);
-gout[1] += + (1*c[2]*s[0]) + (1*c[2]*s[12]) + (1*c[2]*s[24]) + (-1*c[0]*s[2]) + (-1*c[0]*s[14]) + (-1*c[0]*s[26]);
-gout[2] += + (1*c[0]*s[1]) + (1*c[0]*s[13]) + (1*c[0]*s[25]) + (-1*c[1]*s[0]) + (-1*c[1]*s[12]) + (-1*c[1]*s[24]);
-gout += 3;
+gout[0] += + (1*c[1]*s[23]) + (-1*c[2]*s[14]) + (-1*c[1]*s[25]) + (1*c[2]*s[16]);
+gout[1] += + (1*c[1]*s[24]) + (-1*c[2]*s[15]) + (-1*c[1]*s[20]) + (1*c[2]*s[11]);
+gout[2] += + (1*c[1]*s[19]) + (-1*c[2]*s[10]) + (-1*c[1]*s[21]) + (1*c[2]*s[12]);
+gout[3] += + (1*c[2]*s[5]) + (-1*c[0]*s[23]) + (-1*c[2]*s[7]) + (1*c[0]*s[25]);
+gout[4] += + (1*c[2]*s[6]) + (-1*c[0]*s[24]) + (-1*c[2]*s[2]) + (1*c[0]*s[20]);
+gout[5] += + (1*c[2]*s[1]) + (-1*c[0]*s[19]) + (-1*c[2]*s[3]) + (1*c[0]*s[21]);
+gout[6] += + (1*c[0]*s[14]) + (-1*c[1]*s[5]) + (-1*c[0]*s[16]) + (1*c[1]*s[7]);
+gout[7] += + (1*c[0]*s[15]) + (-1*c[1]*s[6]) + (-1*c[0]*s[11]) + (1*c[1]*s[2]);
+gout[8] += + (1*c[0]*s[10]) + (-1*c[1]*s[1]) + (-1*c[0]*s[12]) + (1*c[1]*s[3]);
+gout += 9;
 }}
-int cint1e_iking_cart(double *opij, const int *shls,
+int cint1e_a01gp_cart(double *opij, const int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
@@ -432,8 +587,106 @@ const int j_sh = shls[1];
 const int i_l = bas(ANG_OF, i_sh);
 const int j_l = bas(ANG_OF, j_sh);
 int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[1] = j_l + 1 + 1;
-ng[0] = i_l + 2 + ng[1];
+ng[1] = j_l + 2 + 1;
+ng[0] = i_l + 1 + ng[1];
+ng[GSHIFT] = 3;
+ng[POS_E1] = 1;
+ng[TENSOR] = 9;
+if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
+int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
+int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
+dset0(ip * jp * ng[TENSOR], opij);
+return 0; }
+return cint1e_rinv_drv(opij, ng, 0.5,
+gout1e_cint1e_a01gp_cart, &c2s_cart_1e,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint1e_a01gp_cart)
+/* <G i|OVLP |P DOT P j> */
+static void gout1e_cint1e_igkin_cart(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+int ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + ng[0] * ng[1] * 3;
+double *g2 = g1  + ng[0] * ng[1] * 3;
+double *g3 = g2  + ng[0] * ng[1] * 3;
+double *g4 = g3  + ng[0] * ng[1] * 3;
+double *g5 = g4  + ng[0] * ng[1] * 3;
+double *g6 = g5  + ng[0] * ng[1] * 3;
+double *g7 = g6  + ng[0] * ng[1] * 3;
+double *g8 = g7  + ng[0] * ng[1] * 3;
+double s[27];
+double rirj[3], c[3];
+rirj[0] = ri[0] - rj[0];
+rirj[1] = ri[1] - rj[1];
+rirj[2] = ri[2] - rj[2];
+c[0] = 1 * rirj[0];
+c[1] = 1 * rirj[1];
+c[2] = 1 * rirj[2];
+G1E_D_J(g1, g0, i_l+1, j_l+0);
+G1E_D_J(g2, g0, i_l+1, j_l+1);
+G1E_D_J(g3, g2, i_l+1, j_l+0);
+G1E_R0I(g4, g0, i_l+0, j_l);
+G1E_R0I(g5, g1, i_l+0, j_l);
+G1E_R0I(g6, g2, i_l+0, j_l);
+G1E_R0I(g7, g3, i_l+0, j_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+s[0] = g7[ix] * g0[iy] * g0[iz];
+s[1] = g6[ix] * g1[iy] * g0[iz];
+s[2] = g6[ix] * g0[iy] * g1[iz];
+s[3] = g5[ix] * g2[iy] * g0[iz];
+s[4] = g4[ix] * g3[iy] * g0[iz];
+s[5] = g4[ix] * g2[iy] * g1[iz];
+s[6] = g5[ix] * g0[iy] * g2[iz];
+s[7] = g4[ix] * g1[iy] * g2[iz];
+s[8] = g4[ix] * g0[iy] * g3[iz];
+s[9] = g3[ix] * g4[iy] * g0[iz];
+s[10] = g2[ix] * g5[iy] * g0[iz];
+s[11] = g2[ix] * g4[iy] * g1[iz];
+s[12] = g1[ix] * g6[iy] * g0[iz];
+s[13] = g0[ix] * g7[iy] * g0[iz];
+s[14] = g0[ix] * g6[iy] * g1[iz];
+s[15] = g1[ix] * g4[iy] * g2[iz];
+s[16] = g0[ix] * g5[iy] * g2[iz];
+s[17] = g0[ix] * g4[iy] * g3[iz];
+s[18] = g3[ix] * g0[iy] * g4[iz];
+s[19] = g2[ix] * g1[iy] * g4[iz];
+s[20] = g2[ix] * g0[iy] * g5[iz];
+s[21] = g1[ix] * g2[iy] * g4[iz];
+s[22] = g0[ix] * g3[iy] * g4[iz];
+s[23] = g0[ix] * g2[iy] * g5[iz];
+s[24] = g1[ix] * g0[iy] * g6[iz];
+s[25] = g0[ix] * g1[iy] * g6[iz];
+s[26] = g0[ix] * g0[iy] * g7[iz];
+gout[0] += + (1*c[1]*s[18]) + (-1*c[2]*s[9]) + (1*c[1]*s[22]) + (-1*c[2]*s[13]) + (1*c[1]*s[26]) + (-1*c[2]*s[17]);
+gout[1] += + (1*c[2]*s[0]) + (-1*c[0]*s[18]) + (1*c[2]*s[4]) + (-1*c[0]*s[22]) + (1*c[2]*s[8]) + (-1*c[0]*s[26]);
+gout[2] += + (1*c[0]*s[9]) + (-1*c[1]*s[0]) + (1*c[0]*s[13]) + (-1*c[1]*s[4]) + (1*c[0]*s[17]) + (-1*c[1]*s[8]);
+gout += 3;
+}}
+int cint1e_igkin_cart(double *opij, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[1] = j_l + 2 + 1;
+ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 3;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
@@ -443,11 +696,11 @@ int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
 dset0(ip * jp * ng[TENSOR], opij);
 return 0; }
 return cint1e_drv(opij, ng, 0.25,
-gout1e_cint1e_iking_cart, &c2s_cart_1e,
+gout1e_cint1e_igkin_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
-C2F_(cint1e_iking_cart)
-/* <i|OVLP |G j> */
-static void gout1e_cint1e_iovlpg_cart(double *g, const int *ng,
+C2F_(cint1e_igkin_cart)
+/* <G i|OVLP |j> */
+static void gout1e_cint1e_igovlp_cart(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls, const int *atm, const int *bas, const double *env) {
@@ -473,7 +726,7 @@ rirj[2] = ri[2] - rj[2];
 c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
-G1E_R0J(g1, g0, i_l+0, j_l+0);
+G1E_R0I(g1, g0, i_l+0, j_l);
 for (n = 0; n < nf; n++) {
 ix = idx[n];
 iy = idy[n];
@@ -486,7 +739,7 @@ gout[1] += + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
 gout[2] += + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
 gout += 3;
 }}
-int cint1e_iovlpg_cart(double *opij, const int *shls,
+int cint1e_igovlp_cart(double *opij, const int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
@@ -494,8 +747,8 @@ const int j_sh = shls[1];
 const int i_l = bas(ANG_OF, i_sh);
 const int j_l = bas(ANG_OF, j_sh);
 int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[1] = j_l + 1 + 1;
-ng[0] = i_l + 0 + ng[1];
+ng[1] = j_l + 0 + 1;
+ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
@@ -505,11 +758,11 @@ int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
 dset0(ip * jp * ng[TENSOR], opij);
 return 0; }
 return cint1e_drv(opij, ng, 0.5,
-gout1e_cint1e_iovlpg_cart, &c2s_cart_1e,
+gout1e_cint1e_igovlp_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
-C2F_(cint1e_iovlpg_cart)
-/* <i|NUC |G j> */
-static void gout1e_cint1e_inucg_cart(double *g, const int *ng,
+C2F_(cint1e_igovlp_cart)
+/* <G i|NUC |j> */
+static void gout1e_cint1e_ignuc_cart(double *g, const int *ng,
 double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls, const int *atm, const int *bas, const double *env) {
@@ -535,7 +788,7 @@ rirj[2] = ri[2] - rj[2];
 c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
-G1E_R0J(g1, g0, i_l+0, j_l+0);
+G1E_R0I(g1, g0, i_l+0, j_l);
 for (n = 0; n < nf; n++) {
 ix = idx[n];
 iy = idy[n];
@@ -548,7 +801,7 @@ gout[1] += + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
 gout[2] += + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
 gout += 3;
 }}
-int cint1e_inucg_cart(double *opij, const int *shls,
+int cint1e_ignuc_cart(double *opij, const int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
@@ -556,8 +809,8 @@ const int j_sh = shls[1];
 const int i_l = bas(ANG_OF, i_sh);
 const int j_l = bas(ANG_OF, j_sh);
 int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[1] = j_l + 1 + 1;
-ng[0] = i_l + 0 + ng[1];
+ng[1] = j_l + 0 + 1;
+ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[TENSOR] = 3;
@@ -567,9 +820,9 @@ int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
 dset0(ip * jp * ng[TENSOR], opij);
 return 0; }
 return cint1e_nuc_drv(opij, ng, 0.5,
-gout1e_cint1e_inucg_cart, &c2s_cart_1e,
+gout1e_cint1e_ignuc_cart, &c2s_cart_1e,
 shls, atm, natm, bas, nbas, env); }
-C2F_(cint1e_inucg_cart)
+C2F_(cint1e_ignuc_cart)
 /* <k G i|R12 |j l> : i,jin electron 1; k,lin electron 2
  * = (G i j|R12 |k l) */
 static void gout2e_cint2e_ig1_cart(double *g, const int *ng,

@@ -1,5 +1,5 @@
 
-AM_CFLAGS = -g -O2 -funroll-loops
+AM_CFLAGS = -funroll-loops
 AM_CPPFLAGS= -I$(top_srcdir)/src/include
 
 lib_LTLIBRARIES = libcint.la

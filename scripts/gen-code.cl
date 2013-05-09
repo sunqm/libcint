@@ -98,10 +98,10 @@
 (defun g?e-of (key)
   (case key
     ((p ip nabla px py pz) "D_")
-    ((r x y z) "R_")
-    ((ri rj rk rl) "RC")
-    ((r0 g) "R0")
-    ((rc) "RC")
+    ((r x y z) "R_") ; the vector origin is on the center of the basis it acts on
+    ((ri rj rk rl) "RC") ; the vector origin is R[ijkl]
+    ((r0 g) "R0") ; R0 ~ the vector origin is (0,0,0)
+    ((rc) "RC") ; the vector origin is set in env[PTR_COMMON_ORIG]
     ((nabla-rinv nabla-r12) "D_")
     (otherwise (error "unknown key ~a" key))))
 
@@ -300,8 +300,8 @@ double *g0 = g;~%")
         (format fout "double *g~a = g~a  + ng[0] * ng[1] * 3;~%" (1+ i) i))
       (format fout "double s[~a];~%" (expt 3 tot-len))
       (dump-declare-dri-for-rc fout bra-i "i")
-      (dump-declare-dri-for-rc fout ket-j "j")
-      (dump-declare-giao-ij fout bra-i ket-j)
+      (dump-declare-dri-for-rc fout (append op ket-j) "j")
+      (dump-declare-giao-ij fout bra-i (append op ket-j))
 ;;; generate g_(bin)
 ;;; for the operators act on the |ket>, the reversed scan order and r_combinator
 ;;; is required; for the operators acto on the <bra|, the normal scan order and

@@ -1,5 +1,4 @@
 
-AM_CFLAGS = -g -O2
 AM_CPPFLAGS= -I$(top_srcdir)/src/include
 AM_LDFLAGS = -L../src -lcint
 

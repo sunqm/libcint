@@ -25,20 +25,20 @@
 ;;; r12   = 1/r_12
 ;;; translate these keys in function dress-other combo-op
 (defparameter *one-electron-operator-keywords* '(ovlp rinv nuc nabla-rinv))
-(defparameter *two-electron-operator-keywords* '(r12 gaunt breit))
+(defparameter *two-electron-operator-keywords* '(r12 gaunt))
 
 ;;; *operator-keywords*: precedence from high to low
 ;;; translate these keys in function dress-vec and dress-comp ..
 (defparameter *operator-keywords* '(vec comp-x comp-y comp-z cross dot))
 ;;; p = -i \nabla
 ;;; ip = \nabla
-;;; r0 = r - 0
-;;; rc = r - R
+;;; r0 = r - (0,0,0)
+;;; rc = r - R(env[PTR_COMMON_ORIG])
 ;;; ri = r - R_i
 ;;; rj = r - R_j
 ;;; rk = r - R_k
 ;;; rl = r - R_l
-;;; r = ri/rj/rk/rl
+;;; r = ri/rj/rk/rl; associate with the basis it acts on
 ;;; g = (R_m - R_n) cross r0
 ;;; modify dress-other cons-bra-ket g?e-of factor-of if add new keys
 (defparameter *intvar-keywords* '(p ip nabla r r0 rc ri rj rk rl g x y z px py pz))
@@ -136,7 +136,7 @@
                (make-cell 1 '() '(nabla-rinv y))
                (make-cell 1 '() '(nabla-rinv z))))
     ((ovlp) (make-cell 1 '() '()))
-    ((r12 gaunt breit) ; *two-electron-operator-keywords*
+    ((r12 gaunt) ; *two-electron-operator-keywords*
      (make-cell 1 '() (make-op 'r12 'S)))
     (otherwise (if (numberp item)
                  (make-cell item '() '()) ; factor
@@ -350,7 +350,7 @@
                    ;                `(-1 p ,@ket)))
                    (t (dagger-append (cdr bra)
                                      (cons (car bra) ket))))))
-    ; when bra is reversed, each operator cross gives -1 and p^* = -p
+    ; when bra is reversed, every 'cross gives -1 and p^* = -p
     (let ((fac (* (expt -1 (count 'p bra))
                   (expt -1 (count 'cross bra)))))
       (cons fac (dagger-append bra (append op ket))))))
@@ -428,6 +428,7 @@
                                (or (numberp x)
                                    (member x '(sigma))
                                    (member x *operator-keywords*)
+                                   (member x *intvar-keywords*)
                                    (member x *one-electron-operator-keywords*)
                                    (member x *two-electron-operator-keywords*)))
                              op)))
@@ -453,8 +454,6 @@
         ; two-electron integrals
         (cond ((member 'gaunt op)
                (eval-int-gaunt phasefac op ops-i ops-j ops-k ops-l))
-              ((member 'breit op)
-               (error "not support breit"))
               ((member 'r12 op)
                (eval-int-r12 phasefac op ops-i ops-j ops-k ops-l))
               (t (error "unsupport operator ~s" op)))))))

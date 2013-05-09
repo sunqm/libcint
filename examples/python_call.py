@@ -1,3 +1,4 @@
+from math import *
 import numpy
 import ctypes
 
@@ -21,11 +22,22 @@ def kappa_of(bas_id):
 
 def coeff_of(bas_id):
     # 3 primitive-GTO -> 2 contracted-GTO
-    return numpy.random.random((3,2)).flatten(order='F')
+    c = numpy.random.random((3,2)).flatten(order='F')
+    n = angular_of(bas_id)
+    # absorb the normalization factor of primitive GTO into coefficients
+    for i, a in enumerate(exponent_of(bas_id)):
+        c[i,:] *= gto_norm(a, n)
+    return c
 
 def exponent_of(bas_id):
     # 3 primitive-GTO -> 2 contracted-GTO
     return numpy.random.random(3)
+
+def gto_norm(n, a):
+    # normalization factor of function r^n e^{-a r^2}
+    s = 2**(2*n+3) * factorial(n+1) * (2*a)**(n+1.5) \
+            / (factorial(2*n+2) * sqrt(pi))
+    return sqrt(s)
 
 ptr_env = 10
 atm = []
@@ -62,6 +74,6 @@ di = _cint.cgtos_spheric(ctypes.c_int(0), c_bas)
 dj = _cint.cgtos_spheric(ctypes.c_int(1), c_bas)
 
 c_shls = (ctypes.c_int * 2)(0, 1)
-buf = numpy.empty(di.value, dj.value)
+buf = numpy.empty((di.value, dj.value))
 c_buf = buf.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
 _cint.cint1e_ovlp_sph(c_buf, c_shls, c_atm, c_natm, c_bas, c_nbas, c_env)
