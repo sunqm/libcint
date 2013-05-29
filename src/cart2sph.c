@@ -2437,8 +2437,1413 @@ static struct cart2sp_t g_c2s[6] = {
         {g_trans_cart2sph+110, g_trans_cart2j+880 , g_trans_cart2j+1360},
         {g_trans_cart2sph+245, g_trans_cart2j+1960, g_trans_cart2j+2800}};
 
+// transform integrals from cartesian to spheric
+static void a_bra_cart2spheric(double *gsph, int dgsph, int nket,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double D0 = 0;
+        const double D1 = 1;
+        const char TRANS_T = 'T';
+        const char TRANS_N = 'N';
+        const int l = bas(ANG_OF, bas_id);
+        const int nf = len_cart(l);
+        const int nd = l * 2 + 1;
+        dgemm_(&TRANS_T, &TRANS_N, &nd, &nket, &nf,
+               &D1, g_c2s[l].cart2sph, &nf, gcart, &nf,
+               &D0, gsph, &dgsph);
+}
+
+static void a_ket_cart2spheric(double *gsph, int dgsph, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double D0 = 0;
+        const double D1 = 1;
+        const char TRANS_N = 'N';
+        const int l = bas(ANG_OF, bas_id);
+        const int nf = len_cart(l);
+        const int nd = l * 2 + 1;
+        dgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &D1, gcart, &nbra, g_c2s[l].cart2sph, &nf,
+               &D0, gsph, &dgsph);
+}
+
+// transform s function from cartesian to spheric
+static void s_bra_cart2spheric(double *gsph, int dgsph, int nket,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2sph;
+        int i;
+        for (i = 0; i < nket; i++) {
+                *gsph = coeff_c2s[0] * gcart[i];
+                gsph += dgsph;
+        }
+}
+static void s_ket_cart2spheric(double *gsph, int dgsph, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2sph;
+        int i;
+        for (i = 0; i < nbra; i++) {
+                gsph[i] = coeff_c2s[0] * gcart[i];
+        }
+}
+
+// transform p function from cartesian to spheric
+static void p_bra_cart2spheric(double *gsph, int dgsph, int nket,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[1].cart2sph;
+        int i;
+        for (i = 0; i < nket; i++) {
+                gsph[0] = coeff_c2s[1] * gcart[1];
+                gsph[1] = coeff_c2s[5] * gcart[2];
+                gsph[2] = coeff_c2s[6] * gcart[0];
+                gsph += dgsph;
+                gcart += 3;
+        }
+}
+static void p_ket_cart2spheric(double *gsph, int dgsph, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[1].cart2sph;
+        int i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*dgsph+i] = coeff_c2s[1] * gcart[1*nbra+i];
+                gsph[1*dgsph+i] = coeff_c2s[5] * gcart[2*nbra+i];
+                gsph[2*dgsph+i] = coeff_c2s[6] * gcart[0*nbra+i];
+        }
+}
+
+// transform d function from cartesian to spheric
+static void d_bra_cart2spheric(double *gsph, int dgsph, int nket,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[2].cart2sph;
+        int i;
+        for (i = 0; i < nket; i++) {
+                gsph[0] = coeff_c2s[ 1] * gcart[1];
+                gsph[1] = coeff_c2s[10] * gcart[4];
+                gsph[2] = coeff_c2s[12] * gcart[0]
+                        + coeff_c2s[15] * gcart[3]
+                        + coeff_c2s[17] * gcart[5];
+                gsph[3] = coeff_c2s[20] * gcart[2];
+                gsph[4] = coeff_c2s[24] * gcart[0]
+                        + coeff_c2s[27] * gcart[3];
+                gsph += dgsph;
+                gcart += 6;
+        }
+}
+static void d_ket_cart2spheric(double *gsph, int dgsph, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[2].cart2sph;
+        int i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*dgsph+i] = coeff_c2s[ 1] * gcart[1*nbra+i];
+                gsph[1*dgsph+i] = coeff_c2s[10] * gcart[4*nbra+i];
+                gsph[2*dgsph+i] = coeff_c2s[12] * gcart[0*nbra+i]
+                                + coeff_c2s[15] * gcart[3*nbra+i]
+                                + coeff_c2s[17] * gcart[5*nbra+i];
+                gsph[3*dgsph+i] = coeff_c2s[20] * gcart[2*nbra+i];
+                gsph[4*dgsph+i] = coeff_c2s[24] * gcart[0*nbra+i]
+                                + coeff_c2s[27] * gcart[3*nbra+i];
+        }
+}
+
+// transform f function from cartesian to spheric
+static void f_bra_cart2spheric(double *gsph, int dgsph, int nket,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[3].cart2sph;
+        int i;
+        for (i = 0; i < nket; i++) {
+                gsph[0] = coeff_c2s[ 1] * gcart[1]
+                        + coeff_c2s[ 6] * gcart[6];
+                gsph[1] = coeff_c2s[14] * gcart[4];
+                gsph[2] = coeff_c2s[21] * gcart[1]
+                        + coeff_c2s[26] * gcart[6]
+                        + coeff_c2s[28] * gcart[8];
+                gsph[3] = coeff_c2s[32] * gcart[2]
+                        + coeff_c2s[37] * gcart[7]
+                        + coeff_c2s[39] * gcart[9];
+                gsph[4] = coeff_c2s[40] * gcart[0]
+                        + coeff_c2s[43] * gcart[3]
+                        + coeff_c2s[45] * gcart[5];
+                gsph[5] = coeff_c2s[52] * gcart[2]
+                        + coeff_c2s[57] * gcart[7];
+                gsph[6] = coeff_c2s[60] * gcart[0]
+                        + coeff_c2s[63] * gcart[3];
+                gsph += dgsph;
+                gcart += 10;
+        }
+
+}
+static void f_ket_cart2spheric(double *gsph, int dgsph, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[3].cart2sph;
+        int i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*dgsph+i] = coeff_c2s[ 1] * gcart[1*nbra+i]
+                                + coeff_c2s[ 6] * gcart[6*nbra+i];
+                gsph[1*dgsph+i] = coeff_c2s[14] * gcart[4*nbra+i];
+                gsph[2*dgsph+i] = coeff_c2s[21] * gcart[1*nbra+i]
+                                + coeff_c2s[26] * gcart[6*nbra+i]
+                                + coeff_c2s[28] * gcart[8*nbra+i];
+                gsph[3*dgsph+i] = coeff_c2s[32] * gcart[2*nbra+i]
+                                + coeff_c2s[37] * gcart[7*nbra+i]
+                                + coeff_c2s[39] * gcart[9*nbra+i];
+                gsph[4*dgsph+i] = coeff_c2s[40] * gcart[0*nbra+i]
+                                + coeff_c2s[43] * gcart[3*nbra+i]
+                                + coeff_c2s[45] * gcart[5*nbra+i];
+                gsph[5*dgsph+i] = coeff_c2s[52] * gcart[2*nbra+i]
+                                + coeff_c2s[57] * gcart[7*nbra+i];
+                gsph[6*dgsph+i] = coeff_c2s[60] * gcart[0*nbra+i]
+                                + coeff_c2s[63] * gcart[3*nbra+i];
+        }
+}
+
+static void (*f_bra_sph[6])() = {
+        s_bra_cart2spheric,
+        p_bra_cart2spheric,
+        d_bra_cart2spheric,
+        f_bra_cart2spheric,
+        a_bra_cart2spheric,
+        a_bra_cart2spheric,
+};
+
+static void (*f_ket_sph[6])() = {
+        s_ket_cart2spheric,
+        p_ket_cart2spheric,
+        d_ket_cart2spheric,
+        f_ket_cart2spheric,
+        a_ket_cart2spheric,
+        a_ket_cart2spheric,
+};
 
 
+// transform spin free integrals from cartesian to spinor
+static void a_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const double Z0[] = {0, 0};
+        const double Z1[] = {1, 0};
+        const char TRANS_C = 'C';
+        const char TRANS_N = 'N';
+        const int l = bas(ANG_OF, bas_id);
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const int nf = len_cart(l);
+        const int nf2 = nf * 2;
+        const int nd = len_spinor(bas_id, bas);
+        const double *coeff_c2s;
+
+        if (kappa < 0) { // j = l + 1/2
+                coeff_c2s = g_c2s[l].cart2j_gt_l;
+        } else {
+                coeff_c2s = g_c2s[l].cart2j_lt_l;
+        }
+        zgemm_(&TRANS_C, &TRANS_N, &nd, &nket, &nf,
+               Z1, coeff_c2s, &nf2, gcart, &nf, Z0, gsp, &dgsp);
+        zgemm_(&TRANS_C, &TRANS_N, &nd, &nket, &nf,
+               Z1, coeff_c2s+nf*OF_CMPLX, &nf2, gcart, &nf,
+               Z0, gsp+dgsp*nket*OF_CMPLX, &dgsp);
+}
+static void a_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
+                                   double *gcart, int bas_id, int bas[])
+{
+        const int l = bas(ANG_OF, bas_id);
+        const int nf = len_cart(l);
+        double *tmp1 = (double *)malloc(sizeof(double)*nf*nket*OF_CMPLX);
+
+        dcmplx_re(nf*nket, tmp1, gcart);
+        a_bra_cart2spinor_sf(gsp, dgsp, nket, tmp1, bas_id, bas);
+        free(tmp1);
+}
+
+static void a_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const double Z0[] = {0, 0};
+        const double Z1[] = {1, 0};
+        const char TRANS_C = 'C';
+        const char TRANS_N = 'N';
+        const int l = bas(ANG_OF, bas_id);
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const int nf = len_cart(l);
+        const int nf2 = nf * 2;
+        const int nd = len_spinor(bas_id, bas);
+        const double *coeff_c2s;
+
+        if (kappa < 0) { // j = l + 1/2
+                coeff_c2s = g_c2s[l].cart2j_gt_l;
+        } else {
+                coeff_c2s = g_c2s[l].cart2j_lt_l;
+        }
+        zgemm_(&TRANS_C, &TRANS_N, &nd, &nket, &nf,
+               Z1, coeff_c2s, &nf2, gcart, &nf, Z0, gsp, &dgsp);
+        zgemm_(&TRANS_C, &TRANS_N, &nd, &nket, &nf,
+               Z1, coeff_c2s+nf*OF_CMPLX, &nf2,
+               gcart+nf*nket*OF_CMPLX, &nf, Z1, gsp, &dgsp);
+}
+
+static void a_ket_cart2spinor(double *gsp, int dgsp, int nbra,
+                              double *gcart, int bas_id, int bas[])
+{
+        const double Z0[] = {0, 0};
+        const double Z1[] = {1, 0};
+        const char TRANS_N = 'N';
+        const int l = bas(ANG_OF, bas_id);
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const int nf = len_cart(l);
+        const int nf2 = nf * 2;
+        const int nd = len_spinor(bas_id, bas);
+        const double *coeff_c2s;
+
+        if (kappa < 0) { // j = l + 1/2
+                coeff_c2s = g_c2s[l].cart2j_gt_l;
+        } else {
+                coeff_c2s = g_c2s[l].cart2j_lt_l;
+        }
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf2,
+               Z1, gcart, &nbra, coeff_c2s, &nf2, Z0, gsp, &dgsp);
+}
+// with phase "i"
+static void a_iket_cart2spinor(double *gsp, int dgsp, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double Z0[] = {0, 0};
+        const double ZI[] = {0, 1};
+        const char TRANS_N = 'N';
+        const int l = bas(ANG_OF, bas_id);
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const int nf = len_cart(l);
+        const int nf2 = nf * 2;
+        const int nd = len_spinor(bas_id, bas);
+        const double *coeff_c2s;
+
+        if (kappa < 0) { // j = l + 1/2
+                coeff_c2s = g_c2s[l].cart2j_gt_l;
+        } else {
+                coeff_c2s = g_c2s[l].cart2j_lt_l;
+        }
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf2,
+               ZI, gcart, &nbra, coeff_c2s, &nf2, Z0, gsp, &dgsp);
+}
+
+static void s_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
+        double *gcart0 = gcart;
+        int i;
+        for (i = 0; i < nket; i++) {
+                gsp[0] = 0;
+                gsp[1] = 0;
+                gsp[2] = coeff_c2s[4] * gcart[0];
+                gsp[3] = coeff_c2s[4] * gcart[1];
+                gsp += dgsp * OF_CMPLX;
+                gcart += OF_CMPLX;
+        }
+        gcart = gcart0;
+        for (i = 0; i < nket; i++) {
+                gsp[0] = coeff_c2s[2] * gcart[0];
+                gsp[1] = coeff_c2s[2] * gcart[1];
+                gsp[2] = 0;
+                gsp[3] = 0;
+                gsp += dgsp * OF_CMPLX;
+                gcart += OF_CMPLX;
+        }
+}
+static void s_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
+                                   double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
+        int i;
+        for (i = 0; i < nket; i++) {
+                gsp[0] = 0;
+                gsp[1] = 0;
+                gsp[2] = coeff_c2s[4] * gcart[i];
+                gsp[3] = 0;
+                gsp += dgsp * OF_CMPLX;
+        }
+        for (i = 0; i < nket; i++) {
+                gsp[0] = coeff_c2s[2] * gcart[i];
+                gsp[1] = 0;
+                gsp[2] = 0;
+                gsp[3] = 0;
+                gsp += dgsp * OF_CMPLX;
+        }
+}
+static void s_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
+        double *gsp0 = gsp;
+        int i;
+        for (i = 0; i < nket; i++) {
+                gsp[2] = coeff_c2s[4] * gcart[0];
+                gsp[3] = coeff_c2s[4] * gcart[1];
+                gsp += dgsp * OF_CMPLX;
+                gcart += OF_CMPLX;
+        }
+        gsp = gsp0;
+        for (i = 0; i < nket; i++) {
+                gsp[0] = coeff_c2s[2] * gcart[0];
+                gsp[1] = coeff_c2s[2] * gcart[1];
+                gsp += dgsp * OF_CMPLX;
+                gcart += OF_CMPLX;
+        }
+}
+static void s_ket_cart2spinor(double *gsp, int dgsp, int nbra,
+                              double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
+        int i;
+        for (i = 0; i < nbra; i++) {
+                gsp[             +0] = coeff_c2s[2] * gcart[2*nbra];
+                gsp[             +1] = coeff_c2s[2] * gcart[2*nbra+1];
+                gsp[dgsp*OF_CMPLX+0] = coeff_c2s[4] * gcart[0*nbra];
+                gsp[dgsp*OF_CMPLX+1] = coeff_c2s[4] * gcart[0*nbra+1];
+                gsp += OF_CMPLX;
+                gcart += OF_CMPLX;
+        }
+}
+static void s_iket_cart2spinor(double *gsp, int dgsp, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
+        int i;
+        for (i = 0; i < nbra; i++) {
+                gsp[             +0] =-coeff_c2s[2] * gcart[2*nbra+1];
+                gsp[             +1] = coeff_c2s[2] * gcart[2*nbra];
+                gsp[dgsp*OF_CMPLX+0] =-coeff_c2s[4] * gcart[0*nbra+1];
+                gsp[dgsp*OF_CMPLX+1] = coeff_c2s[4] * gcart[0*nbra];
+                gsp += OF_CMPLX;
+                gcart += OF_CMPLX;
+        }
+}
+
+static void p_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[1].cart2j_lt_l;
+                // spin-up part
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[0]*gcart[0] + coeff_c2s[3]*gcart[3];
+                        gsp[1] = coeff_c2s[0]*gcart[1] - coeff_c2s[3]*gcart[2];
+                        gsp[2] = coeff_c2s[16]*gcart[4];
+                        gsp[3] = coeff_c2s[16]*gcart[5];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                // spin-down part
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[10]*gcart[4];
+                        gsp[1] = coeff_c2s[10]*gcart[5];
+                        gsp[2] = coeff_c2s[18]*gcart[0] + coeff_c2s[21]*gcart[3];
+                        gsp[3] = coeff_c2s[18]*gcart[1] - coeff_c2s[21]*gcart[2];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 4;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[1].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = 0;
+                        gsp[1] = 0;
+                        gsp[2] = coeff_c2s[12]*gcart[0] + coeff_c2s[15]*gcart[3];
+                        gsp[3] = coeff_c2s[12]*gcart[1] - coeff_c2s[15]*gcart[2];
+                        gsp[4] = coeff_c2s[28]*gcart[4];
+                        gsp[5] = coeff_c2s[28]*gcart[5];
+                        gsp[6] = coeff_c2s[36]*gcart[0] + coeff_c2s[39]*gcart[3];
+                        gsp[7] = coeff_c2s[36]*gcart[1] - coeff_c2s[39]*gcart[2];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[6]*gcart[0] + coeff_c2s[9]*gcart[3];
+                        gsp[1] = coeff_c2s[6]*gcart[1] - coeff_c2s[9]*gcart[2];
+                        gsp[2] = coeff_c2s[22]*gcart[4];
+                        gsp[3] = coeff_c2s[22]*gcart[5];
+                        gsp[4] = coeff_c2s[30]*gcart[0] + coeff_c2s[33]*gcart[3];
+                        gsp[5] = coeff_c2s[30]*gcart[1] - coeff_c2s[33]*gcart[2];
+                        gsp[6] = 0;
+                        gsp[7] = 0;
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+        }
+}
+static void p_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
+                                   double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[1].cart2j_lt_l;
+                // spin-up part
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[0]*gcart[0];
+                        gsp[1] =-coeff_c2s[3]*gcart[1];
+                        gsp[2] = coeff_c2s[16]*gcart[2];
+                        gsp[3] = 0;
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3;
+                }
+                gcart = gcart0;
+                // spin-down part
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[10]*gcart[2];
+                        gsp[1] = 0;
+                        gsp[2] = coeff_c2s[18]*gcart[0];
+                        gsp[3] =-coeff_c2s[21]*gcart[1];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 4;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[1].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = 0;
+                        gsp[1] = 0;
+                        gsp[2] = coeff_c2s[12]*gcart[0];
+                        gsp[3] =-coeff_c2s[15]*gcart[1];
+                        gsp[4] = coeff_c2s[28]*gcart[2];
+                        gsp[5] = 0;
+                        gsp[6] = coeff_c2s[36]*gcart[0];
+                        gsp[7] =-coeff_c2s[39]*gcart[1];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[6]*gcart[0];
+                        gsp[1] =-coeff_c2s[9]*gcart[1];
+                        gsp[2] = coeff_c2s[22]*gcart[2];
+                        gsp[3] = 0;
+                        gsp[4] = coeff_c2s[30]*gcart[0];
+                        gsp[5] =-coeff_c2s[33]*gcart[1];
+                        gsp[6] = 0;
+                        gsp[7] = 0;
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3;
+                }
+        }
+}
+static void p_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[1].cart2j_lt_l;
+                // spin-up part
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = coeff_c2s[0]*gcart[0] + coeff_c2s[3]*gcart[3];
+                        gsp[1] = coeff_c2s[0]*gcart[1] - coeff_c2s[3]*gcart[2];
+                        gsp[2] = coeff_c2s[16]*gcart[4];
+                        gsp[3] = coeff_c2s[16]*gcart[5];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+                gsp = gsp0;
+                // spin-down part
+                for (i = 0; i < nket; i++) {
+                        gsp[0] += coeff_c2s[10]*gcart[4];
+                        gsp[1] += coeff_c2s[10]*gcart[5];
+                        gsp[2] += coeff_c2s[18]*gcart[0] + coeff_c2s[21]*gcart[3];
+                        gsp[3] += coeff_c2s[18]*gcart[1] - coeff_c2s[21]*gcart[2];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 4;
+                gsp0 = gsp0 + 4;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[1].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+                        gsp[0] = 0;
+                        gsp[1] = 0;
+                        gsp[2] = coeff_c2s[12]*gcart[0] + coeff_c2s[15]*gcart[3];
+                        gsp[3] = coeff_c2s[12]*gcart[1] - coeff_c2s[15]*gcart[2];
+                        gsp[4] = coeff_c2s[28]*gcart[4];
+                        gsp[5] = coeff_c2s[28]*gcart[5];
+                        gsp[6] = coeff_c2s[36]*gcart[0] + coeff_c2s[39]*gcart[3];
+                        gsp[7] = coeff_c2s[36]*gcart[1] - coeff_c2s[39]*gcart[2];
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+                gsp = gsp0;
+                for (i = 0; i < nket; i++) {
+                        gsp[0] += coeff_c2s[6]*gcart[0] + coeff_c2s[9]*gcart[3];
+                        gsp[1] += coeff_c2s[6]*gcart[1] - coeff_c2s[9]*gcart[2];
+                        gsp[2] += coeff_c2s[22]*gcart[4];
+                        gsp[3] += coeff_c2s[22]*gcart[5];
+                        gsp[4] += coeff_c2s[30]*gcart[0] + coeff_c2s[33]*gcart[3];
+                        gsp[5] += coeff_c2s[30]*gcart[1] - coeff_c2s[33]*gcart[2];
+                        gsp[6] += 0;
+                        gsp[7] += 0;
+                        gsp += dgsp * OF_CMPLX;
+                        gcart += 3 * OF_CMPLX;
+                }
+        }
+}
+static void p_ket_cart2spinor(double *gsp, int dgsp, int nbra,
+                              double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[1].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[              0] = coeff_c2s[0]*gcart[0*nbra] - coeff_c2s[3]*gcart[2*nbra+1] + coeff_c2s[10]*gcart[10*nbra];
+        gsp[              1] = coeff_c2s[0]*gcart[0*nbra+1] + coeff_c2s[3]*gcart[2*nbra] + coeff_c2s[10]*gcart[10*nbra+1];
+        gsp[dgsp*OF_CMPLX+0] = coeff_c2s[16]*gcart[4*nbra] + coeff_c2s[18]*gcart[6*nbra] - coeff_c2s[21]*gcart[8*nbra+1];
+        gsp[dgsp*OF_CMPLX+1] = coeff_c2s[16]*gcart[4*nbra+1] + coeff_c2s[18]*gcart[6*nbra+1] + coeff_c2s[21]*gcart[8*nbra];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + dgsp * OF_CMPLX * 2;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[1].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] = coeff_c2s[6]*gcart[6*nbra] - coeff_c2s[9]*gcart[8*nbra+1];
+        gsp[0*dgsp*OF_CMPLX+1] = coeff_c2s[6]*gcart[6*nbra+1] + coeff_c2s[9]*gcart[8*nbra];
+        gsp[1*dgsp*OF_CMPLX+0] = coeff_c2s[12]*gcart[0*nbra] - coeff_c2s[15]*gcart[2*nbra+1] + coeff_c2s[22]*gcart[10*nbra];
+        gsp[1*dgsp*OF_CMPLX+1] = coeff_c2s[12]*gcart[0*nbra+1] + coeff_c2s[15]*gcart[2*nbra] + coeff_c2s[22]*gcart[10*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+0] = coeff_c2s[28]*gcart[4*nbra] + coeff_c2s[30]*gcart[6*nbra] - coeff_c2s[33]*gcart[8*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+1] = coeff_c2s[28]*gcart[4*nbra+1] + coeff_c2s[30]*gcart[6*nbra+1] + coeff_c2s[33]*gcart[8*nbra];
+        gsp[3*dgsp*OF_CMPLX+0] = coeff_c2s[36]*gcart[0*nbra] - coeff_c2s[39]*gcart[2*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+1] = coeff_c2s[36]*gcart[0*nbra+1] + coeff_c2s[39]*gcart[2*nbra];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+        }
+}
+static void p_iket_cart2spinor(double *gsp, int dgsp, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[1].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[              0] =-(coeff_c2s[0]*gcart[0*nbra+1] + coeff_c2s[3]*gcart[2*nbra] + coeff_c2s[10]*gcart[10*nbra+1]);
+        gsp[              1] =  coeff_c2s[0]*gcart[0*nbra] - coeff_c2s[3]*gcart[2*nbra+1] + coeff_c2s[10]*gcart[10*nbra];
+        gsp[dgsp*OF_CMPLX+0] =-(coeff_c2s[16]*gcart[4*nbra+1] + coeff_c2s[18]*gcart[6*nbra+1] + coeff_c2s[21]*gcart[8*nbra]);
+        gsp[dgsp*OF_CMPLX+1] =  coeff_c2s[16]*gcart[4*nbra] + coeff_c2s[18]*gcart[6*nbra] - coeff_c2s[21]*gcart[8*nbra+1];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + dgsp * OF_CMPLX * 2;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[1].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] =-(coeff_c2s[6]*gcart[6*nbra+1] + coeff_c2s[9]*gcart[8*nbra]);
+        gsp[0*dgsp*OF_CMPLX+1] =  coeff_c2s[6]*gcart[6*nbra] - coeff_c2s[9]*gcart[8*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+0] =-(coeff_c2s[12]*gcart[0*nbra+1] + coeff_c2s[15]*gcart[2*nbra] + coeff_c2s[22]*gcart[10*nbra+1]);
+        gsp[1*dgsp*OF_CMPLX+1] =  coeff_c2s[12]*gcart[0*nbra] - coeff_c2s[15]*gcart[2*nbra+1] + coeff_c2s[22]*gcart[10*nbra];
+        gsp[2*dgsp*OF_CMPLX+0] =-(coeff_c2s[28]*gcart[4*nbra+1] + coeff_c2s[30]*gcart[6*nbra+1] + coeff_c2s[33]*gcart[8*nbra]);
+        gsp[2*dgsp*OF_CMPLX+1] =  coeff_c2s[28]*gcart[4*nbra] + coeff_c2s[30]*gcart[6*nbra] - coeff_c2s[33]*gcart[8*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+0] =-(coeff_c2s[36]*gcart[0*nbra+1] + coeff_c2s[39]*gcart[2*nbra]);
+        gsp[3*dgsp*OF_CMPLX+1] =  coeff_c2s[36]*gcart[0*nbra] - coeff_c2s[39]*gcart[2*nbra+1];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+        }
+}
+
+static void d_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[2].cart2j_lt_l;
+                // spin-up part
+                for (i = 0; i < nket; i++) {
+        gsp[0] = coeff_c2s[0]*gcart[0] + coeff_c2s[6]*gcart[6] + coeff_c2s[3]*gcart[3];
+        gsp[1] = coeff_c2s[0]*gcart[1] + coeff_c2s[6]*gcart[7] - coeff_c2s[3]*gcart[2];
+        gsp[2] = coeff_c2s[28]*gcart[4] + coeff_c2s[33]*gcart[9];
+        gsp[3] = coeff_c2s[28]*gcart[5] - coeff_c2s[33]*gcart[8];
+        gsp[4] = coeff_c2s[48]*gcart[0] + coeff_c2s[54]*gcart[6] + coeff_c2s[58]*gcart[10];
+        gsp[5] = coeff_c2s[48]*gcart[1] + coeff_c2s[54]*gcart[7] + coeff_c2s[58]*gcart[11];
+        gsp[6] = coeff_c2s[76]*gcart[4] + coeff_c2s[81]*gcart[9];
+        gsp[7] = coeff_c2s[76]*gcart[5] - coeff_c2s[81]*gcart[8];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                // spin-down part
+                for (i = 0; i < nket; i++) {
+        gsp[0] = coeff_c2s[16]*gcart[4] + coeff_c2s[21]*gcart[9];
+        gsp[1] = coeff_c2s[16]*gcart[5] - coeff_c2s[21]*gcart[8];
+        gsp[2] = coeff_c2s[36]*gcart[0] + coeff_c2s[42]*gcart[6] + coeff_c2s[46]*gcart[10];
+        gsp[3] = coeff_c2s[36]*gcart[1] + coeff_c2s[42]*gcart[7] + coeff_c2s[46]*gcart[11];
+        gsp[4] = coeff_c2s[64]*gcart[4] + coeff_c2s[69]*gcart[9];
+        gsp[5] = coeff_c2s[64]*gcart[5] - coeff_c2s[69]*gcart[8];
+        gsp[6] = coeff_c2s[84]*gcart[0] + coeff_c2s[90]*gcart[6] + coeff_c2s[87]*gcart[3];
+        gsp[7] = coeff_c2s[84]*gcart[1] + coeff_c2s[90]*gcart[7] - coeff_c2s[87]*gcart[2];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 8;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[2].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = 0;
+        gsp[1 ] = 0;
+        gsp[2 ] = coeff_c2s[24]*gcart[0] + coeff_c2s[30]*gcart[6] + coeff_c2s[27]*gcart[3];
+        gsp[3 ] = coeff_c2s[24]*gcart[1] + coeff_c2s[30]*gcart[7] - coeff_c2s[27]*gcart[2];
+        gsp[4 ] = coeff_c2s[52]*gcart[4] + coeff_c2s[57]*gcart[9];
+        gsp[5 ] = coeff_c2s[52]*gcart[5] - coeff_c2s[57]*gcart[8];
+        gsp[6 ] = coeff_c2s[72]*gcart[0] + coeff_c2s[78]*gcart[6] + coeff_c2s[82]*gcart[10];
+        gsp[7 ] = coeff_c2s[72]*gcart[1] + coeff_c2s[78]*gcart[7] + coeff_c2s[82]*gcart[11];
+        gsp[8 ] = coeff_c2s[100]*gcart[4] + coeff_c2s[105]*gcart[9];
+        gsp[9 ] = coeff_c2s[100]*gcart[5] - coeff_c2s[105]*gcart[8];
+        gsp[10] = coeff_c2s[120]*gcart[0] + coeff_c2s[126]*gcart[6] + coeff_c2s[123]*gcart[3];
+        gsp[11] = coeff_c2s[120]*gcart[1] + coeff_c2s[126]*gcart[7] - coeff_c2s[123]*gcart[2];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[12]*gcart[0] + coeff_c2s[18]*gcart[6] + coeff_c2s[15]*gcart[3];
+        gsp[1 ] = coeff_c2s[12]*gcart[1] + coeff_c2s[18]*gcart[7] - coeff_c2s[15]*gcart[2];
+        gsp[2 ] = coeff_c2s[40]*gcart[4] + coeff_c2s[45]*gcart[9];
+        gsp[3 ] = coeff_c2s[40]*gcart[5] - coeff_c2s[45]*gcart[8];
+        gsp[4 ] = coeff_c2s[60]*gcart[0] + coeff_c2s[66]*gcart[6] + coeff_c2s[70]*gcart[10];
+        gsp[5 ] = coeff_c2s[60]*gcart[1] + coeff_c2s[66]*gcart[7] + coeff_c2s[70]*gcart[11];
+        gsp[6 ] = coeff_c2s[88]*gcart[4] + coeff_c2s[93]*gcart[9];
+        gsp[7 ] = coeff_c2s[88]*gcart[5] - coeff_c2s[93]*gcart[8];
+        gsp[8 ] = coeff_c2s[108]*gcart[0] + coeff_c2s[114]*gcart[6] + coeff_c2s[111]*gcart[3];
+        gsp[9 ] = coeff_c2s[108]*gcart[1] + coeff_c2s[114]*gcart[7] - coeff_c2s[111]*gcart[2];
+        gsp[10] = 0;
+        gsp[11] = 0;
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+        }
+}
+static void d_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
+                                   double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[2].cart2j_lt_l;
+                // spin-up part
+                for (i = 0; i < nket; i++) {
+        gsp[0] = coeff_c2s[0]*gcart[0] + coeff_c2s[6]*gcart[3];
+        gsp[1] =-coeff_c2s[3]*gcart[1];
+        gsp[2] = coeff_c2s[28]*gcart[2];
+        gsp[3] =-coeff_c2s[33]*gcart[4];
+        gsp[4] = coeff_c2s[48]*gcart[0] + coeff_c2s[54]*gcart[3] + coeff_c2s[58]*gcart[5];
+        gsp[5] = 0;
+        gsp[6] = coeff_c2s[76]*gcart[2];
+        gsp[7] =-coeff_c2s[81]*gcart[4];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6;
+                }
+                gcart = gcart0;
+                // spin-down part
+                for (i = 0; i < nket; i++) {
+        gsp[0] = coeff_c2s[16]*gcart[2];
+        gsp[1] =-coeff_c2s[21]*gcart[4];
+        gsp[2] = coeff_c2s[36]*gcart[0] + coeff_c2s[42]*gcart[3] + coeff_c2s[46]*gcart[5];
+        gsp[3] = 0;
+        gsp[4] = coeff_c2s[64]*gcart[2];
+        gsp[5] =-coeff_c2s[69]*gcart[4];
+        gsp[6] = coeff_c2s[84]*gcart[0] + coeff_c2s[90]*gcart[3];
+        gsp[7] =-coeff_c2s[87]*gcart[1];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 8;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[2].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = 0;
+        gsp[1 ] = 0;
+        gsp[2 ] = coeff_c2s[24]*gcart[0] + coeff_c2s[30]*gcart[3];
+        gsp[3 ] =-coeff_c2s[27]*gcart[1];
+        gsp[4 ] = coeff_c2s[52]*gcart[2];
+        gsp[5 ] =-coeff_c2s[57]*gcart[4];
+        gsp[6 ] = coeff_c2s[72]*gcart[0] + coeff_c2s[78]*gcart[3] + coeff_c2s[82]*gcart[5];
+        gsp[7 ] = 0;
+        gsp[8 ] = coeff_c2s[100]*gcart[2];
+        gsp[9 ] =-coeff_c2s[105]*gcart[4];
+        gsp[10] = coeff_c2s[120]*gcart[0] + coeff_c2s[126]*gcart[3];
+        gsp[11] =-coeff_c2s[123]*gcart[1];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[12]*gcart[0] + coeff_c2s[18]*gcart[3];
+        gsp[1 ] =-coeff_c2s[15]*gcart[1];
+        gsp[2 ] = coeff_c2s[40]*gcart[2];
+        gsp[3 ] =-coeff_c2s[45]*gcart[4];
+        gsp[4 ] = coeff_c2s[60]*gcart[0] + coeff_c2s[66]*gcart[3] + coeff_c2s[70]*gcart[5];
+        gsp[5 ] = 0;
+        gsp[6 ] = coeff_c2s[88]*gcart[2];
+        gsp[7 ] =-coeff_c2s[93]*gcart[4];
+        gsp[8 ] = coeff_c2s[108]*gcart[0] + coeff_c2s[114]*gcart[3];
+        gsp[9 ] =-coeff_c2s[111]*gcart[1];
+        gsp[10] = 0;
+        gsp[11] = 0;
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6;
+                }
+        }
+}
+static void d_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[2].cart2j_lt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0] = coeff_c2s[0]*gcart[0] + coeff_c2s[6]*gcart[6] + coeff_c2s[3]*gcart[3];
+        gsp[1] = coeff_c2s[0]*gcart[1] + coeff_c2s[6]*gcart[7] - coeff_c2s[3]*gcart[2];
+        gsp[2] = coeff_c2s[28]*gcart[4] + coeff_c2s[33]*gcart[9];
+        gsp[3] = coeff_c2s[28]*gcart[5] - coeff_c2s[33]*gcart[8];
+        gsp[4] = coeff_c2s[48]*gcart[0] + coeff_c2s[54]*gcart[6] + coeff_c2s[58]*gcart[10];
+        gsp[5] = coeff_c2s[48]*gcart[1] + coeff_c2s[54]*gcart[7] + coeff_c2s[58]*gcart[11];
+        gsp[6] = coeff_c2s[76]*gcart[4] + coeff_c2s[81]*gcart[9];
+        gsp[7] = coeff_c2s[76]*gcart[5] - coeff_c2s[81]*gcart[8];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+                gsp = gsp0;
+                for (i = 0; i < nket; i++) {
+        gsp[0] += coeff_c2s[16]*gcart[4] + coeff_c2s[21]*gcart[9];
+        gsp[1] += coeff_c2s[16]*gcart[5] - coeff_c2s[21]*gcart[8];
+        gsp[2] += coeff_c2s[36]*gcart[0] + coeff_c2s[42]*gcart[6] + coeff_c2s[46]*gcart[10];
+        gsp[3] += coeff_c2s[36]*gcart[1] + coeff_c2s[42]*gcart[7] + coeff_c2s[46]*gcart[11];
+        gsp[4] += coeff_c2s[64]*gcart[4] + coeff_c2s[69]*gcart[9];
+        gsp[5] += coeff_c2s[64]*gcart[5] - coeff_c2s[69]*gcart[8];
+        gsp[6] += coeff_c2s[84]*gcart[0] + coeff_c2s[90]*gcart[6] + coeff_c2s[87]*gcart[3];
+        gsp[7] += coeff_c2s[84]*gcart[1] + coeff_c2s[90]*gcart[7] - coeff_c2s[87]*gcart[2];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 8;
+                gsp0 = gsp0 + 8;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[2].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = 0;
+        gsp[1 ] = 0;
+        gsp[2 ] = coeff_c2s[24]*gcart[0] + coeff_c2s[30]*gcart[6] + coeff_c2s[27]*gcart[3];
+        gsp[3 ] = coeff_c2s[24]*gcart[1] + coeff_c2s[30]*gcart[7] - coeff_c2s[27]*gcart[2];
+        gsp[4 ] = coeff_c2s[52]*gcart[4] + coeff_c2s[57]*gcart[9];
+        gsp[5 ] = coeff_c2s[52]*gcart[5] - coeff_c2s[57]*gcart[8];
+        gsp[6 ] = coeff_c2s[72]*gcart[0] + coeff_c2s[78]*gcart[6] + coeff_c2s[82]*gcart[10];
+        gsp[7 ] = coeff_c2s[72]*gcart[1] + coeff_c2s[78]*gcart[7] + coeff_c2s[82]*gcart[11];
+        gsp[8 ] = coeff_c2s[100]*gcart[4] + coeff_c2s[105]*gcart[9];
+        gsp[9 ] = coeff_c2s[100]*gcart[5] - coeff_c2s[105]*gcart[8];
+        gsp[10] = coeff_c2s[120]*gcart[0] + coeff_c2s[126]*gcart[6] + coeff_c2s[123]*gcart[3];
+        gsp[11] = coeff_c2s[120]*gcart[1] + coeff_c2s[126]*gcart[7] - coeff_c2s[123]*gcart[2];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+                gsp = gsp0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] += coeff_c2s[12]*gcart[0] + coeff_c2s[18]*gcart[6] + coeff_c2s[15]*gcart[3];
+        gsp[1 ] += coeff_c2s[12]*gcart[1] + coeff_c2s[18]*gcart[7] - coeff_c2s[15]*gcart[2];
+        gsp[2 ] += coeff_c2s[40]*gcart[4] + coeff_c2s[45]*gcart[9];
+        gsp[3 ] += coeff_c2s[40]*gcart[5] - coeff_c2s[45]*gcart[8];
+        gsp[4 ] += coeff_c2s[60]*gcart[0] + coeff_c2s[66]*gcart[6] + coeff_c2s[70]*gcart[10];
+        gsp[5 ] += coeff_c2s[60]*gcart[1] + coeff_c2s[66]*gcart[7] + coeff_c2s[70]*gcart[11];
+        gsp[6 ] += coeff_c2s[88]*gcart[4] + coeff_c2s[93]*gcart[9];
+        gsp[7 ] += coeff_c2s[88]*gcart[5] - coeff_c2s[93]*gcart[8];
+        gsp[8 ] += coeff_c2s[108]*gcart[0] + coeff_c2s[114]*gcart[6] + coeff_c2s[111]*gcart[3];
+        gsp[9 ] += coeff_c2s[108]*gcart[1] + coeff_c2s[114]*gcart[7] - coeff_c2s[111]*gcart[2];
+        gsp[10] += 0;
+        gsp[11] += 0;
+        gsp += dgsp * OF_CMPLX;
+        gcart += 6 * OF_CMPLX;
+                }
+        }
+}
+static void d_ket_cart2spinor(double *gsp, int dgsp, int nbra,
+                              double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[2].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] = coeff_c2s[0]*gcart[0*nbra] + coeff_c2s[6]*gcart[6*nbra] - coeff_c2s[3]*gcart[2*nbra+1] + coeff_c2s[16]*gcart[16*nbra] - coeff_c2s[21]*gcart[20*nbra+1];
+        gsp[0*dgsp*OF_CMPLX+1] = coeff_c2s[0]*gcart[0*nbra+1] + coeff_c2s[6]*gcart[6*nbra+1] + coeff_c2s[3]*gcart[2*nbra] + coeff_c2s[16]*gcart[16*nbra+1] + coeff_c2s[21]*gcart[20*nbra];
+        gsp[1*dgsp*OF_CMPLX+0] = coeff_c2s[28]*gcart[4*nbra] - coeff_c2s[33]*gcart[8*nbra+1] + coeff_c2s[36]*gcart[12*nbra] + coeff_c2s[42]*gcart[18*nbra] + coeff_c2s[46]*gcart[22*nbra];
+        gsp[1*dgsp*OF_CMPLX+1] = coeff_c2s[28]*gcart[4*nbra+1] + coeff_c2s[33]*gcart[8*nbra] + coeff_c2s[36]*gcart[12*nbra+1] + coeff_c2s[42]*gcart[18*nbra+1] + coeff_c2s[46]*gcart[22*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+0] = coeff_c2s[48]*gcart[0*nbra] + coeff_c2s[54]*gcart[6*nbra] + coeff_c2s[58]*gcart[10*nbra] + coeff_c2s[64]*gcart[16*nbra] - coeff_c2s[69]*gcart[20*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+1] = coeff_c2s[48]*gcart[0*nbra+1] + coeff_c2s[54]*gcart[6*nbra+1] + coeff_c2s[58]*gcart[10*nbra+1] + coeff_c2s[64]*gcart[16*nbra+1] + coeff_c2s[69]*gcart[20*nbra];
+        gsp[3*dgsp*OF_CMPLX+0] = coeff_c2s[76]*gcart[4*nbra] - coeff_c2s[81]*gcart[8*nbra+1] + coeff_c2s[84]*gcart[12*nbra] + coeff_c2s[90]*gcart[18*nbra] - coeff_c2s[87]*gcart[14*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+1] = coeff_c2s[76]*gcart[4*nbra+1] + coeff_c2s[81]*gcart[8*nbra] + coeff_c2s[84]*gcart[12*nbra+1] + coeff_c2s[90]*gcart[18*nbra+1] + coeff_c2s[87]*gcart[14*nbra];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + dgsp*OF_CMPLX*4;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[2].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] = coeff_c2s[12]*gcart[12*nbra] + coeff_c2s[18]*gcart[18*nbra] - coeff_c2s[15]*gcart[14*nbra+1];
+        gsp[0*dgsp*OF_CMPLX+1] = coeff_c2s[12]*gcart[12*nbra+1] + coeff_c2s[18]*gcart[18*nbra+1] + coeff_c2s[15]*gcart[14*nbra];
+        gsp[1*dgsp*OF_CMPLX+0] = coeff_c2s[24]*gcart[0*nbra] + coeff_c2s[30]*gcart[6*nbra] - coeff_c2s[27]*gcart[2*nbra+1] + coeff_c2s[40]*gcart[16*nbra] - coeff_c2s[45]*gcart[20*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+1] = coeff_c2s[24]*gcart[0*nbra+1] + coeff_c2s[30]*gcart[6*nbra+1] + coeff_c2s[27]*gcart[2*nbra] + coeff_c2s[40]*gcart[16*nbra+1] + coeff_c2s[45]*gcart[20*nbra];
+        gsp[2*dgsp*OF_CMPLX+0] = coeff_c2s[52]*gcart[4*nbra] - coeff_c2s[57]*gcart[8*nbra+1] + coeff_c2s[60]*gcart[12*nbra] + coeff_c2s[66]*gcart[18*nbra] + coeff_c2s[70]*gcart[22*nbra];
+        gsp[2*dgsp*OF_CMPLX+1] = coeff_c2s[52]*gcart[4*nbra+1] + coeff_c2s[57]*gcart[8*nbra] + coeff_c2s[60]*gcart[12*nbra+1] + coeff_c2s[66]*gcart[18*nbra+1] + coeff_c2s[70]*gcart[22*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+0] = coeff_c2s[72]*gcart[0*nbra] + coeff_c2s[78]*gcart[6*nbra] + coeff_c2s[82]*gcart[10*nbra] + coeff_c2s[88]*gcart[16*nbra] - coeff_c2s[93]*gcart[20*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+1] = coeff_c2s[72]*gcart[0*nbra+1] + coeff_c2s[78]*gcart[6*nbra+1] + coeff_c2s[82]*gcart[10*nbra+1] + coeff_c2s[88]*gcart[16*nbra+1] + coeff_c2s[93]*gcart[20*nbra];
+        gsp[4*dgsp*OF_CMPLX+0] = coeff_c2s[100]*gcart[4*nbra] - coeff_c2s[105]*gcart[8*nbra+1] + coeff_c2s[108]*gcart[12*nbra] + coeff_c2s[114]*gcart[18*nbra] - coeff_c2s[111]*gcart[14*nbra+1];
+        gsp[4*dgsp*OF_CMPLX+1] = coeff_c2s[100]*gcart[4*nbra+1] + coeff_c2s[105]*gcart[8*nbra] + coeff_c2s[108]*gcart[12*nbra+1] + coeff_c2s[114]*gcart[18*nbra+1] + coeff_c2s[111]*gcart[14*nbra];
+        gsp[5*dgsp*OF_CMPLX+0] = coeff_c2s[120]*gcart[0*nbra] + coeff_c2s[126]*gcart[6*nbra] - coeff_c2s[123]*gcart[2*nbra+1];
+        gsp[5*dgsp*OF_CMPLX+1] = coeff_c2s[120]*gcart[0*nbra+1] + coeff_c2s[126]*gcart[6*nbra+1] + coeff_c2s[123]*gcart[2*nbra];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+        }
+}
+static void d_iket_cart2spinor(double *gsp, int dgsp, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[2].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] =-(coeff_c2s[0]*gcart[0*nbra+1] + coeff_c2s[6]*gcart[6*nbra+1] + coeff_c2s[3]*gcart[2*nbra] + coeff_c2s[16]*gcart[16*nbra+1] + coeff_c2s[21]*gcart[20*nbra]);
+        gsp[0*dgsp*OF_CMPLX+1] =  coeff_c2s[0]*gcart[0*nbra] + coeff_c2s[6]*gcart[6*nbra] - coeff_c2s[3]*gcart[2*nbra+1] + coeff_c2s[16]*gcart[16*nbra] - coeff_c2s[21]*gcart[20*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+0] =-(coeff_c2s[28]*gcart[4*nbra+1] + coeff_c2s[33]*gcart[8*nbra] + coeff_c2s[36]*gcart[12*nbra+1] + coeff_c2s[42]*gcart[18*nbra+1] + coeff_c2s[46]*gcart[22*nbra+1]);
+        gsp[1*dgsp*OF_CMPLX+1] =  coeff_c2s[28]*gcart[4*nbra] - coeff_c2s[33]*gcart[8*nbra+1] + coeff_c2s[36]*gcart[12*nbra] + coeff_c2s[42]*gcart[18*nbra] + coeff_c2s[46]*gcart[22*nbra];
+        gsp[2*dgsp*OF_CMPLX+0] =-(coeff_c2s[48]*gcart[0*nbra+1] + coeff_c2s[54]*gcart[6*nbra+1] + coeff_c2s[58]*gcart[10*nbra+1] + coeff_c2s[64]*gcart[16*nbra+1] + coeff_c2s[69]*gcart[20*nbra]);
+        gsp[2*dgsp*OF_CMPLX+1] =  coeff_c2s[48]*gcart[0*nbra] + coeff_c2s[54]*gcart[6*nbra] + coeff_c2s[58]*gcart[10*nbra] + coeff_c2s[64]*gcart[16*nbra] - coeff_c2s[69]*gcart[20*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+0] =-(coeff_c2s[76]*gcart[4*nbra+1] + coeff_c2s[81]*gcart[8*nbra] + coeff_c2s[84]*gcart[12*nbra+1] + coeff_c2s[90]*gcart[18*nbra+1] + coeff_c2s[87]*gcart[14*nbra]);
+        gsp[3*dgsp*OF_CMPLX+1] =  coeff_c2s[76]*gcart[4*nbra] - coeff_c2s[81]*gcart[8*nbra+1] + coeff_c2s[84]*gcart[12*nbra] + coeff_c2s[90]*gcart[18*nbra] - coeff_c2s[87]*gcart[14*nbra+1];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + dgsp*OF_CMPLX*4;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[2].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] =-(coeff_c2s[12]*gcart[12*nbra+1] + coeff_c2s[18]*gcart[18*nbra+1] + coeff_c2s[15]*gcart[14*nbra]);
+        gsp[0*dgsp*OF_CMPLX+1] =  coeff_c2s[12]*gcart[12*nbra] + coeff_c2s[18]*gcart[18*nbra] - coeff_c2s[15]*gcart[14*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+0] =-(coeff_c2s[24]*gcart[0*nbra+1] + coeff_c2s[30]*gcart[6*nbra+1] + coeff_c2s[27]*gcart[2*nbra] + coeff_c2s[40]*gcart[16*nbra+1] + coeff_c2s[45]*gcart[20*nbra]);
+        gsp[1*dgsp*OF_CMPLX+1] =  coeff_c2s[24]*gcart[0*nbra] + coeff_c2s[30]*gcart[6*nbra] - coeff_c2s[27]*gcart[2*nbra+1] + coeff_c2s[40]*gcart[16*nbra] - coeff_c2s[45]*gcart[20*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+0] =-(coeff_c2s[52]*gcart[4*nbra+1] + coeff_c2s[57]*gcart[8*nbra] + coeff_c2s[60]*gcart[12*nbra+1] + coeff_c2s[66]*gcart[18*nbra+1] + coeff_c2s[70]*gcart[22*nbra+1]);
+        gsp[2*dgsp*OF_CMPLX+1] =  coeff_c2s[52]*gcart[4*nbra] - coeff_c2s[57]*gcart[8*nbra+1] + coeff_c2s[60]*gcart[12*nbra] + coeff_c2s[66]*gcart[18*nbra] + coeff_c2s[70]*gcart[22*nbra];
+        gsp[3*dgsp*OF_CMPLX+0] =-(coeff_c2s[72]*gcart[0*nbra+1] + coeff_c2s[78]*gcart[6*nbra+1] + coeff_c2s[82]*gcart[10*nbra+1] + coeff_c2s[88]*gcart[16*nbra+1] + coeff_c2s[93]*gcart[20*nbra]);
+        gsp[3*dgsp*OF_CMPLX+1] =  coeff_c2s[72]*gcart[0*nbra] + coeff_c2s[78]*gcart[6*nbra] + coeff_c2s[82]*gcart[10*nbra] + coeff_c2s[88]*gcart[16*nbra] - coeff_c2s[93]*gcart[20*nbra+1];
+        gsp[4*dgsp*OF_CMPLX+0] =-(coeff_c2s[100]*gcart[4*nbra+1] + coeff_c2s[105]*gcart[8*nbra] + coeff_c2s[108]*gcart[12*nbra+1] + coeff_c2s[114]*gcart[18*nbra+1] + coeff_c2s[111]*gcart[14*nbra]);
+        gsp[4*dgsp*OF_CMPLX+1] =  coeff_c2s[100]*gcart[4*nbra] - coeff_c2s[105]*gcart[8*nbra+1] + coeff_c2s[108]*gcart[12*nbra] + coeff_c2s[114]*gcart[18*nbra] - coeff_c2s[111]*gcart[14*nbra+1];
+        gsp[5*dgsp*OF_CMPLX+0] =-(coeff_c2s[120]*gcart[0*nbra+1] + coeff_c2s[126]*gcart[6*nbra+1] + coeff_c2s[123]*gcart[2*nbra]);
+        gsp[5*dgsp*OF_CMPLX+1] =  coeff_c2s[120]*gcart[0*nbra] + coeff_c2s[126]*gcart[6*nbra] - coeff_c2s[123]*gcart[2*nbra+1];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+        }
+}
+
+static void f_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[3].cart2j_lt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[0]*gcart[0] + coeff_c2s[3]*gcart[3] + coeff_c2s[6]*gcart[6] + coeff_c2s[13]*gcart[13];
+        gsp[1 ] = coeff_c2s[0]*gcart[1] - coeff_c2s[3]*gcart[2] + coeff_c2s[6]*gcart[7] - coeff_c2s[13]*gcart[12];
+        gsp[2 ] = coeff_c2s[44]*gcart[4] + coeff_c2s[49]*gcart[9] + coeff_c2s[54]*gcart[14];
+        gsp[3 ] = coeff_c2s[44]*gcart[5] - coeff_c2s[49]*gcart[8] + coeff_c2s[54]*gcart[15];
+        gsp[4 ] = coeff_c2s[80]*gcart[0] + coeff_c2s[83]*gcart[3] + coeff_c2s[86]*gcart[6] + coeff_c2s[90]*gcart[10] + coeff_c2s[93]*gcart[13] + coeff_c2s[97]*gcart[17];
+        gsp[5 ] = coeff_c2s[80]*gcart[1] - coeff_c2s[83]*gcart[2] + coeff_c2s[86]*gcart[7] + coeff_c2s[90]*gcart[11] - coeff_c2s[93]*gcart[12] - coeff_c2s[97]*gcart[16];
+        gsp[6 ] = coeff_c2s[124]*gcart[4] + coeff_c2s[134]*gcart[14] + coeff_c2s[138]*gcart[18];
+        gsp[7 ] = coeff_c2s[124]*gcart[5] + coeff_c2s[134]*gcart[15] + coeff_c2s[138]*gcart[19];
+        gsp[8 ] = coeff_c2s[160]*gcart[0] + coeff_c2s[163]*gcart[3] + coeff_c2s[166]*gcart[6] + coeff_c2s[170]*gcart[10] + coeff_c2s[173]*gcart[13] + coeff_c2s[177]*gcart[17];
+        gsp[9 ] = coeff_c2s[160]*gcart[1] - coeff_c2s[163]*gcart[2] + coeff_c2s[166]*gcart[7] + coeff_c2s[170]*gcart[11] - coeff_c2s[173]*gcart[12] - coeff_c2s[177]*gcart[16];
+        gsp[10] = coeff_c2s[204]*gcart[4] + coeff_c2s[209]*gcart[9] + coeff_c2s[214]*gcart[14];
+        gsp[11] = coeff_c2s[204]*gcart[5] - coeff_c2s[209]*gcart[8] + coeff_c2s[214]*gcart[15];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[24]*gcart[4] + coeff_c2s[29]*gcart[9] + coeff_c2s[34]*gcart[14];
+        gsp[1 ] = coeff_c2s[24]*gcart[5] - coeff_c2s[29]*gcart[8] + coeff_c2s[34]*gcart[15];
+        gsp[2 ] = coeff_c2s[60]*gcart[0] + coeff_c2s[63]*gcart[3] + coeff_c2s[66]*gcart[6] + coeff_c2s[70]*gcart[10] + coeff_c2s[73]*gcart[13] + coeff_c2s[77]*gcart[17];
+        gsp[3 ] = coeff_c2s[60]*gcart[1] - coeff_c2s[63]*gcart[2] + coeff_c2s[66]*gcart[7] + coeff_c2s[70]*gcart[11] - coeff_c2s[73]*gcart[12] - coeff_c2s[77]*gcart[16];
+        gsp[4 ] = coeff_c2s[104]*gcart[4] + coeff_c2s[114]*gcart[14] + coeff_c2s[118]*gcart[18];
+        gsp[5 ] = coeff_c2s[104]*gcart[5] + coeff_c2s[114]*gcart[15] + coeff_c2s[118]*gcart[19];
+        gsp[6 ] = coeff_c2s[140]*gcart[0] + coeff_c2s[143]*gcart[3] + coeff_c2s[146]*gcart[6] + coeff_c2s[150]*gcart[10] + coeff_c2s[153]*gcart[13] + coeff_c2s[157]*gcart[17];
+        gsp[7 ] = coeff_c2s[140]*gcart[1] - coeff_c2s[143]*gcart[2] + coeff_c2s[146]*gcart[7] + coeff_c2s[150]*gcart[11] - coeff_c2s[153]*gcart[12] - coeff_c2s[157]*gcart[16];
+        gsp[8 ] = coeff_c2s[184]*gcart[4] + coeff_c2s[189]*gcart[9] + coeff_c2s[194]*gcart[14];
+        gsp[9 ] = coeff_c2s[184]*gcart[5] - coeff_c2s[189]*gcart[8] + coeff_c2s[194]*gcart[15];
+        gsp[10] = coeff_c2s[220]*gcart[0] + coeff_c2s[223]*gcart[3] + coeff_c2s[226]*gcart[6] + coeff_c2s[233]*gcart[13];
+        gsp[11] = coeff_c2s[220]*gcart[1] - coeff_c2s[223]*gcart[2] + coeff_c2s[226]*gcart[7] - coeff_c2s[233]*gcart[12];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 8;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[3].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = 0;
+        gsp[1 ] = 0;
+        gsp[2 ] = coeff_c2s[40]*gcart[0] + coeff_c2s[43]*gcart[3] + coeff_c2s[46]*gcart[6] + coeff_c2s[53]*gcart[13];
+        gsp[3 ] = coeff_c2s[40]*gcart[1] - coeff_c2s[43]*gcart[2] + coeff_c2s[46]*gcart[7] - coeff_c2s[53]*gcart[12];
+        gsp[4 ] = coeff_c2s[84]*gcart[4] + coeff_c2s[89]*gcart[9] + coeff_c2s[94]*gcart[14];
+        gsp[5 ] = coeff_c2s[84]*gcart[5] - coeff_c2s[89]*gcart[8] + coeff_c2s[94]*gcart[15];
+        gsp[6 ] = coeff_c2s[120]*gcart[0] + coeff_c2s[123]*gcart[3] + coeff_c2s[126]*gcart[6] + coeff_c2s[130]*gcart[10] + coeff_c2s[133]*gcart[13] + coeff_c2s[137]*gcart[17];
+        gsp[7 ] = coeff_c2s[120]*gcart[1] - coeff_c2s[123]*gcart[2] + coeff_c2s[126]*gcart[7] + coeff_c2s[130]*gcart[11] - coeff_c2s[133]*gcart[12] - coeff_c2s[137]*gcart[16];
+        gsp[8 ] = coeff_c2s[164]*gcart[4] + coeff_c2s[174]*gcart[14] + coeff_c2s[178]*gcart[18];
+        gsp[9 ] = coeff_c2s[164]*gcart[5] + coeff_c2s[174]*gcart[15] + coeff_c2s[178]*gcart[19];
+        gsp[10] = coeff_c2s[200]*gcart[0] + coeff_c2s[203]*gcart[3] + coeff_c2s[206]*gcart[6] + coeff_c2s[210]*gcart[10] + coeff_c2s[213]*gcart[13] + coeff_c2s[217]*gcart[17];
+        gsp[11] = coeff_c2s[200]*gcart[1] - coeff_c2s[203]*gcart[2] + coeff_c2s[206]*gcart[7] + coeff_c2s[210]*gcart[11] - coeff_c2s[213]*gcart[12] - coeff_c2s[217]*gcart[16];
+        gsp[12] = coeff_c2s[244]*gcart[4] + coeff_c2s[249]*gcart[9] + coeff_c2s[254]*gcart[14];
+        gsp[13] = coeff_c2s[244]*gcart[5] - coeff_c2s[249]*gcart[8] + coeff_c2s[254]*gcart[15];
+        gsp[14] = coeff_c2s[280]*gcart[0] + coeff_c2s[283]*gcart[3] + coeff_c2s[286]*gcart[6] + coeff_c2s[293]*gcart[13];
+        gsp[15] = coeff_c2s[280]*gcart[1] - coeff_c2s[283]*gcart[2] + coeff_c2s[286]*gcart[7] - coeff_c2s[293]*gcart[12];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[20]*gcart[0] + coeff_c2s[23]*gcart[3] + coeff_c2s[26]*gcart[6] + coeff_c2s[33]*gcart[13];
+        gsp[1 ] = coeff_c2s[20]*gcart[1] - coeff_c2s[23]*gcart[2] + coeff_c2s[26]*gcart[7] - coeff_c2s[33]*gcart[12];
+        gsp[2 ] = coeff_c2s[64]*gcart[4] + coeff_c2s[69]*gcart[9] + coeff_c2s[74]*gcart[14];
+        gsp[3 ] = coeff_c2s[64]*gcart[5] - coeff_c2s[69]*gcart[8] + coeff_c2s[74]*gcart[15];
+        gsp[4 ] = coeff_c2s[100]*gcart[0] + coeff_c2s[103]*gcart[3] + coeff_c2s[106]*gcart[6] + coeff_c2s[110]*gcart[10] + coeff_c2s[113]*gcart[13] + coeff_c2s[117]*gcart[17];
+        gsp[5 ] = coeff_c2s[100]*gcart[1] - coeff_c2s[103]*gcart[2] + coeff_c2s[106]*gcart[7] + coeff_c2s[110]*gcart[11] - coeff_c2s[113]*gcart[12] - coeff_c2s[117]*gcart[16];
+        gsp[6 ] = coeff_c2s[144]*gcart[4] + coeff_c2s[154]*gcart[14] + coeff_c2s[158]*gcart[18];
+        gsp[7 ] = coeff_c2s[144]*gcart[5] + coeff_c2s[154]*gcart[15] + coeff_c2s[158]*gcart[19];
+        gsp[8 ] = coeff_c2s[180]*gcart[0] + coeff_c2s[183]*gcart[3] + coeff_c2s[186]*gcart[6] + coeff_c2s[190]*gcart[10] + coeff_c2s[193]*gcart[13] + coeff_c2s[197]*gcart[17];
+        gsp[9 ] = coeff_c2s[180]*gcart[1] - coeff_c2s[183]*gcart[2] + coeff_c2s[186]*gcart[7] + coeff_c2s[190]*gcart[11] - coeff_c2s[193]*gcart[12] - coeff_c2s[197]*gcart[16];
+        gsp[10] = coeff_c2s[224]*gcart[4] + coeff_c2s[229]*gcart[9] + coeff_c2s[234]*gcart[14];
+        gsp[11] = coeff_c2s[224]*gcart[5] - coeff_c2s[229]*gcart[8] + coeff_c2s[234]*gcart[15];
+        gsp[12] = coeff_c2s[260]*gcart[0] + coeff_c2s[263]*gcart[3] + coeff_c2s[266]*gcart[6] + coeff_c2s[273]*gcart[13];
+        gsp[13] = coeff_c2s[260]*gcart[1] - coeff_c2s[263]*gcart[2] + coeff_c2s[266]*gcart[7] - coeff_c2s[273]*gcart[12];
+        gsp[14] = 0;
+        gsp[15] = 0;
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+        }
+}
+static void f_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
+                                   double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[3].cart2j_lt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[0]*gcart[0] + coeff_c2s[6]*gcart[3];
+        gsp[1 ] =-coeff_c2s[3]*gcart[1] - coeff_c2s[13]*gcart[6];
+        gsp[2 ] = coeff_c2s[44]*gcart[2] + coeff_c2s[54]*gcart[7];
+        gsp[3 ] =-coeff_c2s[49]*gcart[4];
+        gsp[4 ] = coeff_c2s[80]*gcart[0] + coeff_c2s[86]*gcart[3] + coeff_c2s[90]*gcart[5];
+        gsp[5 ] =-coeff_c2s[83]*gcart[1] - coeff_c2s[93]*gcart[6] - coeff_c2s[97]*gcart[8];
+        gsp[6 ] = coeff_c2s[124]*gcart[2] + coeff_c2s[134]*gcart[7] + coeff_c2s[138]*gcart[9];
+        gsp[7 ] = 0;
+        gsp[8 ] = coeff_c2s[160]*gcart[0] + coeff_c2s[166]*gcart[3] + coeff_c2s[170]*gcart[5];
+        gsp[9 ] =-coeff_c2s[163]*gcart[1] - coeff_c2s[173]*gcart[6] - coeff_c2s[177]*gcart[8];
+        gsp[10] = coeff_c2s[204]*gcart[2] + coeff_c2s[214]*gcart[7];
+        gsp[11] =-coeff_c2s[209]*gcart[4];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[24]*gcart[2] + coeff_c2s[34]*gcart[7];
+        gsp[1 ] =-coeff_c2s[29]*gcart[4];
+        gsp[2 ] = coeff_c2s[60]*gcart[0] + coeff_c2s[66]*gcart[3] + coeff_c2s[70]*gcart[5];
+        gsp[3 ] =-coeff_c2s[63]*gcart[1] - coeff_c2s[73]*gcart[6] - coeff_c2s[77]*gcart[8];
+        gsp[4 ] = coeff_c2s[104]*gcart[2] + coeff_c2s[114]*gcart[7] + coeff_c2s[118]*gcart[9];
+        gsp[5 ] = 0;
+        gsp[6 ] = coeff_c2s[140]*gcart[0] + coeff_c2s[146]*gcart[3] + coeff_c2s[150]*gcart[5];
+        gsp[7 ] =-coeff_c2s[143]*gcart[1] - coeff_c2s[153]*gcart[6] - coeff_c2s[157]*gcart[8];
+        gsp[8 ] = coeff_c2s[184]*gcart[2] + coeff_c2s[194]*gcart[7];
+        gsp[9 ] =-coeff_c2s[189]*gcart[4];
+        gsp[10] = coeff_c2s[220]*gcart[0] + coeff_c2s[226]*gcart[3];
+        gsp[11] =-coeff_c2s[223]*gcart[1] - coeff_c2s[233]*gcart[6];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 8;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[3].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = 0;
+        gsp[1 ] = 0;
+        gsp[2 ] = coeff_c2s[40]*gcart[0] + coeff_c2s[46]*gcart[3];
+        gsp[3 ] =-coeff_c2s[43]*gcart[1] - coeff_c2s[53]*gcart[6];
+        gsp[4 ] = coeff_c2s[84]*gcart[2] + coeff_c2s[94]*gcart[7];
+        gsp[5 ] =-coeff_c2s[89]*gcart[4];
+        gsp[6 ] = coeff_c2s[120]*gcart[0] + coeff_c2s[126]*gcart[3] + coeff_c2s[130]*gcart[5];
+        gsp[7 ] =-coeff_c2s[123]*gcart[1] - coeff_c2s[133]*gcart[6] - coeff_c2s[137]*gcart[8];
+        gsp[8 ] = coeff_c2s[164]*gcart[2] + coeff_c2s[174]*gcart[7] + coeff_c2s[178]*gcart[9];
+        gsp[9 ] = 0;
+        gsp[10] = coeff_c2s[200]*gcart[0] + coeff_c2s[206]*gcart[3] + coeff_c2s[210]*gcart[5];
+        gsp[11] =-coeff_c2s[203]*gcart[1] - coeff_c2s[213]*gcart[6] - coeff_c2s[217]*gcart[8];
+        gsp[12] = coeff_c2s[244]*gcart[2] + coeff_c2s[254]*gcart[7];
+        gsp[13] =-coeff_c2s[249]*gcart[4];
+        gsp[14] = coeff_c2s[280]*gcart[0] + coeff_c2s[286]*gcart[3];
+        gsp[15] =-coeff_c2s[283]*gcart[1] - coeff_c2s[293]*gcart[6];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10;
+                }
+                gcart = gcart0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[20]*gcart[0] + coeff_c2s[26]*gcart[3];
+        gsp[1 ] =-coeff_c2s[23]*gcart[1] - coeff_c2s[33]*gcart[6];
+        gsp[2 ] = coeff_c2s[64]*gcart[2] + coeff_c2s[74]*gcart[7];
+        gsp[3 ] =-coeff_c2s[69]*gcart[4];
+        gsp[4 ] = coeff_c2s[100]*gcart[0] + coeff_c2s[106]*gcart[3] + coeff_c2s[110]*gcart[5];
+        gsp[5 ] =-coeff_c2s[103]*gcart[1] - coeff_c2s[113]*gcart[6] - coeff_c2s[117]*gcart[8];
+        gsp[6 ] = coeff_c2s[144]*gcart[2] + coeff_c2s[154]*gcart[7] + coeff_c2s[158]*gcart[9];
+        gsp[7 ] = 0;
+        gsp[8 ] = coeff_c2s[180]*gcart[0] + coeff_c2s[186]*gcart[3] + coeff_c2s[190]*gcart[5];
+        gsp[9 ] =-coeff_c2s[183]*gcart[1] - coeff_c2s[193]*gcart[6] - coeff_c2s[197]*gcart[8];
+        gsp[10] = coeff_c2s[224]*gcart[2] + coeff_c2s[234]*gcart[7];
+        gsp[11] =-coeff_c2s[229]*gcart[4];
+        gsp[12] = coeff_c2s[260]*gcart[0] + coeff_c2s[266]*gcart[3];
+        gsp[13] =-coeff_c2s[263]*gcart[1] - coeff_c2s[273]*gcart[6];
+        gsp[14] = 0;
+        gsp[15] = 0;
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10;
+                }
+        }
+}
+static void f_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
+                                 double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[3].cart2j_lt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = coeff_c2s[0]*gcart[0] + coeff_c2s[3]*gcart[3] + coeff_c2s[6]*gcart[6] + coeff_c2s[13]*gcart[13];
+        gsp[1 ] = coeff_c2s[0]*gcart[1] - coeff_c2s[3]*gcart[2] + coeff_c2s[6]*gcart[7] - coeff_c2s[13]*gcart[12];
+        gsp[2 ] = coeff_c2s[44]*gcart[4] + coeff_c2s[49]*gcart[9] + coeff_c2s[54]*gcart[14];
+        gsp[3 ] = coeff_c2s[44]*gcart[5] - coeff_c2s[49]*gcart[8] + coeff_c2s[54]*gcart[15];
+        gsp[4 ] = coeff_c2s[80]*gcart[0] + coeff_c2s[83]*gcart[3] + coeff_c2s[86]*gcart[6] + coeff_c2s[90]*gcart[10] + coeff_c2s[93]*gcart[13] + coeff_c2s[97]*gcart[17];
+        gsp[5 ] = coeff_c2s[80]*gcart[1] - coeff_c2s[83]*gcart[2] + coeff_c2s[86]*gcart[7] + coeff_c2s[90]*gcart[11] - coeff_c2s[93]*gcart[12] - coeff_c2s[97]*gcart[16];
+        gsp[6 ] = coeff_c2s[124]*gcart[4] + coeff_c2s[134]*gcart[14] + coeff_c2s[138]*gcart[18];
+        gsp[7 ] = coeff_c2s[124]*gcart[5] + coeff_c2s[134]*gcart[15] + coeff_c2s[138]*gcart[19];
+        gsp[8 ] = coeff_c2s[160]*gcart[0] + coeff_c2s[163]*gcart[3] + coeff_c2s[166]*gcart[6] + coeff_c2s[170]*gcart[10] + coeff_c2s[173]*gcart[13] + coeff_c2s[177]*gcart[17];
+        gsp[9 ] = coeff_c2s[160]*gcart[1] - coeff_c2s[163]*gcart[2] + coeff_c2s[166]*gcart[7] + coeff_c2s[170]*gcart[11] - coeff_c2s[173]*gcart[12] - coeff_c2s[177]*gcart[16];
+        gsp[10] = coeff_c2s[204]*gcart[4] + coeff_c2s[209]*gcart[9] + coeff_c2s[214]*gcart[14];
+        gsp[11] = coeff_c2s[204]*gcart[5] - coeff_c2s[209]*gcart[8] + coeff_c2s[214]*gcart[15];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+                gsp = gsp0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] += coeff_c2s[24]*gcart[4] + coeff_c2s[29]*gcart[9] + coeff_c2s[34]*gcart[14];
+        gsp[1 ] += coeff_c2s[24]*gcart[5] - coeff_c2s[29]*gcart[8] + coeff_c2s[34]*gcart[15];
+        gsp[2 ] += coeff_c2s[60]*gcart[0] + coeff_c2s[63]*gcart[3] + coeff_c2s[66]*gcart[6] + coeff_c2s[70]*gcart[10] + coeff_c2s[73]*gcart[13] + coeff_c2s[77]*gcart[17];
+        gsp[3 ] += coeff_c2s[60]*gcart[1] - coeff_c2s[63]*gcart[2] + coeff_c2s[66]*gcart[7] + coeff_c2s[70]*gcart[11] - coeff_c2s[73]*gcart[12] - coeff_c2s[77]*gcart[16];
+        gsp[4 ] += coeff_c2s[104]*gcart[4] + coeff_c2s[114]*gcart[14] + coeff_c2s[118]*gcart[18];
+        gsp[5 ] += coeff_c2s[104]*gcart[5] + coeff_c2s[114]*gcart[15] + coeff_c2s[118]*gcart[19];
+        gsp[6 ] += coeff_c2s[140]*gcart[0] + coeff_c2s[143]*gcart[3] + coeff_c2s[146]*gcart[6] + coeff_c2s[150]*gcart[10] + coeff_c2s[153]*gcart[13] + coeff_c2s[157]*gcart[17];
+        gsp[7 ] += coeff_c2s[140]*gcart[1] - coeff_c2s[143]*gcart[2] + coeff_c2s[146]*gcart[7] + coeff_c2s[150]*gcart[11] - coeff_c2s[153]*gcart[12] - coeff_c2s[157]*gcart[16];
+        gsp[8 ] += coeff_c2s[184]*gcart[4] + coeff_c2s[189]*gcart[9] + coeff_c2s[194]*gcart[14];
+        gsp[9 ] += coeff_c2s[184]*gcart[5] - coeff_c2s[189]*gcart[8] + coeff_c2s[194]*gcart[15];
+        gsp[10] += coeff_c2s[220]*gcart[0] + coeff_c2s[223]*gcart[3] + coeff_c2s[226]*gcart[6] + coeff_c2s[233]*gcart[13];
+        gsp[11] += coeff_c2s[220]*gcart[1] - coeff_c2s[223]*gcart[2] + coeff_c2s[226]*gcart[7] - coeff_c2s[233]*gcart[12];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + 12;
+                gsp0 = gsp0 + 12;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[3].cart2j_gt_l;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] = 0;
+        gsp[1 ] = 0;
+        gsp[2 ] = coeff_c2s[40]*gcart[0] + coeff_c2s[43]*gcart[3] + coeff_c2s[46]*gcart[6] + coeff_c2s[53]*gcart[13];
+        gsp[3 ] = coeff_c2s[40]*gcart[1] - coeff_c2s[43]*gcart[2] + coeff_c2s[46]*gcart[7] - coeff_c2s[53]*gcart[12];
+        gsp[4 ] = coeff_c2s[84]*gcart[4] + coeff_c2s[89]*gcart[9] + coeff_c2s[94]*gcart[14];
+        gsp[5 ] = coeff_c2s[84]*gcart[5] - coeff_c2s[89]*gcart[8] + coeff_c2s[94]*gcart[15];
+        gsp[6 ] = coeff_c2s[120]*gcart[0] + coeff_c2s[123]*gcart[3] + coeff_c2s[126]*gcart[6] + coeff_c2s[130]*gcart[10] + coeff_c2s[133]*gcart[13] + coeff_c2s[137]*gcart[17];
+        gsp[7 ] = coeff_c2s[120]*gcart[1] - coeff_c2s[123]*gcart[2] + coeff_c2s[126]*gcart[7] + coeff_c2s[130]*gcart[11] - coeff_c2s[133]*gcart[12] - coeff_c2s[137]*gcart[16];
+        gsp[8 ] = coeff_c2s[164]*gcart[4] + coeff_c2s[174]*gcart[14] + coeff_c2s[178]*gcart[18];
+        gsp[9 ] = coeff_c2s[164]*gcart[5] + coeff_c2s[174]*gcart[15] + coeff_c2s[178]*gcart[19];
+        gsp[10] = coeff_c2s[200]*gcart[0] + coeff_c2s[203]*gcart[3] + coeff_c2s[206]*gcart[6] + coeff_c2s[210]*gcart[10] + coeff_c2s[213]*gcart[13] + coeff_c2s[217]*gcart[17];
+        gsp[11] = coeff_c2s[200]*gcart[1] - coeff_c2s[203]*gcart[2] + coeff_c2s[206]*gcart[7] + coeff_c2s[210]*gcart[11] - coeff_c2s[213]*gcart[12] - coeff_c2s[217]*gcart[16];
+        gsp[12] = coeff_c2s[244]*gcart[4] + coeff_c2s[249]*gcart[9] + coeff_c2s[254]*gcart[14];
+        gsp[13] = coeff_c2s[244]*gcart[5] - coeff_c2s[249]*gcart[8] + coeff_c2s[254]*gcart[15];
+        gsp[14] = coeff_c2s[280]*gcart[0] + coeff_c2s[283]*gcart[3] + coeff_c2s[286]*gcart[6] + coeff_c2s[293]*gcart[13];
+        gsp[15] = coeff_c2s[280]*gcart[1] - coeff_c2s[283]*gcart[2] + coeff_c2s[286]*gcart[7] - coeff_c2s[293]*gcart[12];
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+                gsp = gsp0;
+                for (i = 0; i < nket; i++) {
+        gsp[0 ] += coeff_c2s[20]*gcart[0] + coeff_c2s[23]*gcart[3] + coeff_c2s[26]*gcart[6] + coeff_c2s[33]*gcart[13];
+        gsp[1 ] += coeff_c2s[20]*gcart[1] - coeff_c2s[23]*gcart[2] + coeff_c2s[26]*gcart[7] - coeff_c2s[33]*gcart[12];
+        gsp[2 ] += coeff_c2s[64]*gcart[4] + coeff_c2s[69]*gcart[9] + coeff_c2s[74]*gcart[14];
+        gsp[3 ] += coeff_c2s[64]*gcart[5] - coeff_c2s[69]*gcart[8] + coeff_c2s[74]*gcart[15];
+        gsp[4 ] += coeff_c2s[100]*gcart[0] + coeff_c2s[103]*gcart[3] + coeff_c2s[106]*gcart[6] + coeff_c2s[110]*gcart[10] + coeff_c2s[113]*gcart[13] + coeff_c2s[117]*gcart[17];
+        gsp[5 ] += coeff_c2s[100]*gcart[1] - coeff_c2s[103]*gcart[2] + coeff_c2s[106]*gcart[7] + coeff_c2s[110]*gcart[11] - coeff_c2s[113]*gcart[12] - coeff_c2s[117]*gcart[16];
+        gsp[6 ] += coeff_c2s[144]*gcart[4] + coeff_c2s[154]*gcart[14] + coeff_c2s[158]*gcart[18];
+        gsp[7 ] += coeff_c2s[144]*gcart[5] + coeff_c2s[154]*gcart[15] + coeff_c2s[158]*gcart[19];
+        gsp[8 ] += coeff_c2s[180]*gcart[0] + coeff_c2s[183]*gcart[3] + coeff_c2s[186]*gcart[6] + coeff_c2s[190]*gcart[10] + coeff_c2s[193]*gcart[13] + coeff_c2s[197]*gcart[17];
+        gsp[9 ] += coeff_c2s[180]*gcart[1] - coeff_c2s[183]*gcart[2] + coeff_c2s[186]*gcart[7] + coeff_c2s[190]*gcart[11] - coeff_c2s[193]*gcart[12] - coeff_c2s[197]*gcart[16];
+        gsp[10] += coeff_c2s[224]*gcart[4] + coeff_c2s[229]*gcart[9] + coeff_c2s[234]*gcart[14];
+        gsp[11] += coeff_c2s[224]*gcart[5] - coeff_c2s[229]*gcart[8] + coeff_c2s[234]*gcart[15];
+        gsp[12] += coeff_c2s[260]*gcart[0] + coeff_c2s[263]*gcart[3] + coeff_c2s[266]*gcart[6] + coeff_c2s[273]*gcart[13];
+        gsp[13] += coeff_c2s[260]*gcart[1] - coeff_c2s[263]*gcart[2] + coeff_c2s[266]*gcart[7] - coeff_c2s[273]*gcart[12];
+        gsp[14] += 0;
+        gsp[15] += 0;
+        gsp += dgsp * OF_CMPLX;
+        gcart += 10 * OF_CMPLX;
+                }
+        }
+}
+static void f_ket_cart2spinor(double *gsp, int dgsp, int nbra,
+                              double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[3].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] = coeff_c2s[0]*gcart[0*nbra] - coeff_c2s[3]*gcart[2*nbra+1] + coeff_c2s[6]*gcart[6*nbra] - coeff_c2s[13]*gcart[12*nbra+1] + coeff_c2s[24]*gcart[24*nbra] - coeff_c2s[29]*gcart[28*nbra+1] + coeff_c2s[34]*gcart[34*nbra];
+        gsp[0*dgsp*OF_CMPLX+1] = coeff_c2s[0]*gcart[0*nbra+1] + coeff_c2s[3]*gcart[2*nbra] + coeff_c2s[6]*gcart[6*nbra+1] + coeff_c2s[13]*gcart[12*nbra] + coeff_c2s[24]*gcart[24*nbra+1] + coeff_c2s[29]*gcart[28*nbra] + coeff_c2s[34]*gcart[34*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+0] = coeff_c2s[44]*gcart[4*nbra] - coeff_c2s[49]*gcart[8*nbra+1] + coeff_c2s[54]*gcart[14*nbra] + coeff_c2s[60]*gcart[20*nbra] - coeff_c2s[63]*gcart[22*nbra+1] + coeff_c2s[66]*gcart[26*nbra] + coeff_c2s[70]*gcart[30*nbra] - coeff_c2s[73]*gcart[32*nbra+1] - coeff_c2s[77]*gcart[36*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+1] = coeff_c2s[44]*gcart[4*nbra+1] + coeff_c2s[49]*gcart[8*nbra] + coeff_c2s[54]*gcart[14*nbra+1] + coeff_c2s[60]*gcart[20*nbra+1] + coeff_c2s[63]*gcart[22*nbra] + coeff_c2s[66]*gcart[26*nbra+1] + coeff_c2s[70]*gcart[30*nbra+1] + coeff_c2s[73]*gcart[32*nbra] + coeff_c2s[77]*gcart[36*nbra];
+        gsp[2*dgsp*OF_CMPLX+0] = coeff_c2s[80]*gcart[0*nbra] - coeff_c2s[83]*gcart[2*nbra+1] + coeff_c2s[86]*gcart[6*nbra] + coeff_c2s[90]*gcart[10*nbra] - coeff_c2s[93]*gcart[12*nbra+1] - coeff_c2s[97]*gcart[16*nbra+1] + coeff_c2s[104]*gcart[24*nbra] + coeff_c2s[114]*gcart[34*nbra] + coeff_c2s[118]*gcart[38*nbra];
+        gsp[2*dgsp*OF_CMPLX+1] = coeff_c2s[80]*gcart[0*nbra+1] + coeff_c2s[83]*gcart[2*nbra] + coeff_c2s[86]*gcart[6*nbra+1] + coeff_c2s[90]*gcart[10*nbra+1] + coeff_c2s[93]*gcart[12*nbra] + coeff_c2s[97]*gcart[16*nbra] + coeff_c2s[104]*gcart[24*nbra+1] + coeff_c2s[114]*gcart[34*nbra+1] + coeff_c2s[118]*gcart[38*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+0] = coeff_c2s[124]*gcart[4*nbra] + coeff_c2s[134]*gcart[14*nbra] + coeff_c2s[138]*gcart[18*nbra] + coeff_c2s[140]*gcart[20*nbra] - coeff_c2s[143]*gcart[22*nbra+1] + coeff_c2s[146]*gcart[26*nbra] + coeff_c2s[150]*gcart[30*nbra] - coeff_c2s[153]*gcart[32*nbra+1] - coeff_c2s[157]*gcart[36*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+1] = coeff_c2s[124]*gcart[4*nbra+1] + coeff_c2s[134]*gcart[14*nbra+1] + coeff_c2s[138]*gcart[18*nbra+1] + coeff_c2s[140]*gcart[20*nbra+1] + coeff_c2s[143]*gcart[22*nbra] + coeff_c2s[146]*gcart[26*nbra+1] + coeff_c2s[150]*gcart[30*nbra+1] + coeff_c2s[153]*gcart[32*nbra] + coeff_c2s[157]*gcart[36*nbra];
+        gsp[4*dgsp*OF_CMPLX+0] = coeff_c2s[160]*gcart[0*nbra] - coeff_c2s[163]*gcart[2*nbra+1] + coeff_c2s[166]*gcart[6*nbra] + coeff_c2s[170]*gcart[10*nbra] - coeff_c2s[173]*gcart[12*nbra+1] - coeff_c2s[177]*gcart[16*nbra+1] + coeff_c2s[184]*gcart[24*nbra] - coeff_c2s[189]*gcart[28*nbra+1] + coeff_c2s[194]*gcart[34*nbra];
+        gsp[4*dgsp*OF_CMPLX+1] = coeff_c2s[160]*gcart[0*nbra+1] + coeff_c2s[163]*gcart[2*nbra] + coeff_c2s[166]*gcart[6*nbra+1] + coeff_c2s[170]*gcart[10*nbra+1] + coeff_c2s[173]*gcart[12*nbra] + coeff_c2s[177]*gcart[16*nbra] + coeff_c2s[184]*gcart[24*nbra+1] + coeff_c2s[189]*gcart[28*nbra] + coeff_c2s[194]*gcart[34*nbra+1];
+        gsp[5*dgsp*OF_CMPLX+0] = coeff_c2s[204]*gcart[4*nbra] - coeff_c2s[209]*gcart[8*nbra+1] + coeff_c2s[214]*gcart[14*nbra] + coeff_c2s[220]*gcart[20*nbra] - coeff_c2s[223]*gcart[22*nbra+1] + coeff_c2s[226]*gcart[26*nbra] - coeff_c2s[233]*gcart[32*nbra+1];
+        gsp[5*dgsp*OF_CMPLX+1] = coeff_c2s[204]*gcart[4*nbra+1] + coeff_c2s[209]*gcart[8*nbra] + coeff_c2s[214]*gcart[14*nbra+1] + coeff_c2s[220]*gcart[20*nbra+1] + coeff_c2s[223]*gcart[22*nbra] + coeff_c2s[226]*gcart[26*nbra+1] + coeff_c2s[233]*gcart[32*nbra];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + dgsp*OF_CMPLX*6;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[3].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] = coeff_c2s[20]*gcart[20*nbra] - coeff_c2s[23]*gcart[22*nbra+1] + coeff_c2s[26]*gcart[26*nbra] - coeff_c2s[33]*gcart[32*nbra+1];
+        gsp[0*dgsp*OF_CMPLX+1] = coeff_c2s[20]*gcart[20*nbra+1] + coeff_c2s[23]*gcart[22*nbra] + coeff_c2s[26]*gcart[26*nbra+1] + coeff_c2s[33]*gcart[32*nbra];
+        gsp[1*dgsp*OF_CMPLX+0] = coeff_c2s[40]*gcart[0*nbra] - coeff_c2s[43]*gcart[2*nbra+1] + coeff_c2s[46]*gcart[6*nbra] - coeff_c2s[53]*gcart[12*nbra+1] + coeff_c2s[64]*gcart[24*nbra] - coeff_c2s[69]*gcart[28*nbra+1] + coeff_c2s[74]*gcart[34*nbra];
+        gsp[1*dgsp*OF_CMPLX+1] = coeff_c2s[40]*gcart[0*nbra+1] + coeff_c2s[43]*gcart[2*nbra] + coeff_c2s[46]*gcart[6*nbra+1] + coeff_c2s[53]*gcart[12*nbra] + coeff_c2s[64]*gcart[24*nbra+1] + coeff_c2s[69]*gcart[28*nbra] + coeff_c2s[74]*gcart[34*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+0] = coeff_c2s[84]*gcart[4*nbra] - coeff_c2s[89]*gcart[8*nbra+1] + coeff_c2s[94]*gcart[14*nbra] + coeff_c2s[100]*gcart[20*nbra] - coeff_c2s[103]*gcart[22*nbra+1] + coeff_c2s[106]*gcart[26*nbra] + coeff_c2s[110]*gcart[30*nbra] - coeff_c2s[113]*gcart[32*nbra+1] - coeff_c2s[117]*gcart[36*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+1] = coeff_c2s[84]*gcart[4*nbra+1] + coeff_c2s[89]*gcart[8*nbra] + coeff_c2s[94]*gcart[14*nbra+1] + coeff_c2s[100]*gcart[20*nbra+1] + coeff_c2s[103]*gcart[22*nbra] + coeff_c2s[106]*gcart[26*nbra+1] + coeff_c2s[110]*gcart[30*nbra+1] + coeff_c2s[113]*gcart[32*nbra] + coeff_c2s[117]*gcart[36*nbra];
+        gsp[3*dgsp*OF_CMPLX+0] = coeff_c2s[120]*gcart[0*nbra] - coeff_c2s[123]*gcart[2*nbra+1] + coeff_c2s[126]*gcart[6*nbra] + coeff_c2s[130]*gcart[10*nbra] - coeff_c2s[133]*gcart[12*nbra+1] - coeff_c2s[137]*gcart[16*nbra+1] + coeff_c2s[144]*gcart[24*nbra] + coeff_c2s[154]*gcart[34*nbra] + coeff_c2s[158]*gcart[38*nbra];
+        gsp[3*dgsp*OF_CMPLX+1] = coeff_c2s[120]*gcart[0*nbra+1] + coeff_c2s[123]*gcart[2*nbra] + coeff_c2s[126]*gcart[6*nbra+1] + coeff_c2s[130]*gcart[10*nbra+1] + coeff_c2s[133]*gcart[12*nbra] + coeff_c2s[137]*gcart[16*nbra] + coeff_c2s[144]*gcart[24*nbra+1] + coeff_c2s[154]*gcart[34*nbra+1] + coeff_c2s[158]*gcart[38*nbra+1];
+        gsp[4*dgsp*OF_CMPLX+0] = coeff_c2s[164]*gcart[4*nbra] + coeff_c2s[174]*gcart[14*nbra] + coeff_c2s[178]*gcart[18*nbra] + coeff_c2s[180]*gcart[20*nbra] - coeff_c2s[183]*gcart[22*nbra+1] + coeff_c2s[186]*gcart[26*nbra] + coeff_c2s[190]*gcart[30*nbra] - coeff_c2s[193]*gcart[32*nbra+1] - coeff_c2s[197]*gcart[36*nbra+1];
+        gsp[4*dgsp*OF_CMPLX+1] = coeff_c2s[164]*gcart[4*nbra+1] + coeff_c2s[174]*gcart[14*nbra+1] + coeff_c2s[178]*gcart[18*nbra+1] + coeff_c2s[180]*gcart[20*nbra+1] + coeff_c2s[183]*gcart[22*nbra] + coeff_c2s[186]*gcart[26*nbra+1] + coeff_c2s[190]*gcart[30*nbra+1] + coeff_c2s[193]*gcart[32*nbra] + coeff_c2s[197]*gcart[36*nbra];
+        gsp[5*dgsp*OF_CMPLX+0] = coeff_c2s[200]*gcart[0*nbra] - coeff_c2s[203]*gcart[2*nbra+1] + coeff_c2s[206]*gcart[6*nbra] + coeff_c2s[210]*gcart[10*nbra] - coeff_c2s[213]*gcart[12*nbra+1] - coeff_c2s[217]*gcart[16*nbra+1] + coeff_c2s[224]*gcart[24*nbra] - coeff_c2s[229]*gcart[28*nbra+1] + coeff_c2s[234]*gcart[34*nbra];
+        gsp[5*dgsp*OF_CMPLX+1] = coeff_c2s[200]*gcart[0*nbra+1] + coeff_c2s[203]*gcart[2*nbra] + coeff_c2s[206]*gcart[6*nbra+1] + coeff_c2s[210]*gcart[10*nbra+1] + coeff_c2s[213]*gcart[12*nbra] + coeff_c2s[217]*gcart[16*nbra] + coeff_c2s[224]*gcart[24*nbra+1] + coeff_c2s[229]*gcart[28*nbra] + coeff_c2s[234]*gcart[34*nbra+1];
+        gsp[6*dgsp*OF_CMPLX+0] = coeff_c2s[244]*gcart[4*nbra] - coeff_c2s[249]*gcart[8*nbra+1] + coeff_c2s[254]*gcart[14*nbra] + coeff_c2s[260]*gcart[20*nbra] - coeff_c2s[263]*gcart[22*nbra+1] + coeff_c2s[266]*gcart[26*nbra] - coeff_c2s[273]*gcart[32*nbra+1];
+        gsp[6*dgsp*OF_CMPLX+1] = coeff_c2s[244]*gcart[4*nbra+1] + coeff_c2s[249]*gcart[8*nbra] + coeff_c2s[254]*gcart[14*nbra+1] + coeff_c2s[260]*gcart[20*nbra+1] + coeff_c2s[263]*gcart[22*nbra] + coeff_c2s[266]*gcart[26*nbra+1] + coeff_c2s[273]*gcart[32*nbra];
+        gsp[7*dgsp*OF_CMPLX+0] = coeff_c2s[280]*gcart[0*nbra] - coeff_c2s[283]*gcart[2*nbra+1] + coeff_c2s[286]*gcart[6*nbra] - coeff_c2s[293]*gcart[12*nbra+1];
+        gsp[7*dgsp*OF_CMPLX+1] = coeff_c2s[280]*gcart[0*nbra+1] + coeff_c2s[283]*gcart[2*nbra] + coeff_c2s[286]*gcart[6*nbra+1] + coeff_c2s[293]*gcart[12*nbra];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+        }
+}
+static void f_iket_cart2spinor(double *gsp, int dgsp, int nbra,
+                               double *gcart, int bas_id, int bas[])
+{
+        const int kappa = bas(KAPPA_OF, bas_id);
+        const double *coeff_c2s;
+        double *gsp0 = gsp;
+        double *gcart0 = gcart;
+        int i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[3].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] =-(coeff_c2s[0]*gcart[0*nbra+1] + coeff_c2s[3]*gcart[2*nbra] + coeff_c2s[6]*gcart[6*nbra+1] + coeff_c2s[13]*gcart[12*nbra] + coeff_c2s[24]*gcart[24*nbra+1] + coeff_c2s[29]*gcart[28*nbra] + coeff_c2s[34]*gcart[34*nbra+1]);
+        gsp[0*dgsp*OF_CMPLX+1] =  coeff_c2s[0]*gcart[0*nbra] - coeff_c2s[3]*gcart[2*nbra+1] + coeff_c2s[6]*gcart[6*nbra] - coeff_c2s[13]*gcart[12*nbra+1] + coeff_c2s[24]*gcart[24*nbra] - coeff_c2s[29]*gcart[28*nbra+1] + coeff_c2s[34]*gcart[34*nbra];
+        gsp[1*dgsp*OF_CMPLX+0] =-(coeff_c2s[44]*gcart[4*nbra+1] + coeff_c2s[49]*gcart[8*nbra] + coeff_c2s[54]*gcart[14*nbra+1] + coeff_c2s[60]*gcart[20*nbra+1] + coeff_c2s[63]*gcart[22*nbra] + coeff_c2s[66]*gcart[26*nbra+1] + coeff_c2s[70]*gcart[30*nbra+1] + coeff_c2s[73]*gcart[32*nbra] + coeff_c2s[77]*gcart[36*nbra]);
+        gsp[1*dgsp*OF_CMPLX+1] =  coeff_c2s[44]*gcart[4*nbra] - coeff_c2s[49]*gcart[8*nbra+1] + coeff_c2s[54]*gcart[14*nbra] + coeff_c2s[60]*gcart[20*nbra] - coeff_c2s[63]*gcart[22*nbra+1] + coeff_c2s[66]*gcart[26*nbra] + coeff_c2s[70]*gcart[30*nbra] - coeff_c2s[73]*gcart[32*nbra+1] - coeff_c2s[77]*gcart[36*nbra+1];
+        gsp[2*dgsp*OF_CMPLX+0] =-(coeff_c2s[80]*gcart[0*nbra+1] + coeff_c2s[83]*gcart[2*nbra] + coeff_c2s[86]*gcart[6*nbra+1] + coeff_c2s[90]*gcart[10*nbra+1] + coeff_c2s[93]*gcart[12*nbra] + coeff_c2s[97]*gcart[16*nbra] + coeff_c2s[104]*gcart[24*nbra+1] + coeff_c2s[114]*gcart[34*nbra+1] + coeff_c2s[118]*gcart[38*nbra+1]);
+        gsp[2*dgsp*OF_CMPLX+1] =  coeff_c2s[80]*gcart[0*nbra] - coeff_c2s[83]*gcart[2*nbra+1] + coeff_c2s[86]*gcart[6*nbra] + coeff_c2s[90]*gcart[10*nbra] - coeff_c2s[93]*gcart[12*nbra+1] - coeff_c2s[97]*gcart[16*nbra+1] + coeff_c2s[104]*gcart[24*nbra] + coeff_c2s[114]*gcart[34*nbra] + coeff_c2s[118]*gcart[38*nbra];
+        gsp[3*dgsp*OF_CMPLX+0] =-(coeff_c2s[124]*gcart[4*nbra+1] + coeff_c2s[134]*gcart[14*nbra+1] + coeff_c2s[138]*gcart[18*nbra+1] + coeff_c2s[140]*gcart[20*nbra+1] + coeff_c2s[143]*gcart[22*nbra] + coeff_c2s[146]*gcart[26*nbra+1] + coeff_c2s[150]*gcart[30*nbra+1] + coeff_c2s[153]*gcart[32*nbra] + coeff_c2s[157]*gcart[36*nbra]);
+        gsp[3*dgsp*OF_CMPLX+1] =  coeff_c2s[124]*gcart[4*nbra] + coeff_c2s[134]*gcart[14*nbra] + coeff_c2s[138]*gcart[18*nbra] + coeff_c2s[140]*gcart[20*nbra] - coeff_c2s[143]*gcart[22*nbra+1] + coeff_c2s[146]*gcart[26*nbra] + coeff_c2s[150]*gcart[30*nbra] - coeff_c2s[153]*gcart[32*nbra+1] - coeff_c2s[157]*gcart[36*nbra+1];
+        gsp[4*dgsp*OF_CMPLX+0] =-(coeff_c2s[160]*gcart[0*nbra+1] + coeff_c2s[163]*gcart[2*nbra] + coeff_c2s[166]*gcart[6*nbra+1] + coeff_c2s[170]*gcart[10*nbra+1] + coeff_c2s[173]*gcart[12*nbra] + coeff_c2s[177]*gcart[16*nbra] + coeff_c2s[184]*gcart[24*nbra+1] + coeff_c2s[189]*gcart[28*nbra] + coeff_c2s[194]*gcart[34*nbra+1]);
+        gsp[4*dgsp*OF_CMPLX+1] =  coeff_c2s[160]*gcart[0*nbra] - coeff_c2s[163]*gcart[2*nbra+1] + coeff_c2s[166]*gcart[6*nbra] + coeff_c2s[170]*gcart[10*nbra] - coeff_c2s[173]*gcart[12*nbra+1] - coeff_c2s[177]*gcart[16*nbra+1] + coeff_c2s[184]*gcart[24*nbra] - coeff_c2s[189]*gcart[28*nbra+1] + coeff_c2s[194]*gcart[34*nbra];
+        gsp[5*dgsp*OF_CMPLX+0] =-(coeff_c2s[204]*gcart[4*nbra+1] + coeff_c2s[209]*gcart[8*nbra] + coeff_c2s[214]*gcart[14*nbra+1] + coeff_c2s[220]*gcart[20*nbra+1] + coeff_c2s[223]*gcart[22*nbra] + coeff_c2s[226]*gcart[26*nbra+1] + coeff_c2s[233]*gcart[32*nbra]);
+        gsp[5*dgsp*OF_CMPLX+1] =  coeff_c2s[204]*gcart[4*nbra] - coeff_c2s[209]*gcart[8*nbra+1] + coeff_c2s[214]*gcart[14*nbra] + coeff_c2s[220]*gcart[20*nbra] - coeff_c2s[223]*gcart[22*nbra+1] + coeff_c2s[226]*gcart[26*nbra] - coeff_c2s[233]*gcart[32*nbra+1];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+                gcart = gcart0;
+                gsp = gsp0 + dgsp*OF_CMPLX*6;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[3].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+        gsp[0*dgsp*OF_CMPLX+0] =-(coeff_c2s[20]*gcart[20*nbra+1] + coeff_c2s[23]*gcart[22*nbra] + coeff_c2s[26]*gcart[26*nbra+1] + coeff_c2s[33]*gcart[32*nbra]);
+        gsp[0*dgsp*OF_CMPLX+1] =  coeff_c2s[20]*gcart[20*nbra] - coeff_c2s[23]*gcart[22*nbra+1] + coeff_c2s[26]*gcart[26*nbra] - coeff_c2s[33]*gcart[32*nbra+1];
+        gsp[1*dgsp*OF_CMPLX+0] =-(coeff_c2s[40]*gcart[0*nbra+1] + coeff_c2s[43]*gcart[2*nbra] + coeff_c2s[46]*gcart[6*nbra+1] + coeff_c2s[53]*gcart[12*nbra] + coeff_c2s[64]*gcart[24*nbra+1] + coeff_c2s[69]*gcart[28*nbra] + coeff_c2s[74]*gcart[34*nbra+1]);
+        gsp[1*dgsp*OF_CMPLX+1] =  coeff_c2s[40]*gcart[0*nbra] - coeff_c2s[43]*gcart[2*nbra+1] + coeff_c2s[46]*gcart[6*nbra] - coeff_c2s[53]*gcart[12*nbra+1] + coeff_c2s[64]*gcart[24*nbra] - coeff_c2s[69]*gcart[28*nbra+1] + coeff_c2s[74]*gcart[34*nbra];
+        gsp[2*dgsp*OF_CMPLX+0] =-(coeff_c2s[84]*gcart[4*nbra+1] + coeff_c2s[89]*gcart[8*nbra] + coeff_c2s[94]*gcart[14*nbra+1] + coeff_c2s[100]*gcart[20*nbra+1] + coeff_c2s[103]*gcart[22*nbra] + coeff_c2s[106]*gcart[26*nbra+1] + coeff_c2s[110]*gcart[30*nbra+1] + coeff_c2s[113]*gcart[32*nbra] + coeff_c2s[117]*gcart[36*nbra]);
+        gsp[2*dgsp*OF_CMPLX+1] =  coeff_c2s[84]*gcart[4*nbra] - coeff_c2s[89]*gcart[8*nbra+1] + coeff_c2s[94]*gcart[14*nbra] + coeff_c2s[100]*gcart[20*nbra] - coeff_c2s[103]*gcart[22*nbra+1] + coeff_c2s[106]*gcart[26*nbra] + coeff_c2s[110]*gcart[30*nbra] - coeff_c2s[113]*gcart[32*nbra+1] - coeff_c2s[117]*gcart[36*nbra+1];
+        gsp[3*dgsp*OF_CMPLX+0] =-(coeff_c2s[120]*gcart[0*nbra+1] + coeff_c2s[123]*gcart[2*nbra] + coeff_c2s[126]*gcart[6*nbra+1] + coeff_c2s[130]*gcart[10*nbra+1] + coeff_c2s[133]*gcart[12*nbra] + coeff_c2s[137]*gcart[16*nbra] + coeff_c2s[144]*gcart[24*nbra+1] + coeff_c2s[154]*gcart[34*nbra+1] + coeff_c2s[158]*gcart[38*nbra+1]);
+        gsp[3*dgsp*OF_CMPLX+1] =  coeff_c2s[120]*gcart[0*nbra] - coeff_c2s[123]*gcart[2*nbra+1] + coeff_c2s[126]*gcart[6*nbra] + coeff_c2s[130]*gcart[10*nbra] - coeff_c2s[133]*gcart[12*nbra+1] - coeff_c2s[137]*gcart[16*nbra+1] + coeff_c2s[144]*gcart[24*nbra] + coeff_c2s[154]*gcart[34*nbra] + coeff_c2s[158]*gcart[38*nbra];
+        gsp[4*dgsp*OF_CMPLX+0] =-(coeff_c2s[164]*gcart[4*nbra+1] + coeff_c2s[174]*gcart[14*nbra+1] + coeff_c2s[178]*gcart[18*nbra+1] + coeff_c2s[180]*gcart[20*nbra+1] + coeff_c2s[183]*gcart[22*nbra] + coeff_c2s[186]*gcart[26*nbra+1] + coeff_c2s[190]*gcart[30*nbra+1] + coeff_c2s[193]*gcart[32*nbra] + coeff_c2s[197]*gcart[36*nbra]);
+        gsp[4*dgsp*OF_CMPLX+1] =  coeff_c2s[164]*gcart[4*nbra] + coeff_c2s[174]*gcart[14*nbra] + coeff_c2s[178]*gcart[18*nbra] + coeff_c2s[180]*gcart[20*nbra] - coeff_c2s[183]*gcart[22*nbra+1] + coeff_c2s[186]*gcart[26*nbra] + coeff_c2s[190]*gcart[30*nbra] - coeff_c2s[193]*gcart[32*nbra+1] - coeff_c2s[197]*gcart[36*nbra+1];
+        gsp[5*dgsp*OF_CMPLX+0] =-(coeff_c2s[200]*gcart[0*nbra+1] + coeff_c2s[203]*gcart[2*nbra] + coeff_c2s[206]*gcart[6*nbra+1] + coeff_c2s[210]*gcart[10*nbra+1] + coeff_c2s[213]*gcart[12*nbra] + coeff_c2s[217]*gcart[16*nbra] + coeff_c2s[224]*gcart[24*nbra+1] + coeff_c2s[229]*gcart[28*nbra] + coeff_c2s[234]*gcart[34*nbra+1]);
+        gsp[5*dgsp*OF_CMPLX+1] =  coeff_c2s[200]*gcart[0*nbra] - coeff_c2s[203]*gcart[2*nbra+1] + coeff_c2s[206]*gcart[6*nbra] + coeff_c2s[210]*gcart[10*nbra] - coeff_c2s[213]*gcart[12*nbra+1] - coeff_c2s[217]*gcart[16*nbra+1] + coeff_c2s[224]*gcart[24*nbra] - coeff_c2s[229]*gcart[28*nbra+1] + coeff_c2s[234]*gcart[34*nbra];
+        gsp[6*dgsp*OF_CMPLX+0] =-(coeff_c2s[244]*gcart[4*nbra+1] + coeff_c2s[249]*gcart[8*nbra] + coeff_c2s[254]*gcart[14*nbra+1] + coeff_c2s[260]*gcart[20*nbra+1] + coeff_c2s[263]*gcart[22*nbra] + coeff_c2s[266]*gcart[26*nbra+1] + coeff_c2s[273]*gcart[32*nbra]);
+        gsp[6*dgsp*OF_CMPLX+1] =  coeff_c2s[244]*gcart[4*nbra] - coeff_c2s[249]*gcart[8*nbra+1] + coeff_c2s[254]*gcart[14*nbra] + coeff_c2s[260]*gcart[20*nbra] - coeff_c2s[263]*gcart[22*nbra+1] + coeff_c2s[266]*gcart[26*nbra] - coeff_c2s[273]*gcart[32*nbra+1];
+        gsp[7*dgsp*OF_CMPLX+0] =-(coeff_c2s[280]*gcart[0*nbra+1] + coeff_c2s[283]*gcart[2*nbra] + coeff_c2s[286]*gcart[6*nbra+1] + coeff_c2s[293]*gcart[12*nbra]);
+        gsp[7*dgsp*OF_CMPLX+1] =  coeff_c2s[280]*gcart[0*nbra] - coeff_c2s[283]*gcart[2*nbra+1] + coeff_c2s[286]*gcart[6*nbra] - coeff_c2s[293]*gcart[12*nbra+1];
+        gsp += OF_CMPLX;
+        gcart += OF_CMPLX;
+                }
+        }
+}
+
+
+static void (*f_bra_spinor_e1sf[6])() = {
+        s_bra_cart2spinor_e1sf,
+        p_bra_cart2spinor_e1sf,
+        d_bra_cart2spinor_e1sf,
+        f_bra_cart2spinor_e1sf,
+        a_bra_cart2spinor_e1sf,
+        a_bra_cart2spinor_e1sf,
+};
+
+static void (*f_bra_spinor_sf[6])() = {
+        s_bra_cart2spinor_sf,
+        p_bra_cart2spinor_sf,
+        d_bra_cart2spinor_sf,
+        f_bra_cart2spinor_sf,
+        a_bra_cart2spinor_sf,
+        a_bra_cart2spinor_sf,
+};
+
+static void (*f_ket_spinor[6])() = {
+        s_ket_cart2spinor,
+        p_ket_cart2spinor,
+        d_ket_cart2spinor,
+        f_ket_cart2spinor,
+        a_ket_cart2spinor,
+        a_ket_cart2spinor,
+};
+
+static void (*f_iket_spinor[6])() = {
+        s_iket_cart2spinor,
+        p_iket_cart2spinor,
+        d_iket_cart2spinor,
+        f_iket_cart2spinor,
+        a_iket_cart2spinor,
+        a_iket_cart2spinor,
+};
+
+static void (*f_bra_spinor_si[6])() = {
+        s_bra_cart2spinor_si,
+        p_bra_cart2spinor_si,
+        d_bra_cart2spinor_si,
+        f_bra_cart2spinor_si,
+        a_bra_cart2spinor_si,
+        a_bra_cart2spinor_si,
+};
 
 /*************************************************
  *
@@ -2604,10 +4009,6 @@ static void dcopy_iklj(double *fijkl, const double *gctr,
 void c2s_sph_1e(double *opij, const double *gctr, const int *shls,
                 const int *bas)
 {
-        const double D0[] = {0};
-        const double D1[] = {1};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_T[] = {'T'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int i_l = bas(ANG_OF, i_sh);
@@ -2626,12 +4027,8 @@ void c2s_sph_1e(double *opij, const double *gctr, const int *shls,
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
-                        dgemm_(TRANS_T, TRANS_N, &di, &nfj, &nfi,
-                               D1, g_c2s[i_l].cart2sph, &nfi, gctr, &nfi,
-                               D0, tmp1, &di);
-                        dgemm_(TRANS_N, TRANS_N, &di, &dj, &nfj,
-                               D1, tmp1, &di, g_c2s[j_l].cart2sph, &nfj,
-                               D0, opij + ni * jc + ic, &ni);
+                        (f_bra_sph[i_l])(tmp1, di, nfj, gctr, i_sh, bas);
+                        (f_ket_sph[j_l])(opij+ni*jc+ic, ni, di, tmp1, j_sh, bas);
                         gctr += nf;
                 }
         free(tmp1);
@@ -2641,13 +4038,8 @@ void c2s_sph_1e(double *opij, const double *gctr, const int *shls,
 /*
  * 1e integrals, cartesian to spin free spinor.
  */
-static void sf_1e(double *opij, const double *gctr, const double *zfac,
-                  const int *shls, const int *bas)
+void c2s_sf_1e(double *opij, const double *gctr, const int *shls, const int *bas)
 {
-        const double Z0[] = {0, 0};
-        const double Z1[] = {1, 0};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_C[] = {'C'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int i_l = bas(ANG_OF, i_sh);
@@ -2660,44 +4052,48 @@ static void sf_1e(double *opij, const double *gctr, const double *zfac,
         const int nj = dj * j_ctr;
         const int nfi = len_cart(i_l);
         const int nfj = len_cart(j_l);
-        const int nf2i = nfi + nfi;
         const int nf2j = nfj + nfj;
         const int nf = nfi * nfj;
-        const int nij = di * nfj;
         int ic, jc;
-        const double *c2s_i, *c2s_j;
-        double *const tmp1 = (double *)malloc(sizeof(double) * nf * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nf2j * OF_CMPLX);
-
-        if (bas(KAPPA_OF, i_sh) < 0) { // j = l + 1/2
-                c2s_i = g_c2s[i_l].cart2j_gt_l;
-        } else {
-                c2s_i = g_c2s[i_l].cart2j_lt_l;
-        }
-        if (bas(KAPPA_OF, j_sh) < 0) { // j = l + 1/2
-                c2s_j = g_c2s[j_l].cart2j_gt_l;
-        } else {
-                c2s_j = g_c2s[j_l].cart2j_lt_l;
-        }
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
-                        dcmplx_re(nf, tmp1, gctr);
+                        (f_bra_spinor_e1sf[i_l])(tmp2, di, nfj, gctr, i_sh, bas);
+                        (f_ket_spinor[j_l])(opij+(ni*jc+ic)*OF_CMPLX,
+                                            ni, di, tmp2, j_sh, bas);
                         gctr += nf;
-
-                        zgemm_(TRANS_C, TRANS_N, &di, &nfj, &nfi,
-                               Z1, c2s_i, &nf2i, tmp1, &nfi,
-                               Z0, tmp2, &di);
-                        zgemm_(TRANS_C, TRANS_N, &di, &nfj, &nfi,
-                               Z1, c2s_i + nfi * OF_CMPLX, &nf2i, tmp1, &nfi,
-                               Z0, tmp2 + nij * OF_CMPLX, &di);
-
-                        zgemm_(TRANS_N, TRANS_N, &di, &dj, &nf2j,
-                               zfac, tmp2, &di, c2s_j, &nf2j, 
-                               Z0, opij + (ni * jc + ic) * OF_CMPLX, &ni);
                 }
 
-        free(tmp1);
+        free(tmp2);
+}
+void c2s_sf_1ei(double *opij, const double *gctr, const int *shls, const int *bas)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int i_l = bas(ANG_OF, i_sh);
+        const int j_l = bas(ANG_OF, j_sh);
+        const int i_ctr = bas(NCTR_OF, i_sh);
+        const int j_ctr = bas(NCTR_OF, j_sh);
+        const int di = len_spinor(i_sh, bas);
+        const int dj = len_spinor(j_sh, bas);
+        const int ni = di * i_ctr;
+        const int nj = dj * j_ctr;
+        const int nfi = len_cart(i_l);
+        const int nfj = len_cart(j_l);
+        const int nf2j = nfj + nfj;
+        const int nf = nfi * nfj;
+        int ic, jc;
+        double *const tmp2 = (double *)malloc(sizeof(double) * di*nf2j * OF_CMPLX);
+
+        for (jc = 0; jc < nj; jc += dj)
+                for (ic = 0; ic < ni; ic += di) {
+                        (f_bra_spinor_e1sf[i_l])(tmp2, di, nfj, gctr, i_sh, bas);
+                        (f_iket_spinor[j_l])(opij+(ni*jc+ic)*OF_CMPLX,
+                                             ni, di, tmp2, j_sh, bas);
+                        gctr += nf;
+                }
+
         free(tmp2);
 }
 
@@ -2705,13 +4101,8 @@ static void sf_1e(double *opij, const double *gctr, const double *zfac,
 /*
  * 1e integrals, cartesian to spinor.
  */
-static void si_1e(double *opij, const double *gctr, const double *zfac,
-                  const int *shls, const int *bas)
+void c2s_si_1e(double *opij, const double *gctr, const int *shls, const int *bas)
 {
-        const double Z0[] = {0, 0};
-        const double Z1[] = {1, 0};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_C[] = {'C'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int i_l = bas(ANG_OF, i_sh);
@@ -2728,46 +4119,73 @@ static void si_1e(double *opij, const double *gctr, const double *zfac,
         const int nf2j = nfj + nfj;
         const int nf = nfi * nfj;
         int ic, jc;
-        const double *c2s_i, *c2s_j;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr;
         const double *gc_1 = gc_z + nf * i_ctr * j_ctr;
-        double *const tmp1 = (double *)malloc(sizeof(double) * nf * 2 * OF_CMPLX);
-        double *const tmp2 = (double *)malloc(sizeof(double) * di*nf2j * OF_CMPLX);
-
-        if (bas(KAPPA_OF, i_sh) < 0) { // j = l + 1/2
-                c2s_i = g_c2s[i_l].cart2j_gt_l;
-        } else {
-                c2s_i = g_c2s[i_l].cart2j_lt_l;
-        }
-        if (bas(KAPPA_OF, j_sh) < 0) { // j = l + 1/2
-                c2s_j = g_c2s[j_l].cart2j_gt_l;
-        } else {
-                c2s_j = g_c2s[j_l].cart2j_lt_l;
-        }
+        double *const tmp1 = (double *)malloc(sizeof(double)*nf2i*nf2j*OF_CMPLX);
+        double *const tmp2 = (double *)malloc(sizeof(double)*di*nf2j*OF_CMPLX);
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
                         //cmplx( gctr.POS_1, gctr.POS_Z)
                         //cmplx( gctr.POS_Y, gctr.POS_X)
                         dcmplx_pp(nf, tmp1, gc_1, gc_z);
-                        dcmplx_pp(nf, tmp1 + nf * OF_CMPLX, gc_y, gc_x);
-                        zgemm_(TRANS_C, TRANS_N, &di, &nf2j, &nfi,
-                               Z1, c2s_i, &nf2i, tmp1, &nfi,
-                               Z0, tmp2, &di);
-
+                        dcmplx_pp(nf, tmp1+nf*OF_CMPLX, gc_y, gc_x);
                         //cmplx(-gctr.POS_Y, gctr.POS_X)
                         //cmplx( gctr.POS_1,-gctr.POS_Z)
-                        dcmplx_np(nf, tmp1, gc_y, gc_x);
-                        dcmplx_pn(nf, tmp1 + nf * OF_CMPLX, gc_1, gc_z);
-                        zgemm_(TRANS_C, TRANS_N, &di, &nf2j, &nfi,
-                               Z1, c2s_i + nfi * OF_CMPLX, &nf2i, tmp1, &nfi,
-                               Z1, tmp2, &di);
+                        dcmplx_np(nf, tmp1+nfi*nf2j*OF_CMPLX, gc_y, gc_x);
+                        dcmplx_pn(nf, tmp1+nfi*nf2j*OF_CMPLX+nf*OF_CMPLX, gc_1, gc_z);
+                        (f_bra_spinor_si[i_l])(tmp2, di, nf2j, tmp1, i_sh, bas);
+                        (f_ket_spinor[j_l])(opij+(ni*jc+ic)*OF_CMPLX,
+                                            ni, di, tmp2, j_sh, bas);
 
-                        zgemm_(TRANS_N, TRANS_N, &di, &dj, &nf2j,
-                               zfac, tmp2, &di, c2s_j, &nf2j, 
-                               Z0, opij + (ni * jc + ic) * OF_CMPLX, &ni);
+                        gc_x += nf;
+                        gc_y += nf;
+                        gc_z += nf;
+                        gc_1 += nf;
+                }
+        free(tmp1);
+        free(tmp2);
+}
+void c2s_si_1ei(double *opij, const double *gctr, const int *shls, const int *bas)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int i_l = bas(ANG_OF, i_sh);
+        const int j_l = bas(ANG_OF, j_sh);
+        const int i_ctr = bas(NCTR_OF, i_sh);
+        const int j_ctr = bas(NCTR_OF, j_sh);
+        const int di = len_spinor(i_sh, bas);
+        const int dj = len_spinor(j_sh, bas);
+        const int ni = di * i_ctr;
+        const int nj = dj * j_ctr;
+        const int nfi = len_cart(i_l);
+        const int nfj = len_cart(j_l);
+        const int nf2i = nfi + nfi;
+        const int nf2j = nfj + nfj;
+        const int nf = nfi * nfj;
+        int ic, jc;
+        const double *gc_x = gctr;
+        const double *gc_y = gc_x + nf * i_ctr * j_ctr;
+        const double *gc_z = gc_y + nf * i_ctr * j_ctr;
+        const double *gc_1 = gc_z + nf * i_ctr * j_ctr;
+        double *const tmp1 = (double *)malloc(sizeof(double)*nf2i*nf2j*OF_CMPLX);
+        double *const tmp2 = (double *)malloc(sizeof(double)*di*nf2j*OF_CMPLX);
+
+        for (jc = 0; jc < nj; jc += dj)
+                for (ic = 0; ic < ni; ic += di) {
+                        //cmplx( gctr.POS_1, gctr.POS_Z)
+                        //cmplx( gctr.POS_Y, gctr.POS_X)
+                        dcmplx_pp(nf, tmp1, gc_1, gc_z);
+                        dcmplx_pp(nf, tmp1+nf*OF_CMPLX, gc_y, gc_x);
+                        //cmplx(-gctr.POS_Y, gctr.POS_X)
+                        //cmplx( gctr.POS_1,-gctr.POS_Z)
+                        dcmplx_np(nf, tmp1+nfi*nf2j*OF_CMPLX, gc_y, gc_x);
+                        dcmplx_pn(nf, tmp1+nfi*nf2j*OF_CMPLX+nf*OF_CMPLX, gc_1, gc_z);
+                        (f_bra_spinor_si[i_l])(tmp2, di, nf2j, tmp1, i_sh, bas);
+                        (f_iket_spinor[j_l])(opij+(ni*jc+ic)*OF_CMPLX,
+                                             ni, di, tmp2, j_sh, bas);
 
                         gc_x += nf;
                         gc_y += nf;
@@ -2787,10 +4205,6 @@ static void si_1e(double *opij, const double *gctr, const double *zfac,
 void c2s_sph_2e1(double *fkijl, const double *gctr, const int *shls,
                  const int *bas)
 {
-        const double D0[] = {0};
-        const double D1[] = {1};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_T[] = {'T'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int k_sh = shls[2];
@@ -2828,36 +4242,22 @@ void c2s_sph_2e1(double *fkijl, const double *gctr, const int *shls,
         double *const tmp1 = (double *)malloc(sizeof(double) * di*nfk*nfl*nfj);
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nfj);
 
-        for (lc = 0; lc < nl; lc += dl)
-                for (kc = 0; kc < nk; kc += dk)
-                        for (jc = 0; jc < nj; jc += dj)
+        for (lc = 0; lc < nl; lc += dl) {
+                for (kc = 0; kc < nk; kc += dk) {
+                        for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
-                                        dgemm_(TRANS_T, TRANS_N, &di, &d_j, &nfi,
-                                               D1, g_c2s[i_l].cart2sph, &nfi,
-                                               gctr, &nfi,
-                                               D0, tmp1, &di);
-                                        dgemm_(TRANS_N, TRANS_N, &d_i, &dj, &nfj,
-                                               D1, tmp1, &d_i,
-                                               g_c2s[j_l].cart2sph, &nfj,
-                                               D0, tmp2, &d_i);
-                                        gctr += nf;
 
-                                        dswap_ik_jl(tmp1, tmp2, di, dj, nfk, nfl);
-                                        dgemm_(TRANS_T, TRANS_N, &dk, &d_l, &nfk,
-                                               D1, g_c2s[k_l].cart2sph, &nfk,
-                                               tmp1, &nfk,
-                                               D0, tmp2, &dk);
-                                        dgemm_(TRANS_N, TRANS_N, &d_k, &dl, &nfl,
-                                               D1, tmp2, &d_k,
-                                               g_c2s[l_l].cart2sph, &nfl,
-                                               D0, tmp1, &d_k);
-                                        pfkijl = fkijl + ofl * lc + ofk * kc
-                                                + ofj * jc + ic;
+        (f_bra_sph[i_l])(tmp1, di, d_j, gctr, i_sh, bas);
+        (f_ket_sph[j_l])(tmp2, d_i, d_i, tmp1, j_sh, bas);
+        gctr += nf;
 
-                                        dcopy_kijl(pfkijl, tmp1, 
-                                                   ni, nj, nk, nl,
-                                                   di, dj, dk, dl);
-                                }
+        dswap_ik_jl(tmp1, tmp2, di, dj, nfk, nfl);
+        (f_bra_sph[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
+        (f_ket_sph[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
+        pfkijl = fkijl + ofl * lc + ofk * kc + ofj * jc + ic;
+
+        dcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+                                } } } }
 
         free(tmp1);
         free(tmp2);
@@ -2871,13 +4271,8 @@ void c2s_sph_2e2() {};
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-static void sf_2e1(double *opij, const double *gctr, const double *zfac,
-                   const int *shls, const int *bas)
+void c2s_sf_2e1(double *opij, const double *gctr, const int *shls, const int *bas)
 {
-        const double Z0[] = {0, 0};
-        const double Z1[] = {1, 0};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_C[] = {'C'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int k_sh = shls[2];
@@ -2896,47 +4291,58 @@ static void sf_2e1(double *opij, const double *gctr, const double *zfac,
         const int nfj = len_cart(j_l);
         const int nfk = len_cart(k_l);
         const int nfl = len_cart(l_l);
-        const int nf2i = nfi + nfi;
         const int nf2j = nfj + nfj;
         const int nf = nfi * nfk * nfl * nfj;
         const int no = di * nfk * nfl * dj;
         const int d_i = di * nfk * nfl;
         const int d_j = nfk * nfl * nfj;
-        const int nij = d_i * nfj;
         int i;
-        const double *c2s_i, *c2s_j;
-        double *const tmp1 = (double *)malloc(sizeof(double) * nf * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nf2j * OF_CMPLX);
 
-        if (bas(KAPPA_OF, i_sh) < 0) { // j = l + 1/2
-                c2s_i = g_c2s[i_l].cart2j_gt_l;
-        } else {
-                c2s_i = g_c2s[i_l].cart2j_lt_l;
-        }
-        if (bas(KAPPA_OF, j_sh) < 0) { // j = l + 1/2
-                c2s_j = g_c2s[j_l].cart2j_gt_l;
-        } else {
-                c2s_j = g_c2s[j_l].cart2j_lt_l;
-        }
-
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
-                dcmplx_re(nf, tmp1, gctr);
+                (f_bra_spinor_e1sf[i_l])(tmp2, di, d_j, gctr, i_sh, bas);
+                (f_ket_spinor[j_l])(opij, d_i, d_i, tmp2, j_sh, bas);
                 gctr += nf;
-
-                zgemm_(TRANS_C, TRANS_N, &di, &d_j, &nfi,
-                       Z1, c2s_i, &nf2i, tmp1, &nfi,
-                       Z0, tmp2, &di);
-                zgemm_(TRANS_C, TRANS_N, &di, &d_j, &nfi,
-                       Z1, c2s_i + nfi * OF_CMPLX, &nf2i, tmp1, &nfi,
-                       Z0, tmp2 + nij * OF_CMPLX, &di);
-
-                zgemm_(TRANS_N, TRANS_N, &d_i, &dj, &nf2j,
-                       zfac, tmp2, &d_i, c2s_j, &nf2j, 
-                       Z0, opij, &d_i);
                 opij += no * OF_CMPLX;
         }
 
-        free(tmp1);
+        free(tmp2);
+}
+void c2s_sf_2e1i(double *opij, const double *gctr, const int *shls, const int *bas)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int k_sh = shls[2];
+        const int l_sh = shls[3];
+        const int i_l = bas(ANG_OF, i_sh);
+        const int j_l = bas(ANG_OF, j_sh);
+        const int k_l = bas(ANG_OF, k_sh);
+        const int l_l = bas(ANG_OF, l_sh);
+        const int i_ctr = bas(NCTR_OF, i_sh);
+        const int j_ctr = bas(NCTR_OF, j_sh);
+        const int k_ctr = bas(NCTR_OF, k_sh);
+        const int l_ctr = bas(NCTR_OF, l_sh);
+        const int di = len_spinor(i_sh, bas);
+        const int dj = len_spinor(j_sh, bas);
+        const int nfi = len_cart(i_l);
+        const int nfj = len_cart(j_l);
+        const int nfk = len_cart(k_l);
+        const int nfl = len_cart(l_l);
+        const int nf2j = nfj + nfj;
+        const int nf = nfi * nfk * nfl * nfj;
+        const int no = di * nfk * nfl * dj;
+        const int d_i = di * nfk * nfl;
+        const int d_j = nfk * nfl * nfj;
+        int i;
+        double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nf2j * OF_CMPLX);
+
+        for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
+                (f_bra_spinor_e1sf[i_l])(tmp2, di, d_j, gctr, i_sh, bas);
+                (f_iket_spinor[j_l])(opij, d_i, d_i, tmp2, j_sh, bas);
+                gctr += nf;
+                opij += no * OF_CMPLX;
+        }
+
         free(tmp2);
 }
 
@@ -2946,13 +4352,8 @@ static void sf_2e1(double *opij, const double *gctr, const double *zfac,
  *
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-static void sf_2e2(double *fkijl, const double *opij, const double *zfac,
-                   const int *shls, const int *bas)
+void c2s_sf_2e2(double *fkijl, const double *opij, const int *shls, const int *bas)
 {
-        const double Z0[] = {0, 0};
-        const double Z1[] = {1, 0};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_C[] = {'C'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int k_sh = shls[2];
@@ -2978,51 +4379,77 @@ static void sf_2e2(double *fkijl, const double *opij, const double *zfac,
         const int d_k = dk * di * dj;
         const int d_l = di * dj * nfl;
         const int nop = nfk * di * dj * nfl;
-        const int nkl = d_k * nfl;
         int ofj = ni;
         int ofk = ni * nj;
         int ofl = nk * ni * nj;
         int ic, jc, kc, lc;
-        const double *c2s_k, *c2s_l;
         double *pfkijl;
         double *const tmp1 = (double *)malloc(sizeof(double) * nf2k*di*dj*nf2l * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * dk*di*dj*nf2l * OF_CMPLX);
 
-        if (bas(KAPPA_OF, k_sh) < 0) { // j = l + 1/2
-                c2s_k = g_c2s[k_l].cart2j_gt_l;
-        } else {
-                c2s_k = g_c2s[k_l].cart2j_lt_l;
-        }
-        if (bas(KAPPA_OF, l_sh) < 0) { // j = l + 1/2
-                c2s_l = g_c2s[l_l].cart2j_gt_l;
-        } else {
-                c2s_l = g_c2s[l_l].cart2j_lt_l;
-        }
-
-        for (lc = 0; lc < nl; lc += dl)
-                for (kc = 0; kc < nk; kc += dk)
-                        for (jc = 0; jc < nj; jc += dj)
+        for (lc = 0; lc < nl; lc += dl) {
+                for (kc = 0; kc < nk; kc += dk) {
+                        for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
-                                        zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
+        zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
+        (f_bra_spinor_sf[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
+        (f_ket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
+        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-                                        zgemm_(TRANS_C, TRANS_N, &dk, &d_l, &nfk,
-                                               Z1, c2s_k, &nf2k, tmp1, &nfk,
-                                               Z0, tmp2, &dk);
-                                        zgemm_(TRANS_C, TRANS_N, &dk, &d_l, &nfk,
-                                               Z1, c2s_k + nfk * OF_CMPLX, &nf2k, tmp1, &nfk,
-                                               Z0, tmp2 + nkl * OF_CMPLX, &dk);
+        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        opij += nop * OF_CMPLX;
+                                } } } }
 
-                                        zgemm_(TRANS_N, TRANS_N, &d_k, &dl, &nf2l,
-                                               zfac, tmp2, &d_k, c2s_l, &nf2l, 
-                                               Z0, tmp1, &d_k);
-                                        pfkijl = fkijl + (ofl * lc + ofk * kc
-                                                + ofj * jc + ic) * OF_CMPLX;
+        free(tmp1);
+        free(tmp2);
+}
+void c2s_sf_2e2i(double *fkijl, const double *opij, const int *shls, const int *bas)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int k_sh = shls[2];
+        const int l_sh = shls[3];
+        const int k_l = bas(ANG_OF, k_sh);
+        const int l_l = bas(ANG_OF, l_sh);
+        const int i_ctr = bas(NCTR_OF, i_sh);
+        const int j_ctr = bas(NCTR_OF, j_sh);
+        const int k_ctr = bas(NCTR_OF, k_sh);
+        const int l_ctr = bas(NCTR_OF, l_sh);
+        const int di = len_spinor(i_sh, bas);
+        const int dj = len_spinor(j_sh, bas);
+        const int dk = len_spinor(k_sh, bas);
+        const int dl = len_spinor(l_sh, bas);
+        const int ni = di * i_ctr;
+        const int nj = dj * j_ctr;
+        const int nk = dk * k_ctr;
+        const int nl = dl * l_ctr;
+        const int nfk = len_cart(k_l);
+        const int nfl = len_cart(l_l);
+        const int nf2k = nfk + nfk;
+        const int nf2l = nfl + nfl;
+        const int d_k = dk * di * dj;
+        const int d_l = di * dj * nfl;
+        const int nop = nfk * di * dj * nfl;
+        int ofj = ni;
+        int ofk = ni * nj;
+        int ofl = nk * ni * nj;
+        int ic, jc, kc, lc;
+        double *pfkijl;
+        double *const tmp1 = (double *)malloc(sizeof(double) * nf2k*di*dj*nf2l * OF_CMPLX);
+        double *const tmp2 = (double *)malloc(sizeof(double) * dk*di*dj*nf2l * OF_CMPLX);
 
-                                        zcopy_kijl(pfkijl, tmp1, 
-                                                   ni, nj, nk, nl,
-                                                   di, dj, dk, dl);
-                                        opij += nop * OF_CMPLX;
-                                }
+        for (lc = 0; lc < nl; lc += dl) {
+                for (kc = 0; kc < nk; kc += dk) {
+                        for (jc = 0; jc < nj; jc += dj) {
+                                for (ic = 0; ic < ni; ic += di) {
+        zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
+        (f_bra_spinor_sf[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
+        (f_iket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
+        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
+
+        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        opij += nop * OF_CMPLX;
+                                } } } }
 
         free(tmp1);
         free(tmp2);
@@ -3034,13 +4461,8 @@ static void sf_2e2(double *fkijl, const double *opij, const double *zfac,
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-static void si_2e1(double *opij, const double *gctr, const double *zfac,
-                   const int *shls, const int *bas)
+void c2s_si_2e1(double *opij, const double *gctr, const int *shls, const int *bas)
 {
-        const double Z0[] = {0, 0};
-        const double Z1[] = {1, 0};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_C[] = {'C'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int k_sh = shls[2];
@@ -3066,46 +4488,79 @@ static void si_2e1(double *opij, const double *gctr, const double *zfac,
         const int d_i = di * nfk * nfl;
         const int d_j = nfk * nfl * nf2j;
         int i;
-        const double *c2s_i, *c2s_j;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr * k_ctr * l_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr * k_ctr * l_ctr;
         const double *gc_1 = gc_z + nf * i_ctr * j_ctr * k_ctr * l_ctr;
-        double *const tmp1 = (double *)malloc(sizeof(double) * nf * 2 * OF_CMPLX);
+        double *const tmp1 = (double *)malloc(sizeof(double) * nf2i*nfk*nfl*nf2j * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nf2j * OF_CMPLX);
-
-        if (bas(KAPPA_OF, i_sh) < 0) { // j = l + 1/2
-                c2s_i = g_c2s[i_l].cart2j_gt_l;
-        } else {
-                c2s_i = g_c2s[i_l].cart2j_lt_l;
-        }
-        if (bas(KAPPA_OF, j_sh) < 0) { // j = l + 1/2
-                c2s_j = g_c2s[j_l].cart2j_gt_l;
-        } else {
-                c2s_j = g_c2s[j_l].cart2j_lt_l;
-        }
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
                 //cmplx( gctr.POS_1, gctr.POS_Z)
                 //cmplx( gctr.POS_Y, gctr.POS_X)
                 dcmplx_pp(nf, tmp1, gc_1, gc_z);
-                dcmplx_pp(nf, tmp1 + nf * OF_CMPLX, gc_y, gc_x);
-                zgemm_(TRANS_C, TRANS_N, &di, &d_j, &nfi,
-                       Z1, c2s_i, &nf2i, tmp1, &nfi,
-                       Z0, tmp2, &di);
-
+                dcmplx_pp(nf, tmp1+nf*OF_CMPLX, gc_y, gc_x);
                 //cmplx(-gctr.POS_Y, gctr.POS_X)
                 //cmplx( gctr.POS_1,-gctr.POS_Z)
-                dcmplx_np(nf, tmp1, gc_y, gc_x);
-                dcmplx_pn(nf, tmp1 + nf * OF_CMPLX, gc_1, gc_z);
-                zgemm_(TRANS_C, TRANS_N, &di, &d_j, &nfi,
-                       Z1, c2s_i + nfi * OF_CMPLX, &nf2i, tmp1, &nfi,
-                       Z1, tmp2, &di);
+                dcmplx_np(nf, tmp1+nfi*d_j*OF_CMPLX, gc_y, gc_x);
+                dcmplx_pn(nf, tmp1+nfi*d_j*OF_CMPLX+nf*OF_CMPLX, gc_1, gc_z);
+                (f_bra_spinor_si[i_l])(tmp2, di, d_j, tmp1, i_sh, bas);
+                (f_ket_spinor[j_l])(opij, d_i, d_i, tmp2, j_sh, bas);
+                gc_x += nf;
+                gc_y += nf;
+                gc_z += nf;
+                gc_1 += nf;
+                opij += no * OF_CMPLX;
+        }
 
-                zgemm_(TRANS_N, TRANS_N, &d_i, &dj, &nf2j,
-                       zfac, tmp2, &d_i, c2s_j, &nf2j, 
-                       Z0, opij, &d_i);
+        free(tmp1);
+        free(tmp2);
+}
+void c2s_si_2e1i(double *opij, const double *gctr, const int *shls, const int *bas)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int k_sh = shls[2];
+        const int l_sh = shls[3];
+        const int i_l = bas(ANG_OF, i_sh);
+        const int j_l = bas(ANG_OF, j_sh);
+        const int k_l = bas(ANG_OF, k_sh);
+        const int l_l = bas(ANG_OF, l_sh);
+        const int i_ctr = bas(NCTR_OF, i_sh);
+        const int j_ctr = bas(NCTR_OF, j_sh);
+        const int k_ctr = bas(NCTR_OF, k_sh);
+        const int l_ctr = bas(NCTR_OF, l_sh);
+        const int di = len_spinor(i_sh, bas);
+        const int dj = len_spinor(j_sh, bas);
+        const int nfi = len_cart(i_l);
+        const int nfj = len_cart(j_l);
+        const int nfk = len_cart(k_l);
+        const int nfl = len_cart(l_l);
+        const int nf2i = nfi + nfi;
+        const int nf2j = nfj + nfj;
+        const int nf = nfi * nfk * nfl * nfj;
+        const int no = di * nfk * nfl * dj;
+        const int d_i = di * nfk * nfl;
+        const int d_j = nfk * nfl * nf2j;
+        int i;
+        const double *gc_x = gctr;
+        const double *gc_y = gc_x + nf * i_ctr * j_ctr * k_ctr * l_ctr;
+        const double *gc_z = gc_y + nf * i_ctr * j_ctr * k_ctr * l_ctr;
+        const double *gc_1 = gc_z + nf * i_ctr * j_ctr * k_ctr * l_ctr;
+        double *const tmp1 = (double *)malloc(sizeof(double) * nf2i*nfk*nfl*nf2j * OF_CMPLX);
+        double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nf2j * OF_CMPLX);
 
+        for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
+                //cmplx( gctr.POS_1, gctr.POS_Z)
+                //cmplx( gctr.POS_Y, gctr.POS_X)
+                dcmplx_pp(nf, tmp1, gc_1, gc_z);
+                dcmplx_pp(nf, tmp1+nf*OF_CMPLX, gc_y, gc_x);
+                //cmplx(-gctr.POS_Y, gctr.POS_X)
+                //cmplx( gctr.POS_1,-gctr.POS_Z)
+                dcmplx_np(nf, tmp1+nfi*d_j*OF_CMPLX, gc_y, gc_x);
+                dcmplx_pn(nf, tmp1+nfi*d_j*OF_CMPLX+nf*OF_CMPLX, gc_1, gc_z);
+                (f_bra_spinor_si[i_l])(tmp2, di, d_j, tmp1, i_sh, bas);
+                (f_iket_spinor[j_l])(opij, d_i, d_i, tmp2, j_sh, bas);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -3179,13 +4634,8 @@ static void si2e_swap(double *new, const double *oldx, const double *oldy,
                         }
                 }
 }
-static void si_2e2(double *fkijl, const double *opij, const double *zfac,
-                   const int *shls, const int *bas)
+void c2s_si_2e2(double *fkijl, const double *opij, const int *shls, const int *bas)
 {
-        const double Z0[] = {0, 0};
-        const double Z1[] = {1, 0};
-        const char TRANS_N[] = {'N'};
-        const char TRANS_C[] = {'C'};
         const int i_sh = shls[0];
         const int j_sh = shls[1];
         const int k_sh = shls[2];
@@ -3215,7 +4665,6 @@ static void si_2e2(double *fkijl, const double *opij, const double *zfac,
         int ofk = ni * nj;
         int ofl = nk * ni * nj;
         int ic, jc, kc, lc;
-        const double *c2s_k, *c2s_l;
         double *pfkijl;
         const double *ox = opij;
         const double *oy = ox + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
@@ -3224,65 +4673,85 @@ static void si_2e2(double *fkijl, const double *opij, const double *zfac,
         double *const tmp1 = (double *)malloc(sizeof(double) * nf2k*di*dj*nf2l * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * dk*di*dj*nf2l * OF_CMPLX);
 
-        if (bas(KAPPA_OF, k_sh) < 0) { // j = l + 1/2
-                c2s_k = g_c2s[k_l].cart2j_gt_l;
-        } else {
-                c2s_k = g_c2s[k_l].cart2j_lt_l;
-        }
-        if (bas(KAPPA_OF, l_sh) < 0) { // j = l + 1/2
-                c2s_l = g_c2s[l_l].cart2j_gt_l;
-        } else {
-                c2s_l = g_c2s[l_l].cart2j_lt_l;
-        }
-
-        for (lc = 0; lc < nl; lc += dl)
-                for (kc = 0; kc < nk; kc += dk)
-                        for (jc = 0; jc < nj; jc += dj)
+        for (lc = 0; lc < nl; lc += dl) {
+                for (kc = 0; kc < nk; kc += dk) {
+                        for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
-                                        si2e_swap(tmp1, ox, oy, oz, o1,
-                                                  di, dj, nfk, nfl);
+        si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
+        (f_bra_spinor_si[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
+        (f_ket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
+        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-                                        zgemm_(TRANS_C, TRANS_N, &dk, &d_l, &nfk,
-                                               Z1, c2s_k, &nf2k, tmp1, &nfk,
-                                               Z0, tmp2, &dk);
-                                        zgemm_(TRANS_C, TRANS_N, &dk, &d_l, &nfk,
-                                               Z1, c2s_k + nfk * OF_CMPLX, &nf2k,
-                                               tmp1 + nfk * d_l * OF_CMPLX, &nfk,
-                                               Z1, tmp2, &dk);
+        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
 
-                                        zgemm_(TRANS_N, TRANS_N, &d_k, &dl, &nf2l,
-                                               zfac, tmp2, &d_k, c2s_l, &nf2l, 
-                                               Z0, tmp1, &d_k);
-                                        pfkijl = fkijl + (ofl * lc + ofk * kc
-                                                + ofj * jc + ic) * OF_CMPLX;
-
-                                        zcopy_kijl(pfkijl, tmp1, 
-                                                   ni, nj, nk, nl,
-                                                   di, dj, dk, dl);
-
-                                        ox += nop * OF_CMPLX;
-                                        oy += nop * OF_CMPLX;
-                                        oz += nop * OF_CMPLX;
-                                        o1 += nop * OF_CMPLX;
-                                }
+        ox += nop * OF_CMPLX;
+        oy += nop * OF_CMPLX;
+        oz += nop * OF_CMPLX;
+        o1 += nop * OF_CMPLX;
+                                } } } }
 
         free(tmp1);
         free(tmp2);
 }
+void c2s_si_2e2i(double *fkijl, const double *opij, const int *shls, const int *bas)
+{
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int k_sh = shls[2];
+        const int l_sh = shls[3];
+        const int k_l = bas(ANG_OF, k_sh);
+        const int l_l = bas(ANG_OF, l_sh);
+        const int i_ctr = bas(NCTR_OF, i_sh);
+        const int j_ctr = bas(NCTR_OF, j_sh);
+        const int k_ctr = bas(NCTR_OF, k_sh);
+        const int l_ctr = bas(NCTR_OF, l_sh);
+        const int di = len_spinor(i_sh, bas);
+        const int dj = len_spinor(j_sh, bas);
+        const int dk = len_spinor(k_sh, bas);
+        const int dl = len_spinor(l_sh, bas);
+        const int ni = di * i_ctr;
+        const int nj = dj * j_ctr;
+        const int nk = dk * k_ctr;
+        const int nl = dl * l_ctr;
+        const int nfk = len_cart(k_l);
+        const int nfl = len_cart(l_l);
+        const int nf2k = nfk + nfk;
+        const int nf2l = nfl + nfl;
+        const int d_k = dk * di * dj;
+        const int d_l = di * dj * nf2l;
+        const int nop = nfk * di * dj * nfl;
+        int ofj = ni;
+        int ofk = ni * nj;
+        int ofl = nk * ni * nj;
+        int ic, jc, kc, lc;
+        double *pfkijl;
+        const double *ox = opij;
+        const double *oy = ox + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
+        const double *oz = oy + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
+        const double *o1 = oz + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
+        double *const tmp1 = (double *)malloc(sizeof(double) * nf2k*di*dj*nf2l * OF_CMPLX);
+        double *const tmp2 = (double *)malloc(sizeof(double) * dk*di*dj*nf2l * OF_CMPLX);
 
-C2S (sf_1e);
-C2Si(sf_1e);
-C2S (si_1e);
-C2Si(si_1e);
+        for (lc = 0; lc < nl; lc += dl) {
+                for (kc = 0; kc < nk; kc += dk) {
+                        for (jc = 0; jc < nj; jc += dj) {
+                                for (ic = 0; ic < ni; ic += di) {
+        si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
+        (f_bra_spinor_si[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
+        (f_iket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
+        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-C2S (sf_2e1);
-C2Si(sf_2e1);
-C2S (sf_2e2);
-C2Si(sf_2e2);
-C2S (si_2e1);
-C2Si(si_2e1);
-C2S (si_2e2);
-C2Si(si_2e2);
+        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+
+        ox += nop * OF_CMPLX;
+        oy += nop * OF_CMPLX;
+        oz += nop * OF_CMPLX;
+        o1 += nop * OF_CMPLX;
+                                } } } }
+
+        free(tmp1);
+        free(tmp2);
+}
 
 /*
  * 1e integrals, reorder cartesian integrals.
@@ -3358,23 +4827,3 @@ void c2s_cart_2e1(double *fkijl, const double *gctr, const int *shls,
                                 }
 }
 void c2s_cart_2e2() {};
-
-
-
-/*************************************************
- *
- * transform vectors
- *
- *************************************************/
-void c2s_sph_vec(double *sph, const double *cart, const int l, const int nvec)
-{
-        const double D0 = 0;
-        const double D1 = 1;
-        const char TRANS_T = 'T';
-        const char TRANS_N = 'N';
-        int ns = l + l + 1;
-        int nc = len_cart(l);
-        dgemm_(&TRANS_T, &TRANS_N, &ns, &nvec, &nc,
-               &D1, g_c2s[l].cart2sph, &nc, cart, &nc,
-               &D0, sph, &ns);
-}
