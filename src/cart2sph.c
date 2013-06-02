@@ -3458,7 +3458,7 @@ static void f_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
         gcart += 10 * OF_CMPLX;
                 }
                 gcart = gcart0;
-                gsp = gsp0 + 8;
+                gsp = gsp0 + 12;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[3].cart2j_gt_l;
@@ -3550,7 +3550,7 @@ static void f_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
         gcart += 10;
                 }
                 gcart = gcart0;
-                gsp = gsp0 + 8;
+                gsp = gsp0 + 12;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[3].cart2j_gt_l;
