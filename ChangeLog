@@ -1,11 +1,17 @@
-Version 1.0 (2013/01/15):
-	* first release
-	* 1e/2e contracted cartensian/spheric/spinor GTO integarls
-	* common lisp script to generate integral code
-
-Version 1.1 (2013/05/29):
-	* optimize the transformation from Cartesian GTO to
-	  spheric/spinor GTO
+Version 1.1.2 (2013/06/04):
+	* Change C/Fortran code examples.
+	* Update testsuits.
+	* Add new integrals which appear in DHF-DKB calculation.
 
 Version 1.1.1 (2013/05/29):
-	* fix bug in function f_bra_cart2spinor_sf
+	* Fix bug in function f_bra_cart2spinor_sf.
+
+Version 1.1 (2013/05/29):
+	* Optimize the transformation from Cartesian GTO to
+	  spheric/spinor GTO.
+
+Version 1.0 (2013/01/15):
+	* First release.
+	* 1e/2e contracted cartensian/spheric/spinor GTO integarls.
+	* Common lisp script to generate integral code.
+

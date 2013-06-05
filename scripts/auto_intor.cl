@@ -54,8 +54,18 @@
   '("cint2e_spgsp1"       (g sigma dot p \, sigma dot p \| \,))
   '("cint2e_g1spsp2"      (g \, \| sigma dot p \, sigma dot p))
   '("cint2e_spgsp1spsp2"  (g sigma dot p \, sigma dot p \| sigma dot p \, sigma dot p))
+  ; for DKB
   '("cint1e_spspsp"     (sigma dot p \| sigma dot p sigma dot p))
   '("cint1e_spnuc"      (sigma dot p \| nuc \|))
+  '("cint2e_spv1"       (sigma dot p \, \| \,))
+  '("cint2e_vsp1"       (\, sigma dot p \| \,))
+  '("cint2e_spsp2"      (\, \| sigma dot p \, sigma dot p))
+  '("cint2e_spv1spv2"   (sigma dot p \, \| sigma dot p \,))
+  '("cint2e_vsp1spv2"   (\, sigma dot p \| sigma dot p \,))
+  '("cint2e_spv1vsp2"   (sigma dot p \, \| \, sigma dot p))
+  '("cint2e_vsp1vsp2"   (\, sigma dot p \| \, sigma dot p))
+  '("cint2e_spv1spsp2"  (sigma dot p \, \| sigma dot p \, sigma dot p))
+  '("cint2e_vsp1spsp2"  (\, sigma dot p \| sigma dot p \, sigma dot p))
 )
 
 (gen-cint "auto_intor3.c" 'cart
@@ -107,4 +117,7 @@
 
 (gen-cint "gaunt1.c" 'spinor
   '("cint2e_ssp1ssp2"   ( \, sigma dot p \| gaunt \| \, sigma dot p))
+  '("cint2e_cg_ssa10ssp2"   (rc cross sigma \, \| gaunt \| \, sigma dot p))
+  '("cint2e_giao_ssa10ssp2" (r cross sigma  \, \| gaunt \| \, sigma dot p))
+  '("cint2e_gssp1ssp2"      (g \, sigma dot p  \| gaunt \| \, sigma dot p))
 )

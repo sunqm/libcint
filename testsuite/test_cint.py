@@ -24,7 +24,6 @@ PTR_LIGHT_SPEED    = 0
 PTR_COMMON_ORIG    = 1
 PTR_SHIELDING_ORIG = 4
 PTR_RINV_ORIG      = 4
-PTR_AO_GAUGE       = 7
 PTR_ENV_START      = 20
 
 CHARGE_OF  = 0
@@ -66,7 +65,7 @@ def test_int1e_sph(name, vref, dim, place):
             intor(op, shls, atm, natm, bas, nbas, env);
             v1 += abs(numpy.array(op[:di*dj*dim])).sum()
     if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", abs(v1-vref), "/", vref
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
     else:
         print "pass: ", name
 
@@ -85,7 +84,7 @@ def test_int1e_spinor(name, vref, dim, place):
             intor(op, shls, atm, natm, bas, nbas, env);
             v1 += abs(cdouble_to_cmplx(op[:di*dj*dim*2])).sum()
     if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", abs(v1-vref), "/", vref
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
     else:
         print "pass: ", name
 
@@ -146,7 +145,7 @@ def test_int2e_sph(name, vref, dim, place):
                     intor(op, shls, atm, natm, bas, nbas, env);
                     v1 += abs(numpy.array(op[:di*dj*dk*dl*dim])).sum()
     if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", abs(v1-vref), "/", vref
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
     else:
         print "pass: ", name
 
@@ -166,7 +165,7 @@ def test_int2e_spinor(name, vref, dim, place):
                     intor(op, shls, atm, natm, bas, nbas, env);
                     v1 += abs(cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2])).sum()
     if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", abs(v1-vref), "/", vref
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
     else:
         print "pass: ", name
 
@@ -215,16 +214,21 @@ if __name__ == "__main__":
               ('cint1e_nuc_sph'   , 3664.898206036863, 1, 10),
               ('cint1e_kin_sph'   , 887.2525599069498, 1, 11),
               ('cint1e_ia01p_sph' , 210.475021425001 , 3, 12),
-              ('cint1e_irxp_sph'  , 3464.41761486531 , 3, 10),
-              ('cint1e_iking_sph' , 105.6144492946662, 3, 11),
-              ('cint1e_iovlpg_sph', 37.94968860771099, 3, 12),
-              ('cint1e_inucg_sph' , 478.5594827282386, 3, 11),
+              ('cint1e_cg_irxp_sph', 3464.41761486531, 3, 10),
+              ('cint1e_giao_irjxp_sph', 2529.89787038728, 3, 10),
+              ('cint1e_igkin_sph' , 107.6417224161130, 3, 11),
+              ('cint1e_igovlp_sph', 37.94968860771099, 3, 12),
+              ('cint1e_ignuc_sph' , 478.5594827282386, 3, 11),
+              ('cint1e_ipovlp_sph', 429.5284222008585, 3, 11),
+              ('cint1e_ipkin_sph' , 1307.395170673386, 3, 10),
+              ('cint1e_ipnuc_sph' , 8358.422626593954, 3, 10),
+              ('cint1e_iprinv_sph', 385.1108471512923, 3, 11),
              ):
         test_int1e_sph(*f)
 
     for f in (('cint1e_ovlp'     , 284.4528456839759, 1, 11),
               ('cint1e_nuc'      , 3025.766689838620, 1, 10),
-              ('cint1e_nucg'     , 296.6160944673867, 3, 11),
+              ('cint1e_gnuc'     , 296.6160944673867, 3, 11),
               ('cint1e_srsr'     , 1430.424389624617, 1, 10),
               ('cint1e_sr'       , 240.4064385362524, 1, 11),
               ('cint1e_srsp'     , 1022.805155947573, 1, 10),
@@ -234,19 +238,29 @@ if __name__ == "__main__":
               ('cint1e_spnuc'    , 3905.024862120781, 1, 10),
               ('cint1e_spnucsp'  , 20689.33926165072, 1, 9 ),
               ('cint1e_srnucsr'  , 13408.06084488522, 1, 9 ),
-              ('cint1e_sa10sa01' , 319.6545034966355, 9, 11),
-              ('cint1e_ovlpg'    , 23.26740744837723, 3, 12),
-              ('cint1e_sa10sp'   , 1705.563585675829, 3, 10),
-              ('cint1e_sa10nucsp', 16506.04502697362, 3, 9 ),
-              ('cint1e_sa01sp'   , 218.2442031726256, 3, 11),
-              ('cint1e_spgsp'    , 96.9346217249868 , 3, 12),
-              ('cint1e_spgnucsp' , 1659.37670007911 , 3, 10),
-              ('cint1e_spgsa01'  , 37.88846629276348, 9, 12),
+              ('cint1e_cg_sa10sa01', 319.6545034966355, 9, 11),
+              ('cint1e_cg_sa10sp'  , 1705.563585675829, 3, 10),
+              ('cint1e_cg_sa10nucsp',16506.04502697362, 3, 9 ),
+              ('cint1e_giao_sa10sa01' , 358.7833729392868, 9, 11),
+              ('cint1e_giao_sa10sp'   , 1070.550400465705, 3, 10),
+              ('cint1e_giao_sa10nucsp', 12819.05472701636, 3, 9 ),
+              ('cint1e_govlp'    , 23.2674074483772, 3, 12),
+              ('cint1e_sa01sp'   , 218.244203172625, 3, 11),
+              ('cint1e_spgsp'    , 96.9346217249868, 3, 12),
+              ('cint1e_spgnucsp' , 1659.37670007911, 3, 10),
+              ('cint1e_spgsa01'  , 37.8884662927634, 9, 12),
+              ('cint1e_ipovlp'   , 153.860148521121, 3, 12),
+              ('cint1e_ipkin'    , 497.249399637873, 3, 11),
+              ('cint1e_ipnuc'    , 4506.61348255897, 3, 10),
+              ('cint1e_iprinv'   , 240.036283917245, 3, 11),
+              ('cint1e_ipspnucsp', 35059.4071347107, 3, 9 ),
+              ('cint1e_ipsprinvsp',1166.20850563398, 3, 11),
              ):
         test_int1e_spinor(*f)
 
     for f in (('cint2e_sph'    , 56243.883287681034, 1, 8),
               ('cint2e_ig1_sph', 8101.0873343981893, 3, 9),
+              ('cint2e_ip1_sph', 115489.8643757788 , 3, 8),
              ):
         test_int2e_sph(*f)
 
@@ -255,11 +269,17 @@ if __name__ == "__main__":
               ('cint2e_spsp1spsp2'  , 1391536.66523326, 1, 7 ),
               ('cint2e_srsr1'       , 178572.480073500, 1, 8 ),
               ('cint2e_srsr1srsr2'  , 860772.141087694, 1, 8 ),
-              ('cint2e_sa10sp1'     , 241519.006395279, 3, 8 ),
-              ('cint2e_sa10sp1spsp2', 1419332.59837329, 3, 7 ),
+              ('cint2e_cg_sa10sp1'  , 241519.006395279, 3, 8 ),
+              ('cint2e_cg_sa10sp1spsp2', 1419332.59837329, 3, 7),
+              ('cint2e_giao_sa10sp1'   ,  153861.7128168867, 3, 8),
+              ('cint2e_giao_sa10sp1spsp2',918176.1514756215, 3, 8),
               ('cint2e_g1'          , 3755.25159040905, 3, 10),
               ('cint2e_spgsp1'      , 16626.9223828688, 3, 9 ),
               ('cint2e_g1spsp2'     , 22186.4661168133, 3, 9 ),
-              ('cint2e_spgsp1spsp2' , 107096.523556956, 3, 8 ),
+              ('cint2e_spgsp1spsp2' , 107096.520663097, 3, 8 ),
+              ('cint2e_ip1'         , 34912.85433409392, 3, 9 ),
+              ('cint2e_ipspsp1'     , 221091.4210207795, 3, 8 ),
+              ('cint2e_ip1spsp2'    , 212446.0411584463, 3, 8 ),
+              ('cint2e_ipspsp1spsp2', 1443719.03469962 , 3, 7 ),
              ):
         test_int2e_spinor(*f)

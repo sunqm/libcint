@@ -1,8 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "cint_bas.h"
 
 #define OF_CMPLX 2
+
+int factorial(int n)
+{
+        int i, fact = 1;
+        for (i = 1; i <= n; i++) {
+                fact *= i;
+        }
+        return fact;
+}
+
+// normalization factor of function r^n e^{-a r^2}
+double gto_norm(int n, double a)
+{
+        return pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
+                / (factorial(2*n+2) * sqrt(M_PI));
+}
+
 
 int main()
 {
@@ -35,7 +53,7 @@ int main()
         bas[PTR_EXP  + BAS_SLOTS * n]  = off;
         env[off + 0] = 1.;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off + 1;
-        env[off + 1] = 1.;
+        env[off + 1] = 1. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]]);
         off += 2;
         n++;
 
@@ -52,10 +70,10 @@ int main()
         env[off + 0] = 3.;
         env[off + 1] = 5.;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off + 2;
-        env[off + 2] = 1.;
-        env[off + 3] = 2.;
-        env[off + 4] = 4.;
-        env[off + 5] = 8.;
+        env[off + 2] = 1. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]])  ;
+        env[off + 3] = 2. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+1]);
+        env[off + 4] = 4. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]])  ;
+        env[off + 5] = 8. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+1]);
         off += 6;
         n++;
 
@@ -68,7 +86,7 @@ int main()
         bas[PTR_EXP  + BAS_SLOTS * n]  = off;
         env[off + 0] = 1;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off + 1;
-        env[off + 1] = 1;
+        env[off + 1] = 1 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]]);
         off += 2;
         n++;
 

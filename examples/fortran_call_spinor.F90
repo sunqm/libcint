@@ -1,3 +1,21 @@
+integer function factorial(n)
+integer :: n
+integer :: i
+factorial = 1
+do i = 1, n
+  factorial = factorial * i
+end do
+end function factorial
+
+double precision function gto_norm(n, a)
+! normalization factor of function r^n e^{-a r^2}
+integer :: n
+double precision :: a
+integer,external :: factorial
+gto_norm = 2**(2*n+3) * factorial(n+1) * (2*a)**(n+1.5) &
+        / (factorial(2*n+2) * sqrt(3.14159265358979d0))
+end function gto_norm
+
 program spinor
 implicit none
 integer,parameter :: CHARGE_OF  = 1
@@ -25,12 +43,13 @@ integer :: nbas = 3
 integer,allocatable :: atm(:,:)
 integer,allocatable :: bas(:,:)
 double precision,allocatable :: env(:)
+double precision,external :: gto_norm
 
 integer :: n, off
 integer :: i, j, k, l
 integer :: di, dj, dk, dl
 integer :: shls(4)
-double complex,allocatable :: buf1e(:,:,:), buf2e(:,:,:,:,:)
+double complex,allocatable :: buf1e(:,:), buf2e(:,:,:,:)
 integer,external :: cgtos_spinor
 external :: cint1e_spnucsp, cint2e_spsp1
 allocate (atm(ATM_SLOTS,natm))
@@ -58,7 +77,7 @@ bas(NCTR_OF  ,n)  = 1
 bas(PTR_EXP  ,n)  = off ! offset of exponents in env
 env(off + 1) = 1.d0
 bas(PTR_COEFF,n) = off + 1 ! offset of contraction coefficeints
-env(off + 2) = 1.d0
+env(off + 2) = 1.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
 off = off + 2
 n = n + 1
 
@@ -73,10 +92,10 @@ bas(PTR_EXP  ,n)  = off
 env(off + 0) = 3.d0
 env(off + 1) = 5.d0
 bas(PTR_COEFF,n) = off + 2
-env(off + 2) = 1.d0
-env(off + 3) = 2.d0
-env(off + 4) = 4.d0
-env(off + 5) = 8.d0
+env(off + 2) = 1.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
+env(off + 3) = 2.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
+env(off + 4) = 4.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
+env(off + 5) = 8.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
 off = off + 6
 n = n + 1
 
@@ -89,31 +108,29 @@ bas(NCTR_OF  ,n)  = 1
 bas(PTR_EXP  ,n)  = off
 env(off + 0) = 1.d0
 bas(PTR_COEFF,n) = off + 1
-env(off + 1) = 1.d0
+env(off + 1) = 1.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
 off = off + 2
 n = n + 1
 
 !
 ! call one-electron spinor integrals
 ! the index of shell is 0-based
-! the integral has 3 components
 !
 i = 0; shls(1) = i; di = cgtos_spinor(i, bas)
 j = 1; shls(2) = j; dj = cgtos_spinor(j, bas)
-allocate (buf1e(di,dj,3))
+allocate (buf1e(di,dj))
 call cint1e_spnucsp(buf1e, shls, atm, natm, bas, nbas, env)
 deallocate (buf1e)
 
 !
 ! call two-electron spinor integrals
 ! the index of shell is 0-based
-! the integral has 3 components
 !
 i = 0; shls(1) = i; di = cgtos_spinor(i, bas)
 j = 1; shls(2) = j; dj = cgtos_spinor(j, bas)
 k = 2; shls(3) = k; dk = cgtos_spinor(k, bas)
 l = 2; shls(4) = l; dl = cgtos_spinor(l, bas)
-allocate (buf2e(di,dj,dk,dl,3))
+allocate (buf2e(di,dj,dk,dl))
 call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env)
 deallocate (buf2e)
 deallocate (atm, bas, env)

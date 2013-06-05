@@ -101,3 +101,414 @@ return cint2e_drv(opkijl, ng, 1,
 gout2e_cint2e_ssp1ssp2, &c2s_si_2e1i, &c2s_si_2e2i,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint2e_ssp1ssp2)
+/* <k RC CROSS SIGMA i|GAUNT |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (RC CROSS SIGMA i j|GAUNT |k SIGMA DOT P l) */
+static void gout2e_cint2e_cg_ssa10ssp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+double dri[3];
+dri[0] = ri[0] - env[PTR_COMMON_ORIG+0];
+dri[1] = ri[1] - env[PTR_COMMON_ORIG+1];
+dri[2] = ri[2] - env[PTR_COMMON_ORIG+2];
+G2E_D_L(g1, g0, i_l+1, j_l+0, k_l+0, l_l+0);
+G2E_RCI(g2, g0, i_l+0, j_l, k_l, l_l);
+G2E_RCI(g3, g1, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (1*s[5]) + (-1*s[7]);
+gout[1] = 0;
+gout[2] = 0;
+gout[3] = + (1*s[8]) + (1*s[4]);
+gout[4] = + (1*s[6]);
+gout[5] = + (1*s[5]);
+gout[6] = + (1*s[8]);
+gout[7] = + (-1*s[3]);
+gout[8] = + (-1*s[3]);
+gout[9] = + (-1*s[4]);
+gout[10] = + (-1*s[7]);
+gout[11] = + (-1*s[6]);
+gout[12] = + (1*s[4]) + (1*s[8]);
+gout[13] = + (-1*s[3]);
+gout[14] = + (-1*s[6]);
+gout[15] = + (1*s[7]) + (-1*s[5]);
+gout[16] = + (-1*s[2]);
+gout[17] = + (-1*s[7]);
+gout[18] = + (-1*s[8]);
+gout[19] = + (-1*s[1]);
+gout[20] = 0;
+gout[21] = + (-1*s[2]) + (1*s[6]);
+gout[22] = 0;
+gout[23] = + (1*s[8]) + (1*s[0]);
+gout[24] = + (1*s[0]);
+gout[25] = + (1*s[1]);
+gout[26] = + (1*s[6]);
+gout[27] = + (-1*s[7]);
+gout[28] = + (-1*s[1]);
+gout[29] = + (1*s[0]) + (1*s[8]);
+gout[30] = + (-1*s[7]);
+gout[31] = + (-1*s[6]) + (1*s[2]);
+gout[32] = + (1*s[1]);
+gout[33] = + (1*s[4]);
+gout[34] = + (1*s[5]);
+gout[35] = + (-1*s[2]);
+gout[36] = + (-1*s[0]);
+gout[37] = + (-1*s[3]);
+gout[38] = + (-1*s[2]);
+gout[39] = + (-1*s[5]);
+gout[40] = 0;
+gout[41] = 0;
+gout[42] = + (1*s[1]) + (-1*s[3]);
+gout[43] = + (1*s[4]) + (1*s[0]);
+gout[44] = + (-1*s[2]);
+gout[45] = + (-1*s[5]);
+gout[46] = + (1*s[0]) + (1*s[4]);
+gout[47] = + (1*s[3]) + (-1*s[1]);
+gout += 48;
+}}
+int cint2e_cg_ssa10ssp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 3;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_cg_ssa10ssp2, &c2s_si_2e1, &c2s_si_2e2i,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_cg_ssa10ssp2)
+/* <k R CROSS SIGMA i|GAUNT |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (R CROSS SIGMA i j|GAUNT |k SIGMA DOT P l) */
+static void gout2e_cint2e_giao_ssa10ssp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+G2E_D_L(g1, g0, i_l+1, j_l+0, k_l+0, l_l+0);
+G2E_R_I(g2, g0, i_l+0, j_l, k_l, l_l);
+G2E_R_I(g3, g1, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (1*s[5]) + (-1*s[7]);
+gout[1] = 0;
+gout[2] = 0;
+gout[3] = + (1*s[8]) + (1*s[4]);
+gout[4] = + (1*s[6]);
+gout[5] = + (1*s[5]);
+gout[6] = + (1*s[8]);
+gout[7] = + (-1*s[3]);
+gout[8] = + (-1*s[3]);
+gout[9] = + (-1*s[4]);
+gout[10] = + (-1*s[7]);
+gout[11] = + (-1*s[6]);
+gout[12] = + (1*s[4]) + (1*s[8]);
+gout[13] = + (-1*s[3]);
+gout[14] = + (-1*s[6]);
+gout[15] = + (1*s[7]) + (-1*s[5]);
+gout[16] = + (-1*s[2]);
+gout[17] = + (-1*s[7]);
+gout[18] = + (-1*s[8]);
+gout[19] = + (-1*s[1]);
+gout[20] = 0;
+gout[21] = + (-1*s[2]) + (1*s[6]);
+gout[22] = 0;
+gout[23] = + (1*s[8]) + (1*s[0]);
+gout[24] = + (1*s[0]);
+gout[25] = + (1*s[1]);
+gout[26] = + (1*s[6]);
+gout[27] = + (-1*s[7]);
+gout[28] = + (-1*s[1]);
+gout[29] = + (1*s[0]) + (1*s[8]);
+gout[30] = + (-1*s[7]);
+gout[31] = + (-1*s[6]) + (1*s[2]);
+gout[32] = + (1*s[1]);
+gout[33] = + (1*s[4]);
+gout[34] = + (1*s[5]);
+gout[35] = + (-1*s[2]);
+gout[36] = + (-1*s[0]);
+gout[37] = + (-1*s[3]);
+gout[38] = + (-1*s[2]);
+gout[39] = + (-1*s[5]);
+gout[40] = 0;
+gout[41] = 0;
+gout[42] = + (1*s[1]) + (-1*s[3]);
+gout[43] = + (1*s[4]) + (1*s[0]);
+gout[44] = + (-1*s[2]);
+gout[45] = + (-1*s[5]);
+gout[46] = + (1*s[0]) + (1*s[4]);
+gout[47] = + (1*s[3]) + (-1*s[1]);
+gout += 48;
+}}
+int cint2e_giao_ssa10ssp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 3;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_giao_ssa10ssp2, &c2s_si_2e1, &c2s_si_2e2i,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_giao_ssa10ssp2)
+/* <k G i|GAUNT |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (G i SIGMA DOT P j|GAUNT |k SIGMA DOT P l) */
+static void gout2e_cint2e_gssp1ssp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double *g5 = g4 + g_size(ng) * 3;
+double *g6 = g5 + g_size(ng) * 3;
+double *g7 = g6 + g_size(ng) * 3;
+double *g8 = g7 + g_size(ng) * 3;
+double s[27];
+double rirj[3];
+rirj[0] = ri[0] - rj[0];
+rirj[1] = ri[1] - rj[1];
+rirj[2] = ri[2] - rj[2];
+double c[3];
+c[0] = 1 * rirj[0];
+c[1] = 1 * rirj[1];
+c[2] = 1 * rirj[2];
+G2E_D_L(g1, g0, i_l+1, j_l+1, k_l+0, l_l+0);
+G2E_D_J(g2, g0, i_l+1, j_l+0, k_l, l_l);
+G2E_D_J(g3, g1, i_l+1, j_l+0, k_l, l_l);
+G2E_R0I(g4, g0, i_l+0, j_l, k_l, l_l);
+G2E_R0I(g5, g1, i_l+0, j_l, k_l, l_l);
+G2E_R0I(g6, g2, i_l+0, j_l, k_l, l_l);
+G2E_R0I(g7, g3, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(27, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
+s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
+s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
+s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
+s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
+s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
+s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
+s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
+s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
+s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
+s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
+s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
+s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
+s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
+s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
+s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
+s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
+s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
+s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
+}
+gout[0] = + (-1*c[1]*s[26]) + (1*c[2]*s[17]) + (-1*c[1]*s[22]) + (1*c[2]*s[13]);
+gout[1] = + (1*c[1]*s[19]) + (-1*c[2]*s[10]);
+gout[2] = + (1*c[1]*s[20]) + (-1*c[2]*s[11]);
+gout[3] = + (-1*c[1]*s[23]) + (1*c[2]*s[14]) + (1*c[1]*s[25]) + (-1*c[2]*s[16]);
+gout[4] = + (1*c[1]*s[21]) + (-1*c[2]*s[12]);
+gout[5] = + (-1*c[1]*s[26]) + (1*c[2]*s[17]) + (-1*c[1]*s[18]) + (1*c[2]*s[9]);
+gout[6] = + (1*c[1]*s[23]) + (-1*c[2]*s[14]);
+gout[7] = + (1*c[1]*s[20]) + (-1*c[2]*s[11]) + (-1*c[1]*s[24]) + (1*c[2]*s[15]);
+gout[8] = + (1*c[1]*s[24]) + (-1*c[2]*s[15]);
+gout[9] = + (1*c[1]*s[25]) + (-1*c[2]*s[16]);
+gout[10] = + (-1*c[1]*s[22]) + (1*c[2]*s[13]) + (-1*c[1]*s[18]) + (1*c[2]*s[9]);
+gout[11] = + (-1*c[1]*s[19]) + (1*c[2]*s[10]) + (1*c[1]*s[21]) + (-1*c[2]*s[12]);
+gout[12] = + (-1*c[1]*s[25]) + (1*c[2]*s[16]) + (1*c[1]*s[23]) + (-1*c[2]*s[14]);
+gout[13] = + (1*c[1]*s[24]) + (-1*c[2]*s[15]) + (-1*c[1]*s[20]) + (1*c[2]*s[11]);
+gout[14] = + (-1*c[1]*s[21]) + (1*c[2]*s[12]) + (1*c[1]*s[19]) + (-1*c[2]*s[10]);
+gout[15] = + (-1*c[1]*s[18]) + (1*c[2]*s[9]) + (-1*c[1]*s[22]) + (1*c[2]*s[13]) + (-1*c[1]*s[26]) + (1*c[2]*s[17]);
+gout[16] = + (-1*c[2]*s[8]) + (1*c[0]*s[26]) + (-1*c[2]*s[4]) + (1*c[0]*s[22]);
+gout[17] = + (1*c[2]*s[1]) + (-1*c[0]*s[19]);
+gout[18] = + (1*c[2]*s[2]) + (-1*c[0]*s[20]);
+gout[19] = + (-1*c[2]*s[5]) + (1*c[0]*s[23]) + (1*c[2]*s[7]) + (-1*c[0]*s[25]);
+gout[20] = + (1*c[2]*s[3]) + (-1*c[0]*s[21]);
+gout[21] = + (-1*c[2]*s[8]) + (1*c[0]*s[26]) + (-1*c[2]*s[0]) + (1*c[0]*s[18]);
+gout[22] = + (1*c[2]*s[5]) + (-1*c[0]*s[23]);
+gout[23] = + (1*c[2]*s[2]) + (-1*c[0]*s[20]) + (-1*c[2]*s[6]) + (1*c[0]*s[24]);
+gout[24] = + (1*c[2]*s[6]) + (-1*c[0]*s[24]);
+gout[25] = + (1*c[2]*s[7]) + (-1*c[0]*s[25]);
+gout[26] = + (-1*c[2]*s[4]) + (1*c[0]*s[22]) + (-1*c[2]*s[0]) + (1*c[0]*s[18]);
+gout[27] = + (-1*c[2]*s[1]) + (1*c[0]*s[19]) + (1*c[2]*s[3]) + (-1*c[0]*s[21]);
+gout[28] = + (-1*c[2]*s[7]) + (1*c[0]*s[25]) + (1*c[2]*s[5]) + (-1*c[0]*s[23]);
+gout[29] = + (1*c[2]*s[6]) + (-1*c[0]*s[24]) + (-1*c[2]*s[2]) + (1*c[0]*s[20]);
+gout[30] = + (-1*c[2]*s[3]) + (1*c[0]*s[21]) + (1*c[2]*s[1]) + (-1*c[0]*s[19]);
+gout[31] = + (-1*c[2]*s[0]) + (1*c[0]*s[18]) + (-1*c[2]*s[4]) + (1*c[0]*s[22]) + (-1*c[2]*s[8]) + (1*c[0]*s[26]);
+gout[32] = + (-1*c[0]*s[17]) + (1*c[1]*s[8]) + (-1*c[0]*s[13]) + (1*c[1]*s[4]);
+gout[33] = + (1*c[0]*s[10]) + (-1*c[1]*s[1]);
+gout[34] = + (1*c[0]*s[11]) + (-1*c[1]*s[2]);
+gout[35] = + (-1*c[0]*s[14]) + (1*c[1]*s[5]) + (1*c[0]*s[16]) + (-1*c[1]*s[7]);
+gout[36] = + (1*c[0]*s[12]) + (-1*c[1]*s[3]);
+gout[37] = + (-1*c[0]*s[17]) + (1*c[1]*s[8]) + (-1*c[0]*s[9]) + (1*c[1]*s[0]);
+gout[38] = + (1*c[0]*s[14]) + (-1*c[1]*s[5]);
+gout[39] = + (1*c[0]*s[11]) + (-1*c[1]*s[2]) + (-1*c[0]*s[15]) + (1*c[1]*s[6]);
+gout[40] = + (1*c[0]*s[15]) + (-1*c[1]*s[6]);
+gout[41] = + (1*c[0]*s[16]) + (-1*c[1]*s[7]);
+gout[42] = + (-1*c[0]*s[13]) + (1*c[1]*s[4]) + (-1*c[0]*s[9]) + (1*c[1]*s[0]);
+gout[43] = + (-1*c[0]*s[10]) + (1*c[1]*s[1]) + (1*c[0]*s[12]) + (-1*c[1]*s[3]);
+gout[44] = + (-1*c[0]*s[16]) + (1*c[1]*s[7]) + (1*c[0]*s[14]) + (-1*c[1]*s[5]);
+gout[45] = + (1*c[0]*s[15]) + (-1*c[1]*s[6]) + (-1*c[0]*s[11]) + (1*c[1]*s[2]);
+gout[46] = + (-1*c[0]*s[12]) + (1*c[1]*s[3]) + (1*c[0]*s[10]) + (-1*c[1]*s[1]);
+gout[47] = + (-1*c[0]*s[9]) + (1*c[1]*s[0]) + (-1*c[0]*s[13]) + (1*c[1]*s[4]) + (-1*c[0]*s[17]) + (1*c[1]*s[8]);
+gout += 48;
+}}
+int cint2e_gssp1ssp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 1 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 3;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 3;
+if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
+int ip = len_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+int jp = len_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+int kp = len_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+int lp = len_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
+dset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);
+return 0; }
+return cint2e_drv(opkijl, ng, 0.5,
+gout2e_cint2e_gssp1ssp2, &c2s_si_2e1, &c2s_si_2e2i,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_gssp1ssp2)

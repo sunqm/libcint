@@ -1,10 +1,10 @@
 
-AM_CFLAGS = -funroll-loops
+AM_CFLAGS = -funroll-all-loops
 AM_CPPFLAGS= -I$(top_srcdir)/src/include
 
 lib_LTLIBRARIES = libcint.la
 
-libcint_la_LDFLAGS = -version-info 1:1:0
+libcint_la_LDFLAGS = -release 1.1.2
 libcint_la_LIBADD = $(BLAS_LIBS) $(LIBS)
 libcint_la_SOURCES = c2f.c \
 		     cart2sph.c \

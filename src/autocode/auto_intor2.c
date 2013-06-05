@@ -3580,3 +3580,809 @@ return cint1e_nuc_drv(opij, ng, 1,
 gout1e_cint1e_spnuc, &c2s_si_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_spnuc)
+/* <k SIGMA DOT P i|R12 |j l> : i,jin electron 1; k,lin electron 2
+ * = (SIGMA DOT P i j|R12 |k l) */
+static void gout2e_cint2e_spv1(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double s[3];
+G2E_D_I(g1, g0, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(3, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
+}
+gout[0] = + (1*s[0]);
+gout[1] = + (1*s[1]);
+gout[2] = + (1*s[2]);
+gout[3] = 0;
+gout += 4;
+}}
+int cint2e_spv1(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 0 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 1;
+ng[POS_E1] = 4;
+ng[POS_E2] = 1;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_spv1, &c2s_si_2e1, &c2s_sf_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_spv1)
+/* <k i|R12 |SIGMA DOT P j l> : i,jin electron 1; k,lin electron 2
+ * = (i SIGMA DOT P j|R12 |k l) */
+static void gout2e_cint2e_vsp1(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double s[3];
+G2E_D_J(g1, g0, i_l+0, j_l+0, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(3, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
+}
+gout[0] = + (-1*s[0]);
+gout[1] = + (-1*s[1]);
+gout[2] = + (-1*s[2]);
+gout[3] = 0;
+gout += 4;
+}}
+int cint2e_vsp1(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 1 + 1;
+ng[2] = l_l + 0 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 0 + ng[3];
+ng[GSHIFT] = 1;
+ng[POS_E1] = 4;
+ng[POS_E2] = 1;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_vsp1, &c2s_si_2e1, &c2s_sf_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_vsp1)
+/* <SIGMA DOT P k i|R12 |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (i j|R12 |SIGMA DOT P k SIGMA DOT P l) */
+static void gout2e_cint2e_spsp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+G2E_D_L(g1, g0, i_l+0, j_l+0, k_l+1, l_l+0);
+G2E_D_K(g2, g0, i_l+0, j_l+0, k_l+0, l_l);
+G2E_D_K(g3, g1, i_l+0, j_l+0, k_l+0, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (1*s[5]) + (-1*s[7]);
+gout[1] = + (1*s[6]) + (-1*s[2]);
+gout[2] = + (1*s[1]) + (-1*s[3]);
+gout[3] = + (1*s[0]) + (1*s[4]) + (1*s[8]);
+gout += 4;
+}}
+int cint2e_spsp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 1 + ng[2];
+ng[0] = i_l + 0 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 1;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_spsp2, &c2s_sf_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_spsp2)
+/* <SIGMA DOT P k SIGMA DOT P i|R12 |j l> : i,jin electron 1; k,lin electron 2
+ * = (SIGMA DOT P i j|R12 |SIGMA DOT P k l) */
+static void gout2e_cint2e_spv1spv2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+G2E_D_K(g1, g0, i_l+1, j_l+0, k_l+0, l_l);
+G2E_D_I(g2, g0, i_l+0, j_l, k_l, l_l);
+G2E_D_I(g3, g1, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (1*s[0]);
+gout[1] = + (1*s[3]);
+gout[2] = + (1*s[6]);
+gout[3] = 0;
+gout[4] = + (1*s[1]);
+gout[5] = + (1*s[4]);
+gout[6] = + (1*s[7]);
+gout[7] = 0;
+gout[8] = + (1*s[2]);
+gout[9] = + (1*s[5]);
+gout[10] = + (1*s[8]);
+gout[11] = 0;
+gout[12] = 0;
+gout[13] = 0;
+gout[14] = 0;
+gout[15] = 0;
+gout += 16;
+}}
+int cint2e_spv1spv2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 0 + 1;
+ng[1] = k_l + 1 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_spv1spv2, &c2s_si_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_spv1spv2)
+/* <SIGMA DOT P k i|R12 |SIGMA DOT P j l> : i,jin electron 1; k,lin electron 2
+ * = (i SIGMA DOT P j|R12 |SIGMA DOT P k l) */
+static void gout2e_cint2e_vsp1spv2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+G2E_D_K(g1, g0, i_l+0, j_l+1, k_l+0, l_l);
+G2E_D_J(g2, g0, i_l+0, j_l+0, k_l, l_l);
+G2E_D_J(g3, g1, i_l+0, j_l+0, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (-1*s[0]);
+gout[1] = + (-1*s[3]);
+gout[2] = + (-1*s[6]);
+gout[3] = 0;
+gout[4] = + (-1*s[1]);
+gout[5] = + (-1*s[4]);
+gout[6] = + (-1*s[7]);
+gout[7] = 0;
+gout[8] = + (-1*s[2]);
+gout[9] = + (-1*s[5]);
+gout[10] = + (-1*s[8]);
+gout[11] = 0;
+gout[12] = 0;
+gout[13] = 0;
+gout[14] = 0;
+gout[15] = 0;
+gout += 16;
+}}
+int cint2e_vsp1spv2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 1 + 1;
+ng[2] = l_l + 0 + 1;
+ng[1] = k_l + 1 + ng[2];
+ng[0] = i_l + 0 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_vsp1spv2, &c2s_si_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_vsp1spv2)
+/* <k SIGMA DOT P i|R12 |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (SIGMA DOT P i j|R12 |k SIGMA DOT P l) */
+static void gout2e_cint2e_spv1vsp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+G2E_D_L(g1, g0, i_l+1, j_l+0, k_l+0, l_l+0);
+G2E_D_I(g2, g0, i_l+0, j_l, k_l, l_l);
+G2E_D_I(g3, g1, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (-1*s[0]);
+gout[1] = + (-1*s[3]);
+gout[2] = + (-1*s[6]);
+gout[3] = 0;
+gout[4] = + (-1*s[1]);
+gout[5] = + (-1*s[4]);
+gout[6] = + (-1*s[7]);
+gout[7] = 0;
+gout[8] = + (-1*s[2]);
+gout[9] = + (-1*s[5]);
+gout[10] = + (-1*s[8]);
+gout[11] = 0;
+gout[12] = 0;
+gout[13] = 0;
+gout[14] = 0;
+gout[15] = 0;
+gout += 16;
+}}
+int cint2e_spv1vsp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_spv1vsp2, &c2s_si_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_spv1vsp2)
+/* <k i|R12 |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (i SIGMA DOT P j|R12 |k SIGMA DOT P l) */
+static void gout2e_cint2e_vsp1vsp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double s[9];
+G2E_D_L(g1, g0, i_l+0, j_l+1, k_l+0, l_l+0);
+G2E_D_J(g2, g0, i_l+0, j_l+0, k_l, l_l);
+G2E_D_J(g3, g1, i_l+0, j_l+0, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(9, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+gout[0] = + (1*s[0]);
+gout[1] = + (1*s[3]);
+gout[2] = + (1*s[6]);
+gout[3] = 0;
+gout[4] = + (1*s[1]);
+gout[5] = + (1*s[4]);
+gout[6] = + (1*s[7]);
+gout[7] = 0;
+gout[8] = + (1*s[2]);
+gout[9] = + (1*s[5]);
+gout[10] = + (1*s[8]);
+gout[11] = 0;
+gout[12] = 0;
+gout[13] = 0;
+gout[14] = 0;
+gout[15] = 0;
+gout += 16;
+}}
+int cint2e_vsp1vsp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 1 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 0 + ng[2];
+ng[0] = i_l + 0 + ng[3];
+ng[GSHIFT] = 2;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_vsp1vsp2, &c2s_si_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_vsp1vsp2)
+/* <SIGMA DOT P k SIGMA DOT P i|R12 |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (SIGMA DOT P i j|R12 |SIGMA DOT P k SIGMA DOT P l) */
+static void gout2e_cint2e_spv1spsp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double *g5 = g4 + g_size(ng) * 3;
+double *g6 = g5 + g_size(ng) * 3;
+double *g7 = g6 + g_size(ng) * 3;
+double *g8 = g7 + g_size(ng) * 3;
+double s[27];
+G2E_D_L(g1, g0, i_l+1, j_l+0, k_l+1, l_l+0);
+G2E_D_K(g2, g0, i_l+1, j_l+0, k_l+0, l_l);
+G2E_D_K(g3, g1, i_l+1, j_l+0, k_l+0, l_l);
+G2E_D_I(g4, g0, i_l+0, j_l, k_l, l_l);
+G2E_D_I(g5, g1, i_l+0, j_l, k_l, l_l);
+G2E_D_I(g6, g2, i_l+0, j_l, k_l, l_l);
+G2E_D_I(g7, g3, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(27, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
+s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
+s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
+s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
+s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
+s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
+s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
+s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
+s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
+s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
+s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
+s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
+s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
+s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
+s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
+s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
+s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
+s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
+s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
+}
+gout[0] = + (1*s[5]) + (-1*s[7]);
+gout[1] = + (1*s[14]) + (-1*s[16]);
+gout[2] = + (1*s[23]) + (-1*s[25]);
+gout[3] = 0;
+gout[4] = + (1*s[6]) + (-1*s[2]);
+gout[5] = + (1*s[15]) + (-1*s[11]);
+gout[6] = + (1*s[24]) + (-1*s[20]);
+gout[7] = 0;
+gout[8] = + (1*s[1]) + (-1*s[3]);
+gout[9] = + (1*s[10]) + (-1*s[12]);
+gout[10] = + (1*s[19]) + (-1*s[21]);
+gout[11] = 0;
+gout[12] = + (1*s[0]) + (1*s[4]) + (1*s[8]);
+gout[13] = + (1*s[9]) + (1*s[13]) + (1*s[17]);
+gout[14] = + (1*s[18]) + (1*s[22]) + (1*s[26]);
+gout[15] = 0;
+gout += 16;
+}}
+int cint2e_spv1spsp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 0 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 1 + ng[2];
+ng[0] = i_l + 1 + ng[3];
+ng[GSHIFT] = 3;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_spv1spsp2, &c2s_si_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_spv1spsp2)
+/* <SIGMA DOT P k i|R12 |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
+ * = (i SIGMA DOT P j|R12 |SIGMA DOT P k SIGMA DOT P l) */
+static void gout2e_cint2e_vsp1spsp2(double *g, const int *ng,
+double *gout, const int nf, const int *idx,
+const double ai, const double aj, const double ak, const double al,
+const int *shls, const int *atm, const int *bas, const double *env) {
+const int INC1 = 1;
+const double D1 = 1;
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+const int *idy = idx + nf;
+const int *idz = idx + nf * 2;
+const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+int ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + g_size(ng) * 3;
+double *g2 = g1 + g_size(ng) * 3;
+double *g3 = g2 + g_size(ng) * 3;
+double *g4 = g3 + g_size(ng) * 3;
+double *g5 = g4 + g_size(ng) * 3;
+double *g6 = g5 + g_size(ng) * 3;
+double *g7 = g6 + g_size(ng) * 3;
+double *g8 = g7 + g_size(ng) * 3;
+double s[27];
+G2E_D_L(g1, g0, i_l+0, j_l+1, k_l+1, l_l+0);
+G2E_D_K(g2, g0, i_l+0, j_l+1, k_l+0, l_l);
+G2E_D_K(g3, g1, i_l+0, j_l+1, k_l+0, l_l);
+G2E_D_J(g4, g0, i_l+0, j_l+0, k_l, l_l);
+G2E_D_J(g5, g1, i_l+0, j_l+0, k_l, l_l);
+G2E_D_J(g6, g2, i_l+0, j_l+0, k_l, l_l);
+G2E_D_J(g7, g3, i_l+0, j_l+0, k_l, l_l);
+for (n = 0; n < nf; n++) {
+ix = idx[n];
+iy = idy[n];
+iz = idz[n];
+dset0(27, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
+s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
+s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
+s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
+s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
+s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
+s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
+s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
+s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
+s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
+s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
+s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
+s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
+s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
+s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
+s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
+s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
+s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
+s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
+}
+gout[0] = + (-1*s[5]) + (1*s[7]);
+gout[1] = + (-1*s[14]) + (1*s[16]);
+gout[2] = + (-1*s[23]) + (1*s[25]);
+gout[3] = 0;
+gout[4] = + (-1*s[6]) + (1*s[2]);
+gout[5] = + (-1*s[15]) + (1*s[11]);
+gout[6] = + (-1*s[24]) + (1*s[20]);
+gout[7] = 0;
+gout[8] = + (-1*s[1]) + (1*s[3]);
+gout[9] = + (-1*s[10]) + (1*s[12]);
+gout[10] = + (-1*s[19]) + (1*s[21]);
+gout[11] = 0;
+gout[12] = + (-1*s[0]) + (-1*s[4]) + (-1*s[8]);
+gout[13] = + (-1*s[9]) + (-1*s[13]) + (-1*s[17]);
+gout[14] = + (-1*s[18]) + (-1*s[22]) + (-1*s[26]);
+gout[15] = 0;
+gout += 16;
+}}
+int cint2e_vsp1spsp2(double *opkijl, const int *shls,
+const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+const int i_sh = shls[0];
+const int j_sh = shls[1];
+const int k_sh = shls[2];
+const int l_sh = shls[3];
+const int i_l = bas(ANG_OF, i_sh);
+const int j_l = bas(ANG_OF, j_sh);
+const int k_l = bas(ANG_OF, k_sh);
+const int l_l = bas(ANG_OF, l_sh);
+int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[3] = j_l + 1 + 1;
+ng[2] = l_l + 1 + 1;
+ng[1] = k_l + 1 + ng[2];
+ng[0] = i_l + 0 + ng[3];
+ng[GSHIFT] = 3;
+ng[POS_E1] = 4;
+ng[POS_E2] = 4;
+ng[TENSOR] = 1;
+return cint2e_drv(opkijl, ng, 1,
+gout2e_cint2e_vsp1spsp2, &c2s_si_2e1, &c2s_si_2e2,
+shls, atm, natm, bas, nbas, env); }
+C2F_(cint2e_vsp1spsp2)
