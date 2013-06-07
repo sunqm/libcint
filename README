@@ -32,9 +32,64 @@ Features
 Getting libcint
 ---------------
 
-The latest version is available from:
+The newest version is available from:
 
     git clone http://github.com/sunqm/libcint.git
+
+
+Generating integrals
+--------------------
+
+If clisp was installed in the system, new integrals can be automatically
+implemented.  You can add entries in script/auto_intor.cl and generate
+code by
+
+    cd script; clisp auto_intor.cl; mv *.c ../src/autocode/
+
+New entries should follow the format of those existed entries.
+In one entry, you need to define the function name and the expression of
+the integral.  The expression is consistent with Mulliken notation.
+For one-electron integral, an entry can be
+
+    '("integral_name" (number op-bra op-bra ... \| op-ket ...))
+or
+    '("integral_name" (number op-bra op-bra ... \| 1e-operator \| op-ket ...))
+
+the entry of two-electron integral can be
+
+    '("integral_name" (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
+                              op-bra-electron-2 ... \, op-ket-electron-2 ... ))
+or
+    '("integral_name" (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
+                       gaunt \| op-bra-electron-2 ... \, op-ket-electron-2 ... ))
+
+* Parentheses should be paired.
+* Line break is allowed
+* Note the _backslash_ in \| and \,
+* "integral_name" is the function name.  Valid name can be made up of
+  letters, digits and underscore ("_").
+* number can be an integer, a real number or a pure imaginary number. An
+  imaginary number should be written as
+    #C(0 XXX)
+* Supported operator-bra and operator-ket include
+    p     means    -i \nabla
+    ip    means    \nabla
+    r0    means    \vec{r} - (0,0,0)
+    rc    means    \vec{r} - \vec{R}_(env[PTR_COMMON_ORIG])
+    ri    means    \vec{r} - \vec{R}_i
+    rj    means    \vec{r} - \vec{R}_j
+    rk    means    \vec{r} - \vec{R}_k
+    rl    means    \vec{r} - \vec{R}_l
+    r              can be ri/rj/rk/rl; associate with the basis it operates
+    g     means    i/2 (\vec{R}_{bra} - \vec{R}_{ket}) \times \vec{r}
+    sigma means    three pauli matrix
+    dot, cross     can be used to combine operator-bra or operator-ket
+* Supported 1e-operator and 2e-operator include
+    rinv        means   1 / |\vec{r} - \vec{R}_(env[PTR_COMMON_ORIG])|
+    nuc         means   \sum_N Z_N / |\vec{r} - \vec{R}_N|
+    nabla-rinv  means   \nabla (1 / |\vec{r} - \vec{R}_(env[PTR_COMMON_ORIG])|)
+    gaunt       means   \alpha_i \dot \alpha_j / |\vec{r}_i - \vec{r}_j|
+
 
 
 Installation
@@ -43,7 +98,7 @@ Installation
 * Prerequisites
     - BLAS library
     - Python version 2.5 or higher (optional, for make check)
-    - common lisp / SBCL (optional, for common lisp script)
+    - clisp / SBCL (optional, for common lisp script)
 
 * Build libcint
     mkdir build; cd build

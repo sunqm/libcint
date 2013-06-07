@@ -43,7 +43,7 @@
   '("cint1e_spgsa01"      (g sigma dot p \| nabla-rinv cross sigma \|))
   ;'("cint2e"              (, \| \, ))
   '("cint2e_spsp1"        (sigma dot p \, sigma dot p \| \, ))
-  '("cint2e_spsp1spsp2"   (sigma dot p \, sigma dot p \| sigma dot p \, sigma dot p ))
+  '("cint2e_spsp1spsp2"   (sigma dot p \, sigma dot p \| sigma dot p \, sigma dot p))
   '("cint2e_srsr1"        (sigma dot r \, sigma dot r \| \,))
   '("cint2e_srsr1srsr2"   (sigma dot r \, sigma dot r \| sigma dot r \, sigma dot r))
   '("cint2e_cg_sa10sp1"   (.5 rc cross sigma \, sigma dot p \| \,))
