@@ -63,11 +63,11 @@ atm = numpy.array(atm)
 bas = numpy.array(atm)
 
 _cint = ctypes.cdll.LoadLibrary('/path/to/libcint.so')
-c_atm = (ctypes.c_int * atm.size)(atm.flatten())
-c_bas = (ctypes.c_int * bas.size)(bas.flatten())
-c_env = (ctypes.c_double * env.__len__())(env)
-c_natm = ctypes.c_int(atm.size)
-c_nbas = ctypes.c_int(bas.size)
+c_atm = (ctypes.c_int * atm.size)(*atm.flatten())
+c_bas = (ctypes.c_int * bas.size)(*bas.flatten())
+c_env = (ctypes.c_double * env.__len__())(*env)
+c_natm = ctypes.c_int(atm.shape[0])
+c_nbas = ctypes.c_int(bas.shape[0])
 
 _cint.cgtos_spheric.restype = ctypes.c_int
 di = _cint.cgtos_spheric(ctypes.c_int(0), c_bas)

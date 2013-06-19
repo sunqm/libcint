@@ -132,13 +132,10 @@ int tot_cgto_cart(const int *bas, const int nbas)
 
 static void shells_cgto_offset(int (*f)(), int ao_loc[], const int *bas, const int nbas)
 {
-        int i;
-        int s = 0;
-
-        ao_loc[0] = 0;
-        for (i = 0; i < nbas - 1; i++) {
+        int i, s;
+        for (i = 0, s = 0; i < nbas; i++) {
+                ao_loc[i] = s;
                 s += (*f)(i, bas);
-                ao_loc[i+1] = s;
         }
 }
 /*

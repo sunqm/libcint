@@ -8,6 +8,11 @@
 #include "cint_bas.h"
 #include "misc.h"
 #include "g2e.h"
+#define MIN(X,Y)        ((X) < (Y) ? (X) : (Y))
+#define DEF_GXYZ(type, G, GX, GY, GZ) \
+        type *GX = G; \
+        type *GY = G + g_size(ng); \
+        type *GZ = G + g_size(ng) * 2
 
 
 inline int g_size(const int *ng)
@@ -80,16 +85,90 @@ void g2e_index_xyz(int *idx, const int *ng, const int *shls,
                                 ofkx = oflx + dk * k_nx[k];
                                 ofky = ofly + dk * k_ny[k];
                                 ofkz = oflz + dk * k_nz[k];
-                                for (i = 0; i < nfi; i++) {
-                                        idx[n] = ofkx + di * i_nx[i]; //(:,ix,kx,lx,jx,1)
-                                        idy[n] = ofky + di * i_ny[i]; //(:,iy,ky,ly,jy,2)
-                                        idz[n] = ofkz + di * i_nz[i]; //(:,iz,kz,lz,jz,3)
-                                        n++;
-                                } // i
+                                switch (i_l) {
+                                        case 0:
+                                                idx[n] = ofkx;
+                                                idy[n] = ofky;
+                                                idz[n] = ofkz;
+                                                n++;
+                                                break;
+                                        case 1:
+                                                idx[n  ] = ofkx + di;
+                                                idy[n  ] = ofky;
+                                                idz[n  ] = ofkz;
+                                                idx[n+1] = ofkx;
+                                                idy[n+1] = ofky + di;
+                                                idz[n+1] = ofkz;
+                                                idx[n+2] = ofkx;
+                                                idy[n+2] = ofky;
+                                                idz[n+2] = ofkz + di;
+                                                n += 3;
+                                                break;
+                                        case 2:
+                                                idx[n  ] = ofkx + di*2;
+                                                idy[n  ] = ofky;
+                                                idz[n  ] = ofkz;
+                                                idx[n+1] = ofkx + di;
+                                                idy[n+1] = ofky + di;
+                                                idz[n+1] = ofkz;
+                                                idx[n+2] = ofkx + di;
+                                                idy[n+2] = ofky;
+                                                idz[n+2] = ofkz + di;
+                                                idx[n+3] = ofkx;
+                                                idy[n+3] = ofky + di*2;
+                                                idz[n+3] = ofkz;
+                                                idx[n+4] = ofkx;
+                                                idy[n+4] = ofky + di;
+                                                idz[n+4] = ofkz + di;
+                                                idx[n+5] = ofkx;
+                                                idy[n+5] = ofky;
+                                                idz[n+5] = ofkz + di*2;
+                                                n += 6;
+                                                break;
+                                        case 3:
+                                                idx[n  ] = ofkx + di*3;
+                                                idy[n  ] = ofky;
+                                                idz[n  ] = ofkz;
+                                                idx[n+1] = ofkx + di*2;
+                                                idy[n+1] = ofky + di;
+                                                idz[n+1] = ofkz;
+                                                idx[n+2] = ofkx + di*2;
+                                                idy[n+2] = ofky;
+                                                idz[n+2] = ofkz + di;
+                                                idx[n+3] = ofkx + di;
+                                                idy[n+3] = ofky + di*2;
+                                                idz[n+3] = ofkz;
+                                                idx[n+4] = ofkx + di;
+                                                idy[n+4] = ofky + di;
+                                                idz[n+4] = ofkz + di;
+                                                idx[n+5] = ofkx + di;
+                                                idy[n+5] = ofky;
+                                                idz[n+5] = ofkz + di*2;
+                                                idx[n+6] = ofkx;
+                                                idy[n+6] = ofky + di*3;
+                                                idz[n+6] = ofkz;
+                                                idx[n+7] = ofkx;
+                                                idy[n+7] = ofky + di*2;
+                                                idz[n+7] = ofkz + di;
+                                                idx[n+8] = ofkx;
+                                                idy[n+8] = ofky + di;
+                                                idz[n+8] = ofkz + di*2;
+                                                idx[n+9] = ofkx;
+                                                idy[n+9] = ofky;
+                                                idz[n+9] = ofkz + di*3;
+                                                n += 10;
+                                                break;
+                                        default:
+                                                for (i = 0; i < nfi; i++) {
+                                                        idx[n] = ofkx + di * i_nx[i]; //(:,ix,kx,lx,jx,1)
+                                                        idy[n] = ofky + di * i_ny[i]; //(:,iy,ky,ly,jy,2)
+                                                        idz[n] = ofkz + di * i_nz[i]; //(:,iz,kz,lz,jz,3)
+                                                        n++;
+                                                } // i
+                                }
                         } // k
                 } // l
         } // j
-
 }
 
 
@@ -150,9 +229,7 @@ void g0_2e_2d(double *g, const int *ng, const double *c00, const double *c0p,
         int i, m, n;
         const int dn = ng[RYS_ROOTS]; // shift of (i++,k,l,j)
         const int dm = ng[RYS_ROOTS] * ng[0]; // shift of (i,k++,l,j)
-        double *gx = g;
-        double *gy = g + ng[RYS_ROOTS] * ng[0] * ng[1] * ng[2] * ng[3];
-        double *gz = g + ng[RYS_ROOTS] * ng[0] * ng[1] * ng[2] * ng[3] * 2;
+        DEF_GXYZ(double, g, gx, gy, gz);
         double *pgx, *pgy, *pgz;
         const double *c00x = c00;
         const double *c00y = c00 + MXRYSROOTS;
@@ -279,15 +356,12 @@ void g0_2e_4d(double *g, const int *ng, const double *rirj, const double *rkrl)
         const int lk = mmax - ll;
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        double *gx = g;
-        double *gy = g + g_size(ng);
-        double *gz = g + g_size(ng) * 2;
+        DEF_GXYZ(double, g, gx, gy, gz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-
+        // g(...,k,l) = rkrl * g(...,k,l-1) +  g(...,k+1,l-1)
+        //n = di * (nmax + 1) * (mmax - l + 1); // dim of (...,0:mmax-l)
         for (l = 1; l <= ll; l++) {
-                // g(...,k,l) = rkrl * g(...,k,l-1) +  g(...,k+1,l-1)
-                //n = di * (nmax + 1) * (mmax - l + 1); // dim of (...,0:mmax-l)
                 ptr = dl * l;
                 for (i = ptr; i < ptr + dl - dk * l; i++) {
                         gx[i] = rkrl[0] * gx[i-dl] + gx[i-dl+dk];
@@ -371,11 +445,10 @@ void nabla1i_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, n, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++)
                 for (l = 0; l <= ll; l++)
@@ -410,11 +483,10 @@ void nabla1j_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         //f(...,0,...) = -2*aj*g(...,1,...)
         for (l = 0; l <= ll; l++) {
@@ -453,11 +525,10 @@ void nabla1k_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++)
                 for (l = 0; l <= ll; l++) {
@@ -491,11 +562,10 @@ void nabla1l_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++) {
                 ptr = dj * j;
@@ -534,11 +604,10 @@ void x1i_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++)
                 for (l = 0; l <= ll; l++) {
@@ -565,11 +634,10 @@ void x1j_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++)
                 for (l = 0; l <= ll; l++) {
@@ -597,11 +665,10 @@ void x1k_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++)
                 for (l = 0; l <= ll; l++) {
@@ -629,11 +696,10 @@ void x1l_2e(double *f, const double *g, const int *ng,
 {
         int i, j, k, l, ptr;
         int di, dk, dl, dj;
-        const double *gx, *gy, *gz;
-        double *fx, *fy, *fz;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
         extract_dim(ng, &di, &dj, &dk, &dl);
-        extract_fg_xyz(f, g, ng, &gx, &gy, &gz, &fx, &fy, &fz);
 
         for (j = 0; j <= lj; j++)
                 for (l = 0; l <= ll; l++) {

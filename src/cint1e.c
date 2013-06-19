@@ -109,14 +109,15 @@ static double nuc_mod(const double aij, const int nuc_id,
              + 138.985999 / atm(CHARGE_OF, nuc_id)) \
              / (env[PTR_LIGHT_SPEED] * env[PTR_LIGHT_SPEED]);
         eta = 1 / (r * r); */
-        double a = pow(mass[atm(CHARGE_OF, nuc_id)], (double)1 / 3);
-        double r = (0.836 * a + 0.570) / 52917.7249;
-        double eta = 1.5 / (r * r);
+        double a, r, eta;
 
         switch (atm(NUC_MOD_OF, nuc_id)) {
                 case POINT_NUC:
                         return 1;
                 case GAUSSIAN_NUC:
+                        a = pow(mass[atm(CHARGE_OF,nuc_id)], (double)1 / 3);
+                        r = (0.836 * a + 0.570) / 52917.7249;
+                        eta = 1.5 / (r * r);
                         return sqrt(eta / (aij + eta));
                 default:
                         return 1;
