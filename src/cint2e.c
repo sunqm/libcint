@@ -65,24 +65,29 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
         int *const idx = (int *)malloc(sizeof(int) * nf * 3);
         double aij, dij, eij, rrij;
         double akl, dkl, ekl, rrkl;
-        double *const g = (double *)malloc(sizeof(double) * g_size(ng) * 3 * ((1<<ng[GSHIFT])+1));  // (irys,i,j,k,l,coord,0:1);
-        double *const gctrk = (double *)malloc(sizeof(double) * nf * i_ctr * j_ctr * k_ctr * n_comp);
+        int len = g_size(ng) * 3 * ((1<<ng[GSHIFT])+1) // (irys,i,j,k,l,coord,0:1);
+                + nf * i_ctr * j_ctr * k_ctr * n_comp // gctrk
+                + nf * i_ctr * j_ctr * n_comp // gctrj
+                + nf * i_ctr * n_comp // gctri
+                + nf * n_comp; // gout
+        double *const g = (double *)malloc(sizeof(double) * len);
+        double *gctrk = g + g_size(ng) * 3 * ((1<<ng[GSHIFT])+1);
         double *gout, *gctri, *gctrj;
 
         if (bas(NPRIM_OF, k_sh) == 1) {
                 gctrj = gctrk;
         } else {
-                gctrj = (double *)malloc(sizeof(double) * nf * i_ctr * j_ctr * n_comp);
+                gctrj = gctrk + nf * i_ctr * j_ctr * k_ctr * n_comp;
         }
         if (bas(NPRIM_OF, j_sh) == 1) {
                 gctri = gctrj;
         } else {
-                gctri = (double *)malloc(sizeof(double) * nf * i_ctr * n_comp);
+                gctri = gctrj + nf * i_ctr * j_ctr * n_comp;
         }
         if (bas(NPRIM_OF, i_sh) == 1) {
                 gout = gctri;
         } else {
-                gout  = (double *)malloc(sizeof(double) * nf * n_comp);
+                gout = gctri + nf * i_ctr * n_comp;
         }
 
         g2e_index_xyz(idx, ng, shls, bas);
@@ -102,10 +107,10 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
                         ekl = (ak[kp] * al[lp] / akl) * rrkl;
                         if (ekl > EXPCUTOFF) {
                                 if (bas(NPRIM_OF, k_sh) == 1) {
-                                        n = nf * i_ctr * j_ctr * n_comp;
-                                        dset0(n, gctrk); 
+                                        goto l_contracted;
+                                } else {
+                                        goto k_contracted;
                                 }
-                                continue;
                         }
                         dkl = exp(-ekl);
 
@@ -123,10 +128,18 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
                                         eij = (ai[ip] * aj[jp] / aij) * rrij;
                                         if (eij > EXPCUTOFF || eij+ekl > EXPCUTOFF) {
                                                 if (bas(NPRIM_OF, i_sh) == 1) {
-                                                        n = nf * n_comp;
-                                                        dset0(n, gctri);
+                                                        if (bas(NPRIM_OF, j_sh) == 1) {
+                                                                if (bas(NPRIM_OF, k_sh) == 1) {
+                                                                        goto l_contracted;
+                                                                } else {
+                                                                        goto k_contracted;
+                                                                }
+                                                        } else {
+                                                                goto j_contracted;
+                                                        }
+                                                } else {
+                                                        goto i_contracted;
                                                 }
-                                                continue;
                                         }
                                         has_value = 1;
                                         dij = exp(-eij);
@@ -140,29 +153,22 @@ int cint2e_loop(double *gctr, const int *ng, const double fac,
 
                                         n = nf * n_comp;
                                         _prim_to_ctr(gctri, n, gout, 1, i_sh, ip, bas, env);
+i_contracted: continue;
                                 }
                                 n = nf * i_ctr * n_comp;
                                 _prim_to_ctr(gctrj, n, gctri, 1, j_sh, jp, bas, env);
+j_contracted: continue;
                         }
                         n = nf * i_ctr * j_ctr * n_comp;
                         _prim_to_ctr(gctrk, n, gctrj, 1, k_sh, kp, bas, env);
+k_contracted: continue;
                 }
                 n = nf * i_ctr * j_ctr * k_ctr;
                 prim_to_ctr(gctr, n, gctrk, n_comp, l_sh, lp, bas, env);
+l_contracted: continue;
         }
-        free(g);
         free(idx);
-        if (bas(NPRIM_OF, i_sh) > 1) {
-                free(gout);
-        }
-        if (bas(NPRIM_OF, j_sh) > 1) {
-                free(gctri);
-        }
-        if (bas(NPRIM_OF, k_sh) > 1) {
-                free(gctrj);
-        }
-        free(gctrk);
-
+        free(g);
         return has_value;
 }
 

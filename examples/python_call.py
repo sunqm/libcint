@@ -43,6 +43,7 @@ ptr_env = 10
 atm = []
 bas = []
 env = [0] * ptr_env
+natm = 2
 for atm_id in range(natm):
     env.extend(coord_of(atm_id))
     atm.append([charge_of(atm_id), ptr_env, nuc_mod_of(atm_id), 0, 0, 0])
@@ -59,21 +60,21 @@ for atm_id in range(natm):
                     kappa_of(bas_id), \
                     ptr_env, ptr_env+e.size, 0])
         ptr_env += e.size + c.size
-atm = numpy.array(atm)
-bas = numpy.array(atm)
+atm = numpy.array(atm,dtype=int32)
+bas = numpy.array(bas,dtype=int32)
+env = numpy.array(env)
 
 _cint = ctypes.cdll.LoadLibrary('/path/to/libcint.so')
-c_atm = (ctypes.c_int * atm.size)(*atm.flatten())
-c_bas = (ctypes.c_int * bas.size)(*bas.flatten())
-c_env = (ctypes.c_double * env.__len__())(*env)
-c_natm = ctypes.c_int(atm.shape[0])
-c_nbas = ctypes.c_int(bas.shape[0])
+c_natm = ctypes.c_int(atm.size)
+c_nbas = ctypes.c_int(bas.size)
 
 _cint.cgtos_spheric.restype = ctypes.c_int
-di = _cint.cgtos_spheric(ctypes.c_int(0), c_bas)
-dj = _cint.cgtos_spheric(ctypes.c_int(1), c_bas)
+di = _cint.cgtos_spheric(ctypes.c_int(0), bas.ctype.data)
+dj = _cint.cgtos_spheric(ctypes.c_int(1), bas.ctype.data)
 
 c_shls = (ctypes.c_int * 2)(0, 1)
 buf = numpy.empty((di.value, dj.value))
-c_buf = buf.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-_cint.cint1e_ovlp_sph(c_buf, c_shls, c_atm, c_natm, c_bas, c_nbas, c_env)
+_cint.cint1e_ovlp_sph(buf.ctypes.data, c_shls, \
+                      atm.ctypes.data, c_natm, \
+                      bas.ctypes.data, c_nbas,
+                      env.ctypes.data)
