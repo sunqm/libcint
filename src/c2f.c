@@ -18,22 +18,22 @@
  * for cint_bas.c
  */
 
-int len_spinor_(const int *bas_id, const int *bas)
+int len_spinor_(const unsigned int *bas_id, const int *bas)
 {
         return len_spinor(*bas_id, bas);
 }
 
-int cgtos_cart_(const int *bas_id, const int *bas)
+int cgtos_cart_(const unsigned int *bas_id, const int *bas)
 {
         return cgtos_cart(*bas_id, bas);
 }
 
-int cgtos_spheric_(const int *bas_id, const int *bas)
+int cgtos_spheric_(const unsigned int *bas_id, const int *bas)
 {
         return cgtos_spheric(*bas_id, bas);
 }
 
-int cgtos_spinor_(const int *bas_id, const int *bas)
+int cgtos_spinor_(const unsigned int *bas_id, const int *bas)
 {
         return cgtos_spinor(*bas_id, bas);
 }
@@ -106,7 +106,9 @@ void shells_spinor_offset_(int ao_loc[], const int *bas, const int *nbas)
 /* 
  * GTO = x^{nx}y^{ny}z^{nz}e^{-ar^2}
  */
-void cart_comp_(int *nx, int *ny, int *nz, const int *lmax)
+void cart_comp_(unsigned int *nx, unsigned int *ny, unsigned int *nz,
+                const unsigned int *lmax)
 {
         cart_comp(nx, ny, nz, *lmax);
 }
+

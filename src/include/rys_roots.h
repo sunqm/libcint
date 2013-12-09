@@ -9,8 +9,8 @@
  */
 
 
-void rys_roots(const int nroots, double x, double *u, double *w);
-static void Root123(int n, double X, double roots[], double weights[]);
+void rys_roots(const unsigned int nroots, double x, double *u, double *w);
+static void Root123(unsigned int n, double X, double roots[], double weights[]);
 static void Root4(double X, double roots[], double weights[]);
 static void Root5(double X, double roots[], double weights[]);
-static void R_droot(const int nroots, const double xx, double roots[], double weights[]);
+static void R_droot(const unsigned int nroots, const double xx, double roots[], double weights[]);

@@ -129,7 +129,8 @@ Known bugs
 
   This problem is caused by the conflict between Python and MKL library.
   Add -lmkl_mc -lmkl_def to MKL link flags to replace the default blas
-  link flags.  e.g.
+  link flags.  Be *careful* with the order of -lmkl_mc and -lmkl_def.
+  e.g.
     ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
         -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def \
         -Wl,--end-group -lpthread"

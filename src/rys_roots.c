@@ -15,7 +15,7 @@
 
 #define MAXROOT
 
-void rys_roots(const int nroots, double x, double *u, double *w)
+void rys_roots(const unsigned int nroots, double x, double *u, double *w)
 {
         switch (nroots) {
                 case 0: case 1: case 2: case 3:
@@ -33,7 +33,7 @@ void rys_roots(const int nroots, double x, double *u, double *w)
         }
 }
 
-static void Root123(int nroots, double X, double roots[], double weights[]){
+static void Root123(unsigned int nroots, double X, double roots[], double weights[]){
 
   double R12, PIE4, R22, W22, R13, R23, W23, R33, W33;
   double RT1=0,RT2=0,RT3=0,WW1=0,WW2=0,WW3=0;
@@ -1657,7 +1657,8 @@ L100:
 }
 
 /* bdf_cvwint_droot_ */
-static void R_droot(const int nroots, const double xx, double roots[], double weights[])
+static void R_droot(const unsigned int nroots, const double xx,
+                    double roots[], double weights[])
 {
     const double a0 = 0.;
     const double a1s2 = .5;

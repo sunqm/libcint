@@ -9,7 +9,7 @@
 
 #define OF_CMPLX        2
 
-void dset0(const int n, double *x)
+void dset0(const unsigned int n, double *x)
 {
         memset(x, 0, sizeof(double) * n);
 }
@@ -18,12 +18,12 @@ void dset0(const int n, double *x)
 /*
  * v = a * x + y
  */
-void daxpy2v(const int n, const double a, const double *x, const double *y, 
+void daxpy2v(const unsigned int n, const double a, const double *x, const double *y, 
              double *v)
 {
         //cblas_dcopy(n, y, 1, v, 1);
         //cblas_daxpy(n, a, x, 1, v, 1);
-        int i;
+        unsigned int i;
         for (i = 0; i < n; i++) {
                 v[i] = a * x[i] + y[i];
         }
@@ -33,9 +33,9 @@ void daxpy2v(const int n, const double a, const double *x, const double *y,
 /*
  * a_t[n,m] = transpose of matrix a[m,n]
  */
-void dmat_transpose(double *a_t, double *a, int m, int n)
+void dmat_transpose(double *a_t, double *a, unsigned int m, unsigned int n)
 {
-        int i, j;
+        unsigned int i, j;
         double *pa_t;
 
         switch (m) {
@@ -213,9 +213,10 @@ void dmat_transpose(double *a_t, double *a, int m, int n)
                         }
         }
 }
-void zmat_transpose(double *a_t, const double *a, int m, int n)
+
+void zmat_transpose(double *a_t, const double *a, unsigned int m, unsigned int n)
 {
-        int i, j;
+        unsigned int i, j;
         double *pa_t;
 
         if (m == 1) {
@@ -236,9 +237,10 @@ void zmat_transpose(double *a_t, const double *a, int m, int n)
                 }
         }
 }
-void zmat_dagger(double *a_t, const double *a, int m, int n)
+
+void zmat_dagger(double *a_t, const double *a, unsigned int m, unsigned int n)
 {
-        int i, j;
+        unsigned int i, j;
         double *pa_t;
 
         for (j = 0; j < n * OF_CMPLX; j += OF_CMPLX) {
@@ -251,3 +253,4 @@ void zmat_dagger(double *a_t, const double *a, int m, int n)
                 a += m * OF_CMPLX;
         }
 }
+

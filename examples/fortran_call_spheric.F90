@@ -33,7 +33,6 @@ integer,parameter :: NCTR_OF    = 4
 integer,parameter :: KAPPA_OF   = 5
 integer,parameter :: PTR_EXP    = 6
 integer,parameter :: PTR_COEFF  = 7
-integer,parameter :: GAUGE_OF   = 8
 integer,parameter :: BAS_SLOTS  = 8
 
 integer,parameter :: PTR_ENV_START = 20

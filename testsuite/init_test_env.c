@@ -3,8 +3,6 @@
 #include "cint_bas.h"
 #include "fblas.h"
 
-#define MI_GAUGE_COMMON         2
-
 // return last offset for env
 int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
 {
@@ -31,7 +29,6 @@ int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
         bas(KAPPA_OF,nh)  = 1;
         bas(NPRIM_OF,nh)  = 1;
         bas(NCTR_OF ,nh)  = 1;
-        bas(GAUGE_OF,nh)  = MI_GAUGE_COMMON;
         bas(PTR_EXP,nh)   = off;
         env[off+0] = 1;
         bas(PTR_COEFF,nh) = off + 1;
@@ -44,7 +41,6 @@ int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
         bas(KAPPA_OF,nh)  = 2;
         bas(NPRIM_OF,nh)  = 2;
         bas(NCTR_OF ,nh)  = 2;
-        bas(GAUGE_OF,nh)  = MI_GAUGE_COMMON;
         bas(PTR_EXP,nh)   = off;
         env[off+0] = 5;
         env[off+1] = 3;
@@ -61,7 +57,6 @@ int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
         bas(KAPPA_OF,nh)  = 3;
         bas(NPRIM_OF,nh)  = 1;
         bas(NCTR_OF ,nh)  = 1;
-        bas(GAUGE_OF,nh)  = MI_GAUGE_COMMON;
         bas(PTR_EXP,nh)   = off;
         env[off+0] = 1;
         bas(PTR_COEFF,nh) = off + 1;
@@ -74,7 +69,6 @@ int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
         bas(KAPPA_OF,nh)  = 4;
         bas(NPRIM_OF,nh)  = 1;
         bas(NCTR_OF ,nh)  = 1;
-        bas(GAUGE_OF,nh)  = MI_GAUGE_COMMON;
         bas(PTR_EXP, nh)  = off;
         env[off+0] = .5;
         bas(PTR_COEFF,nh) = off + 1;
@@ -96,7 +90,6 @@ int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
                 bas(KAPPA_OF,i+nh) =-bas(KAPPA_OF,i);
                 bas(NPRIM_OF,i+nh) = bas(NPRIM_OF,i);
                 bas(NCTR_OF ,i+nh) = bas(NCTR_OF ,i);
-                bas(GAUGE_OF,i+nh) = bas(GAUGE_OF,i);
                 bas(PTR_EXP ,i+nh) = bas(PTR_EXP ,i)  + n;
                 bas(PTR_COEFF,i+nh)= bas(PTR_COEFF,i) + n;
                 env[bas(PTR_COEFF,i+nh)] /= 2 * env[bas(PTR_EXP,i)];

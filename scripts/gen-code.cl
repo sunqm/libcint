@@ -279,21 +279,22 @@ iz = idz[n];~%")
            (sf (cadr raw-script))
            (goutinc))
       (format fout "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */~%" bra-i op ket-j)
-      (format fout "static void gout1e_~a(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+      (format fout "static void gout1e_~a(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {~%" intname)
-      (format fout "const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {~%" intname)
+      (format fout "const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;~%")
       (loop
         for i in (range (ash 1 tot-len)) do
@@ -318,14 +319,14 @@ daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
       (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
       (format fout "gout += ~a;~%}}~%" goutinc)
 ;;; generate function int1e
-      (format fout "int ~a(double *opij, const int *shls,
+      (format fout "int ~a(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {~%" intname)
       (format fout "const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
       (format fout "ng[1] = j_l + ~a + 1;~%" (+ op-len j-len))
       (format fout "ng[0] = i_l + ~a + ng[1];~%" i-len)
       (format fout "ng[GSHIFT] = ~a;~%" tot-len)
@@ -390,10 +391,10 @@ dset0(ip * jp * ng[TENSOR], opij);~%"))
         (format fout ";~%")))))
 
 (defun dump-s-2e (fout n)
-  (format fout "for (n = 0; n < nf; n++) {
-ix = idx[n];
-iy = idy[n];
-iz = idz[n];
+  (format fout "for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
 dset0(~a, s);
 for (i = 0; i < ng[RYS_ROOTS]; i++) {~%" (expt 3 n))
   (loop
@@ -429,31 +430,26 @@ for (i = 0; i < ng[RYS_ROOTS]; i++) {~%" (expt 3 n))
               bra-k bra-i op ket-j ket-l)
       (format fout " * = (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k ~{~a ~}l) */~%"
               bra-i ket-j op bra-k ket-l)
-      (format fout "static void gout2e_~a(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
-const double ai, const double aj, const double ak, const double al,
-const int *shls, const int *atm, const int *bas, const double *env) {~%" intname)
-      (format fout "const int INC1 = 1;
+      (format fout "static void gout2e_~a(double *g,
+double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {~%" intname)
+      (format fout "const unsigned int INC1 = 1;
 const double D1 = 1;
-const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int k_sh = shls[2];
-const int l_sh = shls[3];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int k_l = bas(ANG_OF, k_sh);
-const int l_l = bas(ANG_OF, l_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
-const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
-const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
-const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
-int ix, iy, iz, i, n;
+const double *env = envs->env;
+const unsigned int *ng = envs->ng;
+const unsigned int nf = envs->nf;
+const unsigned int i_l = envs->i_l;
+const unsigned int j_l = envs->j_l;
+const unsigned int k_l = envs->k_l;
+const unsigned int l_l = envs->l_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+const double *rl = envs->rl;
+unsigned int ix, iy, iz, i, n;
 double *g0 = g;~%")
       (loop
         for i in (range (ash 1 tot-len)) do
-        (format fout "double *g~a = g~a + g_size(ng) * 3;~%" (1+ i) i))
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (format fout "double s[~a];~%" (expt 3 tot-len))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout ket-j "j")
@@ -470,32 +466,37 @@ double *g0 = g;~%")
       (let ((fmt-i (mkstr "G2E_~aI(g~a, g~a, i_l+~a, j_l, k_l, l_l);~%"))
             (fmt-op (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);
 G2E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);
-n = g_size(ng) * 3;
+n = envs->g_size * 3;
 daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
             (fmt-j (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len)))
+      (format fout "if (gout_empty) {~%")
 ;;; generate gout
       (dump-s-2e fout tot-len)
 ;;; dump result of eval-int
       (setf goutinc (gen-c-block fout "gout[~a] =" (last1 raw-script)))
-      (format fout "gout += ~a;~%}}~%" goutinc)
-;;; generate function int1e
-      (format fout "int ~a(double *opkijl, const int *shls,
+      (format fout "gout += ~a;~%}} else {~%" goutinc)
+      (dump-s-2e fout tot-len)
+;;; dump result of eval-int
+      (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
+      (format fout "gout += ~a;~%}}}~%" goutinc)
+;;; generate function int2e
+      (format fout "int ~a(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {~%" intname)
-      (format fout "const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int k_sh = shls[2];
-const int l_sh = shls[3];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int k_l = bas(ANG_OF, k_sh);
-const int l_l = bas(ANG_OF, l_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
-      (format fout "ng[3] = j_l + ~a + 1;~%"     j-len)
-      (format fout "ng[2] = l_l + ~a + 1;~%"     (+ op-len l-len))
-      (format fout "ng[1] = k_l + ~a + ng[2];~%" k-len)
-      (format fout "ng[0] = i_l + ~a + ng[3];~%" i-len)
+      (format fout "const unsigned int i_sh = shls[0];
+const unsigned int j_sh = shls[1];
+const unsigned int k_sh = shls[2];
+const unsigned int l_sh = shls[3];
+const unsigned int i_l = bas(ANG_OF, i_sh);
+const unsigned int j_l = bas(ANG_OF, j_sh);
+const unsigned int k_l = bas(ANG_OF, k_sh);
+const unsigned int l_l = bas(ANG_OF, l_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
+      (format fout "ng[0] = i_l + ~a + 1;~%" i-len)
+      (format fout "ng[1] = k_l + ~a + 1;~%" k-len)
+      (format fout "ng[2] = l_l + ~a + ng[1];~%" (+ op-len l-len))
+      (format fout "ng[3] = j_l + ~a + ng[0];~%" j-len)
       (format fout "ng[GSHIFT] = ~a;~%" tot-len)
       (if (eql sf1 'sf)
         (format fout "ng[POS_E1] = 1;~%")
@@ -510,15 +511,15 @@ int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
             (t (format fout "ng[TENSOR] = ~a;~%" (/ goutinc 4))))
 ;;; determine factor
       (when (member 'g raw-infix)
-        (let ((set0sph "int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
-int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
-int kp = (k_l * 2 + 1) * bas(NCTR_OF,k_sh);
-int lp = (l_l * 2 + 1) * bas(NCTR_OF,l_sh);
+        (let ((set0sph "unsigned int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
+unsigned int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
+unsigned int kp = (k_l * 2 + 1) * bas(NCTR_OF,k_sh);
+unsigned int lp = (l_l * 2 + 1) * bas(NCTR_OF,l_sh);
 dset0(kp * ip * jp * lp * ng[TENSOR], opkijl);")
-              (set0spin "int ip = len_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-int jp = len_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
-int kp = len_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
-int lp = len_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
+              (set0spin "unsigned int ip = len_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+unsigned int jp = len_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+unsigned int kp = len_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+unsigned int lp = len_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
 dset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);"))
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {

@@ -10,8 +10,8 @@
 #include "g1e.h"
 
 
-void g1e_index_xyz(int idx[], const int *ng, const int shls[],
-                   const int *bas)
+void g1e_index_xyz(unsigned int idx[], const unsigned int *ng,
+                   const unsigned int shls[], const int *bas)
 {
         const int i_l = bas(ANG_OF, shls[0]);
         const int j_l = bas(ANG_OF, shls[1]);
@@ -19,10 +19,10 @@ void g1e_index_xyz(int idx[], const int *ng, const int shls[],
         const int nfj = len_cart(j_l);
         int i, j, n;
         int ofx, ofy, ofz;
-        int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
-        int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
-        int *idy = idx + nfi * nfj;
-        int *idz = idx + nfi * nfj * 2;
+        unsigned int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
+        unsigned int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
+        unsigned int *idy = idx + nfi * nfj;
+        unsigned int *idz = idx + nfi * nfj * 2;
 
         cart_comp(i_nx, i_ny, i_nz, i_l);
         cart_comp(j_nx, j_ny, j_nz, j_l);
@@ -42,7 +42,7 @@ void g1e_index_xyz(int idx[], const int *ng, const int shls[],
 }
 
 
-void g_ovlp(double *g, const int *ng,
+void g_ovlp(double *g, const unsigned int *ng,
             const double ai, const double aj,
             const double *ri, const double *rj, const double fac)
 {
@@ -88,7 +88,7 @@ void g_ovlp(double *g, const int *ng,
         }
 }
 
-void g_nuc(double *g, const int *ng,
+void g_nuc(double *g, const unsigned int *ng,
            const double aij, const double *rij,
            const double *ri, const double *rj,
            const double *cr, const double t2, const double fac)
@@ -134,9 +134,8 @@ void g_nuc(double *g, const int *ng,
         }
 }
 
-void nabla1i_1e(double *f, const double *g, const int *ng,
-                const int li, const int lj,
-                const double ai)
+void nabla1i_1e(double *f, const double *g, const unsigned int *ng,
+                const int li, const int lj, const double ai)
 {
         int i, j, ptr;
         const double *gx = g;
@@ -161,9 +160,8 @@ void nabla1i_1e(double *f, const double *g, const int *ng,
         }
 }
 
-void nabla1j_1e(double *f, const double *g, const int *ng,
-                const int li, const int lj,
-                const double aj)
+void nabla1j_1e(double *f, const double *g, const unsigned int *ng,
+                const int li, const int lj, const double aj)
 {
         int i, j, ptr;
         const int dj = ng[0];
@@ -196,9 +194,8 @@ void nabla1j_1e(double *f, const double *g, const int *ng,
  * ri is the shift from the center R_O to the center of |i>
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
-void x1i_1e(double *f, const double *g, const int *ng,
-            const int li, const int lj,
-            const double ri[3])
+void x1i_1e(double *f, const double *g, const unsigned int *ng,
+            const int li, const int lj, const double ri[3])
 {
         int i, j, ptr;
         const double *gx = g;
@@ -219,9 +216,8 @@ void x1i_1e(double *f, const double *g, const int *ng,
         }
 }
 
-void x1j_1e(double *f, const double *g, const int *ng,
-            const int li, const int lj,
-            const double rj[3])
+void x1j_1e(double *f, const double *g, const unsigned int *ng,
+            const int li, const int lj, const double rj[3])
 {
         int i, j, ptr;
         const int dj = ng[0];
@@ -252,25 +248,19 @@ void x1j_1e(double *f, const double *g, const int *ng,
  * shl   nth shell
  * ip    ith-1 primitive GTO
  */
-void prim_to_ctr(double *gc, const int nf, const double *gp, const int inc, 
-                 const int shl, const int i_pgto, 
-                 const int *bas, const double *env)
+void prim_to_ctr(double *gc, const unsigned int nf, const double *gp,
+                 const unsigned int inc, const unsigned int nprim,
+                 const unsigned int nctr, const double *pcoeff)
 {
-        const int INC1 = 1;
-        const int nc = bas(NCTR_OF, shl);
-        const int np = bas(NPRIM_OF, shl);
-        const int off = bas(PTR_COEFF, shl) + i_pgto;
-        const double *penv = env + off;
-        int n, i;
+        const unsigned int INC1 = 1;
+        unsigned int n, i;
         double *pgc = gc;
 
-        for (i = 0; i < inc; i++)
-        {
-                //dger(nf, nc, 1.d0, gp(i+1), inc, env(ptr), np, gc(1,i*nc+1), nf)
-                for (n = 0; n < nc; n++)
-                {
-                        if (penv[np * n] != 0)
-                                daxpy_(&nf, penv+np*n, gp+i, &inc, pgc, &INC1);
+        for (i = 0; i < inc; i++) {
+                //dger(nf, nctr, 1.d0, gp(i+1), inc, env(ptr), nprim, gc(1,i*nctr+1), nf)
+                for (n = 0; n < nctr; n++) {
+                        if (pcoeff[nprim*n] != 0)
+                                daxpy_(&nf, pcoeff+nprim*n, gp+i, &inc, pgc, &INC1);
                         // next cgto block
                         pgc += nf;
                 }

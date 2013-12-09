@@ -1,5 +1,5 @@
 /*
- * File: cart2sph.h
+ * File: cart2sph.c
  * Author: Qiming Sun <osirpt.sun@gmail.com>
  *
  * Cartisen GTO to spheric or spinor GTO transformation
@@ -2438,62 +2438,62 @@ static struct cart2sp_t g_c2s[6] = {
         {g_trans_cart2sph+245, g_trans_cart2j+1960, g_trans_cart2j+2800}};
 
 // transform integrals from cartesian to spheric
-static void a_bra_cart2spheric(double *gsph, int dgsph, int nket,
-                               double *gcart, int bas_id, int bas[])
+static void a_bra_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nket,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double D0 = 0;
         const double D1 = 1;
         const char TRANS_T = 'T';
         const char TRANS_N = 'N';
-        const int l = bas(ANG_OF, bas_id);
-        const int nf = len_cart(l);
-        const int nd = l * 2 + 1;
+        const unsigned int l = bas(ANG_OF, bas_id);
+        const unsigned int nf = len_cart(l);
+        const unsigned int nd = l * 2 + 1;
         dgemm_(&TRANS_T, &TRANS_N, &nd, &nket, &nf,
                &D1, g_c2s[l].cart2sph, &nf, gcart, &nf,
                &D0, gsph, &dgsph);
 }
 
-static void a_ket_cart2spheric(double *gsph, int dgsph, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void a_ket_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double D0 = 0;
         const double D1 = 1;
         const char TRANS_N = 'N';
-        const int l = bas(ANG_OF, bas_id);
-        const int nf = len_cart(l);
-        const int nd = l * 2 + 1;
+        const unsigned int l = bas(ANG_OF, bas_id);
+        const unsigned int nf = len_cart(l);
+        const unsigned int nd = l * 2 + 1;
         dgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
                &D1, gcart, &nbra, g_c2s[l].cart2sph, &nf,
                &D0, gsph, &dgsph);
 }
 
 // transform s function from cartesian to spheric
-static void s_bra_cart2spheric(double *gsph, int dgsph, int nket,
-                               double *gcart, int bas_id, int bas[])
+static void s_bra_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nket,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 *gsph = coeff_c2s[0] * gcart[i];
                 gsph += dgsph;
         }
 }
-static void s_ket_cart2spheric(double *gsph, int dgsph, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void s_ket_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nbra; i++) {
                 gsph[i] = coeff_c2s[0] * gcart[i];
         }
 }
 
 // transform p function from cartesian to spheric
-static void p_bra_cart2spheric(double *gsph, int dgsph, int nket,
-                               double *gcart, int bas_id, int bas[])
+static void p_bra_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nket,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[1].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 gsph[0] = coeff_c2s[1] * gcart[1];
                 gsph[1] = coeff_c2s[5] * gcart[2];
@@ -2502,11 +2502,11 @@ static void p_bra_cart2spheric(double *gsph, int dgsph, int nket,
                 gcart += 3;
         }
 }
-static void p_ket_cart2spheric(double *gsph, int dgsph, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void p_ket_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[1].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nbra; i++) {
                 gsph[0*dgsph+i] = coeff_c2s[1] * gcart[1*nbra+i];
                 gsph[1*dgsph+i] = coeff_c2s[5] * gcart[2*nbra+i];
@@ -2515,11 +2515,11 @@ static void p_ket_cart2spheric(double *gsph, int dgsph, int nbra,
 }
 
 // transform d function from cartesian to spheric
-static void d_bra_cart2spheric(double *gsph, int dgsph, int nket,
-                               double *gcart, int bas_id, int bas[])
+static void d_bra_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nket,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[2].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 gsph[0] = coeff_c2s[ 1] * gcart[1];
                 gsph[1] = coeff_c2s[10] * gcart[4];
@@ -2533,11 +2533,11 @@ static void d_bra_cart2spheric(double *gsph, int dgsph, int nket,
                 gcart += 6;
         }
 }
-static void d_ket_cart2spheric(double *gsph, int dgsph, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void d_ket_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[2].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nbra; i++) {
                 gsph[0*dgsph+i] = coeff_c2s[ 1] * gcart[1*nbra+i];
                 gsph[1*dgsph+i] = coeff_c2s[10] * gcart[4*nbra+i];
@@ -2551,11 +2551,11 @@ static void d_ket_cart2spheric(double *gsph, int dgsph, int nbra,
 }
 
 // transform f function from cartesian to spheric
-static void f_bra_cart2spheric(double *gsph, int dgsph, int nket,
-                               double *gcart, int bas_id, int bas[])
+static void f_bra_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nket,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[3].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 gsph[0] = coeff_c2s[ 1] * gcart[1]
                         + coeff_c2s[ 6] * gcart[6];
@@ -2578,11 +2578,11 @@ static void f_bra_cart2spheric(double *gsph, int dgsph, int nket,
         }
 
 }
-static void f_ket_cart2spheric(double *gsph, int dgsph, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void f_ket_cart2spheric(double *gsph, unsigned int dgsph, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[3].cart2sph;
-        int i;
+        unsigned int i;
         for (i = 0; i < nbra; i++) {
                 gsph[0*dgsph+i] = coeff_c2s[ 1] * gcart[1*nbra+i]
                                 + coeff_c2s[ 6] * gcart[6*nbra+i];
@@ -2623,18 +2623,18 @@ static void (*f_ket_sph[6])() = {
 
 
 // transform spin free integrals from cartesian to spinor
-static void a_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void a_bra_cart2spinor_sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const double Z0[] = {0, 0};
         const double Z1[] = {1, 0};
         const char TRANS_C = 'C';
         const char TRANS_N = 'N';
-        const int l = bas(ANG_OF, bas_id);
+        const unsigned int l = bas(ANG_OF, bas_id);
         const int kappa = bas(KAPPA_OF, bas_id);
-        const int nf = len_cart(l);
-        const int nf2 = nf * 2;
-        const int nd = len_spinor(bas_id, bas);
+        const unsigned int nf = len_cart(l);
+        const unsigned int nf2 = nf * 2;
+        const unsigned int nd = len_spinor(bas_id, bas);
         const double *coeff_c2s;
 
         if (kappa < 0) { // j = l + 1/2
@@ -2648,11 +2648,11 @@ static void a_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
                Z1, coeff_c2s+nf*OF_CMPLX, &nf2, gcart, &nf,
                Z0, gsp+dgsp*nket*OF_CMPLX, &dgsp);
 }
-static void a_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
-                                   double *gcart, int bas_id, int bas[])
+static void a_bra_cart2spinor_e1sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                   double *gcart, unsigned int bas_id, int bas[])
 {
-        const int l = bas(ANG_OF, bas_id);
-        const int nf = len_cart(l);
+        const unsigned int l = bas(ANG_OF, bas_id);
+        const unsigned int nf = len_cart(l);
         double *tmp1 = (double *)malloc(sizeof(double)*nf*nket*OF_CMPLX);
 
         dcmplx_re(nf*nket, tmp1, gcart);
@@ -2660,18 +2660,18 @@ static void a_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
         free(tmp1);
 }
 
-static void a_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void a_bra_cart2spinor_si(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const double Z0[] = {0, 0};
         const double Z1[] = {1, 0};
         const char TRANS_C = 'C';
         const char TRANS_N = 'N';
-        const int l = bas(ANG_OF, bas_id);
+        const unsigned int l = bas(ANG_OF, bas_id);
         const int kappa = bas(KAPPA_OF, bas_id);
-        const int nf = len_cart(l);
-        const int nf2 = nf * 2;
-        const int nd = len_spinor(bas_id, bas);
+        const unsigned int nf = len_cart(l);
+        const unsigned int nf2 = nf * 2;
+        const unsigned int nd = len_spinor(bas_id, bas);
         const double *coeff_c2s;
 
         if (kappa < 0) { // j = l + 1/2
@@ -2686,17 +2686,17 @@ static void a_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
                gcart+nf*nket*OF_CMPLX, &nf, Z1, gsp, &dgsp);
 }
 
-static void a_ket_cart2spinor(double *gsp, int dgsp, int nbra,
-                              double *gcart, int bas_id, int bas[])
+static void a_ket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                              double *gcart, unsigned int bas_id, int bas[])
 {
         const double Z0[] = {0, 0};
         const double Z1[] = {1, 0};
         const char TRANS_N = 'N';
-        const int l = bas(ANG_OF, bas_id);
+        const unsigned int l = bas(ANG_OF, bas_id);
         const int kappa = bas(KAPPA_OF, bas_id);
-        const int nf = len_cart(l);
-        const int nf2 = nf * 2;
-        const int nd = len_spinor(bas_id, bas);
+        const unsigned int nf = len_cart(l);
+        const unsigned int nf2 = nf * 2;
+        const unsigned int nd = len_spinor(bas_id, bas);
         const double *coeff_c2s;
 
         if (kappa < 0) { // j = l + 1/2
@@ -2708,17 +2708,17 @@ static void a_ket_cart2spinor(double *gsp, int dgsp, int nbra,
                Z1, gcart, &nbra, coeff_c2s, &nf2, Z0, gsp, &dgsp);
 }
 // with phase "i"
-static void a_iket_cart2spinor(double *gsp, int dgsp, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void a_iket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double Z0[] = {0, 0};
         const double ZI[] = {0, 1};
         const char TRANS_N = 'N';
-        const int l = bas(ANG_OF, bas_id);
+        const unsigned int l = bas(ANG_OF, bas_id);
         const int kappa = bas(KAPPA_OF, bas_id);
-        const int nf = len_cart(l);
-        const int nf2 = nf * 2;
-        const int nd = len_spinor(bas_id, bas);
+        const unsigned int nf = len_cart(l);
+        const unsigned int nf2 = nf * 2;
+        const unsigned int nd = len_spinor(bas_id, bas);
         const double *coeff_c2s;
 
         if (kappa < 0) { // j = l + 1/2
@@ -2730,12 +2730,12 @@ static void a_iket_cart2spinor(double *gsp, int dgsp, int nbra,
                ZI, gcart, &nbra, coeff_c2s, &nf2, Z0, gsp, &dgsp);
 }
 
-static void s_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void s_bra_cart2spinor_sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 gsp[0] = 0;
                 gsp[1] = 0;
@@ -2754,11 +2754,11 @@ static void s_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
                 gcart += OF_CMPLX;
         }
 }
-static void s_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
-                                   double *gcart, int bas_id, int bas[])
+static void s_bra_cart2spinor_e1sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                   double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 gsp[0] = 0;
                 gsp[1] = 0;
@@ -2774,12 +2774,12 @@ static void s_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
                 gsp += dgsp * OF_CMPLX;
         }
 }
-static void s_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void s_bra_cart2spinor_si(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
         double *gsp0 = gsp;
-        int i;
+        unsigned int i;
         for (i = 0; i < nket; i++) {
                 gsp[2] = coeff_c2s[4] * gcart[0];
                 gsp[3] = coeff_c2s[4] * gcart[1];
@@ -2794,11 +2794,11 @@ static void s_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
                 gcart += OF_CMPLX;
         }
 }
-static void s_ket_cart2spinor(double *gsp, int dgsp, int nbra,
-                              double *gcart, int bas_id, int bas[])
+static void s_ket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                              double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
-        int i;
+        unsigned int i;
         for (i = 0; i < nbra; i++) {
                 gsp[             +0] = coeff_c2s[2] * gcart[2*nbra];
                 gsp[             +1] = coeff_c2s[2] * gcart[2*nbra+1];
@@ -2808,11 +2808,11 @@ static void s_ket_cart2spinor(double *gsp, int dgsp, int nbra,
                 gcart += OF_CMPLX;
         }
 }
-static void s_iket_cart2spinor(double *gsp, int dgsp, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void s_iket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const double *coeff_c2s = g_c2s[0].cart2j_lt_l;;
-        int i;
+        unsigned int i;
         for (i = 0; i < nbra; i++) {
                 gsp[             +0] =-coeff_c2s[2] * gcart[2*nbra+1];
                 gsp[             +1] = coeff_c2s[2] * gcart[2*nbra];
@@ -2823,14 +2823,14 @@ static void s_iket_cart2spinor(double *gsp, int dgsp, int nbra,
         }
 }
 
-static void p_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void p_bra_cart2spinor_sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
@@ -2885,14 +2885,14 @@ static void p_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void p_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
-                                   double *gcart, int bas_id, int bas[])
+static void p_bra_cart2spinor_e1sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                   double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
@@ -2947,14 +2947,14 @@ static void p_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void p_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void p_bra_cart2spinor_si(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
@@ -3010,14 +3010,14 @@ static void p_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void p_ket_cart2spinor(double *gsp, int dgsp, int nbra,
-                              double *gcart, int bas_id, int bas[])
+static void p_ket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                              double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
@@ -3048,14 +3048,14 @@ static void p_ket_cart2spinor(double *gsp, int dgsp, int nbra,
                 }
         }
 }
-static void p_iket_cart2spinor(double *gsp, int dgsp, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void p_iket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
@@ -3087,14 +3087,14 @@ static void p_iket_cart2spinor(double *gsp, int dgsp, int nbra,
         }
 }
 
-static void d_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void d_bra_cart2spinor_sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
@@ -3165,14 +3165,14 @@ static void d_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void d_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
-                                   double *gcart, int bas_id, int bas[])
+static void d_bra_cart2spinor_e1sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                   double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
@@ -3243,14 +3243,14 @@ static void d_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void d_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void d_bra_cart2spinor_si(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
@@ -3320,14 +3320,14 @@ static void d_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void d_ket_cart2spinor(double *gsp, int dgsp, int nbra,
-                              double *gcart, int bas_id, int bas[])
+static void d_ket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                              double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
@@ -3366,14 +3366,14 @@ static void d_ket_cart2spinor(double *gsp, int dgsp, int nbra,
                 }
         }
 }
-static void d_iket_cart2spinor(double *gsp, int dgsp, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void d_iket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
@@ -3413,14 +3413,14 @@ static void d_iket_cart2spinor(double *gsp, int dgsp, int nbra,
         }
 }
 
-static void f_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void f_bra_cart2spinor_sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
@@ -3505,14 +3505,14 @@ static void f_bra_cart2spinor_sf(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void f_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
-                                   double *gcart, int bas_id, int bas[])
+static void f_bra_cart2spinor_e1sf(double *gsp, unsigned int dgsp, unsigned int nket,
+                                   double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
@@ -3597,14 +3597,14 @@ static void f_bra_cart2spinor_e1sf(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void f_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
-                                 double *gcart, int bas_id, int bas[])
+static void f_bra_cart2spinor_si(double *gsp, unsigned int dgsp, unsigned int nket,
+                                 double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
@@ -3690,14 +3690,14 @@ static void f_bra_cart2spinor_si(double *gsp, int dgsp, int nket,
                 }
         }
 }
-static void f_ket_cart2spinor(double *gsp, int dgsp, int nbra,
-                              double *gcart, int bas_id, int bas[])
+static void f_ket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                              double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
@@ -3744,14 +3744,14 @@ static void f_ket_cart2spinor(double *gsp, int dgsp, int nbra,
                 }
         }
 }
-static void f_iket_cart2spinor(double *gsp, int dgsp, int nbra,
-                               double *gcart, int bas_id, int bas[])
+static void f_iket_cart2spinor(double *gsp, unsigned int dgsp, unsigned int nbra,
+                               double *gcart, unsigned int bas_id, int bas[])
 {
         const int kappa = bas(KAPPA_OF, bas_id);
         const double *coeff_c2s;
         double *gsp0 = gsp;
         double *gcart0 = gcart;
-        int i;
+        unsigned int i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
@@ -3853,7 +3853,7 @@ static void (*f_bra_spinor_si[6])() = {
 
 #define C2S(KEY) \
 void c2s_##KEY(double *opij, const double *gctr, \
-               const int *shls, const int *bas) \
+               const unsigned int *shls, const int *bas) \
 { \
         const double Z1[] = {1, 0}; \
         KEY(opij, gctr, Z1, shls, bas); \
@@ -3862,7 +3862,7 @@ void c2s_##KEY(double *opij, const double *gctr, \
 /* c2s transformation * #C(0 1) */
 #define C2Si(KEY) \
 void c2s_##KEY##i(double *opij, const double *gctr, \
-                  const int *shls, const int *bas) \
+                  const unsigned int *shls, const int *bas) \
 { \
         const double ZI[] = {0, 1}; \
         KEY(opij, gctr, ZI, shls, bas); \
@@ -3871,13 +3871,14 @@ void c2s_##KEY##i(double *opij, const double *gctr, \
  * (i,k,l,j) -> (k,i,j,l)
  */
 static void dswap_ik_jl(double *new, const double *old,
-                        const int ni, const int nj, const int nk, const int nl)
+                        const unsigned int ni, const unsigned int nj,
+                        const unsigned int nk, const unsigned int nl)
 {
-        int j, l;
-        int dlo = ni * nk; // shift of (i,k,l++,j)
-        int djo = ni * nk * nl; // shift of (i,k,l,j++)
-        int djn = nk * ni; // shift of (k,i,j++,l)
-        int dln = nk * ni * nj; // shift of (k,i,j,l++)
+        unsigned int j, l;
+        unsigned int dlo = ni * nk; // shift of (i,k,l++,j)
+        unsigned int djo = ni * nk * nl; // shift of (i,k,l,j++)
+        unsigned int djn = nk * ni; // shift of (k,i,j++,l)
+        unsigned int dln = nk * ni * nj; // shift of (k,i,j,l++)
 
         for (l = 0; l < nl; l++)
                 for (j = 0; j < nj; j++) {
@@ -3890,13 +3891,14 @@ static void dswap_ik_jl(double *new, const double *old,
  * (i,k,l,j) -> (k,i,j,l)
  */
 static void zswap_ik_jl(double *new, const double *old,
-                        const int ni, const int nj, const int nk, const int nl)
+                        const unsigned int ni, const unsigned int nj,
+                        const unsigned int nk, const unsigned int nl)
 {
-        int j, l;
-        int dlo = ni * nk * OF_CMPLX; // shift of (i,k,l++,j)
-        int djo = ni * nk * nl * OF_CMPLX; // shift of (i,k,l,j++)
-        int djn = nk * ni * OF_CMPLX; // shift of (k,i,j++,l)
-        int dln = nk * ni * nj * OF_CMPLX; // shift of (k,i,j,l++)
+        unsigned int j, l;
+        unsigned int dlo = ni * nk * OF_CMPLX; // shift of (i,k,l++,j)
+        unsigned int djo = ni * nk * nl * OF_CMPLX; // shift of (i,k,l,j++)
+        unsigned int djn = nk * ni * OF_CMPLX; // shift of (k,i,j++,l)
+        unsigned int dln = nk * ni * nj * OF_CMPLX; // shift of (k,i,j,l++)
 
         for (l = 0; l < nl; l++)
                 for (j = 0; j < nj; j++) {
@@ -3907,9 +3909,10 @@ static void zswap_ik_jl(double *new, const double *old,
 
 
 static void dcopy_ij(double *opij, const double *gctr, 
-                     const int ni, const int nj, const int mi, const int mj)
+                     const unsigned int ni, const unsigned int nj,
+                     const unsigned int mi, const unsigned int mj)
 {
-        int i, j, n;
+        unsigned int i, j, n;
 
         n = 0;
         for (j = 0; j < mj; j++) {
@@ -3927,10 +3930,12 @@ static void dcopy_ij(double *opij, const double *gctr,
  * gctr(k,i,j,l) -> fijkl(i,j,k,l)
  */
 static void dcopy_kijl(double *fijkl, const double *gctr, 
-                       const int ni, const int nj, const int nk, const int nl,
-                       const int mi, const int mj, const int mk, const int ml)
+                       const unsigned int ni, const unsigned int nj,
+                       const unsigned int nk, const unsigned int nl,
+                       const unsigned int mi, const unsigned int mj,
+                       const unsigned int mk, const unsigned int ml)
 {
-        int i, j, k, l;
+        unsigned int i, j, k, l;
         double *pl, *pk, *pj;
         const double *pgctr;
 
@@ -3951,10 +3956,12 @@ static void dcopy_kijl(double *fijkl, const double *gctr,
 }
 
 static void zcopy_kijl(double *fijkl, const double *gctr,
-                       const int ni, const int nj, const int nk, const int nl,
-                       const int mi, const int mj, const int mk, const int ml)
+                       const unsigned int ni, const unsigned int nj,
+                       const unsigned int nk, const unsigned int nl,
+                       const unsigned int mi, const unsigned int mj,
+                       const unsigned int mk, const unsigned int ml)
 {
-        int i, j, k, l;
+        unsigned int i, j, k, l;
         double *pl, *pk, *pj;
         const double *pgctr;
 
@@ -3979,10 +3986,12 @@ static void zcopy_kijl(double *fijkl, const double *gctr,
  * gctr(i,k,l,j) -> fijkl(i,j,k,l)
  */
 static void dcopy_iklj(double *fijkl, const double *gctr, 
-                       const int ni, const int nj, const int nk, const int nl,
-                       const int mi, const int mj, const int mk, const int ml)
+                       const unsigned int ni, const unsigned int nj,
+                       const unsigned int nk, const unsigned int nl,
+                       const unsigned int mi, const unsigned int mj,
+                       const unsigned int mk, const unsigned int ml)
 {
-        int i, j, k, l;
+        unsigned int i, j, k, l;
         double *pl, *pk, *pj;
         const double *pgctr;
 
@@ -4006,23 +4015,23 @@ static void dcopy_iklj(double *fijkl, const double *gctr,
 /*
  * 1e integrals, cartesian to real spheric.
  */
-void c2s_sph_1e(double *opij, const double *gctr, const int *shls,
-                const int *bas)
+void c2s_sph_1e(double *opij, const double *gctr,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int di = i_l * 2 + 1;
-        const int dj = j_l * 2 + 1;
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nf = nfi * nfj;
-        int ic, jc;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int di = i_l * 2 + 1;
+        const unsigned int dj = j_l * 2 + 1;
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nf = nfi * nfj;
+        unsigned int ic, jc;
         double *const tmp1 = (double *)malloc(sizeof(double) * di*nfj);
 
         for (jc = 0; jc < nj; jc += dj)
@@ -4038,23 +4047,24 @@ void c2s_sph_1e(double *opij, const double *gctr, const int *shls,
 /*
  * 1e integrals, cartesian to spin free spinor.
  */
-void c2s_sf_1e(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_sf_1e(double *opij, const double *gctr,
+               const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfj;
-        int ic, jc;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfj;
+        unsigned int ic, jc;
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nf2j * OF_CMPLX);
 
         for (jc = 0; jc < nj; jc += dj)
@@ -4067,23 +4077,24 @@ void c2s_sf_1e(double *opij, const double *gctr, const int *shls, const int *bas
 
         free(tmp2);
 }
-void c2s_sf_1ei(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_sf_1ei(double *opij, const double *gctr,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfj;
-        int ic, jc;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfj;
+        unsigned int ic, jc;
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nf2j * OF_CMPLX);
 
         for (jc = 0; jc < nj; jc += dj)
@@ -4101,24 +4112,25 @@ void c2s_sf_1ei(double *opij, const double *gctr, const int *shls, const int *ba
 /*
  * 1e integrals, cartesian to spinor.
  */
-void c2s_si_1e(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_si_1e(double *opij, const double *gctr,
+               const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nf2i = nfi + nfi;
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfj;
-        int ic, jc;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nf2i = nfi + nfi;
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfj;
+        unsigned int ic, jc;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr;
@@ -4148,24 +4160,25 @@ void c2s_si_1e(double *opij, const double *gctr, const int *shls, const int *bas
         free(tmp1);
         free(tmp2);
 }
-void c2s_si_1ei(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_si_1ei(double *opij, const double *gctr,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nf2i = nfi + nfi;
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfj;
-        int ic, jc;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nf2i = nfi + nfi;
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfj;
+        unsigned int ic, jc;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr;
@@ -4202,43 +4215,43 @@ void c2s_si_1ei(double *opij, const double *gctr, const int *shls, const int *ba
  *
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  */
-void c2s_sph_2e1(double *fkijl, const double *gctr, const int *shls,
-                 const int *bas)
+void c2s_sph_2e1(double *fijkl, const double *gctr,
+                 const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = i_l * 2 + 1;
-        const int dj = j_l * 2 + 1;
-        const int dk = k_l * 2 + 1;
-        const int dl = l_l * 2 + 1;
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nk = dk * k_ctr;
-        const int nl = dl * l_ctr;
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf = nfi * nfk * nfl * nfj;
-        const int d_i = di * nfk * nfl;
-        const int d_j = nfk * nfl * nfj;
-        const int d_k = dk * di * dj;
-        const int d_l = di * dj * nfl;
-        int ofj = ni;
-        int ofk = ni * nj;
-        int ofl = nk * ni * nj;
-        int ic, jc, kc, lc;
-        double *pfkijl;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = i_l * 2 + 1;
+        const unsigned int dj = j_l * 2 + 1;
+        const unsigned int dk = k_l * 2 + 1;
+        const unsigned int dl = l_l * 2 + 1;
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nk = dk * k_ctr;
+        const unsigned int nl = dl * l_ctr;
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf = nfi * nfk * nfl * nfj;
+        const unsigned int d_i = di * nfk * nfl;
+        const unsigned int d_j = nfk * nfl * nfj;
+        const unsigned int d_k = dk * di * dj;
+        const unsigned int d_l = di * dj * nfl;
+        unsigned int ofj = ni;
+        unsigned int ofk = ni * nj;
+        unsigned int ofl = nk * ni * nj;
+        unsigned int ic, jc, kc, lc;
+        double *pfijkl;
         double *const tmp1 = (double *)malloc(sizeof(double) * di*nfk*nfl*nfj);
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nfj);
 
@@ -4254,9 +4267,9 @@ void c2s_sph_2e1(double *fkijl, const double *gctr, const int *shls,
         dswap_ik_jl(tmp1, tmp2, di, dj, nfk, nfl);
         (f_bra_sph[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
         (f_ket_sph[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
-        pfkijl = fkijl + ofl * lc + ofk * kc + ofj * jc + ic;
+        pfijkl = fijkl + ofl * lc + ofk * kc + ofj * jc + ic;
 
-        dcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        dcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
                                 } } } }
 
         free(tmp1);
@@ -4271,32 +4284,33 @@ void c2s_sph_2e2() {};
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-void c2s_sf_2e1(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_sf_2e1(double *opij, const double *gctr,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfk * nfl * nfj;
-        const int no = di * nfk * nfl * dj;
-        const int d_i = di * nfk * nfl;
-        const int d_j = nfk * nfl * nfj;
-        int i;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfk * nfl * nfj;
+        const unsigned int no = di * nfk * nfl * dj;
+        const unsigned int d_i = di * nfk * nfl;
+        const unsigned int d_j = nfk * nfl * nfj;
+        unsigned int i;
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nf2j * OF_CMPLX);
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
@@ -4308,32 +4322,33 @@ void c2s_sf_2e1(double *opij, const double *gctr, const int *shls, const int *ba
 
         free(tmp2);
 }
-void c2s_sf_2e1i(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_sf_2e1i(double *opij, const double *gctr,
+                 const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfk * nfl * nfj;
-        const int no = di * nfk * nfl * dj;
-        const int d_i = di * nfk * nfl;
-        const int d_j = nfk * nfl * nfj;
-        int i;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfk * nfl * nfj;
+        const unsigned int no = di * nfk * nfl * dj;
+        const unsigned int d_i = di * nfk * nfl;
+        const unsigned int d_j = nfk * nfl * nfj;
+        unsigned int i;
         double *const tmp2 = (double *)malloc(sizeof(double) * di*nfk*nfl*nf2j * OF_CMPLX);
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
@@ -4352,38 +4367,39 @@ void c2s_sf_2e1i(double *opij, const double *gctr, const int *shls, const int *b
  *
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-void c2s_sf_2e2(double *fkijl, const double *opij, const int *shls, const int *bas)
+void c2s_sf_2e2(double *fijkl, const double *opij,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int dk = len_spinor(k_sh, bas);
-        const int dl = len_spinor(l_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nk = dk * k_ctr;
-        const int nl = dl * l_ctr;
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2k = nfk + nfk;
-        const int nf2l = nfl + nfl;
-        const int d_k = dk * di * dj;
-        const int d_l = di * dj * nfl;
-        const int nop = nfk * di * dj * nfl;
-        int ofj = ni;
-        int ofk = ni * nj;
-        int ofl = nk * ni * nj;
-        int ic, jc, kc, lc;
-        double *pfkijl;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int dk = len_spinor(k_sh, bas);
+        const unsigned int dl = len_spinor(l_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nk = dk * k_ctr;
+        const unsigned int nl = dl * l_ctr;
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2k = nfk + nfk;
+        const unsigned int nf2l = nfl + nfl;
+        const unsigned int d_k = dk * di * dj;
+        const unsigned int d_l = di * dj * nfl;
+        const unsigned int nop = nfk * di * dj * nfl;
+        unsigned int ofj = ni;
+        unsigned int ofk = ni * nj;
+        unsigned int ofl = nk * ni * nj;
+        unsigned int ic, jc, kc, lc;
+        double *pfijkl;
         double *const tmp1 = (double *)malloc(sizeof(double) * nf2k*di*dj*nf2l * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * dk*di*dj*nf2l * OF_CMPLX);
 
@@ -4394,47 +4410,48 @@ void c2s_sf_2e2(double *fkijl, const double *opij, const int *shls, const int *b
         zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
         (f_bra_spinor_sf[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
         (f_ket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
-        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
+        pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
         opij += nop * OF_CMPLX;
                                 } } } }
 
         free(tmp1);
         free(tmp2);
 }
-void c2s_sf_2e2i(double *fkijl, const double *opij, const int *shls, const int *bas)
+void c2s_sf_2e2i(double *fijkl, const double *opij,
+                 const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int dk = len_spinor(k_sh, bas);
-        const int dl = len_spinor(l_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nk = dk * k_ctr;
-        const int nl = dl * l_ctr;
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2k = nfk + nfk;
-        const int nf2l = nfl + nfl;
-        const int d_k = dk * di * dj;
-        const int d_l = di * dj * nfl;
-        const int nop = nfk * di * dj * nfl;
-        int ofj = ni;
-        int ofk = ni * nj;
-        int ofl = nk * ni * nj;
-        int ic, jc, kc, lc;
-        double *pfkijl;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int dk = len_spinor(k_sh, bas);
+        const unsigned int dl = len_spinor(l_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nk = dk * k_ctr;
+        const unsigned int nl = dl * l_ctr;
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2k = nfk + nfk;
+        const unsigned int nf2l = nfl + nfl;
+        const unsigned int d_k = dk * di * dj;
+        const unsigned int d_l = di * dj * nfl;
+        const unsigned int nop = nfk * di * dj * nfl;
+        unsigned int ofj = ni;
+        unsigned int ofk = ni * nj;
+        unsigned int ofl = nk * ni * nj;
+        unsigned int ic, jc, kc, lc;
+        double *pfijkl;
         double *const tmp1 = (double *)malloc(sizeof(double) * nf2k*di*dj*nf2l * OF_CMPLX);
         double *const tmp2 = (double *)malloc(sizeof(double) * dk*di*dj*nf2l * OF_CMPLX);
 
@@ -4445,9 +4462,9 @@ void c2s_sf_2e2i(double *fkijl, const double *opij, const int *shls, const int *
         zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
         (f_bra_spinor_sf[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
         (f_iket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
-        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
+        pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
         opij += nop * OF_CMPLX;
                                 } } } }
 
@@ -4461,33 +4478,34 @@ void c2s_sf_2e2i(double *fkijl, const double *opij, const int *shls, const int *
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-void c2s_si_2e1(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_si_2e1(double *opij, const double *gctr,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2i = nfi + nfi;
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfk * nfl * nfj;
-        const int no = di * nfk * nfl * dj;
-        const int d_i = di * nfk * nfl;
-        const int d_j = nfk * nfl * nf2j;
-        int i;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2i = nfi + nfi;
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfk * nfl * nfj;
+        const unsigned int no = di * nfk * nfl * dj;
+        const unsigned int d_i = di * nfk * nfl;
+        const unsigned int d_j = nfk * nfl * nf2j;
+        unsigned int i;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr * k_ctr * l_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr * k_ctr * l_ctr;
@@ -4516,33 +4534,34 @@ void c2s_si_2e1(double *opij, const double *gctr, const int *shls, const int *ba
         free(tmp1);
         free(tmp2);
 }
-void c2s_si_2e1i(double *opij, const double *gctr, const int *shls, const int *bas)
+void c2s_si_2e1i(double *opij, const double *gctr,
+                 const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2i = nfi + nfi;
-        const int nf2j = nfj + nfj;
-        const int nf = nfi * nfk * nfl * nfj;
-        const int no = di * nfk * nfl * dj;
-        const int d_i = di * nfk * nfl;
-        const int d_j = nfk * nfl * nf2j;
-        int i;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2i = nfi + nfi;
+        const unsigned int nf2j = nfj + nfj;
+        const unsigned int nf = nfi * nfk * nfl * nfj;
+        const unsigned int no = di * nfk * nfl * dj;
+        const unsigned int d_i = di * nfk * nfl;
+        const unsigned int d_j = nfk * nfl * nf2j;
+        unsigned int i;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr * k_ctr * l_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr * k_ctr * l_ctr;
@@ -4579,13 +4598,14 @@ void c2s_si_2e1i(double *opij, const double *gctr, const int *shls, const int *b
  */
 static void si2e_swap(double *new, const double *oldx, const double *oldy,
                       const double *oldz, const double *old1,
-                      const int ni, const int nj, const int nk, const int nl)
+                      const unsigned int ni, const unsigned int nj,
+                      const unsigned int nk, const unsigned int nl)
 {
-        int i, j, k, l;
-        int dlo = ni * nk * OF_CMPLX; // shift of (i,k,l++,j)
-        int djo = ni * nk * nl * OF_CMPLX; // shift of (i,k,l,j++)
-        int djn = nk * ni * OF_CMPLX; // shift of (k,i,j++,l)
-        int dln = nk * ni * nj * OF_CMPLX; // shift of (k,i,j,l++)
+        unsigned int i, j, k, l;
+        unsigned int dlo = ni * nk * OF_CMPLX; // shift of (i,k,l++,j)
+        unsigned int djo = ni * nk * nl * OF_CMPLX; // shift of (i,k,l,j++)
+        unsigned int djn = nk * ni * OF_CMPLX; // shift of (k,i,j++,l)
+        unsigned int dln = nk * ni * nj * OF_CMPLX; // shift of (k,i,j,l++)
         double *new11 = new;
         double *new12 = new11 + nk * ni * nj * nl * OF_CMPLX;
         double *new21 = new12 + nk * ni * nj * nl * OF_CMPLX;
@@ -4634,38 +4654,39 @@ static void si2e_swap(double *new, const double *oldx, const double *oldy,
                         }
                 }
 }
-void c2s_si_2e2(double *fkijl, const double *opij, const int *shls, const int *bas)
+void c2s_si_2e2(double *fijkl, const double *opij,
+                const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int dk = len_spinor(k_sh, bas);
-        const int dl = len_spinor(l_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nk = dk * k_ctr;
-        const int nl = dl * l_ctr;
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2k = nfk + nfk;
-        const int nf2l = nfl + nfl;
-        const int d_k = dk * di * dj;
-        const int d_l = di * dj * nf2l;
-        const int nop = nfk * di * dj * nfl;
-        int ofj = ni;
-        int ofk = ni * nj;
-        int ofl = nk * ni * nj;
-        int ic, jc, kc, lc;
-        double *pfkijl;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int dk = len_spinor(k_sh, bas);
+        const unsigned int dl = len_spinor(l_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nk = dk * k_ctr;
+        const unsigned int nl = dl * l_ctr;
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2k = nfk + nfk;
+        const unsigned int nf2l = nfl + nfl;
+        const unsigned int d_k = dk * di * dj;
+        const unsigned int d_l = di * dj * nf2l;
+        const unsigned int nop = nfk * di * dj * nfl;
+        unsigned int ofj = ni;
+        unsigned int ofk = ni * nj;
+        unsigned int ofl = nk * ni * nj;
+        unsigned int ic, jc, kc, lc;
+        double *pfijkl;
         const double *ox = opij;
         const double *oy = ox + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
         const double *oz = oy + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
@@ -4680,9 +4701,9 @@ void c2s_si_2e2(double *fkijl, const double *opij, const int *shls, const int *b
         si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
         (f_bra_spinor_si[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
         (f_ket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
-        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
+        pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
 
         ox += nop * OF_CMPLX;
         oy += nop * OF_CMPLX;
@@ -4693,38 +4714,39 @@ void c2s_si_2e2(double *fkijl, const double *opij, const int *shls, const int *b
         free(tmp1);
         free(tmp2);
 }
-void c2s_si_2e2i(double *fkijl, const double *opij, const int *shls, const int *bas)
+void c2s_si_2e2i(double *fijkl, const double *opij,
+                 const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int di = len_spinor(i_sh, bas);
-        const int dj = len_spinor(j_sh, bas);
-        const int dk = len_spinor(k_sh, bas);
-        const int dl = len_spinor(l_sh, bas);
-        const int ni = di * i_ctr;
-        const int nj = dj * j_ctr;
-        const int nk = dk * k_ctr;
-        const int nl = dl * l_ctr;
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int nf2k = nfk + nfk;
-        const int nf2l = nfl + nfl;
-        const int d_k = dk * di * dj;
-        const int d_l = di * dj * nf2l;
-        const int nop = nfk * di * dj * nfl;
-        int ofj = ni;
-        int ofk = ni * nj;
-        int ofl = nk * ni * nj;
-        int ic, jc, kc, lc;
-        double *pfkijl;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int di = len_spinor(i_sh, bas);
+        const unsigned int dj = len_spinor(j_sh, bas);
+        const unsigned int dk = len_spinor(k_sh, bas);
+        const unsigned int dl = len_spinor(l_sh, bas);
+        const unsigned int ni = di * i_ctr;
+        const unsigned int nj = dj * j_ctr;
+        const unsigned int nk = dk * k_ctr;
+        const unsigned int nl = dl * l_ctr;
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int nf2k = nfk + nfk;
+        const unsigned int nf2l = nfl + nfl;
+        const unsigned int d_k = dk * di * dj;
+        const unsigned int d_l = di * dj * nf2l;
+        const unsigned int nop = nfk * di * dj * nfl;
+        unsigned int ofj = ni;
+        unsigned int ofk = ni * nj;
+        unsigned int ofl = nk * ni * nj;
+        unsigned int ic, jc, kc, lc;
+        double *pfijkl;
         const double *ox = opij;
         const double *oy = ox + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
         const double *oz = oy + nop * i_ctr * j_ctr * k_ctr * l_ctr * OF_CMPLX;
@@ -4739,9 +4761,9 @@ void c2s_si_2e2i(double *fkijl, const double *opij, const int *shls, const int *
         si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
         (f_bra_spinor_si[k_l])(tmp2, dk, d_l, tmp1, k_sh, bas);
         (f_iket_spinor[l_l])(tmp1, d_k, d_k, tmp2, l_sh, bas);
-        pfkijl = fkijl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
+        pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic) * OF_CMPLX;
 
-        zcopy_kijl(pfkijl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
 
         ox += nop * OF_CMPLX;
         oy += nop * OF_CMPLX;
@@ -4756,21 +4778,21 @@ void c2s_si_2e2i(double *fkijl, const double *opij, const int *shls, const int *
 /*
  * 1e integrals, reorder cartesian integrals.
  */
-void c2s_cart_1e(double *opij, const double *gctr, const int *shls,
-                 const int *bas)
+void c2s_cart_1e(double *opij, const double *gctr,
+                 const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nf = nfi * nfj;
-        const int ni = nfi * i_ctr;
-        const int nj = nfj * j_ctr;
-        int ic, jc;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nf = nfi * nfj;
+        const unsigned int ni = nfi * i_ctr;
+        const unsigned int nj = nfj * j_ctr;
+        unsigned int ic, jc;
         double *popij;
 
         for (jc = 0; jc < nj; jc += nfj)
@@ -4784,46 +4806,44 @@ void c2s_cart_1e(double *opij, const double *gctr, const int *shls,
 /*
  * 2e integrals, reorder cartesian integrals.
  */
-void c2s_cart_2e1(double *fkijl, const double *gctr, const int *shls,
-                  const int *bas)
+void c2s_cart_2e1(double *fijkl, const double *gctr,
+                  const unsigned int *shls, const int *bas)
 {
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
-        const int l_sh = shls[3];
-        const int i_l = bas(ANG_OF, i_sh);
-        const int j_l = bas(ANG_OF, j_sh);
-        const int k_l = bas(ANG_OF, k_sh);
-        const int l_l = bas(ANG_OF, l_sh);
-        const int i_ctr = bas(NCTR_OF, i_sh);
-        const int j_ctr = bas(NCTR_OF, j_sh);
-        const int k_ctr = bas(NCTR_OF, k_sh);
-        const int l_ctr = bas(NCTR_OF, l_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
-        const int nfk = len_cart(k_l);
-        const int nfl = len_cart(l_l);
-        const int ni = nfi * i_ctr;
-        const int nj = nfj * j_ctr;
-        const int nk = nfk * k_ctr;
-        const int nl = nfl * l_ctr;
-        const int nf = nfk * nfi * nfj * nfl;
-        int ofj = ni;
-        int ofk = ni * nj;
-        int ofl = nk * ni * nj;
-        int ic, jc, kc, lc;
-        double *pfkijl;
+        const unsigned int i_sh = shls[0];
+        const unsigned int j_sh = shls[1];
+        const unsigned int k_sh = shls[2];
+        const unsigned int l_sh = shls[3];
+        const unsigned int i_l = bas(ANG_OF, i_sh);
+        const unsigned int j_l = bas(ANG_OF, j_sh);
+        const unsigned int k_l = bas(ANG_OF, k_sh);
+        const unsigned int l_l = bas(ANG_OF, l_sh);
+        const unsigned int i_ctr = bas(NCTR_OF, i_sh);
+        const unsigned int j_ctr = bas(NCTR_OF, j_sh);
+        const unsigned int k_ctr = bas(NCTR_OF, k_sh);
+        const unsigned int l_ctr = bas(NCTR_OF, l_sh);
+        const unsigned int nfi = len_cart(i_l);
+        const unsigned int nfj = len_cart(j_l);
+        const unsigned int nfk = len_cart(k_l);
+        const unsigned int nfl = len_cart(l_l);
+        const unsigned int ni = nfi * i_ctr;
+        const unsigned int nj = nfj * j_ctr;
+        const unsigned int nk = nfk * k_ctr;
+        const unsigned int nl = nfl * l_ctr;
+        const unsigned int nf = nfk * nfi * nfj * nfl;
+        unsigned int ofj = ni;
+        unsigned int ofk = ni * nj;
+        unsigned int ofl = nk * ni * nj;
+        unsigned int ic, jc, kc, lc;
+        double *pfijkl;
 
         for (lc = 0; lc < nl; lc += nfl)
                 for (kc = 0; kc < nk; kc += nfk)
                         for (jc = 0; jc < nj; jc += nfj)
                                 for (ic = 0; ic < ni; ic += nfi) {
-                                        pfkijl = fkijl + ofl * lc + ofk * kc
-                                                + ofj * jc + ic;
-                                        dcopy_kijl(pfkijl, gctr, 
-                                                   ni, nj, nk, nl,
-                                                   nfi, nfj, nfk, nfl);
-                                        gctr += nf;
+        pfijkl = fijkl + ofl * lc + ofk * kc + ofj * jc + ic;
+        dcopy_kijl(pfijkl, gctr, ni, nj, nk, nl, nfi, nfj, nfk, nfl);
+        gctr += nf;
                                 }
 }
 void c2s_cart_2e2() {};
+

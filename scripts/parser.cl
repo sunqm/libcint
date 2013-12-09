@@ -402,7 +402,7 @@
           (vs-by-vs pv1 pv2))))
 
 (defun vs-align-merge (vs1 vs2)
-  "add up two tensors/vectors, vs1 and vs2 should be aligned"
+  "add two tensors/vectors, vs1 and vs2 should be aligned"
   (cond ((null vs1) '())
         ((vector? vs1)
          (apply #'make-vec
@@ -427,13 +427,14 @@
     (let ((unknow (remove-if (lambda (x)
                                (or (numberp x)
                                    (member x '(sigma))
+                                   (member x *intvar-keywords*) ; ??
                                    (member x *operator-keywords*)
                                    (member x *intvar-keywords*)
                                    (member x *one-electron-operator-keywords*)
                                    (member x *two-electron-operator-keywords*)))
                              op)))
       (if (> (length unknow) 0)
-        (print (mkstr "Warning: unknown operators: " unknow))))
+        (format t "//Warning: unknown operators: ~a" unknow)))
     (let ((unknow (remove-if (lambda (x)
                                (or (numberp x)
                                    (member x '(sigma))
@@ -441,7 +442,7 @@
                                    (member x *operator-keywords*)))
                              `(,@bra-i ,@ket-j ,@bra-k ,@ket-l))))
       (if (> (length unknow) 0)
-        (print (mkstr "Warning: unknown keys: " unknow))))
+        (format t "//Warning: unknown keys ~a" unknow)))
     (let ((phasefac (nth-value 1 (factor-of expr)))
           (ops-i (subst 'ri 'r bra-i))
           (ops-j (subst 'rj 'r ket-j))

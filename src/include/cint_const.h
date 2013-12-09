@@ -11,7 +11,7 @@
 #define PTR_AO_GAUGE            7
 #define PTR_ENV_START           20
 
-// index of atm
+// slots of atm
 #define CHARGE_OF       0
 #define PTR_COORD       1
 #define NUC_MOD_OF      2
@@ -21,7 +21,7 @@
 #define ATM_SLOTS       6
 
 
-// index of bas
+// slots of bas
 #define ATOM_OF         0
 #define ANG_OF          1
 #define NPRIM_OF        2
@@ -29,10 +29,10 @@
 #define KAPPA_OF        4
 #define PTR_EXP         5
 #define PTR_COEFF       6
-#define GAUGE_OF        7
+#define RESERVE_BASLOT  7
 #define BAS_SLOTS       8
 
-// index of gout
+// slots of gout
 #define POSX            0
 #define POSY            1
 #define POSZ            2
@@ -76,9 +76,15 @@
 #define TENSOR          8
 
 // some other boundary
-#define CART_MAX        36
 #define MXRYSROOTS      14
-#define EXPCUTOFF       300
+#define ANG_MAX         5
+//#define CART_MAX        (ANG_MAX*(ANG_MAX+1)/2)
+#define CART_MAX        16
+#define SHLS_MAX        0x7fffffff
+#define NPRIM_MAX       0x7fffffff
+#define NCTR_MAX        0x7fffffff
+// ~ 4e-18
+#define EXPCUTOFF       40
 
 #define OF_CMPLX        2
 

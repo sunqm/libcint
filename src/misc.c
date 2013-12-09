@@ -5,9 +5,10 @@
  * basic functions
  */
 
-void dcmplx_re(const int n, double *z, const double *re)
+
+void dcmplx_re(const unsigned int n, double *z, const double *re)
 {
-        int i;
+        unsigned int i;
         for (i = 0; i < n; i++) {
                 z[0] = re[i];
                 z[1] = 0;
@@ -15,9 +16,9 @@ void dcmplx_re(const int n, double *z, const double *re)
         }
 }
 
-void dcmplx_im(const int n, double *z, const double *im)
+void dcmplx_im(const unsigned int n, double *z, const double *im)
 {
-        int i;
+        unsigned int i;
         for (i = 0; i < n; i++) {
                 z[0] = 0;
                 z[1] = im[i];
@@ -25,27 +26,30 @@ void dcmplx_im(const int n, double *z, const double *im)
         }
 }
 
-void dcmplx_pp(const int n, double *z, const double *re, const double *im)
+void dcmplx_pp(const unsigned int n, double *z,
+               const double *re, const double *im)
 {
-        int i;
+        unsigned int i;
         for (i = 0; i < n; i++) {
                 z[0] = re[i];
                 z[1] = im[i];
                 z += 2;
         }
 }
-void dcmplx_pn(const int n, double *z, const double *re, const double *im)
+void dcmplx_pn(const unsigned int n, double *z,
+               const double *re, const double *im)
 {
-        int i;
+        unsigned int i;
         for (i = 0; i < n; i++) {
                 z[0] =  re[i];
                 z[1] = -im[i];
                 z += 2;
         }
 }
-void dcmplx_np(const int n, double *z, const double *re, const double *im)
+void dcmplx_np(const unsigned int n, double *z,
+               const double *re, const double *im)
 {
-        int i;
+        unsigned int i;
         for (i = 0; i < n; i++) {
                 z[0] = -re[i];
                 z[1] =  im[i];

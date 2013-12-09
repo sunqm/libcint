@@ -12,21 +12,22 @@
 #include "fblas.h"
 #include "c2f.h"
 /* <i|OVLP |j> */
-static void gout1e_cint1e_ovlp_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_ovlp_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double s[1];
@@ -38,14 +39,14 @@ s[0] = g0[ix] * g0[iy] * g0[iz];
 gout[0] += + (1*s[0]);
 gout += 1;
 }}
-int cint1e_ovlp_sph(double *opij, const int *shls,
+int cint1e_ovlp_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 0 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
@@ -56,21 +57,22 @@ gout1e_cint1e_ovlp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ovlp_sph)
 /* <i|NUC |j> */
-static void gout1e_cint1e_nuc_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_nuc_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double s[1];
@@ -82,14 +84,14 @@ s[0] = g0[ix] * g0[iy] * g0[iz];
 gout[0] += + (1*s[0]);
 gout += 1;
 }}
-int cint1e_nuc_sph(double *opij, const int *shls,
+int cint1e_nuc_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 0 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 0;
@@ -100,21 +102,22 @@ gout1e_cint1e_nuc_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_nuc_sph)
 /* <i|OVLP |P DOT P j> */
-static void gout1e_cint1e_kin_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_kin_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -140,14 +143,14 @@ s[8] = g0[ix] * g0[iy] * g3[iz];
 gout[0] += + (-1*s[0]) + (-1*s[4]) + (-1*s[8]);
 gout += 1;
 }}
-int cint1e_kin_sph(double *opij, const int *shls,
+int cint1e_kin_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
@@ -158,21 +161,22 @@ gout1e_cint1e_kin_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_kin_sph)
 /* <i|NABLA-RINV |CROSS P j> */
-static void gout1e_cint1e_ia01p_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_ia01p_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -205,14 +209,14 @@ gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
 gout += 3;
 }}
-int cint1e_ia01p_sph(double *opij, const int *shls,
+int cint1e_ia01p_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
@@ -223,21 +227,22 @@ gout1e_cint1e_ia01p_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ia01p_sph)
 /* <i|OVLP |R CROSS P j> */
-static void gout1e_cint1e_giao_irjxp_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_giao_irjxp_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -265,14 +270,14 @@ gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
 gout += 3;
 }}
-int cint1e_giao_irjxp_sph(double *opij, const int *shls,
+int cint1e_giao_irjxp_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
@@ -283,21 +288,22 @@ gout1e_cint1e_giao_irjxp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_giao_irjxp_sph)
 /* <i|OVLP |RC CROSS P j> */
-static void gout1e_cint1e_cg_irxp_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_cg_irxp_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -329,14 +335,14 @@ gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
 gout += 3;
 }}
-int cint1e_cg_irxp_sph(double *opij, const int *shls,
+int cint1e_cg_irxp_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
@@ -347,21 +353,22 @@ gout1e_cint1e_cg_irxp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_cg_irxp_sph)
 /* <i|NABLA-RINV |R j> */
-static void gout1e_cint1e_giao_a11part_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_giao_a11part_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -400,14 +407,14 @@ gout[7] += + (1*s[7]);
 gout[8] += + (1*s[8]);
 gout += 9;
 }}
-int cint1e_giao_a11part_sph(double *opij, const int *shls,
+int cint1e_giao_a11part_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
@@ -418,21 +425,22 @@ gout1e_cint1e_giao_a11part_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_giao_a11part_sph)
 /* <i|NABLA-RINV |RC j> */
-static void gout1e_cint1e_cg_a11part_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_cg_a11part_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -475,14 +483,14 @@ gout[7] += + (1*s[7]);
 gout[8] += + (1*s[8]);
 gout += 9;
 }}
-int cint1e_cg_a11part_sph(double *opij, const int *shls,
+int cint1e_cg_a11part_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 0 + ng[1];
 ng[GSHIFT] = 2;
@@ -493,21 +501,22 @@ gout1e_cint1e_cg_a11part_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_cg_a11part_sph)
 /* <G i|NABLA-RINV CROSS P |j> */
-static void gout1e_cint1e_a01gp_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_a01gp_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -579,14 +588,14 @@ gout[7] += + (1*c[0]*s[15]) + (-1*c[1]*s[6]) + (-1*c[0]*s[11]) + (1*c[1]*s[2]);
 gout[8] += + (1*c[0]*s[10]) + (-1*c[1]*s[1]) + (-1*c[0]*s[12]) + (1*c[1]*s[3]);
 gout += 9;
 }}
-int cint1e_a01gp_sph(double *opij, const int *shls,
+int cint1e_a01gp_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 3;
@@ -602,21 +611,22 @@ gout1e_cint1e_a01gp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_a01gp_sph)
 /* <G i|OVLP |P DOT P j> */
-static void gout1e_cint1e_igkin_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_igkin_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -677,14 +687,14 @@ gout[1] += + (1*c[2]*s[0]) + (-1*c[0]*s[18]) + (1*c[2]*s[4]) + (-1*c[0]*s[22]) +
 gout[2] += + (1*c[0]*s[9]) + (-1*c[1]*s[0]) + (1*c[0]*s[13]) + (-1*c[1]*s[4]) + (1*c[0]*s[17]) + (-1*c[1]*s[8]);
 gout += 3;
 }}
-int cint1e_igkin_sph(double *opij, const int *shls,
+int cint1e_igkin_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 2 + 1;
 ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 3;
@@ -700,21 +710,22 @@ gout1e_cint1e_igkin_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_igkin_sph)
 /* <G i|OVLP |j> */
-static void gout1e_cint1e_igovlp_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_igovlp_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -739,14 +750,14 @@ gout[1] += + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
 gout[2] += + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
 gout += 3;
 }}
-int cint1e_igovlp_sph(double *opij, const int *shls,
+int cint1e_igovlp_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 0 + 1;
 ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
@@ -762,21 +773,22 @@ gout1e_cint1e_igovlp_sph, &c2s_sph_1e,
 shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_igovlp_sph)
 /* <G i|NUC |j> */
-static void gout1e_cint1e_ignuc_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
+static void gout1e_cint1e_ignuc_sph(double *g, const unsigned int *ng,
+double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+const unsigned int *shls,
+const int *atm, const int *bas, const double *env) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
+const unsigned int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const unsigned int j_l = (unsigned int)bas(ANG_OF, j_sh);
+const unsigned int *idy = idx + nf;
+const unsigned int *idz = idx + nf * 2;
 const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
 const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-int ix, iy, iz, n;
+unsigned int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + ng[0] * ng[1] * 3;
 double *g2 = g1  + ng[0] * ng[1] * 3;
@@ -801,14 +813,14 @@ gout[1] += + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
 gout[2] += + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
 gout += 3;
 }}
-int cint1e_ignuc_sph(double *opij, const int *shls,
+int cint1e_ignuc_sph(double *opij, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
 const int i_sh = shls[0];
 const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int i_l = (unsigned int)bas(ANG_OF, i_sh);
+const int j_l = (unsigned int)bas(ANG_OF, j_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 ng[1] = j_l + 0 + 1;
 ng[0] = i_l + 1 + ng[1];
 ng[GSHIFT] = 1;
@@ -825,30 +837,25 @@ shls, atm, natm, bas, nbas, env); }
 C2F_(cint1e_ignuc_sph)
 /* <k G i|R12 |j l> : i,jin electron 1; k,lin electron 2
  * = (G i j|R12 |k l) */
-static void gout2e_cint2e_ig1_sph(double *g, const int *ng,
-double *gout, const int nf, const int *idx,
-const double ai, const double aj, const double ak, const double al,
-const int *shls, const int *atm, const int *bas, const double *env) {
-const int INC1 = 1;
+static void gout2e_cint2e_ig1_sph(double *g,
+double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {
+const unsigned int INC1 = 1;
 const double D1 = 1;
-const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int k_sh = shls[2];
-const int l_sh = shls[3];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int k_l = bas(ANG_OF, k_sh);
-const int l_l = bas(ANG_OF, l_sh);
-const int *idy = idx + nf;
-const int *idz = idx + nf * 2;
-const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
-const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-const double *rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
-const double *rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
-int ix, iy, iz, i, n;
+const double *env = envs->env;
+const unsigned int *ng = envs->ng;
+const unsigned int nf = envs->nf;
+const unsigned int i_l = envs->i_l;
+const unsigned int j_l = envs->j_l;
+const unsigned int k_l = envs->k_l;
+const unsigned int l_l = envs->l_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+const double *rl = envs->rl;
+unsigned int ix, iy, iz, i, n;
 double *g0 = g;
-double *g1 = g0 + g_size(ng) * 3;
-double *g2 = g1 + g_size(ng) * 3;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
 double s[3];
 double rirj[3];
 rirj[0] = ri[0] - rj[0];
@@ -859,10 +866,11 @@ c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
 G2E_R0I(g1, g0, i_l+0, j_l, k_l, l_l);
-for (n = 0; n < nf; n++) {
-ix = idx[n];
-iy = idy[n];
-iz = idz[n];
+if (gout_empty) {
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
 dset0(3, s);
 for (i = 0; i < ng[RYS_ROOTS]; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
@@ -873,32 +881,47 @@ gout[0] = + (-1*c[1]*s[2]) + (1*c[2]*s[1]);
 gout[1] = + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
 gout[2] = + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
 gout += 3;
-}}
-int cint2e_ig1_sph(double *opkijl, const int *shls,
+}} else {
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+dset0(3, s);
+for (i = 0; i < ng[RYS_ROOTS]; i++) {
+s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
+}
+gout[0] += + (-1*c[1]*s[2]) + (1*c[2]*s[1]);
+gout[1] += + (-1*c[2]*s[0]) + (1*c[0]*s[2]);
+gout[2] += + (-1*c[0]*s[1]) + (1*c[1]*s[0]);
+gout += 3;
+}}}
+int cint2e_ig1_sph(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
 const int *bas, const int nbas, const double *env) {
-const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int k_sh = shls[2];
-const int l_sh = shls[3];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);
-const int k_l = bas(ANG_OF, k_sh);
-const int l_l = bas(ANG_OF, l_sh);
-int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[3] = j_l + 0 + 1;
-ng[2] = l_l + 0 + 1;
-ng[1] = k_l + 0 + ng[2];
-ng[0] = i_l + 1 + ng[3];
+const unsigned int i_sh = shls[0];
+const unsigned int j_sh = shls[1];
+const unsigned int k_sh = shls[2];
+const unsigned int l_sh = shls[3];
+const unsigned int i_l = bas(ANG_OF, i_sh);
+const unsigned int j_l = bas(ANG_OF, j_sh);
+const unsigned int k_l = bas(ANG_OF, k_sh);
+const unsigned int l_l = bas(ANG_OF, l_sh);
+unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+ng[0] = i_l + 1 + 1;
+ng[1] = k_l + 0 + 1;
+ng[2] = l_l + 0 + ng[1];
+ng[3] = j_l + 0 + ng[0];
 ng[GSHIFT] = 1;
 ng[POS_E1] = 1;
 ng[POS_E2] = 1;
 ng[TENSOR] = 3;
 if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
-int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
-int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
-int kp = (k_l * 2 + 1) * bas(NCTR_OF,k_sh);
-int lp = (l_l * 2 + 1) * bas(NCTR_OF,l_sh);
+unsigned int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
+unsigned int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
+unsigned int kp = (k_l * 2 + 1) * bas(NCTR_OF,k_sh);
+unsigned int lp = (l_l * 2 + 1) * bas(NCTR_OF,l_sh);
 dset0(kp * ip * jp * lp * ng[TENSOR], opkijl);
 return 0; }
 return cint2e_drv(opkijl, ng, 0.5,

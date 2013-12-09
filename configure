@@ -18780,6 +18780,9 @@ fi
 
 fi
 
+## big- or little- endian
+#AC_C_BIGENDIAN
+
 ## output files
 ac_config_files="$ac_config_files Makefile src/Makefile testsuite/Makefile examples/Makefile"
 

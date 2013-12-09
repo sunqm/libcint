@@ -38,6 +38,9 @@ if test "x$enable_auto_intor" = xyes ; then
                   AC_MSG_ERROR([clisp is not found.]))
 fi
 
+## big- or little- endian
+#AC_C_BIGENDIAN
+
 ## output files
 AC_CONFIG_FILES([Makefile
                  src/Makefile
