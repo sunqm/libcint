@@ -21,6 +21,13 @@ double gto_norm(int n, double a)
                 / (factorial(2*n+2) * sqrt(M_PI));
 }
 
+/* general contracted DZ basis [3s1p/2s1p] for H2
+    exponents    contract-coeff
+S   6.0          0.7               0.4
+    2.0          0.6               0.3
+    0.8          0.5               0.2
+P   0.9          1.
+ */
 
 int main()
 {
@@ -32,62 +39,78 @@ int main()
         double *env = malloc(sizeof(double) * 10000);
 
         int i, n, off;
-        off = PTR_ENV_START;
-        for (i = 0; i < natm; i++) {
-                atm[CHARGE_OF + ATM_SLOTS * i] = i + 1;
-                atm[PTR_COORD + ATM_SLOTS * i] = off;
-                env[off + 0] = i;
-                env[off + 1] = i;
-                env[off + 2] = i;
-                off += 3;
-        }
+        off = PTR_ENV_START; // = 20
+
+        i = 0;
+        atm[CHARGE_OF + ATM_SLOTS * i] = 1;
+        atm[PTR_COORD + ATM_SLOTS * i] = off;
+        env[off + 0] =  0; // x (Bohr)
+        env[off + 1] =  0; // y (Bohr)
+        env[off + 2] =-.8; // z (Bohr)
+        i++;
+        off += 3;
+        atm[CHARGE_OF + ATM_SLOTS * i] = 1;
+        atm[PTR_COORD + ATM_SLOTS * i] = off;
+        env[off + 0] = 0;
+        env[off + 1] = 0;
+        env[off + 2] =.8; // (Bohr)
+        i++;
+        off += 3;
 
         n = 0;
-
         /* basis #0 with kappa > 0  => p_1/2 */
         bas[ATOM_OF  + BAS_SLOTS * n]  = 0;
-        bas[ANG_OF   + BAS_SLOTS * n]  = 1;
-        bas[KAPPA_OF + BAS_SLOTS * n]  = 1;
-        bas[NPRIM_OF + BAS_SLOTS * n]  = 1;
-        bas[NCTR_OF  + BAS_SLOTS * n]  = 1;
-        bas[PTR_EXP  + BAS_SLOTS * n]  = off;
-        env[off + 0] = 1.;
-        bas[PTR_COEFF+ BAS_SLOTS * n] = off + 1;
-        env[off + 1] = 1. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]]);
-        off += 2;
-        n++;
-
-        /*
-         * basis #1 with kappa = 0  => d_3/2, d_5/2,
-         * 2 primitive-GTO -> 2 contracted-GTO
-         */
-        bas[ATOM_OF  + BAS_SLOTS * n]  = 0;
-        bas[ANG_OF   + BAS_SLOTS * n]  = 2;
-        bas[KAPPA_OF + BAS_SLOTS * n]  = 0;
-        bas[NPRIM_OF + BAS_SLOTS * n]  = 2;
+        bas[ANG_OF   + BAS_SLOTS * n]  = 0;
+        bas[NPRIM_OF + BAS_SLOTS * n]  = 3;
         bas[NCTR_OF  + BAS_SLOTS * n]  = 2;
+        bas[KAPPA_OF + BAS_SLOTS * n]  = 1;
         bas[PTR_EXP  + BAS_SLOTS * n]  = off;
-        env[off + 0] = 3.;
-        env[off + 1] = 5.;
-        bas[PTR_COEFF+ BAS_SLOTS * n] = off + 2;
-        env[off + 2] = 1. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]])  ;
-        env[off + 3] = 2. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+1]);
-        env[off + 4] = 4. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]])  ;
-        env[off + 5] = 8. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+1]);
+        env[off + 0] = 6.;
+        env[off + 1] = 2.;
+        env[off + 2] = .8;
+        off += 3;
+        bas[PTR_COEFF+ BAS_SLOTS * n] = off;
+        env[off + 0] = .7 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
+        env[off + 1] = .6 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
+        env[off + 2] = .5 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
+        env[off + 3] = .4 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
+        env[off + 4] = .3 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
+        env[off + 5] = .2 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
         off += 6;
         n++;
 
-        /* basis #2 with kappa < 0  => f_5/2 */
-        bas[ATOM_OF  + BAS_SLOTS * n]  = 1;
-        bas[ANG_OF   + BAS_SLOTS * n]  = 3;
-        bas[KAPPA_OF + BAS_SLOTS * n]  = -4;
+        /* basis #1 with kappa = 0  => p_1/2, p_3/2 */
+        bas[ATOM_OF  + BAS_SLOTS * n]  = 0;
+        bas[ANG_OF   + BAS_SLOTS * n]  = 1;
         bas[NPRIM_OF + BAS_SLOTS * n]  = 1;
         bas[NCTR_OF  + BAS_SLOTS * n]  = 1;
+        bas[KAPPA_OF + BAS_SLOTS * n]  = 0;
         bas[PTR_EXP  + BAS_SLOTS * n]  = off;
-        env[off + 0] = 1;
-        bas[PTR_COEFF+ BAS_SLOTS * n] = off + 1;
-        env[off + 1] = 1 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]]);
-        off += 2;
+        env[off + 0] = .9;
+        off += 1;
+        bas[PTR_COEFF+ BAS_SLOTS * n] = off;
+        env[off + 0] = 1. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], .9);
+        off += 1;
+        n++;
+
+        /* basis #2 == basis #0 */
+        bas[ATOM_OF  + BAS_SLOTS * n] = 1;
+        bas[ANG_OF   + BAS_SLOTS * n] = bas[ANG_OF   + BAS_SLOTS * 0];
+        bas[NPRIM_OF + BAS_SLOTS * n] = bas[NPRIM_OF + BAS_SLOTS * 0];
+        bas[NCTR_OF  + BAS_SLOTS * n] = bas[NCTR_OF  + BAS_SLOTS * 0];
+        bas[KAPPA_OF + BAS_SLOTS * n] = bas[KAPPA_OF + BAS_SLOTS * 0];
+        bas[PTR_EXP  + BAS_SLOTS * n] = bas[PTR_EXP  + BAS_SLOTS * 0];
+        bas[PTR_COEFF+ BAS_SLOTS * n] = bas[PTR_COEFF+ BAS_SLOTS * 0];
+        n++;
+
+        /* basis #3 == basis #1 */
+        bas[ATOM_OF  + BAS_SLOTS * n] = 1;
+        bas[ANG_OF   + BAS_SLOTS * n] = bas[ANG_OF   + BAS_SLOTS * 1];
+        bas[NPRIM_OF + BAS_SLOTS * n] = bas[NPRIM_OF + BAS_SLOTS * 1];
+        bas[NCTR_OF  + BAS_SLOTS * n] = bas[NCTR_OF  + BAS_SLOTS * 1];
+        bas[KAPPA_OF + BAS_SLOTS * n] = bas[KAPPA_OF + BAS_SLOTS * 1];
+        bas[PTR_EXP  + BAS_SLOTS * n] = bas[PTR_EXP  + BAS_SLOTS * 1];
+        bas[PTR_COEFF+ BAS_SLOTS * n] = bas[PTR_COEFF+ BAS_SLOTS * 1];
         n++;
 
         /*

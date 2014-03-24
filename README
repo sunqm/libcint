@@ -19,7 +19,7 @@ Features
 
 * one electron integrals
     - nuclear attraction due to Gaussian nuclear model
-* two electron integrals
+* two electron integrals (value < 1e-20 are neglected)
     - Coulomb repulsion
     - Gaunt interaction
 * Cartesian GTO:  6d, 10f, 15g Gaussian type functions
@@ -91,7 +91,6 @@ or
     gaunt       means   \alpha_i \dot \alpha_j / |\vec{r}_i - \vec{r}_j|
 
 
-
 Installation
 ------------
 
@@ -120,8 +119,8 @@ Installation
       http://software.intel.com/sites/products/mkl/
 
 
-Known bugs
-----------
+Known problems
+--------------
 
 * On 64-bit system, "make check" stop with error:
 
@@ -144,6 +143,14 @@ Known bugs
     - cint2e_spgsp1
     - cint2e_g1spsp2
     - cint2e_spgsp1spsp2
+
+* For the basis which has high angular momentum GTOs, increase the value
+  of EXPCUTOFF in src/include/cint_const.h to improve accuracy.
+  Recommended minimal values to reach the accuracy of 1e-14 are
+    max. angular        EXPCUTOFF
+    s, p, d             30
+    f, g                40
+    h                   50
 
 
 Bug report

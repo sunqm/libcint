@@ -56,59 +56,77 @@ allocate (bas(BAS_SLOTS,nbas))
 allocate (env(10000))
 
 off = PTR_ENV_START
-do i = 1, natm
-  atm(CHARGE_OF,i) = i
-  atm(PTR_COORD,i) = off ! off is the offset in env
-  env(off + 1) = i - 1
-  env(off + 2) = i - 1
-  env(off + 3) = i - 1
-  off = off + 3
-end do
+
+i = 1
+atm(CHARGE_OF,i) = 1
+atm(PTR_COORD,i) = off ! note the 0-based index
+env(off + 1) =  0 ! x (Bohr)
+env(off + 2) =  0 ! y (Bohr)
+env(off + 3) =-.8 ! z (Bohr)
+i = i + 1
+off = off + 3
+atm(CHARGE_OF,i) = 1
+atm(PTR_COORD,i) = off
+env(off + 1) = 0
+env(off + 2) = 0
+env(off + 3) =.8 ! (Bohr)
+i = i + 1
+off = off + 3
 
 n = 1
-
-! basis #0 with kappa > 0  => p_1/2
-bas(ATOM_OF  ,n)  = 0 ! the first atom, the index is 0-based
-bas(ANG_OF   ,n)  = 1
-bas(KAPPA_OF ,n)  = 1
-bas(NPRIM_OF ,n)  = 1
-bas(NCTR_OF  ,n)  = 1
-bas(PTR_EXP  ,n)  = off ! offset of exponents in env
-env(off + 1) = 1.d0
-bas(PTR_COEFF,n) = off + 1 ! offset of contraction coefficeints
-env(off + 2) = 1.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
-off = off + 2
-n = n + 1
-
-! basis #1 with kappa = 0  => d_3/2, d_5/2,
-! 2 primitive-GTO -> 2 contracted-GTO
-bas(ATOM_OF  ,n)  = 0 ! the first atom
-bas(ANG_OF   ,n)  = 2
-bas(KAPPA_OF ,n)  = 0
-bas(NPRIM_OF ,n)  = 2
+! basis #1, with kappa > 0  => p_1/2
+bas(ATOM_OF  ,n)  = 0 ! note that it's the first atom, the index is 0-based
+bas(ANG_OF   ,n)  = 0
+bas(NPRIM_OF ,n)  = 3
 bas(NCTR_OF  ,n)  = 2
-bas(PTR_EXP  ,n)  = off
-env(off + 0) = 3.d0
-env(off + 1) = 5.d0
-bas(PTR_COEFF,n) = off + 2
-env(off + 2) = 1.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
-env(off + 3) = 2.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
-env(off + 4) = 4.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
-env(off + 5) = 8.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
+bas(KAPPA_OF ,n)  = 1
+bas(PTR_EXP  ,n)  = off ! note the 0-based index
+env(off + 1) = 6.
+env(off + 2) = 2.
+env(off + 3) = .8
+off = off + 3
+bas(PTR_COEFF+ BAS_SLOTS * n) = off
+env(off + 0) = .7 * gto_norm(bas(ANG_OF+BAS_SLOTS*n), 6.)
+env(off + 1) = .6 * gto_norm(bas(ANG_OF+BAS_SLOTS*n), 2.)
+env(off + 2) = .5 * gto_norm(bas(ANG_OF+BAS_SLOTS*n), .8)
+env(off + 3) = .4 * gto_norm(bas(ANG_OF+BAS_SLOTS*n), 6.)
+env(off + 4) = .3 * gto_norm(bas(ANG_OF+BAS_SLOTS*n), 2.)
+env(off + 5) = .2 * gto_norm(bas(ANG_OF+BAS_SLOTS*n), .8)
 off = off + 6
 n = n + 1
 
-! basis #2 with kappa < 0  => f_5/2
-bas(ATOM_OF  ,n)  = 1 ! the second atom
-bas(ANG_OF   ,n)  = 3
-bas(KAPPA_OF ,n)  = -4
+! basis #2, with kappa = 0  => p_1/2, p_3/2
+bas(ATOM_OF  ,n)  = 0
+bas(ANG_OF   ,n)  = 1
 bas(NPRIM_OF ,n)  = 1
 bas(NCTR_OF  ,n)  = 1
+bas(KAPPA_OF ,n)  = 0
 bas(PTR_EXP  ,n)  = off
-env(off + 0) = 1.d0
-bas(PTR_COEFF,n) = off + 1
-env(off + 1) = 1.d0 * gto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)))
-off = off + 2
+env(off + 0) = .9
+off = off + 1
+bas(PTR_COEFF+ BAS_SLOTS * n) = off
+env(off + 0) = 1. * gto_norm(bas(ANG_OF+BAS_SLOTS*n), .9)
+off = off + 1
+n = n + 1
+
+! basis #3 == basis #1
+bas(ATOM_OF  ,n) = 1 ! note that it's the second atom, the index is 0-based
+bas(ANG_OF   ,n) = bas(ANG_OF   ,1)
+bas(NPRIM_OF ,n) = bas(NPRIM_OF ,1)
+bas(NCTR_OF  ,n) = bas(NCTR_OF  ,1)
+bas(KAPPA_OF ,n) = bas(KAPPA_OF ,1)
+bas(PTR_EXP  ,n) = bas(PTR_EXP  ,1)
+bas(PTR_COEFF,n) = bas(PTR_COEFF,1)
+n = n + 1
+
+! basis #4 == basis #2
+bas(ATOM_OF  ,n) = 1
+bas(ANG_OF   ,n) = bas(ANG_OF   ,2)
+bas(NPRIM_OF ,n) = bas(NPRIM_OF ,2)
+bas(NCTR_OF  ,n) = bas(NCTR_OF  ,2)
+bas(KAPPA_OF ,n) = bas(KAPPA_OF ,2)
+bas(PTR_EXP  ,n) = bas(PTR_EXP  ,2)
+bas(PTR_COEFF,n) = bas(PTR_COEFF,2)
 n = n + 1
 
 !

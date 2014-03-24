@@ -2,36 +2,12 @@ from math import *
 import numpy
 import ctypes
 
-def charge_of(atm_id):
-    return 1
-
-def coord_of(atm_id):
-    return (0,1,2)
-
-def angular_of(bas_id):
-    return 1
-
-def nprimitive_of(bas_id):
-    return 3
-
-def ncontract_of(bas_id):
-    return 2
-
-def kappa_of(bas_id):
-    return 0
-
-def coeff_of(bas_id):
-    # 3 primitive-GTO -> 2 contracted-GTO
-    c = numpy.random.random((3,2)).flatten(order='F')
-    n = angular_of(bas_id)
-    # absorb the normalization factor of primitive GTO into coefficients
-    for i, a in enumerate(exponent_of(bas_id)):
-        c[i,:] *= gto_norm(a, n)
-    return c
-
-def exponent_of(bas_id):
-    # 3 primitive-GTO -> 2 contracted-GTO
-    return numpy.random.random(3)
+# general contracted DZ basis [3s1p/2s1p] for H2
+#     exponents    contract-coeff
+# S   6.0          0.7               0.4
+#     2.0          0.6               0.3
+#     0.8          0.5               0.2
+# P   0.9          1.
 
 def gto_norm(n, a):
     # normalization factor of function r^n e^{-a r^2}
@@ -39,27 +15,53 @@ def gto_norm(n, a):
             / (factorial(2*n+2) * sqrt(pi))
     return sqrt(s)
 
-ptr_env = 10
+CHARGE_OF  = 1
+PTR_COORD  = 2
+NUC_MOD_OF = 3
+PTR_MASS   = 4
+RADI_GRIDS = 5
+ANG_GRIDS  = 6
+ATM_SLOTS  = 6
+
+ATOM_OF    = 1
+ANG_OF     = 2
+NPRIM_OF   = 3
+NCTR_OF    = 4
+KAPPA_OF   = 5
+PTR_EXP    = 6
+PTR_COEFF  = 7
+BAS_SLOTS  = 8
+
+ptr_env = 20
 atm = []
 bas = []
 env = [0] * ptr_env
-natm = 2
-for atm_id in range(natm):
-    env.extend(coord_of(atm_id))
-    atm.append([charge_of(atm_id), ptr_env, nuc_mod_of(atm_id), 0, 0, 0])
-    ptr_env += 3
-    for bas_id in basis_of(atm_id):
-        c = coeff_of(bas_id)
-        e = exponent_of(bas_id)
-        env.extend(e)
-        env.extend(c)
 
-        bas.append([atm_id, angular_of(bas_id), \
-                    nprimitive_of(bas_id), \
-                    ncontract_of(bas_id), \
-                    kappa_of(bas_id), \
-                    ptr_env, ptr_env+e.size, 0])
-        ptr_env += e.size + c.size
+i = 0
+#           CHARGE_OF,PTR_COORD
+atm.append([1,        ptr_env,  0, 0, 0, 0])
+#           x  y  z (Bohr)
+env.extend([0, 0, -0.8])
+ptr_env += 3
+atm.append([1,        ptr_env,  0, 0, 0, 0])
+env.extend([0, 0,  0.8])
+
+# basis for atom #0
+# 3s -> 2s
+env.extend([6., 2., .8])
+env.extend([.7, .6, .5, .4, .3, .2])
+#           ATOM_OF, ANG_OF, NPRIM_OF, NCTR_OF, KAPPA_OF, PTR_EXP, PTR_COEFF
+bas.append([0,       0,      3,        2,       0,        ptr_env, ptr_env+3, 0])
+ptr_env += 9
+env.extend([.9])
+env.extend([1.])
+bas.append([0,       1,      1,        1,       0,        ptr_env, ptr_env+1, 0])
+ptr_env += 1
+
+# basis functions for atom #1, they are the same to thoes of atom #0
+bas.extend(bas[-2:])
+
+# note the integer type
 atm = numpy.array(atm,dtype=int32)
 bas = numpy.array(bas,dtype=int32)
 env = numpy.array(env)
@@ -73,8 +75,8 @@ di = _cint.cgtos_spheric(ctypes.c_int(0), bas.ctype.data)
 dj = _cint.cgtos_spheric(ctypes.c_int(1), bas.ctype.data)
 
 c_shls = (ctypes.c_int * 2)(0, 1)
-buf = numpy.empty((di.value, dj.value))
-_cint.cint1e_ovlp_sph(buf.ctypes.data, c_shls, \
-                      atm.ctypes.data, c_natm, \
-                      bas.ctypes.data, c_nbas,
-                      env.ctypes.data)
+buf = numpy.empty((di.value, dj.value, 3))
+_cint.cint1e_ipnuc_sph(buf.ctypes.data, c_shls, \
+                       atm.ctypes.data, c_natm, \
+                       bas.ctypes.data, c_nbas,
+                       env.ctypes.data)

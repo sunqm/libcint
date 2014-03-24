@@ -58,9 +58,11 @@ env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 ~~~~~~~~
 
     - `bas[i*8+7]` unused
-* nbas: int, number of bases, nbas has no effect
+* nbas: int, number of bases, nbas has no effect, can be set to 0
 * env:  double[], save the value of coordinates, exponents,
   contraction coefficients
+
+* if the return value equals 0, every element of the integral is 0
 
 Fortran routine
 ---------------
