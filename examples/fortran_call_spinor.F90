@@ -38,7 +38,7 @@ integer,parameter :: BAS_SLOTS  = 8
 integer,parameter :: PTR_ENV_START = 20
 
 integer :: natm = 2
-integer :: nbas = 3
+integer :: nbas = 4
 integer,allocatable :: atm(:,:)
 integer,allocatable :: bas(:,:)
 double precision,allocatable :: env(:)
@@ -86,12 +86,12 @@ env(off + 2) = 2.
 env(off + 3) = .8
 off = off + 3
 bas(PTR_COEFF,n) = off
-env(off + 0) = .7 * gto_norm(bas(ANG_OF,n), 6.)
-env(off + 1) = .6 * gto_norm(bas(ANG_OF,n), 2.)
-env(off + 2) = .5 * gto_norm(bas(ANG_OF,n), .8)
-env(off + 3) = .4 * gto_norm(bas(ANG_OF,n), 6.)
-env(off + 4) = .3 * gto_norm(bas(ANG_OF,n), 2.)
-env(off + 5) = .2 * gto_norm(bas(ANG_OF,n), .8)
+env(off + 1) = .7 * gto_norm(bas(ANG_OF,n), 6.)
+env(off + 2) = .6 * gto_norm(bas(ANG_OF,n), 2.)
+env(off + 3) = .5 * gto_norm(bas(ANG_OF,n), .8)
+env(off + 4) = .4 * gto_norm(bas(ANG_OF,n), 6.)
+env(off + 5) = .3 * gto_norm(bas(ANG_OF,n), 2.)
+env(off + 6) = .2 * gto_norm(bas(ANG_OF,n), .8)
 off = off + 6
 n = n + 1
 
@@ -102,10 +102,10 @@ bas(NPRIM_OF ,n)  = 1
 bas(NCTR_OF  ,n)  = 1
 bas(KAPPA_OF ,n)  = 0
 bas(PTR_EXP  ,n)  = off
-env(off + 0) = .9
+env(off + 1) = .9
 off = off + 1
 bas(PTR_COEFF,n) = off
-env(off + 0) = 1. * gto_norm(bas(ANG_OF,n), .9)
+env(off + 1) = 1. * gto_norm(bas(ANG_OF,n), .9)
 off = off + 1
 n = n + 1
 

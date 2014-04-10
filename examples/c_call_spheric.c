@@ -30,7 +30,7 @@ P   0.9          1.
 int main()
 {
         int natm = 2;
-        int nbas = 3;
+        int nbas = 4;
         // ATM_SLOTS = 6; BAS_SLOTS = 8;
         int *atm = malloc(sizeof(int) * natm * ATM_SLOTS);
         int *bas = malloc(sizeof(int) * nbas * BAS_SLOTS);
