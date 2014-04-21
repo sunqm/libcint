@@ -95,7 +95,8 @@ Fortran routine
 * opt: an integer(8) to hold the address of so called "optimizer", it
   needs to be intialized by
 
-    intname_optimizer(&opt, atm, natm, bas, nbas, env)
+    integer(8) opt
+    f2e_optimizer(&opt, atm, natm, bas, nbas, env)
 
   The optimizier can be banned by setting the "optimizier" to 0_8
 
@@ -184,7 +185,7 @@ function list
 =============
 
 * Cartesian GTO integrals
-    - `cgto_cart(int ishell, int bas[])`:
+    - `CINTcgto_cart(int ishell, int bas[])`:
       Number of cartesian functions of the given shell
     - `cint1e_ovlp_cart`   $$\langle i| j\rangle $$
     - `cint1e_nuc_cart`    $$\langle i| V_{nuc} | j\rangle $$

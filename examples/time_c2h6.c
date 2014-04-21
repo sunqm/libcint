@@ -1,5 +1,5 @@
 /*
- * C60 molecule
+ * ethane molecule
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -712,7 +712,7 @@ void run_all(const int *atm, const int natm,
         CINTOpt *opt_for_cint2e = NULL;
         cint2e_optimizer(&opt_for_cint2e, atm, natm, bas, nbas, env);
         CINTOpt *opt_for_ip1 = NULL;
-        cint2e_optimizer(&opt_for_ip1, atm, natm, bas, nbas, env);
+        cint2e_ip1_sph_optimizer(&opt_for_ip1, atm, natm, bas, nbas, env);
 
         printf("\tcint2e_sph without optimizer: total num ERI = %.2e\n", tot);
         pct = 0; count = 0;
