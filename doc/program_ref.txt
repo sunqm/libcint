@@ -14,7 +14,9 @@ Interface
 C routine
 ---------
 
-    f(buf, shls, atm, natm, bas, nbas, env);
+    f1e(buf, shls, atm, natm, bas, nbas, env);
+    f2e_optimizer(opt, atm, nbat, bas, nbas, env);
+    f2e(buf, shls, atm, natm, bas, nbas, env, opt);
 
 * buf:  column-major double precision array.
     - for 1e integrals of shells (i,j), data are stored as `[i1j1 i2j1 ... ]`
@@ -62,12 +64,24 @@ env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 * env:  double[], save the value of coordinates, exponents,
   contraction coefficients
 
+* struct CINTOpt *opt: so called "optimizer", it needs to be intialized
+
+    CINTOpt *opt = NULL;
+    intname_optimizer(&opt, atm, natm, bas, nbas, env);
+
+  every integral type has its own optimizer with the suffix _optimizer
+  in its name, e.g. the optimizer for cint2e_sph is cint2e_sph_opimizer.
+  "optimizer" is an optional argument for the integrals. It can roughly
+  speed the integration by 10% without affecting the value of integrals.
+  If no optimizer is wanted, set it to NULL.
+
 * if the return value equals 0, every element of the integral is 0
 
 Fortran routine
 ---------------
 
-    call f(buf, shls, atm, natm, bas, nbas, env)
+    call f1e(buf, shls, atm, natm, bas, nbas, env)
+    call f2e(buf, shls, atm, natm, bas, nbas, env, opt)
 
 * atm and bas are 2D integer array
     - atm(1:6,i) is the (charge, offset_coord, nuclear_model, unused,
@@ -78,11 +92,19 @@ Fortran routine
 * parameters are the same to the C function.
   Note that those offsets   atm(2,i)   bas(6,i)   bas(7,i)  are 0-based.
 * buf is 2D/4D double precision/double complex array
+* opt: an integer(8) to hold the address of so called "optimizer", it
+  needs to be intialized by
+
+    intname_optimizer(&opt, atm, natm, bas, nbas, env)
+
+  The optimizier can be banned by setting the "optimizier" to 0_8
+
+    f2e(buf, atm, natm, bas, nbas, env, 0_8)
+
 
 Supported angular momentum
 --------------------------
-* 1e integrals $l_{max}$ = 6
-* 2e integrals $l_{max}$ = 4
+$l_{max}$ = 6
 
 Data ordering
 -------------
@@ -107,12 +129,12 @@ Data ordering
     s shell & p shell & d shell     & f shell         & ... \\
 \hline
     ...     & ...     & ...         & ...             & \\
-    s       & p $y$   & d $xy     $ & f $y(3x^2-y^2)$ & \\
-    s       & p $z$   & d $yz     $ & f $xyz        $ & \\
-    ...     & p $x$   & d $z^2    $ & f $yz^2       $ & \\
-            & p $y$   & d $xz     $ & f $z^3        $ & \\
-            & p $z$   & d $x^2-y^2$ & f $xz^2       $ & \\
-            & p $x$   & ...         & f $z(x^2-y^2) $ & \\
+    s       & p $x$   & d $xy     $ & f $y(3x^2-y^2)$ & \\
+    s       & p $y$   & d $yz     $ & f $xyz        $ & \\
+    ...     & p $z$   & d $z^2    $ & f $yz^2       $ & \\
+            & p $x$   & d $xz     $ & f $z^3        $ & \\
+            & p $y$   & d $x^2-y^2$ & f $xz^2       $ & \\
+            & p $z$   & ...         & f $z(x^2-y^2) $ & \\
             & ...     &             & f $x(x^2-3y^2)$ & \\
             &         &             & ...             & \\
 \hline

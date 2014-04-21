@@ -49,7 +49,7 @@ natm = ctypes.c_int()
 nbas = ctypes.c_int()
 _cint.init_test_env(atm, ctypes.addressof(natm), bas, ctypes.addressof(nbas), env)
 
-_cint.len_spinor.restype = ctypes.c_int
+_cint.CINTlen_spinor.restype = ctypes.c_int
 
 def test_int1e_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
@@ -76,8 +76,8 @@ def test_int1e_spinor(name, vref, dim, place):
     v1 = 0
     for j in range(nbas.value*2):
         for i in range(j+1):
-            di = _cint.len_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-            dj = _cint.len_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
+            di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
+            dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
             shls = (ctypes.c_int * 2)(i, j)
             intor(op, shls, atm, natm, bas, nbas, env);
             v1 += abs(cdouble_to_cmplx(op[:di*dj*dim*2])).sum()
@@ -110,8 +110,8 @@ def test_comp1e_spinor(name1, name_ref, shift, dim, place):
 
     for j in range(nbas.value*2 - shift[1]):
         for i in range(min(nbas.value*2-shift[0],j+1)):
-            di = _cint.len_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-            dj = _cint.len_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
+            di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
+            dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
             shls = (ctypes.c_int * 2)(i+shift[0], j+shift[1])
             intor(op, shls, atm, natm, bas, nbas, env);
             shls_ref = (ctypes.c_int * 2)(i, j)
@@ -155,10 +155,10 @@ def test_int2e_spinor(name, vref, dim, place):
         for k in range(l+1):
             for j in range(nbas.value*2):
                 for i in range(j+1):
-                    di = _cint.len_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-                    dj = _cint.len_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
-                    dk = _cint.len_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
-                    dl = _cint.len_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
+                    di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
+                    dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
+                    dk = _cint.CINTlen_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
+                    dl = _cint.CINTlen_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
                     shls = (ctypes.c_int * 4)(i, j, k, l)
                     intor(op, shls, atm, natm, bas, nbas, env);
                     v1 += abs(cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2])).sum()
@@ -187,10 +187,10 @@ def test_comp2e_spinor(name1, name_ref, shift, dim, place):
         for k in range(min(nbas.value*2-shift[0],l+1)):
             for j in range(nbas.value*2 - shift[1]):
                 for i in range(min(nbas.value*2-shift[0],j+1)):
-                    di = _cint.len_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-                    dj = _cint.len_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
-                    dk = _cint.len_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
-                    dl = _cint.len_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
+                    di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
+                    dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
+                    dk = _cint.CINTlen_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
+                    dl = _cint.CINTlen_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
                     shls = (ctypes.c_int * 4)(i+shift[0], j+shift[1], k+shift[2], l+shift[3])
                     intor(op, shls, atm, natm, bas, nbas, env);
                     shls_ref = (ctypes.c_int * 4)(i, j, k, l)

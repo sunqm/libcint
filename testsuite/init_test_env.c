@@ -9,7 +9,7 @@ int init_test_env(int *atm, int *natm, int *bas, int *nbas, double *env)
         *natm = 4;
         int i, n, nh, off, off0;
 
-        dset0(PTR_ENV_START, env);
+        CINTdset0(PTR_ENV_START, env);
         off = PTR_ENV_START;
         for (i = 0; i < *natm; i++) {
                 atm(CHARGE_OF,i) = (i+1) * 2;

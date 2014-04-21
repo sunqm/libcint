@@ -51,12 +51,15 @@ void zgemm_(const char*, const char*,
             const double*, double*, const unsigned int*);
 
 
-void dset0(const unsigned int n, double *x);
-void daxpy2v(const unsigned int n, const double a, const double *x, const double *y, 
-             double *v);
-void dmat_transpose(double *a_t, const double *a, const unsigned int m, const unsigned int n);
-void zmat_transpose(double *a_t, const double *a, const unsigned int m, const unsigned int n);
-void zmat_dagger(double *a_c, const double *a, const unsigned int m, const unsigned int n);
+void CINTdset0(const unsigned int n, double *x);
+void CINTdaxpy2v(const unsigned int n, const double a,
+                 const double *x, const double *y, double *v);
+void CINTdmat_transpose(double *a_t, const double *a,
+                        const unsigned int m, const unsigned int n);
+void CINTzmat_transpose(double *a_t, const double *a,
+                        const unsigned int m, const unsigned int n);
+void CINTzmat_dagger(double *a_c, const double *a,
+                     const unsigned int m, const unsigned int n);
 
 #if defined __cplusplus
 } // end extern "C"

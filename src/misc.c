@@ -1,12 +1,13 @@
 /*
- * File: util.c
+ * File: misc.c
  * Author: Qiming Sun <osirpt.sun@gmail.com>
  *
  * basic functions
  */
 
+#include <math.h>
 
-void dcmplx_re(const unsigned int n, double *z, const double *re)
+void CINTdcmplx_re(const unsigned int n, double *z, const double *re)
 {
         unsigned int i;
         for (i = 0; i < n; i++) {
@@ -16,7 +17,7 @@ void dcmplx_re(const unsigned int n, double *z, const double *re)
         }
 }
 
-void dcmplx_im(const unsigned int n, double *z, const double *im)
+void CINTdcmplx_im(const unsigned int n, double *z, const double *im)
 {
         unsigned int i;
         for (i = 0; i < n; i++) {
@@ -26,8 +27,8 @@ void dcmplx_im(const unsigned int n, double *z, const double *im)
         }
 }
 
-void dcmplx_pp(const unsigned int n, double *z,
-               const double *re, const double *im)
+void CINTdcmplx_pp(const unsigned int n, double *z,
+                   const double *re, const double *im)
 {
         unsigned int i;
         for (i = 0; i < n; i++) {
@@ -36,8 +37,8 @@ void dcmplx_pp(const unsigned int n, double *z,
                 z += 2;
         }
 }
-void dcmplx_pn(const unsigned int n, double *z,
-               const double *re, const double *im)
+void CINTdcmplx_pn(const unsigned int n, double *z,
+                   const double *re, const double *im)
 {
         unsigned int i;
         for (i = 0; i < n; i++) {
@@ -46,8 +47,8 @@ void dcmplx_pn(const unsigned int n, double *z,
                 z += 2;
         }
 }
-void dcmplx_np(const unsigned int n, double *z,
-               const double *re, const double *im)
+void CINTdcmplx_np(const unsigned int n, double *z,
+                   const double *re, const double *im)
 {
         unsigned int i;
         for (i = 0; i < n; i++) {
@@ -58,7 +59,7 @@ void dcmplx_np(const unsigned int n, double *z,
 }
 
 
-inline double square_dist(const double *r1, const double *r2)
+inline double CINTsquare_dist(const double *r1, const double *r2)
 {
         double r12[3];
 
@@ -69,3 +70,16 @@ inline double square_dist(const double *r1, const double *r2)
         return r12[0] * r12[0] + r12[1] * r12[1] + r12[2] * r12[2];
 }
 
+static int factorial(int n)
+{
+        int i, fact = 1;
+        for (i = 1; i <= n; i++) {
+                fact *= i;
+        }
+        return fact;
+}
+double CINTgto_norm(int n, double a)
+{
+        return pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
+                / (factorial(2*n+2) * sqrt(M_PI));
+}

@@ -15,7 +15,7 @@
 
 #define MAXROOT
 
-void rys_roots(const unsigned int nroots, double x, double *u, double *w)
+void CINTrys_roots(const unsigned int nroots, double x, double *u, double *w)
 {
         switch (nroots) {
                 case 0: case 1: case 2: case 3:

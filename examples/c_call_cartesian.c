@@ -67,12 +67,12 @@ int main()
         env[off + 2] = .8;
         off += 3;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off;
-        env[off + 0] = .7 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
-        env[off + 1] = .6 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
-        env[off + 2] = .5 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
-        env[off + 3] = .4 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
-        env[off + 4] = .3 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
-        env[off + 5] = .2 * gto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
+        env[off + 0] = .7 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
+        env[off + 1] = .6 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
+        env[off + 2] = .5 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
+        env[off + 3] = .4 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
+        env[off + 4] = .3 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
+        env[off + 5] = .2 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
         off += 6;
         n++;
 
@@ -85,7 +85,7 @@ int main()
         env[off + 0] = .9;
         off += 1;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off;
-        env[off + 0] = 1. * gto_norm(bas[ANG_OF+BAS_SLOTS*n], .9);
+        env[off + 0] = 1. * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], .9);
         off += 1;
         n++;
 
@@ -119,8 +119,8 @@ int main()
         int shls[4];
         double *buf;
 
-        i = 0; shls[0] = i; di = cgtos_cart(i, bas);
-        j = 1; shls[1] = j; dj = cgtos_cart(j, bas);
+        i = 0; shls[0] = i; di = CINTcgtos_cart(i, bas);
+        j = 1; shls[1] = j; dj = CINTcgtos_cart(j, bas);
         buf = malloc(sizeof(double) * di * dj * 3);
         if (0 != cint1e_ipnuc_cart(buf, shls, atm, natm, bas, nbas, env)) {
                 printf("This gradient integral is not 0.\n");
@@ -130,13 +130,13 @@ int main()
         /*
          * call two-electron cartesian integrals
          */
-        i = 0; shls[0] = i; di = cgtos_cart(i, bas);
-        j = 1; shls[1] = j; dj = cgtos_cart(j, bas);
-        k = 2; shls[2] = k; dk = cgtos_cart(k, bas);
-        l = 2; shls[3] = l; dl = cgtos_cart(l, bas);
+        i = 0; shls[0] = i; di = CINTcgtos_cart(i, bas);
+        j = 1; shls[1] = j; dj = CINTcgtos_cart(j, bas);
+        k = 2; shls[2] = k; dk = CINTcgtos_cart(k, bas);
+        l = 2; shls[3] = l; dl = CINTcgtos_cart(l, bas);
         buf = malloc(sizeof(double) * di * dj * dk * dl);
-        if (0 != cint2e_cart(buf, shls, atm, natm, bas, nbas, env)) {
-                printf("This gradient integral is not 0.\n");
+        if (0 != cint2e_cart(buf, shls, atm, natm, bas, nbas, env, NULL)) {
+                printf("This integral is not 0.\n");
         }
         free(buf);
 

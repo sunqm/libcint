@@ -1,7 +1,7 @@
 libcint
 =======
 
-version 1.1
+version 2.0
 2013-05-29
 
 
@@ -17,22 +17,45 @@ functions.
 Features
 --------
 
-* one electron integrals
-    - nuclear attraction due to Gaussian nuclear model
-* two electron integrals (value < 1e-20 are neglected)
-    - Coulomb repulsion
-    - Gaunt interaction
-* Cartesian GTO:  6d, 10f, 15g Gaussian type functions
-* real-spheric GTO:  5d, 7f, 9g Gaussian type functions
-* spinor GTO:  J-adapted spinor Gaussian functions
-* common lisp script to generate C code
-* thread safe
+* Various GTO type:
+  - Cartesian GTO:  6d, 10f, 15g Gaussian type functions.
+  - Real-spheric GTO:  5d, 7f, 9g Gaussian type functions.
+  - Spinor GTO:  J-adapted spinor Gaussian functions.
+* One electron integrals.
+  - Besides the regular kinetic, or nuclear attraction etc.,
+    nuclear attraction due to Gaussian nuclear model are supported.
+* Two electron integrals (value < 1e-20 are neglected) include
+  - Coulomb repulsion
+  - Gaunt interaction
+* Common lisp script to generate C code for new integrals.
+* Thread safe.
+* Uniform API for all kind of integrals.
+  - one electron integrals
+    not0 = fn1e_name(int *atm, int natm, int *bas, int nbas, double *env);
+  - two electron integrals
+    not0 = fn2e_name(int *atm, int natm, int *bas, int nbas, double *env, NULL);
+  - the return boolean (not0) gives the summary whether the integrals
+    are completely 0.
+* Minimal overhead of initialization
+  - Pre-comuptation is not required.  Only basic info (see previous API)
+    of basis function need to be initialized, within a plain integer or
+    double precision array, once.  (For 2e integral, there is an optional
+    argument called optimizer which can increase the performance by ~10%.
+    Using NULL to swith off the optimizer does not affect the value of
+    integral.)
+* Minimal dependence on external library.
+  - BLAS is the only library needed.  Normally, the performance
+    difference due to various BLAS implementations is less than 1%.
+* Small memory usage.
+  - Very few intermediate data are allocated.  ~80% of the memory are
+    used for holding the whole contracted Cartesion integrals, which
+    typically should be less than 1 Mega bytes.
 
 
 Getting libcint
 ---------------
 
-The newest version is available from:
+The newest version is available on GitHub:
 
     git clone http://github.com/sunqm/libcint.git
 
@@ -63,9 +86,9 @@ or
     '("integral_name" (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
                        gaunt \| op-bra-electron-2 ... \, op-ket-electron-2 ... ))
 
-* Parentheses should be paired.
-* Line break is allowed
-* Note the _backslash_ in \| and \,
+* Parentheses must be paired.
+* Line break is allowed.
+* Note the _backslash_ in \| and \ is required.
 * "integral_name" is the function name.  Valid name can be made up of
   letters, digits and underscore ("_").
 * number can be an integer, a real number or a pure imaginary number. An
@@ -124,33 +147,25 @@ Known problems
 
 * On 64-bit system, "make check" stop with error:
 
-    MKL FATAL ERROR: Cannot load libmkl_def.so
+    MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
 
   This problem is caused by the conflict between Python and MKL library.
-  Add -lmkl_mc -lmkl_def to MKL link flags to replace the default blas
-  link flags.  Be *careful* with the order of -lmkl_mc and -lmkl_def.
-  e.g.
+  Add -lmkl_avx or -lmkl_mc -lmkl_def to MKL link flags to replace the
+  default blas link flags.  Be *careful* with the order of -lmkl_mc and
+  -lmkl_def.  e.g.
     ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
         -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def \
         -Wl,--end-group -lpthread"
 
 * "make check" may fail in the following tests
-    - cint2e_sph
-    - cint2e_ig1_sph
-    - cint2e
-    - cint2e_sa10sp1
-    - cint2e_sa10sp1spsp2
-    - cint2e_spgsp1
-    - cint2e_g1spsp2
-    - cint2e_spgsp1spsp2
-
-* For the basis which has high angular momentum GTOs, increase the value
-  of EXPCUTOFF in src/include/cint_const.h to improve accuracy.
-  Recommended minimal values to reach the accuracy of 1e-14 are
-    max. angular        EXPCUTOFF
-    s, p, d             30
-    f, g                40
-    h                   50
+    - cint1e_ipspnucsp
+    - cint1e_ipsprinvsp
+    - cint2e_spsp1
+    - cint2e_spsp1spsp2
+    - cint2e_srsr1
+    - cint2e_giao_sa10sp1spsp2
+    - cint2e_ipspsp1
+    - cint2e_ip1spsp2
 
 
 Bug report

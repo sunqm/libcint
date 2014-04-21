@@ -49,14 +49,14 @@ integer :: nbas = 4
 integer,allocatable :: atm(:,:)
 integer,allocatable :: bas(:,:)
 double precision,allocatable :: env(:)
-double precision,external :: gto_norm
+double precision,external :: CINTgto_norm
 
 integer :: n, off
 integer :: i, j, k, l
 integer :: di, dj, dk, dl
 integer :: shls(4)
 double precision,allocatable :: buf1e(:,:,:), buf2e(:,:,:,:,:)
-integer,external :: cgtos_spheric
+integer,external :: CINTcgtos_spheric
 integer,external :: cint1e_ipovlp_sph, cint2e_ip1_sph
 allocate (atm(ATM_SLOTS,natm))
 allocate (bas(BAS_SLOTS,nbas))
@@ -92,12 +92,12 @@ env(off + 2) = 2.
 env(off + 3) = .8
 off = off + 3
 bas(PTR_COEFF,n) = off
-env(off + 1) = .7 * gto_norm(bas(ANG_OF,n), 6.)
-env(off + 2) = .6 * gto_norm(bas(ANG_OF,n), 2.)
-env(off + 3) = .5 * gto_norm(bas(ANG_OF,n), .8)
-env(off + 4) = .4 * gto_norm(bas(ANG_OF,n), 6.)
-env(off + 5) = .3 * gto_norm(bas(ANG_OF,n), 2.)
-env(off + 6) = .2 * gto_norm(bas(ANG_OF,n), .8)
+env(off + 1) = .7 * CINTgto_norm(bas(ANG_OF,n), 6.)
+env(off + 2) = .6 * CINTgto_norm(bas(ANG_OF,n), 2.)
+env(off + 3) = .5 * CINTgto_norm(bas(ANG_OF,n), .8)
+env(off + 4) = .4 * CINTgto_norm(bas(ANG_OF,n), 6.)
+env(off + 5) = .3 * CINTgto_norm(bas(ANG_OF,n), 2.)
+env(off + 6) = .2 * CINTgto_norm(bas(ANG_OF,n), .8)
 off = off + 6
 n = n + 1
 
@@ -110,7 +110,7 @@ bas(PTR_EXP  ,n)  = off
 env(off + 1) = .9
 off = off + 1
 bas(PTR_COEFF,n) = off
-env(off + 1) = 1. * gto_norm(bas(ANG_OF,n), .9)
+env(off + 1) = 1. * CINTgto_norm(bas(ANG_OF,n), .9)
 off = off + 1
 n = n + 1
 
@@ -137,8 +137,8 @@ n = n + 1
 ! the index of shell is 0-based
 ! the integral has 3 components
 !
-i = 0; shls(1) = i; di = cgtos_spheric(i, bas)
-j = 0; shls(2) = j; dj = cgtos_spheric(j, bas)
+i = 0; shls(1) = i; di = CINTcgtos_spheric(i, bas)
+j = 0; shls(2) = j; dj = CINTcgtos_spheric(j, bas)
 allocate (buf1e(di,dj,3))
 if (0 /= cint1e_ipovlp_sph(buf1e, shls, atm, natm, bas, nbas, env)) then
   print*, "This gradient integral is not 0.\n"
@@ -150,12 +150,12 @@ deallocate (buf1e)
 ! the index of shell is 0-based
 ! the integral has 3 components
 !
-i = 0; shls(1) = i; di = cgtos_spheric(i, bas)
-j = 1; shls(2) = j; dj = cgtos_spheric(j, bas)
-k = 2; shls(3) = k; dk = cgtos_spheric(k, bas)
-l = 2; shls(4) = l; dl = cgtos_spheric(l, bas)
+i = 0; shls(1) = i; di = CINTcgtos_spheric(i, bas)
+j = 1; shls(2) = j; dj = CINTcgtos_spheric(j, bas)
+k = 2; shls(3) = k; dk = CINTcgtos_spheric(k, bas)
+l = 2; shls(4) = l; dl = CINTcgtos_spheric(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
-if (0 /= cint2e_ip1_sph(buf2e, shls, atm, natm, bas, nbas, env)) then
+if (0 /= cint2e_ip1_sph(buf2e, shls, atm, natm, bas, nbas, env, 0_8)) then
   print*, "This gradient integral is not 0.\n"
 endif
 deallocate (buf2e)

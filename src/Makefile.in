@@ -76,8 +76,8 @@ am__DEPENDENCIES_1 =
 libcint_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_libcint_la_OBJECTS = c2f.lo cart2sph.lo cint1e.lo cint2e.lo \
 	cint_bas.lo fblas.lo g1e.lo g2e.lo rys_roots.lo misc.lo \
-	auto_intor1.lo auto_intor2.lo auto_intor3.lo grad1.lo grad2.lo \
-	grad3.lo gaunt1.lo
+	optimizer.lo auto_intor1.lo auto_intor2.lo auto_intor3.lo \
+	grad1.lo grad2.lo grad3.lo gaunt1.lo
 libcint_la_OBJECTS = $(am_libcint_la_OBJECTS)
 libcint_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -224,25 +224,26 @@ top_srcdir = @top_srcdir@
 AM_CFLAGS = -DNDEBUG -funroll-all-loops
 AM_CPPFLAGS = -I$(top_srcdir)/src/include
 lib_LTLIBRARIES = libcint.la
-libcint_la_LDFLAGS = -release 1.2
+libcint_la_LDFLAGS = -release 2.0
 libcint_la_LIBADD = $(BLAS_LIBS) $(LIBS)
 libcint_la_SOURCES = c2f.c \
-		     cart2sph.c \
-		     cint1e.c  \
-		     cint2e.c \
-		     cint_bas.c \
-		     fblas.c \
-		     g1e.c \
-		     g2e.c \
-		     rys_roots.c \
-		     misc.c \
-		     autocode/auto_intor1.c \
-		     autocode/auto_intor2.c \
-		     autocode/auto_intor3.c \
-		     autocode/grad1.c \
-		     autocode/grad2.c \
-		     autocode/grad3.c \
-		     autocode/gaunt1.c
+                     cart2sph.c \
+                     cint1e.c  \
+                     cint2e.c \
+                     cint_bas.c \
+                     fblas.c \
+                     g1e.c \
+                     g2e.c \
+                     rys_roots.c \
+                     misc.c \
+                     optimizer.c \
+                     autocode/auto_intor1.c \
+                     autocode/auto_intor2.c \
+                     autocode/auto_intor3.c \
+                     autocode/grad1.c \
+                     autocode/grad2.c \
+                     autocode/grad3.c \
+                     autocode/gaunt1.c
 
 include_HEADERS = $(top_srcdir)/src/include/cint_const.h \
 		  $(top_srcdir)/src/include/cint_bas.h
@@ -337,6 +338,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grad2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grad3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/optimizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rys_roots.Plo@am__quote@
 
 .c.o:

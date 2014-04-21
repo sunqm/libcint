@@ -6,6 +6,7 @@
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "g2e.h"
+#include "optimizer.h"
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
@@ -13,12 +14,11 @@
 #include "c2f.h"
 /* <k i|GAUNT |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (i SIGMA DOT P j|GAUNT |k SIGMA DOT P l) */
-static void gout2e_cint2e_ssp1ssp2(double *g,
-double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {
+static void CINTgout2e_cint2e_ssp1ssp2(double *g,
+double *gout, const unsigned int *idx, const CINTEnvVars *envs, int gout_empty) {
 const unsigned int INC1 = 1;
 const double D1 = 1;
 const double *env = envs->env;
-const unsigned int *ng = envs->ng;
 const unsigned int nf = envs->nf;
 const unsigned int i_l = envs->i_l;
 const unsigned int j_l = envs->j_l;
@@ -43,8 +43,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(9, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
@@ -77,8 +77,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(9, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
@@ -107,38 +107,30 @@ gout[14] += + (1*s[3]) + (-1*s[1]);
 gout[15] += + (1*s[0]) + (1*s[4]) + (1*s[8]);
 gout += 16;
 }}}
+void cint2e_ssp1ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+unsigned int ng[] = {0, 1, 0, 1, 0, 0, 0, 0, 0};
+CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
 int cint2e_ssp1ssp2(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-const unsigned int i_sh = shls[0];
-const unsigned int j_sh = shls[1];
-const unsigned int k_sh = shls[2];
-const unsigned int l_sh = shls[3];
-const unsigned int i_l = bas(ANG_OF, i_sh);
-const unsigned int j_l = bas(ANG_OF, j_sh);
-const unsigned int k_l = bas(ANG_OF, k_sh);
-const unsigned int l_l = bas(ANG_OF, l_sh);
-unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[0] = i_l + 0 + 1;
-ng[1] = k_l + 0 + 1;
-ng[2] = l_l + 1 + ng[1];
-ng[3] = j_l + 1 + ng[0];
-ng[GSHIFT] = 2;
-ng[POS_E1] = 4;
-ng[POS_E2] = 4;
-ng[TENSOR] = 1;
-return cint2e_drv(opkijl, ng, 1,
-gout2e_cint2e_ssp1ssp2, &c2s_si_2e1i, &c2s_si_2e2i,
-shls, atm, natm, bas, nbas, env); }
-C2F_(cint2e_ssp1ssp2)
+const int *bas, const int nbas, const double *env, CINTOpt *opt) {
+unsigned int ng[] = {0, 1, 0, 1, 0, 2, 4, 4, 1};
+CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2e_cint2e_ssp1ssp2;
+envs.common_factor *= 1;
+return CINT2e_spinor_drv(opkijl, &envs, opt, &c2s_si_2e1i, &c2s_si_2e2i);
+}
+OPTIMIZER2F_(cint2e_ssp1ssp2_optimizer);
+C2Fo_(cint2e_ssp1ssp2)
 /* <k RC CROSS SIGMA i|GAUNT |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (RC CROSS SIGMA i j|GAUNT |k SIGMA DOT P l) */
-static void gout2e_cint2e_cg_ssa10ssp2(double *g,
-double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {
+static void CINTgout2e_cint2e_cg_ssa10ssp2(double *g,
+double *gout, const unsigned int *idx, const CINTEnvVars *envs, int gout_empty) {
 const unsigned int INC1 = 1;
 const double D1 = 1;
 const double *env = envs->env;
-const unsigned int *ng = envs->ng;
 const unsigned int nf = envs->nf;
 const unsigned int i_l = envs->i_l;
 const unsigned int j_l = envs->j_l;
@@ -167,8 +159,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(9, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
@@ -233,8 +225,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(9, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
@@ -295,38 +287,30 @@ gout[46] += + (1*s[0]) + (1*s[4]);
 gout[47] += + (1*s[3]) + (-1*s[1]);
 gout += 48;
 }}}
+void cint2e_cg_ssa10ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+unsigned int ng[] = {1, 0, 0, 1, 0, 0, 0, 0, 0};
+CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
 int cint2e_cg_ssa10ssp2(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-const unsigned int i_sh = shls[0];
-const unsigned int j_sh = shls[1];
-const unsigned int k_sh = shls[2];
-const unsigned int l_sh = shls[3];
-const unsigned int i_l = bas(ANG_OF, i_sh);
-const unsigned int j_l = bas(ANG_OF, j_sh);
-const unsigned int k_l = bas(ANG_OF, k_sh);
-const unsigned int l_l = bas(ANG_OF, l_sh);
-unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[0] = i_l + 1 + 1;
-ng[1] = k_l + 0 + 1;
-ng[2] = l_l + 1 + ng[1];
-ng[3] = j_l + 0 + ng[0];
-ng[GSHIFT] = 2;
-ng[POS_E1] = 4;
-ng[POS_E2] = 4;
-ng[TENSOR] = 3;
-return cint2e_drv(opkijl, ng, 1,
-gout2e_cint2e_cg_ssa10ssp2, &c2s_si_2e1, &c2s_si_2e2i,
-shls, atm, natm, bas, nbas, env); }
-C2F_(cint2e_cg_ssa10ssp2)
+const int *bas, const int nbas, const double *env, CINTOpt *opt) {
+unsigned int ng[] = {1, 0, 0, 1, 0, 2, 4, 4, 3};
+CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2e_cint2e_cg_ssa10ssp2;
+envs.common_factor *= 1;
+return CINT2e_spinor_drv(opkijl, &envs, opt, &c2s_si_2e1, &c2s_si_2e2i);
+}
+OPTIMIZER2F_(cint2e_cg_ssa10ssp2_optimizer);
+C2Fo_(cint2e_cg_ssa10ssp2)
 /* <k R CROSS SIGMA i|GAUNT |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (R CROSS SIGMA i j|GAUNT |k SIGMA DOT P l) */
-static void gout2e_cint2e_giao_ssa10ssp2(double *g,
-double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {
+static void CINTgout2e_cint2e_giao_ssa10ssp2(double *g,
+double *gout, const unsigned int *idx, const CINTEnvVars *envs, int gout_empty) {
 const unsigned int INC1 = 1;
 const double D1 = 1;
 const double *env = envs->env;
-const unsigned int *ng = envs->ng;
 const unsigned int nf = envs->nf;
 const unsigned int i_l = envs->i_l;
 const unsigned int j_l = envs->j_l;
@@ -351,8 +335,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(9, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
@@ -417,8 +401,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(9, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
@@ -479,38 +463,30 @@ gout[46] += + (1*s[0]) + (1*s[4]);
 gout[47] += + (1*s[3]) + (-1*s[1]);
 gout += 48;
 }}}
+void cint2e_giao_ssa10ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+unsigned int ng[] = {1, 0, 0, 1, 0, 0, 0, 0, 0};
+CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
 int cint2e_giao_ssa10ssp2(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-const unsigned int i_sh = shls[0];
-const unsigned int j_sh = shls[1];
-const unsigned int k_sh = shls[2];
-const unsigned int l_sh = shls[3];
-const unsigned int i_l = bas(ANG_OF, i_sh);
-const unsigned int j_l = bas(ANG_OF, j_sh);
-const unsigned int k_l = bas(ANG_OF, k_sh);
-const unsigned int l_l = bas(ANG_OF, l_sh);
-unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[0] = i_l + 1 + 1;
-ng[1] = k_l + 0 + 1;
-ng[2] = l_l + 1 + ng[1];
-ng[3] = j_l + 0 + ng[0];
-ng[GSHIFT] = 2;
-ng[POS_E1] = 4;
-ng[POS_E2] = 4;
-ng[TENSOR] = 3;
-return cint2e_drv(opkijl, ng, 1,
-gout2e_cint2e_giao_ssa10ssp2, &c2s_si_2e1, &c2s_si_2e2i,
-shls, atm, natm, bas, nbas, env); }
-C2F_(cint2e_giao_ssa10ssp2)
+const int *bas, const int nbas, const double *env, CINTOpt *opt) {
+unsigned int ng[] = {1, 0, 0, 1, 0, 2, 4, 4, 3};
+CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2e_cint2e_giao_ssa10ssp2;
+envs.common_factor *= 1;
+return CINT2e_spinor_drv(opkijl, &envs, opt, &c2s_si_2e1, &c2s_si_2e2i);
+}
+OPTIMIZER2F_(cint2e_giao_ssa10ssp2_optimizer);
+C2Fo_(cint2e_giao_ssa10ssp2)
 /* <k G i|GAUNT |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (G i SIGMA DOT P j|GAUNT |k SIGMA DOT P l) */
-static void gout2e_cint2e_gssp1ssp2(double *g,
-double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {
+static void CINTgout2e_cint2e_gssp1ssp2(double *g,
+double *gout, const unsigned int *idx, const CINTEnvVars *envs, int gout_empty) {
 const unsigned int INC1 = 1;
 const double D1 = 1;
 const double *env = envs->env;
-const unsigned int *ng = envs->ng;
 const unsigned int nf = envs->nf;
 const unsigned int i_l = envs->i_l;
 const unsigned int j_l = envs->j_l;
@@ -551,8 +527,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(27, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(27, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
@@ -635,8 +611,8 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(27, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {
+CINTdset0(27, s);
+for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
@@ -715,34 +691,31 @@ gout[46] += + (-1*c[0]*s[12]) + (1*c[1]*s[3]) + (1*c[0]*s[10]) + (-1*c[1]*s[1]);
 gout[47] += + (-1*c[0]*s[9]) + (1*c[1]*s[0]) + (-1*c[0]*s[13]) + (1*c[1]*s[4]) + (-1*c[0]*s[17]) + (1*c[1]*s[8]);
 gout += 48;
 }}}
+void cint2e_gssp1ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {
+unsigned int ng[] = {1, 1, 0, 1, 0, 0, 0, 0, 0};
+CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
 int cint2e_gssp1ssp2(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
+const int *bas, const int nbas, const double *env, CINTOpt *opt) {
+unsigned int ng[] = {1, 1, 0, 1, 0, 3, 4, 4, 3};
 const unsigned int i_sh = shls[0];
 const unsigned int j_sh = shls[1];
 const unsigned int k_sh = shls[2];
 const unsigned int l_sh = shls[3];
-const unsigned int i_l = bas(ANG_OF, i_sh);
-const unsigned int j_l = bas(ANG_OF, j_sh);
-const unsigned int k_l = bas(ANG_OF, k_sh);
-const unsigned int l_l = bas(ANG_OF, l_sh);
-unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-ng[0] = i_l + 1 + 1;
-ng[1] = k_l + 0 + 1;
-ng[2] = l_l + 1 + ng[1];
-ng[3] = j_l + 1 + ng[0];
-ng[GSHIFT] = 3;
-ng[POS_E1] = 4;
-ng[POS_E2] = 4;
-ng[TENSOR] = 3;
 if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
-unsigned int ip = len_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-unsigned int jp = len_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
-unsigned int kp = len_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
-unsigned int lp = len_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
-dset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);
+unsigned int ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+unsigned int jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+unsigned int kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+unsigned int lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
+CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);
 return 0; }
-return cint2e_drv(opkijl, ng, 0.5,
-gout2e_cint2e_gssp1ssp2, &c2s_si_2e1, &c2s_si_2e2i,
-shls, atm, natm, bas, nbas, env); }
-C2F_(cint2e_gssp1ssp2)
+CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2e_cint2e_gssp1ssp2;
+envs.common_factor *= 0.5;
+return CINT2e_spinor_drv(opkijl, &envs, opt, &c2s_si_2e1, &c2s_si_2e2i);
+}
+OPTIMIZER2F_(cint2e_gssp1ssp2_optimizer);
+C2Fo_(cint2e_gssp1ssp2)

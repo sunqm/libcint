@@ -76,15 +76,15 @@
 #define TENSOR          8
 
 // some other boundary
-#define MXRYSROOTS      14
-#define ANG_MAX         5
+#define MXRYSROOTS      16 // >= ANG_MAX*2+1
+#define ANG_MAX         6 // l = 0..5
 //#define CART_MAX        (ANG_MAX*(ANG_MAX+1)/2)
-#define CART_MAX        16
+#define CART_MAX        32
 #define SHLS_MAX        0x7fffffff
 #define NPRIM_MAX       0x7fffffff
 #define NCTR_MAX        0x7fffffff
-// ~ 4e-18
-#define EXPCUTOFF       40
+// ~ 1e-26
+#define EXPCUTOFF       60
 
 #define OF_CMPLX        2
 

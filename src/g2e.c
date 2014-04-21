@@ -18,16 +18,22 @@
         type *GY = G + envs->g_size; \
         type *GZ = G + envs->g_size * 2
 
-typedef struct {
+struct _BC {
         double c00[MXRYSROOTS*3];
         double c0p[MXRYSROOTS*3];
         double b01[MXRYSROOTS];
         double b00[MXRYSROOTS];
         double b10[MXRYSROOTS];
-} _BC;
+};
+
+static void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+static void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+static void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+static void CINTset_g2e_params(CINTEnvVars *envs);
 
 
-int init_int2e_CintEnvVars(CintEnvVars *envs, const unsigned int ng[],
+int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const unsigned int *ng,
                            const unsigned int *shls,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env)
@@ -38,7 +44,6 @@ int init_int2e_CintEnvVars(CintEnvVars *envs, const unsigned int ng[],
         envs->bas = bas;
         envs->env = env;
         envs->shls = shls;
-        envs->ng = ng;
 
         const unsigned int i_sh = shls[0];
         const unsigned int j_sh = shls[1];
@@ -56,20 +61,32 @@ int init_int2e_CintEnvVars(CintEnvVars *envs, const unsigned int ng[],
         envs->j_ctr = bas(NCTR_OF, j_sh);
         envs->k_ctr = bas(NCTR_OF, k_sh);
         envs->l_ctr = bas(NCTR_OF, l_sh);
-        envs->nfi = len_cart(envs->i_l);
-        envs->nfj = len_cart(envs->j_l);
-        envs->nfk = len_cart(envs->k_l);
-        envs->nfl = len_cart(envs->l_l);
+        envs->nfi = CINTlen_cart(envs->i_l);
+        envs->nfj = CINTlen_cart(envs->j_l);
+        envs->nfk = CINTlen_cart(envs->k_l);
+        envs->nfl = CINTlen_cart(envs->l_l);
         envs->nf = envs->nfi * envs->nfk * envs->nfl * envs->nfj;
-        envs->g_size = ng[RYS_ROOTS] * ng[0] * ng[1] * ng[2] * ng[3];
-        envs->g_stride_i = ng[RYS_ROOTS]; // shift of (i++,k,l,j)
-        envs->g_stride_k = ng[RYS_ROOTS] * ng[0]; // shift of (i,k++,l,j)
-        envs->g_stride_l = ng[RYS_ROOTS] * ng[0] * ng[1]; // shift of (i,k,l++,j)
-        envs->g_stride_j = ng[RYS_ROOTS] * ng[0] * ng[1] * ng[2]; // shift of (i,k,l,j++)
+
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
         envs->rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
         envs->rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
         envs->rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+
+        envs->common_factor = (M_PI*M_PI*M_PI)*2/SQRTPI
+                * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
+                * CINTcommon_fac_sp(envs->k_l) * CINTcommon_fac_sp(envs->l_l);
+
+        envs->gbits =  ng[GSHIFT];
+        envs->ncomp_e1 =  ng[POS_E1];
+        envs->ncomp_e2 =  ng[POS_E2];
+        envs->ncomp_tensor = ng[TENSOR];
+
+        envs->li_ceil = envs->i_l + ng[0]; // ng[0] has different meaning in cint1e
+        envs->lj_ceil = envs->j_l + ng[1];
+        envs->lk_ceil = envs->k_l + ng[2];
+        envs->ll_ceil = envs->l_l + ng[3];
+        envs->nrys_roots =(envs->li_ceil + envs->lj_ceil
+                         + envs->lk_ceil + envs->ll_ceil)/2 + 1;
 
         assert(i_sh < SHLS_MAX);
         assert(j_sh < SHLS_MAX);
@@ -99,11 +116,87 @@ int init_int2e_CintEnvVars(CintEnvVars *envs, const unsigned int ng[],
         assert(bas(ATOM_OF,j_sh) < natm);
         assert(bas(ATOM_OF,k_sh) < natm);
         assert(bas(ATOM_OF,l_sh) < natm);
+        assert(envs->nrys_roots < MXRYSROOTS);
 
+        CINTset_g2e_params(envs);
         return 0;
 }
 
-void g2e_index_xyz(unsigned int *idx, const CintEnvVars *envs)
+/* set strides and parameters for g0_2d4d algorithm */
+static void CINTset_g2e_params(CINTEnvVars *envs)
+{
+        unsigned int dli, dlj, dlk, dll;
+        int ibase = envs->li_ceil > envs->lj_ceil;
+        int kbase = envs->lk_ceil > envs->ll_ceil;
+        if (envs->nrys_roots <= 2) { // use the fully optimized lj_4d algorithm
+                ibase = 0;
+                kbase = 0;
+        }
+        if (kbase) {
+                dlk = envs->lk_ceil + envs->ll_ceil + 1;
+                dll = envs->ll_ceil + 1;
+        } else {
+                dlk = envs->lk_ceil + 1;
+                dll = envs->lk_ceil + envs->ll_ceil + 1;
+        }
+
+        if (ibase) {
+                dli = envs->li_ceil + envs->lj_ceil + 1;
+                dlj = envs->lj_ceil + 1;
+        } else {
+                dli = envs->li_ceil + 1;
+                dlj = envs->li_ceil + envs->lj_ceil + 1;
+        }
+        envs->g_stride_i = envs->nrys_roots;
+        envs->g_stride_k = envs->nrys_roots * dli;
+        envs->g_stride_l = envs->nrys_roots * dli * dlk;
+        envs->g_stride_j = envs->nrys_roots * dli * dlk * dll;
+        envs->g_size     = envs->nrys_roots * dli * dlk * dll * dlj;
+
+        if (kbase) {
+                envs->g2d_klmax = envs->g_stride_k;
+                envs->rx_in_rklrx = envs->rk;
+                envs->rkrl[0] = envs->rk[0] - envs->rl[0];
+                envs->rkrl[1] = envs->rk[1] - envs->rl[1];
+                envs->rkrl[2] = envs->rk[2] - envs->rl[2];
+        } else {
+                envs->g2d_klmax = envs->g_stride_l;
+                envs->rx_in_rklrx = envs->rl;
+                envs->rkrl[0] = envs->rl[0] - envs->rk[0];
+                envs->rkrl[1] = envs->rl[1] - envs->rk[1];
+                envs->rkrl[2] = envs->rl[2] - envs->rk[2];
+        }
+
+        if (ibase) {
+                envs->g2d_ijmax = envs->g_stride_i;
+                envs->rx_in_rijrx = envs->ri;
+                envs->rirj[0] = envs->ri[0] - envs->rj[0];
+                envs->rirj[1] = envs->ri[1] - envs->rj[1];
+                envs->rirj[2] = envs->ri[2] - envs->rj[2];
+        } else {
+                envs->g2d_ijmax = envs->g_stride_j;
+                envs->rx_in_rijrx = envs->rj;
+                envs->rirj[0] = envs->rj[0] - envs->ri[0];
+                envs->rirj[1] = envs->rj[1] - envs->ri[1];
+                envs->rirj[2] = envs->rj[2] - envs->ri[2];
+        }
+
+        if (kbase) {
+                if (ibase) {
+                        envs->f_g0_2d4d = &CINTg0_2e_ik2d4d;
+                } else {
+                        envs->f_g0_2d4d = &CINTg0_2e_kj2d4d;
+                }
+        } else {
+                if (ibase) {
+                        envs->f_g0_2d4d = &CINTg0_2e_il2d4d;
+                } else {
+                        envs->f_g0_2d4d = &CINTg0_2e_lj2d4d;
+                }
+        }
+}
+
+void CINTg2e_index_xyz(unsigned int *idx, const CINTEnvVars *envs)
 {
         const unsigned int i_l = envs->i_l;
         const unsigned int j_l = envs->j_l;
@@ -126,10 +219,10 @@ void g2e_index_xyz(unsigned int *idx, const CintEnvVars *envs)
         unsigned int k_nx[CART_MAX], k_ny[CART_MAX], k_nz[CART_MAX];
         unsigned int l_nx[CART_MAX], l_ny[CART_MAX], l_nz[CART_MAX];
 
-        cart_comp(i_nx, i_ny, i_nz, i_l);
-        cart_comp(j_nx, j_ny, j_nz, j_l);
-        cart_comp(k_nx, k_ny, k_nz, k_l);
-        cart_comp(l_nx, l_ny, l_nz, l_l);
+        CINTcart_comp(i_nx, i_ny, i_nz, i_l);
+        CINTcart_comp(j_nx, j_ny, j_nz, j_l);
+        CINTcart_comp(k_nx, k_ny, k_nz, k_l);
+        CINTcart_comp(l_nx, l_ny, l_nz, l_l);
 
         ofx = 0;
         ofy = envs->g_size;
@@ -201,16 +294,14 @@ void g2e_index_xyz(unsigned int *idx, const CintEnvVars *envs)
 /*
  * g(nroots,0:nmax,0:mmax)
  */
-static void g0_2e_2d(double *g, _BC *bc, const double *w, const double fac,
-                     const CintEnvVars *envs)
+static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
-        const unsigned int *ng = envs->ng;
-        const unsigned int mmax = ng[2] - 1;
-        const unsigned int nmax = ng[3] - 1;
+        const unsigned int nroots = envs->nrys_roots;
+        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
+        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        const unsigned int dm = envs->g2d_klmax;
+        const unsigned int dn = envs->g2d_ijmax;
         unsigned int i, m, n, off;
-        const unsigned int nroots = ng[RYS_ROOTS];
-        const unsigned int dm = envs->g_stride_l;
-        const unsigned int dn = envs->g_stride_j;
         DEF_GXYZ(double, g, gx, gy, gz);
         const double *c00;
         const double *c0p;
@@ -221,7 +312,7 @@ static void g0_2e_2d(double *g, _BC *bc, const double *w, const double fac,
         for (i = 0; i < nroots; i++) {
                 gx[i] = 1;
                 gy[i] = 1;
-                gz[i] = w[i] * fac;
+                //gz[i] = w[i];
         }
 
         if (nmax > 0) {
@@ -288,7 +379,11 @@ static void g0_2e_2d(double *g, _BC *bc, const double *w, const double fac,
                 // + m*b00(irys)*gx(irys,m-1,n)
                 for (m = 1; m <= mmax; m++) {
                         for (n = 1; n < nmax; n++) {
-                                for (c00 = bc->c00, off = m*dm+n*dn, i = 0;
+                                off = m*dm+n*dn;
+                                //_mm_prefetch(gx+off+2*dn, _MM_HINT_T0);
+                                //_mm_prefetch(gy+off+2*dn, _MM_HINT_T0);
+                                //_mm_prefetch(gz+off+2*dn, _MM_HINT_T0);
+                                for (c00 = bc->c00, i = 0;
                                      i < nroots; i++, c00+=3) {
                                         gx[off+i+dn] = c00[0]*gx[off+i] +n*b10[i]*gx[off+i-dn] + m*b00[i]*gx[off+i-dm];
                                         gy[off+i+dn] = c00[1]*gy[off+i] +n*b10[i]*gy[off+i-dn] + m*b00[i]*gy[off+i-dm];
@@ -303,85 +398,212 @@ static void g0_2e_2d(double *g, _BC *bc, const double *w, const double fac,
 /*
  * g0[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-void g0_2e_4d(double *g, const double *rirj, const double *rkrl,
-              const CintEnvVars *envs)
+/* 2d is based on l,j */
+void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
 {
-        const unsigned int *ng = envs->ng;
-        const unsigned int nmax = ng[3] - 1;
-        const unsigned int mmax = ng[2] - 1;
-        const unsigned int li = ng[0] - 1;
-        const unsigned int lk = ng[1] - 1;
-        //const unsigned int ll = mmax - lk;
-        const unsigned int lj = nmax - li;
+        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
+        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        const unsigned int li = envs->li_ceil;
+        const unsigned int lk = envs->lk_ceil;
+        //const unsigned int ll = envs->ll_ceil;
+        const unsigned int lj = envs->lj_ceil;
         unsigned int i, j, k, l, ptr, n;
         const unsigned int di = envs->g_stride_i;
         const unsigned int dk = envs->g_stride_k;
         const unsigned int dl = envs->g_stride_l;
         const unsigned int dj = envs->g_stride_j;
+        const double *rirj = envs->rirj;
+        const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
 
         // g(i,...,j) = rirj * g(i-1,...,j) +  g(i-1,...,j+1)
         for (i = 1; i <= li; i++) {
-                for (j = 0; j <= nmax-i; j++) {
-                        for (l = 0; l <= mmax; l++) {
-                                ptr = j*dj + l*dl + i*di;
-                                for (n = ptr; n < ptr+di; n++) {
-                                        gx[n] = rirj[0]*gx[n-di] + gx[n-di+dj];
-                                        gy[n] = rirj[1]*gy[n-di] + gy[n-di+dj];
-                                        gz[n] = rirj[2]*gz[n-di] + gz[n-di+dj];
-                                }
+        for (j = 0; j <= nmax-i; j++) {
+        for (l = 0; l <= mmax; l++) {
+                ptr = j*dj + l*dl + i*di;
+                for (n = ptr; n < ptr+di; n++) {
+                        gx[n] = rirj[0]*gx[n-di] + gx[n-di+dj];
+                        gy[n] = rirj[1]*gy[n-di] + gy[n-di+dj];
+                        gz[n] = rirj[2]*gz[n-di] + gz[n-di+dj];
+                }
+        } } }
+
+        // g(...,k,l,..) = rkrl * g(...,k-1,l,..) + g(...,k-1,l+1,..)
+        for (j = 0; j <= lj; j++) {
+        for (k = 1; k <= lk; k++) {
+                for (l = 0; l < mmax-k; l+=2) {
+                        ptr = j*dj + l*dl + k*dk;
+                        for (n = ptr; n < ptr+dk; n++) {
+                                gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
+                                gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
+                                gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
+                                gx[n+dl] = rkrl[0]*gx[n+dl-dk] + gx[n+dl-dk+dl];
+                                gy[n+dl] = rkrl[1]*gy[n+dl-dk] + gy[n+dl-dk+dl];
+                                gz[n+dl] = rkrl[2]*gz[n+dl-dk] + gz[n+dl-dk+dl];
+                        }
+                }
+                if (l <= mmax-k) {
+                        ptr = j*dj + l*dl + k*dk;
+                        for (n = ptr; n < ptr+dk; n++) {
+                                gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
+                                gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
+                                gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
+                        }
+                }
+        } }
+}
+/* 2d is based on k,j */
+void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
+{
+        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
+        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        const unsigned int li = envs->li_ceil;
+        //const unsigned int lk = envs->lk_ceil;
+        const unsigned int ll = envs->ll_ceil;
+        const unsigned int lj = envs->lj_ceil;
+        unsigned int i, j, k, l, ptr, n;
+        const unsigned int di = envs->g_stride_i;
+        const unsigned int dk = envs->g_stride_k;
+        const unsigned int dl = envs->g_stride_l;
+        const unsigned int dj = envs->g_stride_j;
+        const double *rirj = envs->rirj;
+        const double *rkrl = envs->rkrl;
+        DEF_GXYZ(double, g, gx, gy, gz);
+
+        // g(i,...,j) = rirj * g(i-1,...,j) +  g(i-1,...,j+1)
+        for (i = 1; i <= li; i++) {
+        for (j = 0; j <= nmax-i; j++) {
+        for (k = 0; k <= mmax; k++) {
+                ptr = j*dj + k*dk + i*di;
+                for (n = ptr; n < ptr+di; n++) {
+                        gx[n] = rirj[0]*gx[n-di] + gx[n-di+dj];
+                        gy[n] = rirj[1]*gy[n-di] + gy[n-di+dj];
+                        gz[n] = rirj[2]*gz[n-di] + gz[n-di+dj];
+                }
+        } } }
+
+        // g(...,k,l,..) = rkrl * g(...,k,l-1,..) + g(...,k+1,l-1,..)
+        for (j = 0; j <= lj; j++) {
+        for (l = 1; l <= ll; l++) {
+                for (k = 0; k <= mmax-l; k++) {
+                        ptr = j*dj + l*dl + k*dk;
+                        for (n = ptr; n < ptr+dk; n++) {
+                                gx[n] = rkrl[0]*gx[n-dl] + gx[n-dl+dk];
+                                gy[n] = rkrl[1]*gy[n-dl] + gy[n-dl+dk];
+                                gz[n] = rkrl[2]*gz[n-dl] + gz[n-dl+dk];
+                        }
+                }
+        } }
+}
+/* 2d is based on i,l */
+void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
+{
+        //const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
+        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        //const unsigned int li = envs->li_ceil;
+        const unsigned int lk = envs->lk_ceil;
+        const unsigned int ll = envs->ll_ceil;
+        const unsigned int lj = envs->lj_ceil;
+        unsigned int j, k, l, ptr, n;
+        const unsigned int di = envs->g_stride_i;
+        const unsigned int dk = envs->g_stride_k;
+        const unsigned int dl = envs->g_stride_l;
+        const unsigned int dj = envs->g_stride_j;
+        const double *rirj = envs->rirj;
+        const double *rkrl = envs->rkrl;
+        DEF_GXYZ(double, g, gx, gy, gz);
+
+        // g(...,k,l,..) = rkrl * g(...,k-1,l,..) + g(...,k-1,l+1,..)
+        for (k = 1; k <= lk; k++) {
+        for (l = 0; l <= mmax-k; l++) {
+                ptr = l*dl + k*dk;
+                for (n = ptr; n < ptr+dk; n++) {
+                        gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
+                        gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
+                        gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
+                }
+        } }
+
+        // g(i,...,j) = rirj * g(i,...,j-1) +  g(i+1,...,j-1)
+        for (j = 1; j <= lj; j++) {
+        for (l = 0; l <= ll; l++) {
+        for (k = 0; k <= lk; k++) {
+                ptr = j*dj + l*dl + k*dk;
+                for (n = ptr; n < ptr+dk-di*j; n++) {
+                        gx[n] = rirj[0] * gx[n-dj] + gx[n-dj+di];
+                        gy[n] = rirj[1] * gy[n-dj] + gy[n-dj+di];
+                        gz[n] = rirj[2] * gz[n-dj] + gz[n-dj+di];
+                }
+        } } }
+}
+/* 2d is based on i,k */
+void static CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
+{
+        //const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
+        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        //const unsigned int li = envs->li_ceil;
+        const unsigned int lk = envs->lk_ceil;
+        const unsigned int ll = envs->ll_ceil;
+        const unsigned int lj = envs->lj_ceil;
+        unsigned int j, k, l, ptr, n;
+        const unsigned int di = envs->g_stride_i;
+        const unsigned int dk = envs->g_stride_k;
+        const unsigned int dl = envs->g_stride_l;
+        const unsigned int dj = envs->g_stride_j;
+        const double *rirj = envs->rirj;
+        const double *rkrl = envs->rkrl;
+        DEF_GXYZ(double, g, gx, gy, gz);
+
+        // g(...,k,l,..) = rkrl * g(...,k,l-1,..) + g(...,k+1,l-1,..)
+        for (l = 1; l <= ll; l++) {
+                // (:,i) is full, so loop:k and loop:n can be merged to
+                // for(n = l*dl; n < ptr+dl-dk*l; n++)
+                for (k = 0; k <= mmax-l; k++) {
+                        ptr = l*dl + k*dk;
+                        for (n = ptr; n < ptr+dk; n++) {
+                                gx[n] = rkrl[0]*gx[n-dl] + gx[n-dl+dk];
+                                gy[n] = rkrl[1]*gy[n-dl] + gy[n-dl+dk];
+                                gz[n] = rkrl[2]*gz[n-dl] + gz[n-dl+dk];
                         }
                 }
         }
 
-        // g(0,k,l,..) = rkrl * g(0,k-1,l,..) + g(0,k-1,l+1,..)
-        for (j = 0; j <= lj; j++) {
-                for (k = 1; k <= lk; k++) {
-                        for (l = 0; l < mmax-k; l+=2) {
-                                ptr = j*dj + l*dl + k*dk;
-                                for (n = ptr; n < ptr+dk; n++) {
-                                        gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
-                                        gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
-                                        gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
-                                        gx[n+dl] = rkrl[0]*gx[n+dl-dk] + gx[n+dl-dk+dl];
-                                        gy[n+dl] = rkrl[1]*gy[n+dl-dk] + gy[n+dl-dk+dl];
-                                        gz[n+dl] = rkrl[2]*gz[n+dl-dk] + gz[n+dl-dk+dl];
-                                }
-                        }
-                        if (l <= mmax-k) {
-                                ptr = j*dj + l*dl + k*dk;
-                                for (n = ptr; n < ptr+dk; n++) {
-                                        gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
-                                        gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
-                                        gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
-                                }
-                        }
+        // g(i,...,j) = rirj * g(i,...,j-1) +  g(i+1,...,j-1)
+        for (j = 1; j <= lj; j++) {
+        for (l = 0; l <= ll; l++) {
+        for (k = 0; k <= lk; k++) {
+                ptr = j*dj + l*dl + k*dk;
+                for (n = ptr; n < ptr+dk-di*j; n++) {
+                        gx[n] = rirj[0] * gx[n-dj] + gx[n-dj+di];
+                        gy[n] = rirj[1] * gy[n-dj] + gy[n-dj+di];
+                        gz[n] = rirj[2] * gz[n-dj] + gz[n-dj+di];
                 }
-        }
+        } } }
 }
 /************* some special g0_4d results *************/
-static inline void _g0_4d_ng_1112(double *g, double *c,
-                                  const double *r, double *w, double fac1)
+/* 4 digits stand for i_ceil, k_ceil, l_ceil, j_ceil */
+static inline void _g0_lj_4d_0001(double *g, double *c,
+                                  const double *r)
 {
         g[0] = 1;
         g[1] = c[0];
         g[2] = 1;
         g[3] = c[1];
-        g[4] = w[0] * fac1;
+        //g[4] = w[0];
         g[5] = c[2] * g[4];
 }
-static inline void _g0_4d_ng_2112(double *g, double *c,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_1000(double *g, double *c,
+                                  const double *r)
 {
         g[0] = 1;
         g[1] = r[0] + c[0];
         g[4] = 1;
         g[5] = r[1] + c[1];
-        g[8] = w[0] * fac1;
+        //g[8] = w[0];
         g[9] =(r[2] + c[2]) * g[8];
 }
-static inline void _g0_4d_ng_1113(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_0002(double *g, double *c, double *b,
+                                  const double *r)
 {
         g[0 ] = 1;
         g[1 ] = 1;
@@ -395,15 +617,15 @@ static inline void _g0_4d_ng_1113(double *g, double *c, double *b,
         g[9 ] = c[4];
         g[10] = c[1] * c[1] + b[0];
         g[11] = c[4] * c[4] + b[1];
-        g[12] = w[0] * fac1;
-        g[13] = w[1] * fac1;
+        //g[12] = w[0];
+        //g[13] = w[1];
         g[14] = c[2] * g[12];
         g[15] = c[5] * g[13];
         g[16] =(c[2] * c[2] + b[0])* g[12];
         g[17] =(c[5] * c[5] + b[1])* g[13];
 }
-static inline void _g0_4d_ng_2113(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_1001(double *g, double *c, double *b,
+                                  const double *r)
 {
         double rc[] = {r[0]+c[0], r[0]+c[3],
                        r[1]+c[1], r[1]+c[4],
@@ -424,8 +646,8 @@ static inline void _g0_4d_ng_2113(double *g, double *c, double *b,
         g[17] = c[4];
         g[18] = rc[2] * c[1] + b[0];
         g[19] = rc[3] * c[4] + b[1];
-        g[24] = w[0] * fac1;
-        g[25] = w[1] * fac1;
+        //g[24] = w[0];
+        //g[25] = w[1];
         g[26] = rc[4] * g[24];
         g[27] = rc[5] * g[25];
         g[28] = c[2] * g[24];
@@ -433,8 +655,8 @@ static inline void _g0_4d_ng_2113(double *g, double *c, double *b,
         g[30] =(rc[4] * c[2] + b[0])* g[24];
         g[31] =(rc[5] * c[5] + b[1])* g[25];
 }
-static inline void _g0_4d_ng_3113(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_2000(double *g, double *c, double *b,
+                                  const double *r)
 {
         double rc[] = {r[0]+c[0], r[0]+c[3],
                        r[1]+c[1], r[1]+c[4],
@@ -451,15 +673,15 @@ static inline void _g0_4d_ng_3113(double *g, double *c, double *b,
         g[21] = rc[3];
         g[22] = rc[2] * rc[2] + b[0];
         g[23] = rc[3] * rc[3] + b[1];
-        g[36] = w[0] * fac1;
-        g[37] = w[1] * fac1;
+        //g[36] = w[0];
+        //g[37] = w[1];
         g[38] = rc[4] * g[36];
         g[39] = rc[5] * g[37];
         g[40] =(rc[4] * rc[4] + b[0])* g[36];
         g[41] =(rc[5] * rc[5] + b[1])* g[37];
 }
-static inline void _g0_4d_ng_1114(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_0003(double *g, double *c, double *b,
+                                  const double *r)
 {
         g[0 ] = 1;
         g[1 ] = 1;
@@ -477,8 +699,8 @@ static inline void _g0_4d_ng_1114(double *g, double *c, double *b,
         g[13] = c[4] * c[4] + b[1];
         g[14] = c[1] *(c[1] * c[1] + 3 * b[0]);
         g[15] = c[4] *(c[4] * c[4] + 3 * b[1]);
-        g[16] = w[0] * fac1;
-        g[17] = w[1] * fac1;
+        //g[16] = w[0];
+        //g[17] = w[1];
         g[18] = c[2] * g[16];
         g[19] = c[5] * g[17];
         g[20] =(c[2] * c[2] + b[0])* g[16];
@@ -486,8 +708,8 @@ static inline void _g0_4d_ng_1114(double *g, double *c, double *b,
         g[22] =(c[2] * c[2] + 3 * b[0])* c[2] * g[16];
         g[23] =(c[5] * c[5] + 3 * b[1])* c[5] * g[17];
 }
-static inline void _g0_4d_ng_2114(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_1002(double *g, double *c, double *b,
+                                  const double *r)
 {
         double rc[] = {r[0]+c[0], r[0]+c[3],
                        r[1]+c[1], r[1]+c[4],
@@ -516,8 +738,8 @@ static inline void _g0_4d_ng_2114(double *g, double *c, double *b,
         g[25] = c[4] * c[4] + b[1];
         g[26] = rc[2]*c[1]*c[1] + b[0]*(rc[2]+2*c[1]);
         g[27] = rc[3]*c[4]*c[4] + b[1]*(rc[3]+2*c[4]);
-        g[32] = w[0] * fac1;
-        g[33] = w[1] * fac1;
+        //g[32] = w[0];
+        //g[33] = w[1];
         g[34] = rc[4] * g[32];
         g[35] = rc[5] * g[33];
         g[36] = c[2] * g[32];
@@ -529,8 +751,8 @@ static inline void _g0_4d_ng_2114(double *g, double *c, double *b,
         g[42] =(rc[4]*c[2]*c[2]+b[0]*(rc[4]+2*c[2]))*g[32];
         g[43] =(rc[5]*c[5]*c[5]+b[1]*(rc[5]+2*c[5]))*g[33];
 }
-static inline void _g0_4d_ng_3114(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_2001(double *g, double *c, double *b,
+                                  const double *r)
 {
         double rc[] = {r[0]+c[0], r[0]+c[3],
                        r[1]+c[1], r[1]+c[4],
@@ -559,8 +781,8 @@ static inline void _g0_4d_ng_3114(double *g, double *c, double *b,
         g[33] = c[4] * rc[3] + b[1];
         g[34] = c[1]*rc[2]*rc[2] + b[0]*(2*rc[2]+c[1]);
         g[35] = c[4]*rc[3]*rc[3] + b[1]*(2*rc[3]+c[4]);
-        g[48] = w[0] * fac1;
-        g[49] = w[1] * fac1;
+        //g[48] = w[0];
+        //g[49] = w[1];
         g[50] = rc[4] * g[48];
         g[51] = rc[5] * g[49];
         g[52] =(rc[4] * rc[4] + b[0])* g[48];
@@ -572,8 +794,8 @@ static inline void _g0_4d_ng_3114(double *g, double *c, double *b,
         g[58] =(c[2]*rc[4]*rc[4] + b[0]*(2*rc[4]+c[2]))* g[48];
         g[59] =(c[5]*rc[5]*rc[5] + b[1]*(2*rc[5]+c[5]))* g[49];
 }
-static inline void _g0_4d_ng_4114(double *g, double *c, double *b,
-                                  const double *r, double *w, double fac1)
+static inline void _g0_lj_4d_3000(double *g, double *c, double *b,
+                                  const double *r)
 {
         double rc[] = {r[0]+c[0], r[0]+c[3],
                        r[1]+c[1], r[1]+c[4],
@@ -594,8 +816,8 @@ static inline void _g0_4d_ng_4114(double *g, double *c, double *b,
         g[37] = rc[3] * rc[3] + b[1];
         g[38] = rc[2] *(rc[2] * rc[2] + 3 * b[0]);
         g[39] = rc[3] *(rc[3] * rc[3] + 3 * b[1]);
-        g[64] = w[0] * fac1;
-        g[65] = w[1] * fac1;
+        //g[64] = w[0];
+        //g[65] = w[1];
         g[66] = rc[4] * g[64];
         g[67] = rc[5] * g[65];
         g[68] =(rc[4] * rc[4] + b[0])* g[64];
@@ -603,9 +825,8 @@ static inline void _g0_4d_ng_4114(double *g, double *c, double *b,
         g[70] =(rc[4] * rc[4] + 3 * b[0])* rc[4] * g[64];
         g[71] =(rc[5] * rc[5] + 3 * b[1])* rc[5] * g[65];
 }
-static inline void _g0_4d_ng_1122(double *g, double *c0, double *cp, double *b,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+static inline void _g0_lj_4d_0011(double *g, double *c0, double *cp, double *b,
+                                  const double *r0, const double *rp)
 {
         g[0 ] = 1;
         g[1 ] = 1;
@@ -623,8 +844,8 @@ static inline void _g0_4d_ng_1122(double *g, double *c0, double *cp, double *b,
         g[13] = c0[4];
         g[14] = cp[1] * c0[1] + b[0];
         g[15] = cp[4] * c0[4] + b[1];
-        g[16] = w[0] * fac1;
-        g[17] = w[1] * fac1;
+        //g[16] = w[0];
+        //g[17] = w[1];
         g[18] = cp[2] * g[16];
         g[19] = cp[5] * g[17];
         g[20] = c0[2] * g[16];
@@ -632,9 +853,8 @@ static inline void _g0_4d_ng_1122(double *g, double *c0, double *cp, double *b,
         g[22] =(cp[2] * c0[2] + b[0]) * g[16];
         g[23] =(cp[5] * c0[5] + b[1]) * g[17];
 }
-static inline void _g0_4d_ng_2122(double *g, double *c0, double *cp, double *b,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+static inline void _g0_lj_4d_1010(double *g, double *c0, double *cp, double *b,
+                                  const double *r0, const double *rp)
 {
         double rc[] = {r0[0]+c0[0], r0[0]+c0[3],
                        r0[1]+c0[1], r0[1]+c0[4],
@@ -655,8 +875,8 @@ static inline void _g0_4d_ng_2122(double *g, double *c0, double *cp, double *b,
         g[21] = cp[4];
         g[22] = rc[2] * cp[1] + b[0];
         g[23] = rc[3] * cp[4] + b[1];
-        g[32] = w[0] * fac1;
-        g[33] = w[1] * fac1;
+        //g[32] = w[0];
+        //g[33] = w[1];
         g[34] = rc[4] * g[32];
         g[35] = rc[5] * g[33];
         g[36] = cp[2] * g[32];
@@ -664,9 +884,8 @@ static inline void _g0_4d_ng_2122(double *g, double *c0, double *cp, double *b,
         g[38] =(rc[4]*cp[2] + b[0]) * g[32];
         g[39] =(rc[5]*cp[5] + b[1]) * g[33];
 }
-static inline void _g0_4d_ng_1222(double *g, double *c0, double *cp, double *b,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+static inline void _g0_lj_4d_0101(double *g, double *c0, double *cp, double *b,
+                                  const double *r0, const double *rp)
 {
         double rc[] = {rp[0]+cp[0], rp[0]+cp[3],
                        rp[1]+cp[1], rp[1]+cp[4],
@@ -687,8 +906,8 @@ static inline void _g0_4d_ng_1222(double *g, double *c0, double *cp, double *b,
         g[25] = c0[4];
         g[26] = rc[2] * c0[1] + b[0];
         g[27] = rc[3] * c0[4] + b[1];
-        g[32] = w[0] * fac1;
-        g[33] = w[1] * fac1;
+        //g[32] = w[0];
+        //g[33] = w[1];
         g[34] = rc[4] * g[32];
         g[35] = rc[5] * g[33];
         g[40] = c0[2] * g[32];
@@ -696,9 +915,8 @@ static inline void _g0_4d_ng_1222(double *g, double *c0, double *cp, double *b,
         g[42] =(rc[4]*c0[2] + b[0]) * g[32];
         g[43] =(rc[5]*c0[5] + b[1]) * g[33];
 }
-static inline void _g0_4d_ng_2222(double *g, double *c0, double *cp, double *b,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+static inline void _g0_lj_4d_1100(double *g, double *c0, double *cp, double *b,
+                                  const double *r0, const double *rp)
 {
         double rc0[] = {r0[0]+c0[0], r0[0]+c0[3],
                         r0[1]+c0[1], r0[1]+c0[4],
@@ -722,8 +940,8 @@ static inline void _g0_4d_ng_2222(double *g, double *c0, double *cp, double *b,
         g[37] = rcp[3];
         g[38] = rc0[2] * rcp[2] + b[0];
         g[39] = rc0[3] * rcp[3] + b[1];
-        g[64] = w[0] * fac1;
-        g[65] = w[1] * fac1;
+        //g[64] = w[0];
+        //g[65] = w[1];
         g[66] = rc0[4] * g[64];
         g[67] = rc0[5] * g[65];
         g[68] = rcp[4] * g[64];
@@ -731,9 +949,8 @@ static inline void _g0_4d_ng_2222(double *g, double *c0, double *cp, double *b,
         g[70] =(rc0[4]*rcp[4] + b[0]) * g[64];
         g[71] =(rc0[5]*rcp[5] + b[1]) * g[65];
 }
-static inline void _g0_4d_ng_1132(double *g, double *c0, double *cp,
-                                  double *b0, double *b1,
-                                  double *w, double fac1)
+static inline void _g0_lj_4d_0021(double *g, double *c0, double *cp,
+                                  double *b0, double *b1)
 {
         g[0 ] = 1;
         g[1 ] = 1;
@@ -759,8 +976,8 @@ static inline void _g0_4d_ng_1132(double *g, double *c0, double *cp,
         g[21] = cp[4] * c0[4] + b0[1];
         g[22] = c0[1] * g[16] + 2 * b0[0] * cp[1];
         g[23] = c0[4] * g[17] + 2 * b0[1] * cp[4];
-        g[24] = w[0] * fac1;
-        g[25] = w[1] * fac1;
+        //g[24] = w[0];
+        //g[25] = w[1];
         g[26] = cp[2] * g[24];
         g[27] = cp[5] * g[25];
         g[28] =(cp[2] * cp[2] + b1[0]) * g[24];
@@ -772,10 +989,9 @@ static inline void _g0_4d_ng_1132(double *g, double *c0, double *cp,
         g[34] = c0[2] * g[28] + 2 * b0[0] * g[26];
         g[35] = c0[5] * g[29] + 2 * b0[1] * g[27];
 }
-static inline void _g0_4d_ng_2132(double *g, double *c0, double *cp,
+static inline void _g0_lj_4d_1020(double *g, double *c0, double *cp,
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc[] = {r0[0]+c0[0], r0[0]+c0[3],
                        r0[1]+c0[1], r0[1]+c0[4],
@@ -804,8 +1020,8 @@ static inline void _g0_4d_ng_2132(double *g, double *c0, double *cp,
         g[33] = cp[4] * cp[4] + b1[1];
         g[34] = rc[2] * g[32] + 2 * b0[0] * cp[1];
         g[35] = rc[3] * g[33] + 2 * b0[1] * cp[4];
-        g[48] = w[0] * fac1;
-        g[49] = w[1] * fac1;
+        //g[48] = w[0];
+        //g[49] = w[1];
         g[50] = rc[4] * g[48];
         g[51] = rc[5] * g[49];
         g[52] = cp[2] * g[48];
@@ -817,10 +1033,9 @@ static inline void _g0_4d_ng_2132(double *g, double *c0, double *cp,
         g[58] = rc[4] * g[56] + 2 * b0[0] * g[52];
         g[59] = rc[5] * g[57] + 2 * b0[1] * g[53];
 }
-static inline void _g0_4d_ng_1232(double *g, double *c0, double *cp,
+static inline void _g0_lj_4d_0111(double *g, double *c0, double *cp,
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc[] = {rp[0]+cp[0], rp[0]+cp[3],
                        rp[1]+cp[1], rp[1]+cp[4],
@@ -857,8 +1072,8 @@ static inline void _g0_4d_ng_1232(double *g, double *c0, double *cp,
         g[41] = c0[4] * cp[4] + b0[1];
         g[42] = c0[1] * g[30] + b0[0] *(rc[2] + cp[1]);
         g[43] = c0[4] * g[31] + b0[1] *(rc[3] + cp[4]);
-        g[48] = w[0] * fac1;
-        g[49] = w[1] * fac1;
+        //g[48] = w[0];
+        //g[49] = w[1];
         g[50] = rc[4] * g[48];
         g[51] = rc[5] * g[49];
         g[52] = cp[2] * g[48];
@@ -874,10 +1089,9 @@ static inline void _g0_4d_ng_1232(double *g, double *c0, double *cp,
         g[66] = c0[2] * g[54] + b0[0] *(g[50] + g[52]);
         g[67] = c0[5] * g[55] + b0[1] *(g[51] + g[53]);
 }
-static inline void _g0_4d_ng_2232(double *g, double *c0, double *cp, 
+static inline void _g0_lj_4d_1110(double *g, double *c0, double *cp, 
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc0[] = {r0[0]+c0[0], r0[0]+c0[3],
                         r0[1]+c0[1], r0[1]+c0[4],
@@ -917,8 +1131,8 @@ static inline void _g0_4d_ng_2232(double *g, double *c0, double *cp,
         g[61] = cp[4] * rcp[3] + b1[1];
         g[62] = rc0[2] * g[60] + b0[0] *(rcp[2] + cp[1]);
         g[63] = rc0[3] * g[61] + b0[1] *(rcp[3] + cp[4]);
-        g[96 ] = w[0] * fac1;
-        g[97 ] = w[1] * fac1;
+        //g[96 ] = w[0];
+        //g[97 ] = w[1];
         g[98 ] = rc0[4] * g[96 ];
         g[99 ] = rc0[5] * g[97 ];
         g[100] = rcp[4] * g[96 ];
@@ -934,10 +1148,9 @@ static inline void _g0_4d_ng_2232(double *g, double *c0, double *cp,
         g[110] = rc0[4] * g[108] + b0[0] *(g[100] + g[104]);
         g[111] = rc0[5] * g[109] + b0[1] *(g[101] + g[105]);
 }
-static inline void _g0_4d_ng_1332(double *g, double *c0, double *cp,
+static inline void _g0_lj_4d_0201(double *g, double *c0, double *cp,
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc[] = {rp[0]+cp[0], rp[0]+cp[3],
                        rp[1]+cp[1], rp[1]+cp[4],
@@ -966,8 +1179,8 @@ static inline void _g0_4d_ng_1332(double *g, double *c0, double *cp,
         g[57] = rc[3] * c0[4] + b0[1];
         g[58] = c0[1] * g[40] + 2 * b0[0] * rc[2];
         g[59] = c0[4] * g[41] + 2 * b0[1] * rc[3];
-        g[72] = w[0] * fac1;
-        g[73] = w[1] * fac1;
+        //g[72] = w[0];
+        //g[73] = w[1];
         g[74] = rc[4] * g[72];
         g[75] = rc[5] * g[73];
         g[76] =(rc[4] * rc[4] + b1[0])* g[72];
@@ -979,10 +1192,9 @@ static inline void _g0_4d_ng_1332(double *g, double *c0, double *cp,
         g[94] = c0[2] * g[76] + 2 * b0[0] * g[74];
         g[95] = c0[5] * g[77] + 2 * b0[1] * g[75];
 }
-static inline void _g0_4d_ng_2332(double *g, double *c0, double *cp, 
+static inline void _g0_lj_4d_1200(double *g, double *c0, double *cp, 
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc0[] = {r0[0]+c0[0], r0[0]+c0[3],
                         r0[1]+c0[1], r0[1]+c0[4],
@@ -1014,8 +1226,8 @@ static inline void _g0_4d_ng_2332(double *g, double *c0, double *cp,
         g[81] = rcp[3] * rcp[3] + b1[1];
         g[82] = rc0[2] * g[80] + 2 * b0[0] * rcp[2];
         g[83] = rc0[3] * g[81] + 2 * b0[1] * rcp[3];
-        g[144] = w[0] * fac1;
-        g[145] = w[1] * fac1;
+        //g[144] = w[0];
+        //g[145] = w[1];
         g[146] = rc0[4] * g[144];
         g[147] = rc0[5] * g[145];
         g[148] = rcp[4] * g[144];
@@ -1027,9 +1239,8 @@ static inline void _g0_4d_ng_2332(double *g, double *c0, double *cp,
         g[154] = rc0[4] * g[152] + 2 * b0[0] * g[148];
         g[155] = rc0[5] * g[153] + 2 * b0[1] * g[149];
 }
-static inline void _g0_4d_ng_1123(double *g, double *c0, double *cp,
-                                  double *b0, double *b1,
-                                  double *w, double fac1)
+static inline void _g0_lj_4d_0012(double *g, double *c0, double *cp,
+                                  double *b0, double *b1)
 {
         g[0 ] = 1;
         g[1 ] = 1;
@@ -1055,8 +1266,8 @@ static inline void _g0_4d_ng_1123(double *g, double *c0, double *cp,
         g[21] = c0[4] * c0[4] + b1[1];
         g[22] = cp[1] * g[20] + 2 * b0[0] * c0[1];
         g[23] = cp[4] * g[21] + 2 * b0[1] * c0[4];
-        g[24] = w[0] * fac1;
-        g[25] = w[1] * fac1;
+        //g[24] = w[0];
+        //g[25] = w[1];
         g[26] = cp[2] * g[24];
         g[27] = cp[5] * g[25];
         g[28] = c0[2] * g[24];
@@ -1068,10 +1279,9 @@ static inline void _g0_4d_ng_1123(double *g, double *c0, double *cp,
         g[34] = cp[2] * g[32] + 2 * b0[0] * g[28];
         g[35] = cp[5] * g[33] + 2 * b0[1] * g[29];
 }
-static inline void _g0_4d_ng_2123(double *g, double *c0, double *cp,
+static inline void _g0_lj_4d_1011(double *g, double *c0, double *cp,
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc[] = {r0[0]+c0[0], r0[0]+c0[3],
                        r0[1]+c0[1], r0[1]+c0[4],
@@ -1108,8 +1318,8 @@ static inline void _g0_4d_ng_2123(double *g, double *c0, double *cp,
         g[37] = c0[4] * cp[4] + b0[1];
         g[38] = cp[1] * g[34] + b0[0] *(rc[2] + c0[1]);
         g[39] = cp[4] * g[35] + b0[1] *(rc[3] + c0[4]);
-        g[48] = w[0] * fac1;
-        g[49] = w[1] * fac1;
+        //g[48] = w[0];
+        //g[49] = w[1];
         g[50] = rc[4] * g[48];
         g[51] = rc[5] * g[49];
         g[52] = cp[2] * g[48];
@@ -1125,10 +1335,9 @@ static inline void _g0_4d_ng_2123(double *g, double *c0, double *cp,
         g[62] = cp[2] * g[58] + b0[0] *(g[50] + g[56]);
         g[63] = cp[5] * g[59] + b0[1] *(g[51] + g[57]);
 }
-static inline void _g0_4d_ng_3123(double *g, double *c0, double *cp,
+static inline void _g0_lj_4d_2010(double *g, double *c0, double *cp,
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc[] = {r0[0]+c0[0], r0[0]+c0[3],
                        r0[1]+c0[1], r0[1]+c0[4],
@@ -1157,8 +1366,8 @@ static inline void _g0_4d_ng_3123(double *g, double *c0, double *cp,
         g[45] = cp[4] * rc[3] + b0[1];
         g[46] = cp[1] * g[40] + 2 * b0[0] * rc[2];
         g[47] = cp[4] * g[41] + 2 * b0[1] * rc[3];
-        g[72] = w[0] * fac1;
-        g[73] = w[1] * fac1;
+        //g[72] = w[0];
+        //g[73] = w[1];
         g[74] = rc[4] * g[72];
         g[75] = rc[5] * g[73];
         g[76] =(rc[4] * rc[4] + b1[0]) * g[72];
@@ -1170,10 +1379,9 @@ static inline void _g0_4d_ng_3123(double *g, double *c0, double *cp,
         g[82] = cp[2] * g[76] + 2 * b0[0] * g[74];
         g[83] = cp[5] * g[77] + 2 * b0[1] * g[75];
 }
-static inline void _g0_4d_ng_1223(double *g, double *c0, double *cp,
+static inline void _g0_lj_4d_0102(double *g, double *c0, double *cp,
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc[] = {rp[0]+cp[0], rp[0]+cp[3],
                        rp[1]+cp[1], rp[1]+cp[4],
@@ -1202,8 +1410,8 @@ static inline void _g0_4d_ng_1223(double *g, double *c0, double *cp,
         g[41] = c0[4] * c0[4] + b1[1];
         g[42] = rc[2] * g[40] + 2 * b0[0] * c0[1];
         g[43] = rc[3] * g[41] + 2 * b0[1] * c0[4];
-        g[48] = w[0] * fac1;
-        g[49] = w[1] * fac1;
+        //g[48] = w[0];
+        //g[49] = w[1];
         g[50] = rc[4] * g[48];
         g[51] = rc[5] * g[49];
         g[56] = c0[2] * g[48];
@@ -1215,10 +1423,9 @@ static inline void _g0_4d_ng_1223(double *g, double *c0, double *cp,
         g[66] = rc[4] * g[64] + 2 * b0[0] * g[56];
         g[67] = rc[5] * g[65] + 2 * b0[1] * g[57];
 }
-static inline void _g0_4d_ng_2223(double *g, double *c0, double *cp, 
+static inline void _g0_lj_4d_1101(double *g, double *c0, double *cp, 
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc0[] = {r0[0]+c0[0], r0[0]+c0[3],
                         r0[1]+c0[1], r0[1]+c0[4],
@@ -1258,8 +1465,8 @@ static inline void _g0_4d_ng_2223(double *g, double *c0, double *cp,
         g[69] = c0[4] * rcp[3] + b0[1];
         g[70] = rcp[2] * g[66] + b0[0] *(rc0[2] + c0[1]);
         g[71] = rcp[3] * g[67] + b0[1] *(rc0[3] + c0[4]);
-        g[96 ] = w[0] * fac1;
-        g[97 ] = w[1] * fac1;
+        //g[96 ] = w[0];
+        //g[97 ] = w[1];
         g[98 ] = rc0[4] * g[96];
         g[99 ] = rc0[5] * g[97];
         g[100] = rcp[4] * g[96];
@@ -1275,10 +1482,9 @@ static inline void _g0_4d_ng_2223(double *g, double *c0, double *cp,
         g[118] = rcp[4] * g[114] + b0[0] *(g[98] + g[112]);
         g[119] = rcp[5] * g[115] + b0[1] *(g[99] + g[113]);
 }
-static inline void _g0_4d_ng_3223(double *g, double *c0, double *cp, 
+static inline void _g0_lj_4d_2100(double *g, double *c0, double *cp, 
                                   double *b0, double *b1,
-                                  const double *r0, const double *rp,
-                                  double *w, double fac1)
+                                  const double *r0, const double *rp)
 {
         double rc0[] = {r0[0]+c0[0], r0[0]+c0[3],
                         r0[1]+c0[1], r0[1]+c0[4],
@@ -1310,8 +1516,8 @@ static inline void _g0_4d_ng_3223(double *g, double *c0, double *cp,
         g[81] = rcp[3] * rc0[3] + b0[1];
         g[82] = rcp[2] * g[76] + 2 * b0[0] * rc0[2];
         g[83] = rcp[3] * g[77] + 2 * b0[1] * rc0[3];
-        g[144] = w[0] * fac1;
-        g[145] = w[1] * fac1;
+        //g[144] = w[0];
+        //g[145] = w[1];
         g[146] = rc0[4] * g[144];
         g[147] = rc0[5] * g[145];
         g[148] =(rc0[4] * rc0[4] + b1[0])* g[144];
@@ -1326,22 +1532,130 @@ static inline void _g0_4d_ng_3223(double *g, double *c0, double *cp,
 /************** end special g0_4d results *************/
 
 
+
+static void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+{
+        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
+        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        switch (nmax) {
+                case 0: switch(mmax) {
+                        case 0: goto _g0_4d_default; // ssss
+                        case 1: switch (envs->lk_ceil) {
+                                case 0: _g0_lj_4d_0001(g, bc->c0p, envs->rkrl); goto normal_end;
+                                case 1: _g0_lj_4d_1000(g, bc->c0p, envs->rkrl); goto normal_end;
+                                default: goto error; }
+                        case 2: switch (envs->lk_ceil) {
+                                case 0: _g0_lj_4d_0002(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                case 1: _g0_lj_4d_1001(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                case 2: _g0_lj_4d_2000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                default: goto error; }
+                        case 3: switch (envs->lk_ceil) {
+                                case 0: _g0_lj_4d_0003(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                case 1: _g0_lj_4d_1002(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                case 2: _g0_lj_4d_2001(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                case 3: _g0_lj_4d_3000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                case 1: switch(mmax) {
+                        case 0: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0001(g, bc->c00, envs->rirj); goto normal_end;
+                                case 1: _g0_lj_4d_1000(g, bc->c00, envs->rirj); goto normal_end;
+                                default: goto error; }
+                        case 1: switch (envs->lk_ceil) {
+                                case 0: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0011(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 1: _g0_lj_4d_1010(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                case 1: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0101(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 1: _g0_lj_4d_1100(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                default: goto error; }
+                        case 2: switch (envs->lk_ceil) {
+                                case 0: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0021(g, bc->c00, bc->c0p, bc->b00, bc->b01); goto normal_end;
+                                        case 1: _g0_lj_4d_1020(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                case 1: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0111(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 1: _g0_lj_4d_1110(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                case 2: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0201(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 1: _g0_lj_4d_1200(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                case 2: switch(mmax) {
+                        case 0: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0002(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 1: _g0_lj_4d_1001(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 2: _g0_lj_4d_2000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                default: goto error; }
+                        case 1: switch (envs->lk_ceil) {
+                                case 0: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0012(g, bc->c00, bc->c0p, bc->b00, bc->b10); goto normal_end;
+                                        case 1: _g0_lj_4d_1011(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 2: _g0_lj_4d_2010(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                case 1: switch (envs->li_ceil) {
+                                        case 0: _g0_lj_4d_0102(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 1: _g0_lj_4d_1101(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                        case 2: _g0_lj_4d_2100(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                        default: goto error; }
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                case 3: switch(mmax) {
+                        case 0: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0003(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 1: _g0_lj_4d_1002(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 2: _g0_lj_4d_2001(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 3: _g0_lj_4d_3000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                default:
+_g0_4d_default:
+                        CINTg0_2e_2d(g, bc, envs);
+                        CINTg0_lj2d_4d(g, envs);
+        }
+normal_end:
+        return;
+error:
+        printf("Dimension error for CINTg0_2e_lj2d4d: iklj = %d %d %d %d",
+               envs->li_ceil, envs->lk_ceil, envs->ll_ceil, envs->lj_ceil);
+        exit(1);
+}
+
+static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+{
+        CINTg0_2e_2d(g, bc, envs);
+        CINTg0_kj2d_4d(g, envs);
+}
+static void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+{
+        CINTg0_2e_2d(g, bc, envs);
+        CINTg0_ik2d_4d(g, envs);
+}
+static void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+{
+        CINTg0_2e_2d(g, bc, envs);
+        CINTg0_il2d_4d(g, envs);
+}
+
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-void g0_2e(double *g, const RijSets *rij, const RijSets *rkl,
-           const double fac, const CintEnvVars *envs)
+void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
-        const unsigned int *ng = envs->ng;
-        const double aij = rij->a12;
-        const double akl = rkl->a12;
+        const double aij = envs->aij;
+        const double akl = envs->akl;
         double a0, a1, fac1, x;
         double u[MXRYSROOTS];
-        double w[MXRYSROOTS];
+        double *w = g + envs->g_size * 2; // ~ gz
         double rijrkl[3];
-        rijrkl[0] = rij->r12[0] - rkl->r12[0];
-        rijrkl[1] = rij->r12[1] - rkl->r12[1];
-        rijrkl[2] = rij->r12[2] - rkl->r12[2];
+        rijrkl[0] = envs->rij[0] - envs->rkl[0];
+        rijrkl[1] = envs->rij[1] - envs->rkl[1];
+        rijrkl[2] = envs->rij[2] - envs->rkl[2];
 
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
@@ -1349,19 +1663,17 @@ void g0_2e(double *g, const RijSets *rij, const RijSets *rkl,
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
-        rys_roots(ng[RYS_ROOTS], x, u, w);
+        CINTrys_roots(envs->nrys_roots, x, u, w);
 
         unsigned int irys;
         double u2, div;
-        const double *rijrj = rij->r12r2;
-        const double *rklrl = rkl->r12r2;
-        const double *rirj = rij->r1r2;
-        const double *rkrl = rkl->r1r2;
-        _BC bc;
+        const double *rijrx = envs->rijrx;
+        const double *rklrx = envs->rklrx;
+        struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
 
-        for (irys = 0; irys < ng[RYS_ROOTS]; irys++, c00+=3, c0p+=3)
+        for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3)
         {
                 /*
                  *t2 = u(irys)/(1+u(irys))
@@ -1372,100 +1684,16 @@ void g0_2e(double *g, const RijSets *rij, const RijSets *rkl,
                 bc.b00[irys] = 0.5 * u2 * div;
                 bc.b10[irys] = 0.5 * (u2 + akl) * div;
                 bc.b01[irys] = 0.5 * (u2 + aij) * div;
-                c00[0] = rijrj[0] - u2 * akl * rijrkl[0] * div;
-                c00[1] = rijrj[1] - u2 * akl * rijrkl[1] * div;
-                c00[2] = rijrj[2] - u2 * akl * rijrkl[2] * div;
-                c0p[0] = rklrl[0] + u2 * aij * rijrkl[0] * div;
-                c0p[1] = rklrl[1] + u2 * aij * rijrkl[1] * div;
-                c0p[2] = rklrl[2] + u2 * aij * rijrkl[2] * div;
+                c00[0] = rijrx[0] - u2 * akl * rijrkl[0] * div;
+                c00[1] = rijrx[1] - u2 * akl * rijrkl[1] * div;
+                c00[2] = rijrx[2] - u2 * akl * rijrkl[2] * div;
+                c0p[0] = rklrx[0] + u2 * aij * rijrkl[0] * div;
+                c0p[1] = rklrx[1] + u2 * aij * rijrkl[1] * div;
+                c0p[2] = rklrx[2] + u2 * aij * rijrkl[2] * div;
+                w[irys] *= fac1;
         }
 
-        switch (ng[3]) {
-                case 1: switch(ng[2]) {
-                        case 1: goto _g0_4d_default; // ssss
-                        case 2: switch (ng[1]) {
-                                case 1: _g0_4d_ng_1112(g, bc.c0p, rkrl, w,fac1); goto normal_end;
-                                case 2: _g0_4d_ng_2112(g, bc.c0p, rkrl, w,fac1); goto normal_end;
-                                default: goto error; }
-                        case 3: switch (ng[1]) {
-                                case 1: _g0_4d_ng_1113(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                case 2: _g0_4d_ng_2113(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                case 3: _g0_4d_ng_3113(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                default: goto error; }
-                        case 4: switch (ng[1]) {
-                                case 1: _g0_4d_ng_1114(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                case 2: _g0_4d_ng_2114(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                case 3: _g0_4d_ng_3114(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                case 4: _g0_4d_ng_4114(g, bc.c0p, bc.b01, rkrl, w, fac1); goto normal_end;
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                case 2: switch(ng[2]) {
-                        case 1: switch (ng[0]) {
-                                case 1: _g0_4d_ng_1112(g, bc.c00, rirj, w,fac1); goto normal_end;
-                                case 2: _g0_4d_ng_2112(g, bc.c00, rirj, w,fac1); goto normal_end;
-                                default: goto error; }
-                        case 2: switch (ng[1]) {
-                                case 1: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1122(g, bc.c00, bc.c0p, bc.b00, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2122(g, bc.c00, bc.c0p, bc.b00, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                case 2: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1222(g, bc.c00, bc.c0p, bc.b00, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2222(g, bc.c00, bc.c0p, bc.b00, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                default: goto error; }
-                        case 3: switch (ng[1]) {
-                                case 1: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1132(g, bc.c00, bc.c0p, bc.b00, bc.b01, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2132(g, bc.c00, bc.c0p, bc.b00, bc.b01, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                case 2: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1232(g, bc.c00, bc.c0p, bc.b00, bc.b01, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2232(g, bc.c00, bc.c0p, bc.b00, bc.b01, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                case 3: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1332(g, bc.c00, bc.c0p, bc.b00, bc.b01, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2332(g, bc.c00, bc.c0p, bc.b00, bc.b01, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                case 3: switch(ng[2]) {
-                        case 1: switch (ng[0]) {
-                                case 1: _g0_4d_ng_1113(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                case 2: _g0_4d_ng_2113(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                case 3: _g0_4d_ng_3113(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                default: goto error; }
-                        case 2: switch (ng[1]) {
-                                case 1: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1123(g, bc.c00, bc.c0p, bc.b00, bc.b10, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2123(g, bc.c00, bc.c0p, bc.b00, bc.b10, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 3: _g0_4d_ng_3123(g, bc.c00, bc.c0p, bc.b00, bc.b10, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                case 2: switch (ng[0]) {
-                                        case 1: _g0_4d_ng_1223(g, bc.c00, bc.c0p, bc.b00, bc.b10, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 2: _g0_4d_ng_2223(g, bc.c00, bc.c0p, bc.b00, bc.b10, rirj, rkrl, w, fac1); goto normal_end;
-                                        case 3: _g0_4d_ng_3223(g, bc.c00, bc.c0p, bc.b00, bc.b10, rirj, rkrl, w, fac1); goto normal_end;
-                                        default: goto error; }
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                case 4: switch(ng[2]) {
-                        case 1: switch (ng[0]) {
-                                case 1: _g0_4d_ng_1114(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                case 2: _g0_4d_ng_2114(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                case 3: _g0_4d_ng_3114(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                case 4: _g0_4d_ng_4114(g, bc.c00, bc.b10, rirj, w, fac1); goto normal_end;
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                default:
-_g0_4d_default:
-                        g0_2e_2d(g, &bc, w, fac1, envs);
-                        g0_2e_4d(g, rij->r1r2, rkl->r1r2, envs);
-        }
-normal_end:
-        return;
-error:
-        printf("Dimension error: %u %u %u %u\n", ng[0], ng[1], ng[2], ng[3]);
-        exit(1);
+        (*envs->f_g0_2d4d)(g, envs, &bc);
 }
 
 
@@ -1521,16 +1749,15 @@ static double rys_root1(double x)
         }
         return ww1;
 }
-double g0_2e_ssss(const RijSets *rij, const RijSets *rkl,
-                  const double fac, const CintEnvVars *envs)
+double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs)
 {
-        const double aij = rij->a12;
-        const double akl = rkl->a12;
+        const double aij = envs->aij;
+        const double akl = envs->akl;
         double a0, a1, x;
         double rijrkl[3];
-        rijrkl[0] = rij->r12[0] - rkl->r12[0];
-        rijrkl[1] = rij->r12[1] - rkl->r12[1];
-        rijrkl[2] = rij->r12[2] - rkl->r12[2];
+        rijrkl[0] = envs->rij[0] - envs->rkl[0];
+        rijrkl[1] = envs->rij[1] - envs->rkl[1];
+        rijrkl[2] = envs->rij[2] - envs->rkl[2];
 
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
@@ -1544,10 +1771,10 @@ double g0_2e_ssss(const RijSets *rij, const RijSets *rkl,
 /*
  * ( \nabla i j | kl )
  */
-void nabla1i_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs)
+void CINTnabla1i_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, n, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1585,10 +1812,10 @@ void nabla1i_2e(double *f, const double *g,
 /*
  * ( i \nabla j | kl )
  */
-void nabla1j_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs)
+void CINTnabla1j_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1630,10 +1857,10 @@ void nabla1j_2e(double *f, const double *g,
 /*
  * ( ij | \nabla k l )
  */
-void nabla1k_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs)
+void CINTnabla1k_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1670,10 +1897,10 @@ void nabla1k_2e(double *f, const double *g,
 /*
  * ( ij | k \nabla l )
  */
-void nabla1l_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs)
+void CINTnabla1l_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1715,10 +1942,10 @@ void nabla1l_2e(double *f, const double *g,
  * ri is the shift from the center R_O to the center of |i>
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
-void x1i_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *ri, const CintEnvVars *envs)
+void CINTx1i_2e(double *f, const double *g,
+                const unsigned int li, const unsigned int lj,
+                const unsigned int lk, const unsigned int ll,
+                const double *ri, const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1747,10 +1974,10 @@ void x1i_2e(double *f, const double *g,
 /*
  * ( i x^1 j | kl )
  */
-void x1j_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *rj, const CintEnvVars *envs)
+void CINTx1j_2e(double *f, const double *g,
+                const unsigned int li, const unsigned int lj,
+                const unsigned int lk, const unsigned int ll,
+                const double *rj, const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1780,10 +2007,10 @@ void x1j_2e(double *f, const double *g,
 /*
  * ( ij | x^1 k l )
  */
-void x1k_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *rk, const CintEnvVars *envs)
+void CINTx1k_2e(double *f, const double *g,
+                const unsigned int li, const unsigned int lj,
+                const unsigned int lk, const unsigned int ll,
+                const double *rk, const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;
@@ -1813,10 +2040,10 @@ void x1k_2e(double *f, const double *g,
 /*
  * ( i j | x^1 kl )
  */
-void x1l_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *rl, const CintEnvVars *envs)
+void CINTx1l_2e(double *f, const double *g,
+                const unsigned int li, const unsigned int lj,
+                const unsigned int lk, const unsigned int ll,
+                const double *rl, const CINTEnvVars *envs)
 {
         unsigned int i, j, k, l, ptr;
         const unsigned int di = envs->g_stride_i;

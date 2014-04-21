@@ -9,7 +9,7 @@
  */
 
 
-void rys_roots(const unsigned int nroots, double x, double *u, double *w);
+void CINTrys_roots(const unsigned int nroots, double x, double *u, double *w);
 static void Root123(unsigned int n, double X, double roots[], double weights[]);
 static void Root4(double X, double roots[], double weights[]);
 static void Root5(double X, double roots[], double weights[]);

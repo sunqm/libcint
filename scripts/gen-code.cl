@@ -114,6 +114,7 @@
 #include \"cint_bas.h\"
 #include \"cart2sph.h\"
 #include \"g2e.h\"
+#include \"optimizer.h\"
 #include \"cint1e.h\"
 #include \"cint2e.h\"
 #include \"misc.h\"
@@ -273,13 +274,13 @@ iz = idz[n];~%")
            (i-len (length i-rev))
            (j-len (length j-rev))
            (op-len (length op-rev))
-           (tot-len (+ i-len j-len op-len))
+           (tot-bits (+ i-len j-len op-len))
            (raw-script (eval-int raw-infix))
            (ts (car raw-script))
            (sf (cadr raw-script))
            (goutinc))
       (format fout "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */~%" bra-i op ket-j)
-      (format fout "static void gout1e_~a(double *g, const unsigned int *ng,
+      (format fout "static void CINTgout1e_~a(double *g, const unsigned int *ng,
 double *gout, const unsigned int nf, const unsigned int *idx,
 const double ai, const double aj,
 const unsigned int *shls,
@@ -297,9 +298,9 @@ const double *rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
 unsigned int ix, iy, iz, n;
 double *g0 = g;~%")
       (loop
-        for i in (range (ash 1 tot-len)) do
+        for i in (range (ash 1 tot-bits)) do
         (format fout "double *g~a = g~a  + ng[0] * ng[1] * 3;~%" (1+ i) i))
-      (format fout "double s[~a];~%" (expt 3 tot-len))
+      (format fout "double s[~a];~%" (expt 3 tot-bits))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout (append op ket-j) "j")
       (dump-declare-giao-ij fout bra-i (append op ket-j))
@@ -314,7 +315,7 @@ daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
             (fmt-j (mkstr "G1E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
 ;;; generate gout
-      (dump-s-1e fout tot-len)
+      (dump-s-1e fout tot-bits)
 ;;; dump result of eval-int
       (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
       (format fout "gout += ~a;~%}}~%" goutinc)
@@ -329,7 +330,7 @@ const int j_l = (unsigned int)bas(ANG_OF, j_sh);
 unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
       (format fout "ng[1] = j_l + ~a + 1;~%" (+ op-len j-len))
       (format fout "ng[0] = i_l + ~a + ng[1];~%" i-len)
-      (format fout "ng[GSHIFT] = ~a;~%" tot-len)
+      (format fout "ng[GSHIFT] = ~a;~%" tot-bits)
       (if (eql sf 'sf)
         (progn (format fout "ng[POS_E1] = 1;~%")
                (format fout "ng[TENSOR] = ~a;~%" goutinc))
@@ -339,23 +340,23 @@ unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
       (when (member 'g raw-infix)
         (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {~%")
         (if (eql sp 'spinor)
-           (format fout "int ip = len_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-int jp = len_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
-dset0(ip * jp * OF_CMPLX * ng[TENSOR], opij);~%")
+           (format fout "int ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+int jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+CINTdset0(ip * jp * OF_CMPLX * ng[TENSOR], opij);~%")
            (format fout "int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
 int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
-dset0(ip * jp * ng[TENSOR], opij);~%"))
+CINTdset0(ip * jp * ng[TENSOR], opij);~%"))
         (format fout "return 0; }~%"))
 ;;; determine function caller
-      (let ((intdrv (cond ((member 'nuc raw-infix) "cint1e_nuc_drv")
+      (let ((intdrv (cond ((member 'nuc raw-infix) "CINT1e_nuc_drv")
                           ((or (member 'rinv raw-infix)
                                (member 'nabla-rinv raw-infix))
-                           "cint1e_rinv_drv")
-                          (t "cint1e_drv")))
+                           "CINT1e_rinv_drv")
+                          (t "CINT1e_drv")))
             (rfac (factor-of raw-infix))
             (c2sor (name-c2sor "1e" sp sf ts)))
         (format fout "return ~a(opij, ng, ~a,~%" intdrv rfac)
-        (format fout "gout1e_~a, ~a,~%" intname c2sor)
+        (format fout "CINTgout1e_~a, ~a,~%" intname c2sor)
         (format fout "shls, atm, natm, bas, nbas, env); }~%C2F_(~a)~%" intname)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -395,8 +396,8 @@ dset0(ip * jp * ng[TENSOR], opij);~%"))
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
-dset0(~a, s);
-for (i = 0; i < ng[RYS_ROOTS]; i++) {~%" (expt 3 n))
+CINTdset0(~a, s);
+for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
   (loop
     for i upto (1- (expt 3 n)) do
     (let* ((ybin (dec-to-ybin i))
@@ -404,7 +405,7 @@ for (i = 0; i < ng[RYS_ROOTS]; i++) {~%" (expt 3 n))
            (xbin (- (ash 1 n) 1 ybin zbin)))
       (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
               i xbin ybin zbin)))
-  (format fout "}~%")) ; end do i = 1, ng[RYS_ROOTS]
+  (format fout "}~%")) ; end do i = 1, envs->nrys_roots
 
 (defun gen-code-int2e (fout intname raw-infix &optional (sp 'spinor))
   (destructuring-bind (op bra-i ket-j bra-k ket-l)
@@ -419,7 +420,7 @@ for (i = 0; i < ng[RYS_ROOTS]; i++) {~%" (expt 3 n))
            (k-len (length k-rev))
            (l-len (length l-rev))
            (op-len (length op-rev))
-           (tot-len (+ i-len j-len op-len k-len l-len))
+           (tot-bits (+ i-len j-len op-len k-len l-len))
            (raw-script (eval-int raw-infix))
            (ts1 (car raw-script))
            (sf1 (cadr raw-script))
@@ -430,12 +431,13 @@ for (i = 0; i < ng[RYS_ROOTS]; i++) {~%" (expt 3 n))
               bra-k bra-i op ket-j ket-l)
       (format fout " * = (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k ~{~a ~}l) */~%"
               bra-i ket-j op bra-k ket-l)
-      (format fout "static void gout2e_~a(double *g,
-double *gout, const unsigned int *idx, const CintEnvVars *envs, int gout_empty) {~%" intname)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate function gout2e
+      (format fout "static void CINTgout2e_~a(double *g,
+double *gout, const unsigned int *idx, const CINTEnvVars *envs, int gout_empty) {~%" intname)
       (format fout "const unsigned int INC1 = 1;
 const double D1 = 1;
 const double *env = envs->env;
-const unsigned int *ng = envs->ng;
 const unsigned int nf = envs->nf;
 const unsigned int i_l = envs->i_l;
 const unsigned int j_l = envs->j_l;
@@ -448,9 +450,9 @@ const double *rl = envs->rl;
 unsigned int ix, iy, iz, i, n;
 double *g0 = g;~%")
       (loop
-        for i in (range (ash 1 tot-len)) do
+        for i in (range (ash 1 tot-bits)) do
         (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
-      (format fout "double s[~a];~%" (expt 3 tot-len))
+      (format fout "double s[~a];~%" (expt 3 tot-bits))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout ket-j "j")
       (dump-declare-dri-for-rc fout bra-k "k")
@@ -472,68 +474,70 @@ daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len)))
       (format fout "if (gout_empty) {~%")
 ;;; generate gout
-      (dump-s-2e fout tot-len)
+      (dump-s-2e fout tot-bits)
 ;;; dump result of eval-int
       (setf goutinc (gen-c-block fout "gout[~a] =" (last1 raw-script)))
       (format fout "gout += ~a;~%}} else {~%" goutinc)
-      (dump-s-2e fout tot-len)
+      (dump-s-2e fout tot-bits)
 ;;; dump result of eval-int
       (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
       (format fout "gout += ~a;~%}}}~%" goutinc)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate optimizer for function int2e
+      (format fout "void ~a_optimizer(CINTOpt **opt, const int *atm, const int natm,
+const int *bas, const int nbas, const double *env) {~%" intname)
+      (format fout "unsigned int ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0, 0};~%"
+              i-len j-len k-len (+ op-len l-len))
+      (format fout "CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate function int2e
       (format fout "int ~a(double *opkijl, const unsigned int *shls,
 const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {~%" intname)
-      (format fout "const unsigned int i_sh = shls[0];
-const unsigned int j_sh = shls[1];
-const unsigned int k_sh = shls[2];
-const unsigned int l_sh = shls[3];
-const unsigned int i_l = bas(ANG_OF, i_sh);
-const unsigned int j_l = bas(ANG_OF, j_sh);
-const unsigned int k_l = bas(ANG_OF, k_sh);
-const unsigned int l_l = bas(ANG_OF, l_sh);
-unsigned int ng[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};~%")
-      (format fout "ng[0] = i_l + ~a + 1;~%" i-len)
-      (format fout "ng[1] = k_l + ~a + 1;~%" k-len)
-      (format fout "ng[2] = l_l + ~a + ng[1];~%" (+ op-len l-len))
-      (format fout "ng[3] = j_l + ~a + ng[0];~%" j-len)
-      (format fout "ng[GSHIFT] = ~a;~%" tot-len)
-      (if (eql sf1 'sf)
-        (format fout "ng[POS_E1] = 1;~%")
-        (format fout "ng[POS_E1] = 4;~%"))
-      (if (eql sf2 'sf)
-        (format fout "ng[POS_E2] = 1;~%")
-        (format fout "ng[POS_E2] = 4;~%"))
-      (cond ((and (eql sf1 'sf) (eql sf2 'sf))
-             (format fout "ng[TENSOR] = ~a;~%" goutinc))
-            ((and (eql sf1 'si) (eql sf2 'si))
-             (format fout "ng[TENSOR] = ~a;~%" (/ goutinc 16)))
-            (t (format fout "ng[TENSOR] = ~a;~%" (/ goutinc 4))))
+const int *bas, const int nbas, const double *env, CINTOpt *opt) {~%" intname)
+      (format fout "unsigned int ng[] = {~d, ~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
+              i-len j-len k-len (+ op-len l-len) tot-bits
+              (if (eql sf1 'sf) 1 4) (if (eql sf2 'sf) 1 4)
+              (cond ((and (eql sf1 'sf) (eql sf2 'sf)) goutinc)
+                    ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
+                    (t (/ goutinc 4))))
 ;;; determine factor
       (when (member 'g raw-infix)
-        (let ((set0sph "unsigned int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
-unsigned int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
-unsigned int kp = (k_l * 2 + 1) * bas(NCTR_OF,k_sh);
-unsigned int lp = (l_l * 2 + 1) * bas(NCTR_OF,l_sh);
-dset0(kp * ip * jp * lp * ng[TENSOR], opkijl);")
-              (set0spin "unsigned int ip = len_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-unsigned int jp = len_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
-unsigned int kp = len_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
-unsigned int lp = len_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
-dset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);"))
+        (format fout "const unsigned int i_sh = shls[0];
+const unsigned int j_sh = shls[1];
+const unsigned int k_sh = shls[2];
+const unsigned int l_sh = shls[3];~%")
+        (let ((set0sph "unsigned int ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
+unsigned int jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
+unsigned int kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
+unsigned int lp = (bas(ANG_OF,l_sh) * 2 + 1) * bas(NCTR_OF,l_sh);
+CINTdset0(kp * ip * jp * lp * ng[TENSOR], opkijl);")
+              (set0spin "unsigned int ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+unsigned int jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+unsigned int kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+unsigned int lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
+CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);"))
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
 ~a~%return 0; }~%" (if (eql sp 'spinor) set0spin set0sph)))
         (when (or (member 'g bra-k) (member 'g ket-l))
           (format fout "if (bas(ATOM_OF, k_sh) == bas(ATOM_OF, l_sh)) {
 ~a~%return 0; }~%" (if (eql sp 'spinor) set0spin set0sph)))))
+;;; initialize CINTEnvVars
+      (format fout "CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
+      (format fout "envs.f_gout = &CINTgout2e_~a;~%" intname)
+      (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix))
 ;;; determine function caller
-      (let ((rfac (factor-of raw-infix))
-            (c2sor_e1 (name-c2sor "2e1" sp sf1 ts1))
-            (c2sor_e2 (name-c2sor "2e2" sp sf2 ts2)))
-        (format fout "return cint2e_drv(opkijl, ng, ~a,~%" rfac)
-        (format fout "gout2e_~a, ~a, ~a,~%" intname c2sor_e1 c2sor_e2)
-        (format fout "shls, atm, natm, bas, nbas, env); }~%C2F_(~a)~%" intname)))))
+      (cond ((eql sp 'spinor)
+             (format fout "return CINT2e_spinor_drv(opkijl, &envs, opt, ~a, ~a);~%}~%"
+                     (name-c2sor "2e1" sp sf1 ts1)
+                     (name-c2sor "2e2" sp sf2 ts2)))
+            ((eql sp 'spheric)
+             (format fout "return CINT2e_spheric_drv(opkijl, &envs, opt);~%}~%"))
+            ((eql sp 'cart)
+             (format fout "return CINT2e_cart_drv(opkijl, &envs, opt);~%}~%")))
+      (format fout "OPTIMIZER2F_(~a_optimizer);~%C2Fo_(~a)~%"
+              intname intname))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

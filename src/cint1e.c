@@ -18,7 +18,7 @@
 /*
  * 1e GTO integral basic loop for < i|j>, no 1/r
  */
-int cint1e_loop(double *gctr, const unsigned int *ng, const double fac,
+int CINT1e_loop(double *gctr, const unsigned int *ng, double fac,
                 void (*const f_gout)(), const unsigned int *shls,
                 const int *atm, const int *bas, const double *env)
 {
@@ -28,8 +28,8 @@ int cint1e_loop(double *gctr, const unsigned int *ng, const double fac,
         const int j_l = bas(ANG_OF, j_sh);
         const int i_ctr = bas(NCTR_OF, i_sh);
         const int j_ctr = bas(NCTR_OF, j_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
+        const int nfi = CINTlen_cart(i_l);
+        const int nfj = CINTlen_cart(j_l);
         const int n_comp = ng[POS_E1] * ng[TENSOR];
         const int nf = nfi * nfj;
         const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
@@ -46,13 +46,15 @@ int cint1e_loop(double *gctr, const unsigned int *ng, const double fac,
         double *const gout = (double *)malloc(sizeof(double) * nf * n_comp);
         double *const gctri = (double *)malloc(sizeof(double) * nf * i_ctr * n_comp);
 
-        g1e_index_xyz(idx, ng, shls, bas);
+        CINTg1e_index_xyz(idx, ng, shls, bas);
 
-        rrij = square_dist(ri, rj);
+        rrij = CINTsquare_dist(ri, rj);
+        fac *= SQRTPI * PI
+             * CINTcommon_fac_sp(i_l) * CINTcommon_fac_sp(j_l);
 
         for (jp = 0; jp < bas(NPRIM_OF, j_sh); jp++) {
                 n = nf * i_ctr * n_comp;
-                dset0(n, gctri);
+                CINTdset0(n, gctri);
                 for (ip = 0; ip < bas(NPRIM_OF, i_sh); ip++) {
                         aij = ai[ip] + aj[jp];
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
@@ -60,20 +62,20 @@ int cint1e_loop(double *gctr, const unsigned int *ng, const double fac,
                                 continue;
                         has_value = 1;
 
-                        dij = SQRTPI * PI * exp(-eij) / (aij * sqrt(aij)) * fac;
-                        g_ovlp(g, ng, ai[ip], aj[jp], ri, rj, dij);
+                        dij = exp(-eij) / (aij * sqrt(aij)) * fac;
+                        CINTg_ovlp(g, ng, ai[ip], aj[jp], ri, rj, dij);
 
-                        dset0(nf * n_comp, gout);
+                        CINTdset0(nf * n_comp, gout);
                         (*f_gout)(g, ng, gout, nf, idx, ai[ip], aj[jp],
                                   shls, atm, bas, env);
 
                         n = nf * n_comp;
-                        prim_to_ctr(gctri, n, gout, 1, bas(NPRIM_OF, i_sh),
-                                    i_ctr, ci+ip);
+                        CINTprim_to_ctr(gctri, n, gout, 1, bas(NPRIM_OF, i_sh),
+                                        i_ctr, ci+ip);
                 }
                 n = nf * i_ctr;
-                prim_to_ctr(gctr, n, gctri, n_comp, bas(NPRIM_OF, j_sh),
-                            j_ctr, cj+jp);
+                CINTprim_to_ctr(gctr, n, gctri, n_comp, bas(NPRIM_OF, j_sh),
+                                j_ctr, cj+jp);
         }
         free(g);
         free(idx);
@@ -88,8 +90,8 @@ int cint1e_loop(double *gctr, const unsigned int *ng, const double fac,
  * for given nuclear model, calculate temporary parameter tau
  * aij = ai + aj
  */
-static double nuc_mod(const double aij, const int nuc_id,
-                      const int *atm, const double *env)
+static double CINTnuc_mod(const double aij, const int nuc_id,
+                          const int *atm, const double *env)
 {
         const int mass[109] = { \
                 1  , 4  , 7  , 9  , 11 , 12 , 14 , 16 , 19  , 20 , \
@@ -125,8 +127,8 @@ static double nuc_mod(const double aij, const int nuc_id,
                         return 1;
         }
 }
-static double no_nuc_mod(const double aij, const int nuc_id,
-                         const int *atm, const double *env)
+static double CINTno_nuc_mod(const double aij, const int nuc_id,
+                             const int *atm, const double *env)
 {
         return 1;
 }
@@ -136,7 +138,7 @@ static double no_nuc_mod(const double aij, const int nuc_id,
  * if nuc_id >= 0: nuclear attraction, use nuclear model
  * if nuc_id <  0: 1/r potential, do not use nuclear model
  */
-int cint1e_nuc_loop(double *gctr, const unsigned int *ng, const double fac,
+int CINT1e_nuc_loop(double *gctr, const unsigned int *ng, double fac,
                 void (*const f_gout)(), const int nuc_id,
                 const unsigned int *shls,
                 const int *atm, const int *bas, const double *env)
@@ -147,8 +149,8 @@ int cint1e_nuc_loop(double *gctr, const unsigned int *ng, const double fac,
         const int j_l = bas(ANG_OF, j_sh);
         const int i_ctr = bas(NCTR_OF, i_sh);
         const int j_ctr = bas(NCTR_OF, j_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
+        const int nfi = CINTlen_cart(i_l);
+        const int nfj = CINTlen_cart(j_l);
         const int nf = nfi * nfj;
         const int n_comp = ng[POS_E1] * ng[TENSOR];
         const double *ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
@@ -171,19 +173,21 @@ int cint1e_nuc_loop(double *gctr, const unsigned int *ng, const double fac,
 
         if (nuc_id < 0) {
                 cr = &env[PTR_RINV_ORIG];
-                f_nuc_mod = no_nuc_mod;
+                f_nuc_mod = CINTno_nuc_mod;
         } else {
                 cr = &env[atm(PTR_COORD, nuc_id)],
-                f_nuc_mod = nuc_mod;
+                f_nuc_mod = CINTnuc_mod;
         }
 
-        g1e_index_xyz(idx, ng, shls, bas);
+        CINTg1e_index_xyz(idx, ng, shls, bas);
 
-        rrij = square_dist(ri, rj);
+        rrij = CINTsquare_dist(ri, rj);
+        fac *= 2 * M_PI
+             * CINTcommon_fac_sp(i_l) * CINTcommon_fac_sp(j_l);
 
         for (jp = 0; jp < bas(NPRIM_OF, j_sh); jp++) {
                 n = nf * i_ctr * n_comp;
-                dset0(n, gctri);
+                CINTdset0(n, gctri);
                 for (ip = 0; ip < bas(NPRIM_OF, i_sh); ip++) {
                         aij = ai[ip] + aj[jp];
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
@@ -195,27 +199,27 @@ int cint1e_nuc_loop(double *gctr, const unsigned int *ng, const double fac,
                         rij[1] = (ai[ip] * ri[1] + aj[jp] * rj[1]) / aij;
                         rij[2] = (ai[ip] * ri[2] + aj[jp] * rj[2]) / aij;
                         tau = (*f_nuc_mod)(aij, nuc_id, atm, env);
-                        x = aij * square_dist(rij, cr) * tau * tau;
-                        rys_roots(ng[RYS_ROOTS], x, u, w);
+                        x = aij * CINTsquare_dist(rij, cr) * tau * tau;
+                        CINTrys_roots(ng[RYS_ROOTS], x, u, w);
 
-                        dij = 2 * M_PI * exp(-eij) / aij * fac;
-                        dset0(nf * n_comp, gout);
+                        dij = exp(-eij) / aij * fac;
+                        CINTdset0(nf * n_comp, gout);
                         for (i = 0; i < ng[RYS_ROOTS]; i++) {
                                 t2 = u[i] / (1 + u[i]) * tau * tau;
-                                g_nuc(g, ng, aij, rij, ri, rj,
-                                      cr, t2, dij * w[i] * tau);
+                                CINTg_nuc(g, ng, aij, rij, ri, rj,
+                                          cr, t2, dij * w[i] * tau);
 
                                 (*f_gout)(g, ng, gout, nf, idx, ai[ip], aj[jp],
                                           shls, atm, bas, env);
                         }
 
                         n = nf * n_comp;
-                        prim_to_ctr(gctri, n, gout, 1, bas(NPRIM_OF, i_sh),
-                                    i_ctr, ci+ip);
+                        CINTprim_to_ctr(gctri, n, gout, 1, bas(NPRIM_OF, i_sh),
+                                        i_ctr, ci+ip);
                 }
                 n = nf * i_ctr;
-                prim_to_ctr(gctr, n, gctri, n_comp, bas(NPRIM_OF, j_sh),
-                            j_ctr, cj+jp);
+                CINTprim_to_ctr(gctr, n, gctri, n_comp, bas(NPRIM_OF, j_sh),
+                                j_ctr, cj+jp);
         }
         free(g);
         free(idx);
@@ -229,7 +233,7 @@ int cint1e_nuc_loop(double *gctr, const unsigned int *ng, const double fac,
 /*
  * 1e integrals <i|O|j> without 1/r
  */
-int cint1e_drv(double *opij, unsigned int *ng, const double fac,
+int CINT1e_drv(double *opij, unsigned int *ng, double fac,
                void (*const f_gout)(), void (*const f_c2s)(),
                const unsigned int *shls, const int *atm, const int natm,
                const int *bas, const int nbas, const double *env)
@@ -240,8 +244,8 @@ int cint1e_drv(double *opij, unsigned int *ng, const double fac,
         const int j_l = bas(ANG_OF, j_sh);
         const int i_ctr = bas(NCTR_OF, i_sh);
         const int j_ctr = bas(NCTR_OF, j_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
+        const int nfi = CINTlen_cart(i_l);
+        const int nfj = CINTlen_cart(j_l);
         const int nc = nfi * nfj * i_ctr * j_ctr * ng[POS_E1];
         int ip, jp, nop;
         int n;
@@ -249,26 +253,26 @@ int cint1e_drv(double *opij, unsigned int *ng, const double fac,
         double *const gctr = (double *)malloc(sizeof(double) * nc * ng[TENSOR]);
         double *pgctr = gctr;
 
-        dset0(nc*ng[TENSOR], gctr);
-        has_value = cint1e_loop(gctr, ng, fac, f_gout,
+        CINTdset0(nc*ng[TENSOR], gctr);
+        has_value = CINT1e_loop(gctr, ng, fac, f_gout,
                                 shls, atm, bas, env);
 
         if (f_c2s == c2s_sph_1e) {
-                ip = cgtos_spheric(i_sh, bas);
-                jp = cgtos_spheric(j_sh, bas);
+                ip = CINTcgtos_spheric(i_sh, bas);
+                jp = CINTcgtos_spheric(j_sh, bas);
                 nop = ip * jp;
         } else if (f_c2s == c2s_cart_1e) {
-                ip = cgtos_cart(i_sh, bas);
-                jp = cgtos_cart(j_sh, bas);
+                ip = CINTcgtos_cart(i_sh, bas);
+                jp = CINTcgtos_cart(j_sh, bas);
                 nop = ip * jp;
         } else {
-                ip = cgtos_spinor(i_sh, bas);
-                jp = cgtos_spinor(j_sh, bas);
+                ip = CINTcgtos_spinor(i_sh, bas);
+                jp = CINTcgtos_spinor(j_sh, bas);
                 nop = ip * jp * OF_CMPLX;
         }
 
         if (!has_value) {
-                dset0(nop * ng[TENSOR], opij);
+                CINTdset0(nop * ng[TENSOR], opij);
         } else {
                 for (n = 0; n < ng[TENSOR]; n++) {
                         (*f_c2s)(opij, pgctr, shls, bas);
@@ -284,7 +288,7 @@ int cint1e_drv(double *opij, unsigned int *ng, const double fac,
 /*
  * 1e integrals <i|O|j> with 1/r
  */
-int cint1e_rinv_drv(double *opij, unsigned int *ng, const double fac,
+int CINT1e_rinv_drv(double *opij, unsigned int *ng, double fac,
                     void (*const f_gout)(), void (*const f_c2s)(),
                     const unsigned int *shls, const int *atm, const int natm,
                     const int *bas, const int nbas, const double *env)
@@ -295,8 +299,8 @@ int cint1e_rinv_drv(double *opij, unsigned int *ng, const double fac,
         const int j_l = bas(ANG_OF, j_sh);
         const int i_ctr = bas(NCTR_OF, i_sh);
         const int j_ctr = bas(NCTR_OF, j_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
+        const int nfi = CINTlen_cart(i_l);
+        const int nfj = CINTlen_cart(j_l);
         const int nc = nfi * nfj * i_ctr * j_ctr * ng[POS_E1];
         int ip, jp, nop;
         int n;
@@ -305,26 +309,26 @@ int cint1e_rinv_drv(double *opij, unsigned int *ng, const double fac,
         double *pgctr = gctr;
 
         ng[RYS_ROOTS] = (ng[0] + 1) / 2; // li + lj + 2
-        dset0(nc*ng[TENSOR], gctr);
-        has_value = cint1e_nuc_loop(gctr, ng, fac, f_gout, -1,
+        CINTdset0(nc*ng[TENSOR], gctr);
+        has_value = CINT1e_nuc_loop(gctr, ng, fac, f_gout, -1,
                                     shls, atm, bas, env);
 
         if (f_c2s == c2s_sph_1e) {
-                ip = cgtos_spheric(i_sh, bas);
-                jp = cgtos_spheric(j_sh, bas);
+                ip = CINTcgtos_spheric(i_sh, bas);
+                jp = CINTcgtos_spheric(j_sh, bas);
                 nop = ip * jp;
         } else if (f_c2s == c2s_cart_1e) {
-                ip = cgtos_cart(i_sh, bas);
-                jp = cgtos_cart(j_sh, bas);
+                ip = CINTcgtos_cart(i_sh, bas);
+                jp = CINTcgtos_cart(j_sh, bas);
                 nop = ip * jp;
         } else {
-                ip = cgtos_spinor(i_sh, bas);
-                jp = cgtos_spinor(j_sh, bas);
+                ip = CINTcgtos_spinor(i_sh, bas);
+                jp = CINTcgtos_spinor(j_sh, bas);
                 nop = ip * jp * OF_CMPLX;
         }
 
         if (!has_value) {
-                dset0(nop * ng[TENSOR], opij);
+                CINTdset0(nop * ng[TENSOR], opij);
         } else {
                 for (n = 0; n < ng[TENSOR]; n++) {
                         (*f_c2s)(opij, pgctr, shls, bas);
@@ -341,7 +345,7 @@ int cint1e_rinv_drv(double *opij, unsigned int *ng, const double fac,
  * 1e integrals <i|O|j> with nuclear attraction
  * TODO: add the gaussian nuclear model
  */
-int cint1e_nuc_drv(double *opij, unsigned int *ng, const double fac,
+int CINT1e_nuc_drv(double *opij, unsigned int *ng, double fac,
                    void (*const f_gout)(), void (*const f_c2s)(),
                    const unsigned int *shls, const int *atm, const int natm,
                    const int *bas, const int nbas, const double *env)
@@ -352,8 +356,8 @@ int cint1e_nuc_drv(double *opij, unsigned int *ng, const double fac,
         const int j_l = bas(ANG_OF, j_sh);
         const int i_ctr = bas(NCTR_OF, i_sh);
         const int j_ctr = bas(NCTR_OF, j_sh);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
+        const int nfi = CINTlen_cart(i_l);
+        const int nfj = CINTlen_cart(j_l);
         const int nc = nfi * nfj * i_ctr * j_ctr * ng[POS_E1];
         int has_value = 0, has_value0;
         int ip, jp, nop;
@@ -362,29 +366,29 @@ int cint1e_nuc_drv(double *opij, unsigned int *ng, const double fac,
         double *pgctr = gctr;
 
         ng[RYS_ROOTS] = (ng[0] + 1) / 2; // li + lj + 2
-        dset0(nc * ng[TENSOR], gctr);
+        CINTdset0(nc * ng[TENSOR], gctr);
         for (n = 0; n < natm; n++) {
-                has_value0 = cint1e_nuc_loop(gctr, ng, -fabs(atm(CHARGE_OF,n))*fac,
+                has_value0 = CINT1e_nuc_loop(gctr, ng, -fabs(atm(CHARGE_OF,n))*fac,
                                              f_gout, n, shls, atm, bas, env);
                 has_value = has_value || has_value0;
         }
 
         if (f_c2s == c2s_sph_1e) {
-                ip = cgtos_spheric(i_sh, bas);
-                jp = cgtos_spheric(j_sh, bas);
+                ip = CINTcgtos_spheric(i_sh, bas);
+                jp = CINTcgtos_spheric(j_sh, bas);
                 nop = ip * jp;
         } else if (f_c2s == c2s_cart_1e) {
-                ip = cgtos_cart(i_sh, bas);
-                jp = cgtos_cart(j_sh, bas);
+                ip = CINTcgtos_cart(i_sh, bas);
+                jp = CINTcgtos_cart(j_sh, bas);
                 nop = ip * jp;
         } else {
-                ip = cgtos_spinor(i_sh, bas);
-                jp = cgtos_spinor(j_sh, bas);
+                ip = CINTcgtos_spinor(i_sh, bas);
+                jp = CINTcgtos_spinor(j_sh, bas);
                 nop = ip * jp * OF_CMPLX;
         }
 
         if (!has_value) {
-                dset0(nop * ng[TENSOR], opij);
+                CINTdset0(nop * ng[TENSOR], opij);
         } else {
                 for (n = 0; n < ng[TENSOR]; n++) {
                         (*f_c2s)(opij, pgctr, shls, bas);
@@ -430,7 +434,7 @@ int cint1e_ovlp_sph(double *opij, const int *shls,
         ng[1] = j_l     + 1;     // 0:j_l,
         ng[0] = i_l     + ng[1]; // 0:nmax, nmax = li + lj, 0:i_l
 
-        return cint1e_drv(opij, ng, 1, &gout1e, &c2s_sph_1e,
+        return CINT1e_drv(opij, ng, 1, &gout1e, &c2s_sph_1e,
                           shls, atm, natm, bas, nbas, env);
 }
 
@@ -447,7 +451,7 @@ int cint1e_ovlp(double *opij, const int *shls,
         ng[1] = j_l     + 1;     // 0:j_l,
         ng[0] = i_l     + ng[1]; // 0:nmax, nmax = li + lj, 0:i_l
 
-        return cint1e_drv(opij, ng, 1, &gout1e, &c2s_sf_1e,
+        return CINT1e_drv(opij, ng, 1, &gout1e, &c2s_sf_1e,
                           shls, atm, natm, bas, nbas, env);
 }
 
@@ -464,7 +468,7 @@ int cint1e_nuc_sph(double *opij, const int *shls,
         ng[1] = j_l     + 1;     // 0:j_l,
         ng[0] = i_l     + ng[1]; // 0:nmax, nmax = li + lj, 0:i_l
 
-        return cint1e_nuc_drv(opij, ng, 1, gout1e, c2s_sph_1e,
+        return CINT1e_nuc_drv(opij, ng, 1, gout1e, c2s_sph_1e,
                               shls, atm, natm, bas, nbas, env);
 }
 
@@ -481,7 +485,7 @@ int cint1e_nuc(double *opij, const int *shls,
         ng[1] = j_l     + 1;     // 0:j_l,
         ng[0] = i_l     + ng[1]; // 0:nmax, nmax = li + lj, 0:i_l
 
-        return cint1e_nuc_drv(opij, ng, 1, gout1e, c2s_sf_1e,
+        return CINT1e_nuc_drv(opij, ng, 1, gout1e, c2s_sf_1e,
                               shls, atm, natm, bas, nbas, env);
 }
 

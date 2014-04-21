@@ -36,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = cartesian_c$(EXEEXT) spheric_c$(EXEEXT) \
 	spinor_c$(EXEEXT) cartesian_f$(EXEEXT) spheric_f$(EXEEXT) \
-	spinor_f$(EXEEXT)
+	spinor_f$(EXEEXT) time_c2h6$(EXEEXT) time_c60$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -69,6 +69,12 @@ spinor_c_LDADD = $(LDADD)
 am_spinor_f_OBJECTS = fortran_call_spinor.$(OBJEXT)
 spinor_f_OBJECTS = $(am_spinor_f_OBJECTS)
 spinor_f_LDADD = $(LDADD)
+am_time_c2h6_OBJECTS = time_c2h6.$(OBJEXT)
+time_c2h6_OBJECTS = $(am_time_c2h6_OBJECTS)
+time_c2h6_LDADD = $(LDADD)
+am_time_c60_OBJECTS = time_c2h6.$(OBJEXT)
+time_c60_OBJECTS = $(am_time_c60_OBJECTS)
+time_c60_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -93,10 +99,10 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(cartesian_c_SOURCES) $(cartesian_f_SOURCES) \
 	$(spheric_c_SOURCES) $(spheric_f_SOURCES) $(spinor_c_SOURCES) \
-	$(spinor_f_SOURCES)
+	$(spinor_f_SOURCES) $(time_c2h6_SOURCES) $(time_c60_SOURCES)
 DIST_SOURCES = $(cartesian_c_SOURCES) $(cartesian_f_SOURCES) \
 	$(spheric_c_SOURCES) $(spheric_f_SOURCES) $(spinor_c_SOURCES) \
-	$(spinor_f_SOURCES)
+	$(spinor_f_SOURCES) $(time_c2h6_SOURCES) $(time_c60_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -222,6 +228,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/src/include
 AM_LDFLAGS = -L../src -lcint
+time_c2h6_SOURCES = time_c2h6.c
+time_c60_SOURCES = time_c2h6.c
 cartesian_c_SOURCES = c_call_cartesian.c
 spheric_c_SOURCES = c_call_spheric.c
 spinor_c_SOURCES = c_call_spinor.c
@@ -289,6 +297,12 @@ spinor_c$(EXEEXT): $(spinor_c_OBJECTS) $(spinor_c_DEPENDENCIES)
 spinor_f$(EXEEXT): $(spinor_f_OBJECTS) $(spinor_f_DEPENDENCIES) 
 	@rm -f spinor_f$(EXEEXT)
 	$(FCLINK) $(spinor_f_OBJECTS) $(spinor_f_LDADD) $(LIBS)
+time_c2h6$(EXEEXT): $(time_c2h6_OBJECTS) $(time_c2h6_DEPENDENCIES) 
+	@rm -f time_c2h6$(EXEEXT)
+	$(LINK) $(time_c2h6_OBJECTS) $(time_c2h6_LDADD) $(LIBS)
+time_c60$(EXEEXT): $(time_c60_OBJECTS) $(time_c60_DEPENDENCIES) 
+	@rm -f time_c60$(EXEEXT)
+	$(LINK) $(time_c60_OBJECTS) $(time_c60_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -299,6 +313,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c_call_cartesian.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c_call_spheric.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c_call_spinor.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time_c2h6.Po@am__quote@
 
 .F90.o:
 	$(PPFCCOMPILE) -c -o $@ $<

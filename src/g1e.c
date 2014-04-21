@@ -10,13 +10,13 @@
 #include "g1e.h"
 
 
-void g1e_index_xyz(unsigned int idx[], const unsigned int *ng,
-                   const unsigned int shls[], const int *bas)
+void CINTg1e_index_xyz(unsigned int idx[], const unsigned int *ng,
+                       const unsigned int shls[], const int *bas)
 {
         const int i_l = bas(ANG_OF, shls[0]);
         const int j_l = bas(ANG_OF, shls[1]);
-        const int nfi = len_cart(i_l);
-        const int nfj = len_cart(j_l);
+        const int nfi = CINTlen_cart(i_l);
+        const int nfj = CINTlen_cart(j_l);
         int i, j, n;
         int ofx, ofy, ofz;
         unsigned int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
@@ -24,8 +24,8 @@ void g1e_index_xyz(unsigned int idx[], const unsigned int *ng,
         unsigned int *idy = idx + nfi * nfj;
         unsigned int *idz = idx + nfi * nfj * 2;
 
-        cart_comp(i_nx, i_ny, i_nz, i_l);
-        cart_comp(j_nx, j_ny, j_nz, j_l);
+        CINTcart_comp(i_nx, i_ny, i_nz, i_l);
+        CINTcart_comp(j_nx, j_ny, j_nz, j_l);
 
         ofx = 0;
         ofy = ng[0] * ng[1];
@@ -42,9 +42,9 @@ void g1e_index_xyz(unsigned int idx[], const unsigned int *ng,
 }
 
 
-void g_ovlp(double *g, const unsigned int *ng,
-            const double ai, const double aj,
-            const double *ri, const double *rj, const double fac)
+void CINTg_ovlp(double *g, const unsigned int *ng,
+                const double ai, const double aj,
+                const double *ri, const double *rj, const double fac)
 {
         const int nmax = ng[0] - 1;
         const int lj = ng[1] - 1;
@@ -88,10 +88,10 @@ void g_ovlp(double *g, const unsigned int *ng,
         }
 }
 
-void g_nuc(double *g, const unsigned int *ng,
-           const double aij, const double *rij,
-           const double *ri, const double *rj,
-           const double *cr, const double t2, const double fac)
+void CINTg_nuc(double *g, const unsigned int *ng,
+               const double aij, const double *rij,
+               const double *ri, const double *rj,
+               const double *cr, const double t2, const double fac)
 {
         const int nmax = ng[0] - 1;
         const int lj = ng[1] - 1;
@@ -134,8 +134,8 @@ void g_nuc(double *g, const unsigned int *ng,
         }
 }
 
-void nabla1i_1e(double *f, const double *g, const unsigned int *ng,
-                const int li, const int lj, const double ai)
+void CINTnabla1i_1e(double *f, const double *g, const unsigned int *ng,
+                    const int li, const int lj, const double ai)
 {
         int i, j, ptr;
         const double *gx = g;
@@ -160,8 +160,8 @@ void nabla1i_1e(double *f, const double *g, const unsigned int *ng,
         }
 }
 
-void nabla1j_1e(double *f, const double *g, const unsigned int *ng,
-                const int li, const int lj, const double aj)
+void CINTnabla1j_1e(double *f, const double *g, const unsigned int *ng,
+                    const int li, const int lj, const double aj)
 {
         int i, j, ptr;
         const int dj = ng[0];
@@ -194,8 +194,8 @@ void nabla1j_1e(double *f, const double *g, const unsigned int *ng,
  * ri is the shift from the center R_O to the center of |i>
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
-void x1i_1e(double *f, const double *g, const unsigned int *ng,
-            const int li, const int lj, const double ri[3])
+void CINTx1i_1e(double *f, const double *g, const unsigned int *ng,
+                const int li, const int lj, const double ri[3])
 {
         int i, j, ptr;
         const double *gx = g;
@@ -216,8 +216,8 @@ void x1i_1e(double *f, const double *g, const unsigned int *ng,
         }
 }
 
-void x1j_1e(double *f, const double *g, const unsigned int *ng,
-            const int li, const int lj, const double rj[3])
+void CINTx1j_1e(double *f, const double *g, const unsigned int *ng,
+                const int li, const int lj, const double rj[3])
 {
         int i, j, ptr;
         const int dj = ng[0];
@@ -248,9 +248,9 @@ void x1j_1e(double *f, const double *g, const unsigned int *ng,
  * shl   nth shell
  * ip    ith-1 primitive GTO
  */
-void prim_to_ctr(double *gc, const unsigned int nf, const double *gp,
-                 const unsigned int inc, const unsigned int nprim,
-                 const unsigned int nctr, const double *pcoeff)
+void CINTprim_to_ctr(double *gc, const unsigned int nf, const double *gp,
+                     const unsigned int inc, const unsigned int nprim,
+                     const unsigned int nctr, const double *pcoeff)
 {
         const unsigned int INC1 = 1;
         unsigned int n, i;
@@ -259,11 +259,24 @@ void prim_to_ctr(double *gc, const unsigned int nf, const double *gp,
         for (i = 0; i < inc; i++) {
                 //dger(nf, nctr, 1.d0, gp(i+1), inc, env(ptr), nprim, gc(1,i*nctr+1), nf)
                 for (n = 0; n < nctr; n++) {
-                        if (pcoeff[nprim*n] != 0)
+                        if (pcoeff[nprim*n] != 0) {
                                 daxpy_(&nf, pcoeff+nprim*n, gp+i, &inc, pgc, &INC1);
+                        }
                         // next cgto block
                         pgc += nf;
                 }
         }
 }
 
+/*
+ * to optimize memory copy in cart2sph.c, remove the common factor for s
+ * and p function in cart2sph
+ */
+double CINTcommon_fac_sp(unsigned int l)
+{
+        switch (l) {
+                case 0: return 0.282094791773878143;
+                case 1: return 0.488602511902919921;
+                default: return 1;
+        }
+}

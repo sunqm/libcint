@@ -42,14 +42,14 @@ integer :: nbas = 4
 integer,allocatable :: atm(:,:)
 integer,allocatable :: bas(:,:)
 double precision,allocatable :: env(:)
-double precision,external :: gto_norm
+double precision,external :: CINTgto_norm
 
 integer :: n, off
 integer :: i, j, k, l
 integer :: di, dj, dk, dl
 integer :: shls(4)
 double complex,allocatable :: buf1e(:,:), buf2e(:,:,:,:)
-integer,external :: cgtos_spinor
+integer,external :: CINTcgtos_spinor
 external :: cint1e_spnucsp, cint2e_spsp1
 allocate (atm(ATM_SLOTS,natm))
 allocate (bas(BAS_SLOTS,nbas))
@@ -86,12 +86,12 @@ env(off + 2) = 2.
 env(off + 3) = .8
 off = off + 3
 bas(PTR_COEFF,n) = off
-env(off + 1) = .7 * gto_norm(bas(ANG_OF,n), 6.)
-env(off + 2) = .6 * gto_norm(bas(ANG_OF,n), 2.)
-env(off + 3) = .5 * gto_norm(bas(ANG_OF,n), .8)
-env(off + 4) = .4 * gto_norm(bas(ANG_OF,n), 6.)
-env(off + 5) = .3 * gto_norm(bas(ANG_OF,n), 2.)
-env(off + 6) = .2 * gto_norm(bas(ANG_OF,n), .8)
+env(off + 1) = .7 * CINTgto_norm(bas(ANG_OF,n), 6.)
+env(off + 2) = .6 * CINTgto_norm(bas(ANG_OF,n), 2.)
+env(off + 3) = .5 * CINTgto_norm(bas(ANG_OF,n), .8)
+env(off + 4) = .4 * CINTgto_norm(bas(ANG_OF,n), 6.)
+env(off + 5) = .3 * CINTgto_norm(bas(ANG_OF,n), 2.)
+env(off + 6) = .2 * CINTgto_norm(bas(ANG_OF,n), .8)
 off = off + 6
 n = n + 1
 
@@ -105,7 +105,7 @@ bas(PTR_EXP  ,n)  = off
 env(off + 1) = .9
 off = off + 1
 bas(PTR_COEFF,n) = off
-env(off + 1) = 1. * gto_norm(bas(ANG_OF,n), .9)
+env(off + 1) = 1. * CINTgto_norm(bas(ANG_OF,n), .9)
 off = off + 1
 n = n + 1
 
@@ -133,8 +133,8 @@ n = n + 1
 ! call one-electron spinor integrals
 ! the index of shell is 0-based
 !
-i = 0; shls(1) = i; di = cgtos_spinor(i, bas)
-j = 1; shls(2) = j; dj = cgtos_spinor(j, bas)
+i = 0; shls(1) = i; di = CINTcgtos_spinor(i, bas)
+j = 1; shls(2) = j; dj = CINTcgtos_spinor(j, bas)
 allocate (buf1e(di,dj))
 call cint1e_spnucsp(buf1e, shls, atm, natm, bas, nbas, env)
 deallocate (buf1e)
@@ -143,12 +143,12 @@ deallocate (buf1e)
 ! call two-electron spinor integrals
 ! the index of shell is 0-based
 !
-i = 0; shls(1) = i; di = cgtos_spinor(i, bas)
-j = 1; shls(2) = j; dj = cgtos_spinor(j, bas)
-k = 2; shls(3) = k; dk = cgtos_spinor(k, bas)
-l = 2; shls(4) = l; dl = cgtos_spinor(l, bas)
+i = 0; shls(1) = i; di = CINTcgtos_spinor(i, bas)
+j = 1; shls(2) = j; dj = CINTcgtos_spinor(j, bas)
+k = 2; shls(3) = k; dk = CINTcgtos_spinor(k, bas)
+l = 2; shls(4) = l; dl = CINTcgtos_spinor(l, bas)
 allocate (buf2e(di,dj,dk,dl))
-call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env)
+call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env, 0_8)
 deallocate (buf2e)
 deallocate (atm, bas, env)
 end program spinor

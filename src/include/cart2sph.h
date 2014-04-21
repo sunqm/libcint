@@ -53,9 +53,3 @@ void c2s_cart_2e1(double *fkijl, const double *gctr,
                   const unsigned int *shls, const int *bas);
 void c2s_cart_2e2();
 
-/*************************************************
- *
- * transform vectors
- *
- *************************************************/
-void c2s_sph_vec(double *sph, const double *cart, const int l, const int nvec);

@@ -7,74 +7,72 @@
 
 #include "g1e.h"
 
-void g2e_index_xyz(unsigned int *idx, const CintEnvVars *envs);
+void CINTg2e_index_xyz(unsigned int *idx, const CINTEnvVars *envs);
 
-int init_int2e_CintEnvVars(CintEnvVars *envs, const unsigned int ng[],
+int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const unsigned int ng[],
                            const unsigned int *shls,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
 
-void g0_2e(double *g, const RijSets *rij, const RijSets *rkl,
-           const double fac, const CintEnvVars *envs);
+void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
 
-double g0_2e_ssss(const RijSets *rij, const RijSets *rkl,
-                  const double fac, const CintEnvVars *envs);
+double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs);
 
-void nabla1i_2e(double *f, const double *g,
+void CINTnabla1i_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs);
+
+void CINTnabla1j_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs);
+
+void CINTnabla1k_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs);
+
+void CINTnabla1l_2e(double *f, const double *g,
+                    const unsigned int li, const unsigned int lj,
+                    const unsigned int lk, const unsigned int ll,
+                    const CINTEnvVars *envs);
+
+void CINTx1i_2e(double *f, const double *g,
                 const unsigned int li, const unsigned int lj,
                 const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs);
+                const double *ri, const CINTEnvVars *envs);
 
-void nabla1j_2e(double *f, const double *g,
+void CINTx1j_2e(double *f, const double *g,
                 const unsigned int li, const unsigned int lj,
                 const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs);
+                const double *rj, const CINTEnvVars *envs);
 
-void nabla1k_2e(double *f, const double *g,
+void CINTx1k_2e(double *f, const double *g,
                 const unsigned int li, const unsigned int lj,
                 const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs);
+                const double *rk, const CINTEnvVars *envs);
 
-void nabla1l_2e(double *f, const double *g,
+void CINTx1l_2e(double *f, const double *g,
                 const unsigned int li, const unsigned int lj,
                 const unsigned int lk, const unsigned int ll,
-                const CintEnvVars *envs);
-
-void x1i_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *ri, const CintEnvVars *envs);
-
-void x1j_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *rj, const CintEnvVars *envs);
-
-void x1k_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *rk, const CintEnvVars *envs);
-
-void x1l_2e(double *f, const double *g,
-            const unsigned int li, const unsigned int lj,
-            const unsigned int lk, const unsigned int ll,
-            const double *rl, const CintEnvVars *envs);
+                const double *rl, const CINTEnvVars *envs);
 
 
-#define G2E_D_I(f, g, li, lj, lk, ll)   nabla1i_2e(f, g, li, lj, lk, ll, envs)
-#define G2E_D_J(f, g, li, lj, lk, ll)   nabla1j_2e(f, g, li, lj, lk, ll, envs)
-#define G2E_D_K(f, g, li, lj, lk, ll)   nabla1k_2e(f, g, li, lj, lk, ll, envs)
-#define G2E_D_L(f, g, li, lj, lk, ll)   nabla1l_2e(f, g, li, lj, lk, ll, envs)
+#define G2E_D_I(f, g, li, lj, lk, ll)   CINTnabla1i_2e(f, g, li, lj, lk, ll, envs)
+#define G2E_D_J(f, g, li, lj, lk, ll)   CINTnabla1j_2e(f, g, li, lj, lk, ll, envs)
+#define G2E_D_K(f, g, li, lj, lk, ll)   CINTnabla1k_2e(f, g, li, lj, lk, ll, envs)
+#define G2E_D_L(f, g, li, lj, lk, ll)   CINTnabla1l_2e(f, g, li, lj, lk, ll, envs)
 /* r-R_0, R_0 is (0,0,0) */
-#define G2E_R0I(f, g, li, lj, lk, ll)   x1i_2e(f, g, li, lj, lk, ll, ri, envs)
-#define G2E_R0J(f, g, li, lj, lk, ll)   x1j_2e(f, g, li, lj, lk, ll, rj, envs)
-#define G2E_R0K(f, g, li, lj, lk, ll)   x1k_2e(f, g, li, lj, lk, ll, rk, envs)
-#define G2E_R0L(f, g, li, lj, lk, ll)   x1l_2e(f, g, li, lj, lk, ll, rl, envs)
+#define G2E_R0I(f, g, li, lj, lk, ll)   CINTx1i_2e(f, g, li, lj, lk, ll, ri, envs)
+#define G2E_R0J(f, g, li, lj, lk, ll)   CINTx1j_2e(f, g, li, lj, lk, ll, rj, envs)
+#define G2E_R0K(f, g, li, lj, lk, ll)   CINTx1k_2e(f, g, li, lj, lk, ll, rk, envs)
+#define G2E_R0L(f, g, li, lj, lk, ll)   CINTx1l_2e(f, g, li, lj, lk, ll, rl, envs)
 /* r-R_C, R_C is common origin */
-#define G2E_RCI(f, g, li, lj, lk, ll)   x1i_2e(f, g, li, lj, lk, ll, dri, envs)
-#define G2E_RCJ(f, g, li, lj, lk, ll)   x1j_2e(f, g, li, lj, lk, ll, drj, envs)
-#define G2E_RCK(f, g, li, lj, lk, ll)   x1k_2e(f, g, li, lj, lk, ll, drk, envs)
-#define G2E_RCL(f, g, li, lj, lk, ll)   x1l_2e(f, g, li, lj, lk, ll, drl, envs)
+#define G2E_RCI(f, g, li, lj, lk, ll)   CINTx1i_2e(f, g, li, lj, lk, ll, dri, envs)
+#define G2E_RCJ(f, g, li, lj, lk, ll)   CINTx1j_2e(f, g, li, lj, lk, ll, drj, envs)
+#define G2E_RCK(f, g, li, lj, lk, ll)   CINTx1k_2e(f, g, li, lj, lk, ll, drk, envs)
+#define G2E_RCL(f, g, li, lj, lk, ll)   CINTx1l_2e(f, g, li, lj, lk, ll, drl, envs)
 /* origin from center of each basis
  * x1[ijkl]_2e(f, g, ng, li, lj, lk, ll, 0d0) */
 #define G2E_R_I(f, g, li, lj, lk, ll)   f = g + envs->g_stride_i
