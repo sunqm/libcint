@@ -7,16 +7,6 @@
 
 #include "cint_const.h"
 
-#if !defined HAVE_DEFINED_CINTOPT_H
-#define HAVE_DEFINED_CINTOPT_H
-typedef struct {
-    unsigned int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
-    unsigned int *ptr_log_coeff;
-    double *log_coeff; // -log(c) where c is the largest coeff of a pGTO
-    double expcutoff;
-} CINTOpt;
-#endif
-
 #define bas(SLOT,I)     bas[BAS_SLOTS * (I) + (SLOT)]
 #define atm(SLOT,I)     atm[ATM_SLOTS * (I) + (SLOT)]
 
@@ -40,6 +30,3 @@ void CINTshells_spinor_offset(int ao_loc[], const int *bas, const int nbas);
 
 void CINTcart_comp(unsigned int *nx, unsigned int *ny, unsigned int *nz,
                    const unsigned int lmax);
-
-// misc.c
-double CINTgto_norm(int n, double a);

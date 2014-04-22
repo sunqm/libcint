@@ -51,6 +51,7 @@ integer :: shls(4)
 double complex,allocatable :: buf1e(:,:), buf2e(:,:,:,:)
 integer,external :: CINTcgtos_spinor
 external :: cint1e_spnucsp, cint2e_spsp1
+integer(8) :: opt
 allocate (atm(ATM_SLOTS,natm))
 allocate (bas(BAS_SLOTS,nbas))
 allocate (env(10000))
@@ -150,5 +151,15 @@ l = 2; shls(4) = l; dl = CINTcgtos_spinor(l, bas)
 allocate (buf2e(di,dj,dk,dl))
 call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env, 0_8)
 deallocate (buf2e)
+
+call cint2e_spsp1_optimizer(opt, atm, natm, bas, nbas, env)
+i = 0; shls(1) = i; di = CINTcgtos_spinor(i, bas)
+j = 1; shls(2) = j; dj = CINTcgtos_spinor(j, bas)
+k = 2; shls(3) = k; dk = CINTcgtos_spinor(k, bas)
+l = 2; shls(4) = l; dl = CINTcgtos_spinor(l, bas)
+allocate (buf2e(di,dj,dk,dl))
+call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env, opt)
+deallocate (buf2e)
+call CINTdel_optimizer(opt)
 deallocate (atm, bas, env)
 end program spinor

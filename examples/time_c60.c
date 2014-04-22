@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <omp.h>
-#include "cint_bas.h"
+#include "cint.h"
 
 #define atm(X,Y) atm[(X)+(Y)*ATM_SLOTS]
 
@@ -198,7 +198,7 @@ void run_all(const int *atm, const int natm,
 
         printf("\tcint2e_sph with optimizer: total num ERI = %.2e\n", tot);
         CINTOpt *opt = NULL;
-        cint2e_optimizer(&opt, atm, natm, bas, nbas, env);
+        cint2e_sph_optimizer(&opt, atm, natm, bas, nbas, env);
 
         pct = 0; count = 0;
 #pragma omp parallel default(none) \
@@ -239,6 +239,8 @@ void run_all(const int *atm, const int natm,
         tt = (double)(time1-time0)/CLOCKS_PER_SEC;
         printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
                tt, tot/1e6/tt, wtime1-wtime0);
+
+        CINTdel_optimizer(opt);
 }
 
 double get_wall_time()

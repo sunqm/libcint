@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "cint_bas.h"
+#include "cint.h"
 
 int factorial(int n)
 {
@@ -139,6 +139,19 @@ int main()
                 printf("This integral is not 0.\n");
         }
         free(buf);
+
+        CINTOpt *opt = NULL;
+        cint2e_cart_optimizer(&opt, atm, natm, bas, nbas, env);
+        i = 0; shls[0] = i; di = CINTcgtos_cart(i, bas);
+        j = 1; shls[1] = j; dj = CINTcgtos_cart(j, bas);
+        k = 2; shls[2] = k; dk = CINTcgtos_cart(k, bas);
+        l = 2; shls[3] = l; dl = CINTcgtos_cart(l, bas);
+        buf = malloc(sizeof(double) * di * dj * dk * dl);
+        if (0 != cint2e_cart(buf, shls, atm, natm, bas, nbas, env, opt)) {
+                printf("This integral is not 0.\n");
+        }
+        free(buf);
+        CINTdel_optimizer(opt);
 
         free(atm);
         free(bas);

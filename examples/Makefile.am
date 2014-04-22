@@ -1,5 +1,5 @@
 
-AM_CPPFLAGS= -I$(top_srcdir)/src/include
+AM_CPPFLAGS= -I$(top_srcdir)/src/include -I$(top_srcdir)/include
 AM_LDFLAGS = -L../src -lcint
 
 noinst_PROGRAMS = cartesian_c spheric_c spinor_c \

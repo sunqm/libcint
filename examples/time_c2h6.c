@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <omp.h>
-#include "cint_bas.h"
+#include "cint.h"
 
 #define atm(X,Y) atm[(X)+(Y)*ATM_SLOTS]
 
@@ -51,10 +51,10 @@ int main()
         env[off+21] = 1.8812885; env[off+24] = 0.3164240*CINTgto_norm(1,env[off+21]);
         env[off+22] = 0.5442493; env[off+25] = 0.7443083*CINTgto_norm(1,env[off+22]);
         env[off+26] = 0.1687144; env[off+27] = 1.0000000*CINTgto_norm(1,env[off+26]);
-        env[off+28] = 18.731137; env[off+31] = 0.0334946*CINTgto_norm(0,env[off+29]);
-        env[off+29] = 2.8253937; env[off+32] = 0.2347269*CINTgto_norm(0,env[off+30]);
-        env[off+30] = 0.6401217; env[off+33] = 0.8137573*CINTgto_norm(0,env[off+34]);
-        env[off+34] = 0.1612778; env[off+35] = 1.0000000*CINTgto_norm(0,env[off+36]);
+        env[off+28] = 18.731137; env[off+31] = 0.0334946*CINTgto_norm(0,env[off+28]);
+        env[off+29] = 2.8253937; env[off+32] = 0.2347269*CINTgto_norm(0,env[off+29]);
+        env[off+30] = 0.6401217; env[off+33] = 0.8137573*CINTgto_norm(0,env[off+30]);
+        env[off+34] = 0.1612778; env[off+35] = 1.0000000*CINTgto_norm(0,env[off+34]);
         for (i = 0, ia = 0, n = 0; i < 2; i++) {
                 bas[ATOM_OF  +BAS_SLOTS*n] = ia;
                 bas[ANG_OF   +BAS_SLOTS*n] = 0;
@@ -107,6 +107,7 @@ int main()
                         bas[PTR_EXP  +BAS_SLOTS*n] = off+34;
                         bas[PTR_COEFF+BAS_SLOTS*n] = off+35;
                         n++;
+                        ia++;
                 }
         }
         nbas = n;
@@ -224,6 +225,7 @@ int main()
                         bas[PTR_EXP  +BAS_SLOTS*n] = off+39;
                         bas[PTR_COEFF+BAS_SLOTS*n] = off+45;
                         n++;
+                        ia++;
                 }
         }
         nbas = n;
@@ -251,7 +253,7 @@ int main()
         env[off+38] = 0.4446; env[off+41]=0.478148*CINTgto_norm(0,env[off+38]);
         env[off+42] = 0.1220; env[off+43]=1       *CINTgto_norm(0,env[off+42]);
         env[off+44] = 0.7270; env[off+45]=1       *CINTgto_norm(0,env[off+44]);
-        for (i = 0, ia++, n = 0; i < 2; i++) {
+        for (i = 0, ia = 0, n = 0; i < 2; i++) {
                 bas[ATOM_OF  +BAS_SLOTS*n] = ia;
                 bas[ANG_OF   +BAS_SLOTS*n] = 0;
                 bas[NPRIM_OF +BAS_SLOTS*n] = 8;
@@ -344,7 +346,7 @@ int main()
         env[off+49] = 1.4070; env[off+57]= 1.000000*CINTgto_norm(1,env[off+49]);
         env[off+50] = 0.3880; env[off+58]= 1.000000*CINTgto_norm(1,env[off+50]);
         env[off+51] = 1.0570; env[off+59]= 1.000000*CINTgto_norm(2,env[off+51]);
-        for (i = 0, ia++, n = 0; i < 2; i++) {
+        for (i = 0, ia = 0, n = 0; i < 2; i++) {
                 bas[ATOM_OF  +BAS_SLOTS*n] = ia;
                 bas[ANG_OF   +BAS_SLOTS*n] = 0;
                 bas[NPRIM_OF +BAS_SLOTS*n] = 8;
@@ -495,7 +497,7 @@ int main()
         env[off+66] = 2.062; env[off+78] = 1.000000*CINTgto_norm(2,env[off+66]);
         env[off+67] = 0.662; env[off+79] = 1.000000*CINTgto_norm(2,env[off+67]);
         env[off+68] = 1.397; env[off+80] = 1.000000*CINTgto_norm(3,env[off+68]);
-        for (i = 0, ia++, n = 0; i < 2; i++) {
+        for (i = 0, ia = 0, n = 0; i < 2; i++) {
                 bas[ATOM_OF  +BAS_SLOTS*n] = ia;
                 bas[ANG_OF   +BAS_SLOTS*n] = 0;
                 bas[NPRIM_OF +BAS_SLOTS*n] = 8;
@@ -710,7 +712,7 @@ void run_all(const int *atm, const int natm,
 
         CINTOpt *non_opt = NULL;
         CINTOpt *opt_for_cint2e = NULL;
-        cint2e_optimizer(&opt_for_cint2e, atm, natm, bas, nbas, env);
+        cint2e_sph_optimizer(&opt_for_cint2e, atm, natm, bas, nbas, env);
         CINTOpt *opt_for_ip1 = NULL;
         cint2e_ip1_sph_optimizer(&opt_for_ip1, atm, natm, bas, nbas, env);
 
@@ -754,7 +756,6 @@ void run_all(const int *atm, const int natm,
         wtime1 = get_wall_time();
         printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
                tt, tot/1e6/tt, wtime1-wtime0);
-
         /* */
         time0 = time1;
         wtime0 = wtime1;
@@ -842,6 +843,9 @@ void run_all(const int *atm, const int natm,
         tt = (double)(time1-time0)/CLOCKS_PER_SEC;
         printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
                tt, tot/1e6/tt, wtime1-wtime0);
+
+        CINTdel_optimizer(opt_for_cint2e);
+        CINTdel_optimizer(opt_for_ip1);
 }
 
 double get_wall_time()
@@ -852,3 +856,4 @@ double get_wall_time()
     }
     return (double)time.tv_sec + (double)time.tv_usec * 1e-6;
 }
+

@@ -1139,6 +1139,14 @@ int cint2e_sph(double *opijkl, const unsigned int *shls,
         envs.f_gout = &CINTgout2e;
         return CINT2e_spheric_drv(opijkl, &envs, opt);
 }
+void cint2e_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
+                          const int *bas, const int nbas, const double *env)
+{
+        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_log_coeff(*opt, atm, natm, bas, nbas, env);
+        unsigned int ng[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+        CINTOpt_set_index_xyz(*opt, ng, atm, natm, bas, nbas, env);
+}
 
 int cint2e_cart(double *opijkl, const unsigned int *shls,
                 const int *atm, const int natm,
@@ -1151,19 +1159,16 @@ int cint2e_cart(double *opijkl, const unsigned int *shls,
         envs.f_gout = &CINTgout2e;
         return CINT2e_cart_drv(opijkl, &envs, opt);
 }
+void cint2e_cart_optimizer(CINTOpt **opt, const int *atm, const int natm,
+                           const int *bas, const int nbas, const double *env)
+{
+        cint2e_sph_optimizer(opt, atm, natm, bas, nbas, env);
+}
 
 
 /*
  * spinor <ki|jl> = (ij|kl); i,j\in electron 1; k,l\in electron 2
  */
-void cint2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
-                      const int *bas, const int nbas, const double *env)
-{
-        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_set_log_coeff(*opt, atm, natm, bas, nbas, env);
-        unsigned int ng[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-        CINTOpt_set_index_xyz(*opt, ng, atm, natm, bas, nbas, env);
-}
 int cint2e(double *opijkl, const unsigned int *shls,
            const int *atm, const int natm,
            const int *bas, const int nbas, const double *env,
@@ -1175,6 +1180,11 @@ int cint2e(double *opijkl, const unsigned int *shls,
         envs.f_gout = &CINTgout2e;
         return CINT2e_spinor_drv(opijkl, &envs, opt, &c2s_sf_2e1, &c2s_sf_2e2);
 }
+void cint2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
+                      const int *bas, const int nbas, const double *env)
+{
+        cint2e_sph_optimizer(opt, atm, natm, bas, nbas, env);
+}
 
 
 /*
@@ -1185,4 +1195,7 @@ int cint2e(double *opijkl, const unsigned int *shls,
 C2Fo_(cint2e_cart);
 C2Fo_(cint2e_sph);
 C2Fo_(cint2e);
+OPTIMIZER2F_(cint2e_cart_optimizer);
+OPTIMIZER2F_(cint2e_sph_optimizer);
+OPTIMIZER2F_(cint2e_optimizer);
 

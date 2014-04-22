@@ -15,3 +15,6 @@ void CINTdcmplx_np(const unsigned int n, double *z, const double *re, const doub
 inline double CINTsquare_dist(const double *r1, const double *r2);
 
 void CINTrys_roots(const unsigned int nroots, double x, double *u, double *w);
+
+double CINTgto_norm(int n, double a);
+

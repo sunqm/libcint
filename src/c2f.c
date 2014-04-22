@@ -139,8 +139,18 @@ void cintinit_2e_optimizer_(CINTOptPtrAsInteger8 *optptr,
         CINTOpt **opt = (CINTOpt **)optptr;
         CINTinit_2e_optimizer(opt, atm, *natm, bas, *nbas, env);
 }
+void cintinit_optimizer_(CINTOptPtrAsInteger8 *optptr,
+                         int *atm, int *natm,
+                         int *bas, int *nbas, double *env)
+{
+        cintinit_2e_optimizer_(optptr, atm, natm, bas, nbas, env);
+}
 void cintdel_2e_optimizer_(CINTOptPtrAsInteger8 *optptr)
 {
         CINTOpt *opt = (CINTOpt *)*optptr;
         CINTdel_2e_optimizer(opt);
+}
+void cintdel_optimizer_(CINTOptPtrAsInteger8 *optptr)
+{
+        cintdel_2e_optimizer_(optptr);
 }

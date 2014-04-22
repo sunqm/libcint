@@ -1,6 +1,6 @@
 
 AM_CFLAGS = -DNDEBUG -funroll-all-loops
-AM_CPPFLAGS= -I$(top_srcdir)/src/include
+AM_CPPFLAGS= -I$(top_srcdir)/src
 
 lib_LTLIBRARIES = libcint.la
 
@@ -25,5 +25,3 @@ libcint_la_SOURCES = c2f.c \
                      autocode/grad3.c \
                      autocode/gaunt1.c
 
-include_HEADERS = $(top_srcdir)/src/include/cint_const.h \
-		  $(top_srcdir)/src/include/cint_bas.h

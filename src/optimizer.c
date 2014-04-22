@@ -31,6 +31,11 @@ void CINTinit_2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
         opt0->index_xyz_array = NULL;
         *opt = opt0;
 }
+void CINTinit_optimizer(CINTOpt **opt, const int *atm, const int natm,
+                        const int *bas, const int nbas, const double *env)
+{
+        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+}
 
 void CINTdel_2e_optimizer(CINTOpt *opt)
 {
@@ -54,6 +59,10 @@ void CINTdel_2e_optimizer(CINTOpt *opt)
         }
 
         free(opt);
+}
+void CINTdel_optimizer(CINTOpt *opt)
+{
+        CINTdel_2e_optimizer(opt);
 }
 
 void CINTno_optimizer(CINTOpt **opt, const int *atm, const int natm,

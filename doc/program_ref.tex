@@ -25,7 +25,13 @@
 \subsection{C routine}
 
 \begin{verbatim}
-f(buf, shls, atm, natm, bas, nbas, env);
+dim = CINTgto_cart(bas_id, bas);
+dim = CINTgto_spheric(bas_id, bas);
+dim = CINTgto_spinor(bas_id, bas);
+f1e(buf, shls, atm, natm, bas, nbas, env);
+f2e(buf, shls, atm, natm, bas, nbas, env, opt);
+f2e_optimizer(&opt, atm, nbat, bas, nbas, env);
+CINTdel_optimizer(opt);
 \end{verbatim}
 \begin{itemize}
 \item
@@ -111,15 +117,68 @@ env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 \end{verbatim}
 \begin{itemize}
 \item
-  nbas: int, number of bases, nbas has no effect
+  nbas: int, number of bases, nbas has no effect, can be set to 0
 \item
   env: double[], save the value of coordinates, exponents,
   contraction coefficients
+
+\item
+  struct CINTOpt *opt: so called ``optimizer'', it needs to be
+  intialized
+
+  CINTOpt *opt = NULL; intname\_optimizer(\&opt, atm, natm, bas,
+  nbas, env);
+
 \end{itemize}
+every integral type has its own optimizer with the suffix
+\_optimizer in its name, e.g.~the optimizer for cint2e\_sph is
+cint2e\_sph\_opimizer. ``optimizer'' is an optional argument for
+the integrals. It can roughly speed the integration by 10\% without
+affecting the value of integrals. If no optimizer is wanted, set it
+to NULL.
+
+optimizer needs to be released after using.
+
+\begin{verbatim}
+CINTdel_optimizer(opt);
+\end{verbatim}
+\begin{itemize}
+\item
+  if the return value equals 0, every element of the integral is 0
+
+\item
+  short example
+
+\end{itemize}
+\begin{verbatim}
+#include "cint.h"
+...
+CINTOpt *opt = NULL;
+cint2e_sph_optimizer(&opt, atm, natm, bas, nbas, env);
+for (i = 0; i < nbas; i++) {
+        shls[0] = i;
+        di = CINTcgto_spheric(i, bas);
+        ...
+        for (l = 0; l < nbas; l++) {
+                shls[3] = l;
+                dl = CINTcgto_spheric(l, bas);
+                buf = malloc(sizeof(double) * di * dj * dk * dl);
+                cint2e_cart(buf, shls, atm, natm, bas, nbas, env, opt);
+                free(buf);
+        }
+}
+CINTdel_optimizer(opt);
+\end{verbatim}
 \subsection{Fortran routine}
 
 \begin{verbatim}
-call f(buf, shls, atm, natm, bas, nbas, env)
+dim = CINTgto_cart(bas_id, bas)
+dim = CINTgto_spheric(bas_id, bas)
+dim = CINTgto_spinor(bas_id, bas)
+call f1e(buf, shls, atm, natm, bas, nbas, env)
+call f2e(buf, shls, atm, natm, bas, nbas, env, opt)
+call f2e_optimizer(&opt, atm, nbat, bas, nbas, env)
+call CINTdel_optimizer(opt)
 \end{verbatim}
 \begin{itemize}
 \item
@@ -138,15 +197,51 @@ call f(buf, shls, atm, natm, bas, nbas, env)
   atm(2,i) bas(6,i) bas(7,i) are 0-based.
 \item
   buf is 2D/4D double precision/double complex array
-\end{itemize}
-\subsection{Supported angular momentum}
+\item
+  opt: an integer(8) to hold the address of so called ``optimizer'',
+  it needs to be intialized by
 
+  integer(8) opt call f2e\_optimizer(\&opt, atm, natm, bas, nbas,
+  env)
+
+\end{itemize}
+The optimizier can be banned by setting the ``optimizier'' to 0\_8
+
+\begin{verbatim}
+call f2e(buf, atm, natm, bas, nbas, env, 0_8)
+\end{verbatim}
+To release optimizer, execute
+
+\begin{verbatim}
+call CINTdel_optimizer(opt);
+\end{verbatim}
 \begin{itemize}
 \item
-  1e integrals $l_{max}$ = 6
-\item
-  2e integrals $l_{max}$ = 4
+  short example
 \end{itemize}
+\begin{verbatim}
+...
+integer,external CINTcgto_spheric
+integer(8) opt
+call cint2e_sph_optimizer(opt, atm, natm, bas, nbas, env)
+do i = 1, nbas
+  shls(1) = i - 1
+  di = CINTcgto_spheric(i-1, bas)
+  ...
+  do l = 1, nbas
+    shls(4) = l - 1
+    dl = CINTcgto_spheric(l-1, bas)
+    allocate(buf(di,dj,dk,dl))
+    call cint2e_sph(buf, shls, atm, natm, bas, nbas, env, opt)
+    deallocate(buf)
+  end do
+end do
+call CINTdel_optimizer(opt)
+\end{verbatim}
+\subsection{Supported angular momentum}
+
+$l_{max}$ = 6
+
 \subsection{Data ordering}
 
 \begin{itemize}
@@ -173,12 +268,12 @@ call f(buf, shls, atm, natm, bas, nbas, env)
     s shell & p shell & d shell     & f shell         & ... \\
 \hline
     ...     & ...     & ...         & ...             & \\
-    s       & p $y$   & d $xy     $ & f $y(3x^2-y^2)$ & \\
-    s       & p $z$   & d $yz     $ & f $xyz        $ & \\
-    ...     & p $x$   & d $z^2    $ & f $yz^2       $ & \\
-            & p $y$   & d $xz     $ & f $z^3        $ & \\
-            & p $z$   & d $x^2-y^2$ & f $xz^2       $ & \\
-            & p $x$   & ...         & f $z(x^2-y^2) $ & \\
+    s       & p $x$   & d $xy     $ & f $y(3x^2-y^2)$ & \\
+    s       & p $y$   & d $yz     $ & f $xyz        $ & \\
+    ...     & p $z$   & d $z^2    $ & f $yz^2       $ & \\
+            & p $x$   & d $xz     $ & f $z^3        $ & \\
+            & p $y$   & d $x^2-y^2$ & f $xz^2       $ & \\
+            & p $z$   & ...         & f $z(x^2-y^2) $ & \\
             & ...     &             & f $x(x^2-3y^2)$ & \\
             &         &             & ...             & \\
 \hline
@@ -206,8 +301,9 @@ call f(buf, shls, atm, natm, bas, nbas, env)
 \end{itemize}
 \subsection{Tensor}
 
-integrals like Gradients have tensor components. the output data
-is
+Integrals like Gradients have more than one components. The output
+array is ordered in Fortran-contiguous. The tensor component takes
+the biggest strides.
 
 \begin{itemize}
 \item
@@ -243,14 +339,14 @@ is
     ZZ \verb!buf(:,8)!
   \end{itemize}
 \end{itemize}
-\section{function list}
+\section{Built-in function list}
 
 \begin{itemize}
 \item
   Cartesian GTO integrals
   \begin{itemize}
   \item
-    \verb!cgto_cart(int ishell, int bas[])!: Number of cartesian
+    \verb!CINTcgto_cart(int shell_id, int bas[])!: Number of cartesian
     functions of the given shell
   \item
     \verb!cint1e_ovlp_cart! \[\langle i| j\rangle \]
@@ -299,7 +395,7 @@ is
   Spheric GTO integrals
   \begin{itemize}
   \item
-    \verb!cgto_spheric(int ishell, int bas[])!: Number of spheric
+    \verb!CINTcgto_spheric(int shell_id, int bas[])!: Number of spheric
     functions of the given shell
   \item
     \verb!cint1e_ovlp_sph! \[\langle  i| j\rangle \]
@@ -347,7 +443,7 @@ is
   Spinor GTO integrals
   \begin{itemize}
   \item
-    \verb!cgto_spinor(int ishell, int bas[])!: Number of spinor
+    \verb!CINTcgto_spinor(int shell_id, int bas[])!: Number of spinor
     functions of the given shell
   \item
     \verb!cint1e_ovlp! \[\langle  i| j\rangle \]
