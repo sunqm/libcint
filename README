@@ -167,6 +167,8 @@ Known problems
     - cint2e_ipspsp1
     - cint2e_ip1spsp2
 
+* The package have not been fully tested on 32-bit system.
+
 
 Bug report
 ----------

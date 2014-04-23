@@ -241,6 +241,8 @@ void run_all(const int *atm, const int natm,
                tt, tot/1e6/tt, wtime1-wtime0);
 
         CINTdel_optimizer(opt);
+        free(ishls);
+        free(jshls);
 }
 
 double get_wall_time()

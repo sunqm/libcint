@@ -846,6 +846,8 @@ void run_all(const int *atm, const int natm,
 
         CINTdel_optimizer(opt_for_cint2e);
         CINTdel_optimizer(opt_for_ip1);
+        free(ishls);
+        free(jshls);
 }
 
 double get_wall_time()

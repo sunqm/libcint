@@ -30,3 +30,4 @@ void CINTshells_spinor_offset(int ao_loc[], const int *bas, const int nbas);
 
 void CINTcart_comp(unsigned int *nx, unsigned int *ny, unsigned int *nz,
                    const unsigned int lmax);
+

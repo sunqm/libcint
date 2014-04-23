@@ -6,12 +6,6 @@
  */
 
 #include "cint_bas.h"
-/*
-#define DEBUG_ON(i, dj, l, k, s) printf("%d : %d, l = %d, kappa = %d, %s\n", \
-                                 (i), (dj), (l), (k), (s));
-*/
-#define DEBUG_ON(...)
-
 
 /*
  * No. components of a Cartesian GTO, = (l+1)*(l+2)/2
