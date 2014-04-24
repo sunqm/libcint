@@ -31,9 +31,9 @@ Features
 * Thread safe.
 * Uniform API for all kind of integrals.
   - one electron integrals
-    not0 = fn1e_name(int *atm, int natm, int *bas, int nbas, double *env);
+    not0 = fn1e_name(double *buf, int *atm, int natm, int *bas, int nbas, double *env);
   - two electron integrals
-    not0 = fn2e_name(int *atm, int natm, int *bas, int nbas, double *env, NULL);
+    not0 = fn2e_name(double *buf, int *atm, int natm, int *bas, int nbas, double *env, NULL);
   - the return boolean (not0) gives the summary whether the integrals
     are completely 0.
 * Minimal overhead of initialization
