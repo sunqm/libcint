@@ -7,7 +7,7 @@ noinst_PROGRAMS = cartesian_c spheric_c spinor_c \
 		  time_c2h6 time_c60
 
 time_c2h6_SOURCES = time_c2h6.c
-time_c60_SOURCES = time_c2h6.c
+time_c60_SOURCES = time_c60.c
 cartesian_c_SOURCES = c_call_cartesian.c
 spheric_c_SOURCES =   c_call_spheric.c
 spinor_c_SOURCES =    c_call_spinor.c

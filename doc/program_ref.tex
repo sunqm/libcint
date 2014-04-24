@@ -31,7 +31,7 @@ dim = CINTgto_spinor(bas_id, bas);
 f1e(buf, shls, atm, natm, bas, nbas, env);
 f2e(buf, shls, atm, natm, bas, nbas, env, opt);
 f2e_optimizer(&opt, atm, nbat, bas, nbas, env);
-CINTdel_optimizer(opt);
+CINTdel_optimizer(&opt);
 \end{verbatim}
 \begin{itemize}
 \item
@@ -140,7 +140,7 @@ to NULL.
 optimizer needs to be released after using.
 
 \begin{verbatim}
-CINTdel_optimizer(opt);
+CINTdel_optimizer(&opt);
 \end{verbatim}
 \begin{itemize}
 \item
@@ -167,7 +167,7 @@ for (i = 0; i < nbas; i++) {
                 free(buf);
         }
 }
-CINTdel_optimizer(opt);
+CINTdel_optimizer(&opt);
 \end{verbatim}
 \subsection{Fortran routine}
 
@@ -177,7 +177,7 @@ dim = CINTgto_spheric(bas_id, bas)
 dim = CINTgto_spinor(bas_id, bas)
 call f1e(buf, shls, atm, natm, bas, nbas, env)
 call f2e(buf, shls, atm, natm, bas, nbas, env, opt)
-call f2e_optimizer(&opt, atm, nbat, bas, nbas, env)
+call f2e_optimizer(opt, atm, nbat, bas, nbas, env)
 call CINTdel_optimizer(opt)
 \end{verbatim}
 \begin{itemize}
@@ -201,8 +201,7 @@ call CINTdel_optimizer(opt)
   opt: an integer(8) to hold the address of so called ``optimizer'',
   it needs to be intialized by
 
-  integer(8) opt call f2e\_optimizer(\&opt, atm, natm, bas, nbas,
-  env)
+  integer(8) opt call f2e\_optimizer(opt, atm, natm, bas, nbas, env)
 
 \end{itemize}
 The optimizier can be banned by setting the ``optimizier'' to 0\_8

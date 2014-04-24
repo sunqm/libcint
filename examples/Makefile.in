@@ -72,7 +72,7 @@ spinor_f_LDADD = $(LDADD)
 am_time_c2h6_OBJECTS = time_c2h6.$(OBJEXT)
 time_c2h6_OBJECTS = $(am_time_c2h6_OBJECTS)
 time_c2h6_LDADD = $(LDADD)
-am_time_c60_OBJECTS = time_c2h6.$(OBJEXT)
+am_time_c60_OBJECTS = time_c60.$(OBJEXT)
 time_c60_OBJECTS = $(am_time_c60_OBJECTS)
 time_c60_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -229,7 +229,7 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/src/include -I$(top_srcdir)/include
 AM_LDFLAGS = -L../src -lcint
 time_c2h6_SOURCES = time_c2h6.c
-time_c60_SOURCES = time_c2h6.c
+time_c60_SOURCES = time_c60.c
 cartesian_c_SOURCES = c_call_cartesian.c
 spheric_c_SOURCES = c_call_spheric.c
 spinor_c_SOURCES = c_call_spinor.c
@@ -314,6 +314,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c_call_spheric.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c_call_spinor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time_c2h6.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time_c60.Po@am__quote@
 
 .F90.o:
 	$(PPFCCOMPILE) -c -o $@ $<

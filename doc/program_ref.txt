@@ -20,7 +20,7 @@ C routine
     f1e(buf, shls, atm, natm, bas, nbas, env);
     f2e(buf, shls, atm, natm, bas, nbas, env, opt);
     f2e_optimizer(&opt, atm, nbat, bas, nbas, env);
-    CINTdel_optimizer(opt);
+    CINTdel_optimizer(&opt);
 
 * buf:  column-major double precision array.
     - for 1e integrals of shells (i,j), data are stored as `[i1j1 i2j1 ... ]`
@@ -81,7 +81,7 @@ env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 
   optimizer needs to be released after using.
 
-    CINTdel_optimizer(opt);
+    CINTdel_optimizer(&opt);
 
 * if the return value equals 0, every element of the integral is 0
 
@@ -104,7 +104,7 @@ for (i = 0; i < nbas; i++) {
                 free(buf);
         }
 }
-CINTdel_optimizer(opt);
+CINTdel_optimizer(&opt);
 ~~~~~~~~
 
 
@@ -116,7 +116,7 @@ Fortran routine
     dim = CINTgto_spinor(bas_id, bas)
     call f1e(buf, shls, atm, natm, bas, nbas, env)
     call f2e(buf, shls, atm, natm, bas, nbas, env, opt)
-    call f2e_optimizer(&opt, atm, nbat, bas, nbas, env)
+    call f2e_optimizer(opt, atm, nbat, bas, nbas, env)
     call CINTdel_optimizer(opt)
 
 * atm and bas are 2D integer array
@@ -132,7 +132,7 @@ Fortran routine
   needs to be intialized by
 
     integer(8) opt
-    call f2e_optimizer(&opt, atm, natm, bas, nbas, env)
+    call f2e_optimizer(opt, atm, natm, bas, nbas, env)
 
   The optimizier can be banned by setting the "optimizier" to 0_8
 
