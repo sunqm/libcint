@@ -123,13 +123,6 @@ double cintgto_norm_(int *n, double *a)
  * * * * * * * * * * * * * * * * * * * * *
  * let Fortran be able to change CINTOpt
  */
-void cintopt_set_expcutoff_(long *optptr, double *thrd)
-{
-        CINTOpt *opt = (CINTOpt *)*optptr;
-        double x = -log(*thrd);
-        opt->expcutoff = (int)((x>0) ? (x+1) : x);
-}
-
 /* in Fortran, pass an integer(8) to hold the pointer of CINTOpt */
 //typedef long CINTOptPtrAsInteger8;
 void cintinit_2e_optimizer_(CINTOptPtrAsInteger8 *optptr,
@@ -147,7 +140,7 @@ void cintinit_optimizer_(CINTOptPtrAsInteger8 *optptr,
 }
 void cintdel_2e_optimizer_(CINTOptPtrAsInteger8 *optptr)
 {
-        CINTOpt *opt = (CINTOpt *)*optptr;
+        CINTOpt **opt = (CINTOpt **)optptr;
         CINTdel_2e_optimizer(opt);
 }
 void cintdel_optimizer_(CINTOptPtrAsInteger8 *optptr)

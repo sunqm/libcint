@@ -12,7 +12,7 @@ void CINTdcmplx_pp(const unsigned int n, double *z, const double *re, const doub
 void CINTdcmplx_pn(const unsigned int n, double *z, const double *re, const double *im);
 void CINTdcmplx_np(const unsigned int n, double *z, const double *re, const double *im);
 
-inline double CINTsquare_dist(const double *r1, const double *r2);
+double CINTsquare_dist(const double *r1, const double *r2);
 
 void CINTrys_roots(const unsigned int nroots, double x, double *u, double *w);
 

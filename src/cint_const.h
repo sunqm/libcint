@@ -83,8 +83,8 @@
 #define SHLS_MAX        0x7fffffff
 #define NPRIM_MAX       0x7fffffff
 #define NCTR_MAX        0x7fffffff
-// ~ 1e-26
-#define EXPCUTOFF       60
+// ~ 1e-30
+#define EXPCUTOFF       69
 
 #define OF_CMPLX        2
 

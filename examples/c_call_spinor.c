@@ -17,8 +17,9 @@ int factorial(int n)
 // normalization factor of function r^n e^{-a r^2}
 double gto_norm(int n, double a)
 {
-        return pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
+        double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
                 / (factorial(2*n+2) * sqrt(M_PI));
+        return sqrt(nn);
 }
 
 /* general contracted DZ basis [3s1p/2s1p] for H2
@@ -153,7 +154,7 @@ int main()
                 printf("This integral is not 0.\n");
         }
         free(buf);
-        CINTdel_optimizer(opt);
+        CINTdel_optimizer(&opt);
 
         free(atm);
         free(bas);

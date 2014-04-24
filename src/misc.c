@@ -59,7 +59,7 @@ void CINTdcmplx_np(const unsigned int n, double *z,
 }
 
 
-inline double CINTsquare_dist(const double *r1, const double *r2)
+double CINTsquare_dist(const double *r1, const double *r2)
 {
         double r12[3];
 
@@ -80,6 +80,7 @@ static int factorial(int n)
 }
 double CINTgto_norm(int n, double a)
 {
-        return pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
+        double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
                 / (factorial(2*n+2) * sqrt(M_PI));
+        return sqrt(nn);
 }
