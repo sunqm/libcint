@@ -8,7 +8,10 @@
 typedef struct {
     unsigned int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
     unsigned int *prim_offset;
-    double **eij;
+    unsigned int *non0ctr;
+    unsigned int **non0idx;
+    double **non0coeff;
+    double **expij;
     double **rij;
     int **screenij;
     unsigned int tot_prim;
@@ -26,6 +29,8 @@ void CINTOpt_set_index_xyz(CINTOpt *opt, unsigned int *ng,
                            const int *bas, const int nbas, const double *env);
 void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                    const int *bas, const int nbas, const double *env);
+void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
+                           const int *bas, const int nbas, const double *env);
 
 // optimizer examples
 void CINTno_optimizer(CINTOpt **opt, const int *atm, const int natm,

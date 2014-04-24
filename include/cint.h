@@ -83,7 +83,10 @@
 typedef struct {
     unsigned int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
     unsigned int *prim_offset;
-    double **eij;
+    unsigned int *non0ctr;
+    unsigned int **non0idx;
+    double **non0coeff;
+    double **expij;
     double **rij;
     int **screenij;
     unsigned int tot_prim;

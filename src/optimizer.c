@@ -23,7 +23,10 @@ void CINTinit_2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
         CINTOpt *opt0 = (CINTOpt *)malloc(sizeof(CINTOpt));
         opt0->index_xyz_array = NULL;
         opt0->prim_offset = NULL;
-        opt0->eij = NULL;
+        opt0->non0ctr = NULL;
+        opt0->non0idx = NULL;
+        opt0->non0coeff = NULL;
+        opt0->expij = NULL;
         opt0->rij = NULL;
         opt0->screenij = NULL;
         opt0->tot_prim = 0;
@@ -53,17 +56,32 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 free(opt0->index_xyz_array);
         }
 
-        if (opt0->prim_offset) {
-                free(opt0->prim_offset);
+        if (opt0->expij) {
                 for (i = 0; i < opt0->tot_prim; i++) {
-                        free(opt0->eij[i]);
+                        free(opt0->expij[i]);
                         free(opt0->rij[i]);
                         free(opt0->screenij[i]);
                 }
-                free(opt0->eij);
+                free(opt0->expij);
                 free(opt0->rij);
                 free(opt0->screenij);
         }
+
+        if (opt0->non0ctr) {
+                free(opt0->non0ctr);
+                for (i = 0; i < opt0->tot_prim; i++) {
+                        free(opt0->non0idx[i]);
+                        free(opt0->non0coeff[i]);
+                }
+                free(opt0->non0idx);
+                free(opt0->non0coeff);
+        }
+
+        if (opt0->prim_offset) {
+                free(opt0->prim_offset);
+        }
+
+        opt0->tot_prim = 0;
 
         free(opt0);
         *opt = NULL;
@@ -85,6 +103,7 @@ void CINTuse_all_optimizer(CINTOpt **opt, unsigned int *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         CINTOpt_set_index_xyz(*opt, ng, atm, natm, bas, nbas, env);
 }
 
@@ -153,20 +172,22 @@ static double max_pgto_coeff(const double *coeff, int nprim, int nctr,
 void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                    const int *bas, const int nbas, const double *env)
 {
-        opt->prim_offset = (unsigned int *)malloc(sizeof(unsigned int) * nbas);
-        opt->tot_prim = 0;
         unsigned int i, j, ip, jp, io, jo, off;
-        for (i = 0; i < nbas; i++) {
-                opt->prim_offset[i] = opt->tot_prim;
-                opt->tot_prim += bas(NPRIM_OF, i);
+        if (!opt->prim_offset) {
+                opt->prim_offset = (unsigned int *)malloc(sizeof(unsigned int) * nbas);
+                opt->tot_prim = 0;
+                for (i = 0; i < nbas; i++) {
+                        opt->prim_offset[i] = opt->tot_prim;
+                        opt->tot_prim += bas(NPRIM_OF, i);
+                }
         }
 
         unsigned int iprim, ictr, jprim, jctr, il, jl;
-        double aij, rr, maxci, maxcj, logci, logcj;
+        double eij, aij, rr, maxci, maxcj;
         const double *ai, *aj, *ri, *rj, *ci, *cj;
-        double *eij, *rij;
+        double *expij, *rij;
         int *screenij;
-        opt->eij = (double **)malloc(sizeof(double *) * opt->tot_prim);
+        opt->expij = (double **)malloc(sizeof(double *) * opt->tot_prim);
         opt->rij = (double **)malloc(sizeof(double *) * opt->tot_prim);
         opt->screenij = (int **)malloc(sizeof(int *) * opt->tot_prim);
         for (i = 0; i < nbas; i++) {
@@ -179,10 +200,14 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                 il = bas(ANG_OF,i);
                 for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
                         maxci = max_pgto_coeff(ci, iprim, ictr, ip);
-                        logci = log(maxci/CINTgto_norm(il, ai[ip]));
-                        eij = (double *)malloc(sizeof(double)*opt->tot_prim);
+                        maxci = maxci / CINTgto_norm(il, ai[ip]);
+                        expij = (double *)malloc(sizeof(double)*opt->tot_prim);
                         rij = (double *)malloc(sizeof(double)*opt->tot_prim*3);
                         screenij = (int *)malloc(sizeof(int)*opt->tot_prim);
+                        opt->expij[io+ip] = expij;
+                        opt->rij[io+ip] = rij;
+                        opt->screenij[io+ip] = screenij;
+
                         for (j = 0; j < nbas; j++) {
                                 rj = env + atm(PTR_COORD,bas(ATOM_OF,j));
                                 aj = env + bas(PTR_EXP,j);
@@ -196,27 +221,68 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                                    + (ri[2]-rj[2])*(ri[2]-rj[2]);
                                 for (jp = 0; jp < bas(NPRIM_OF,j); jp++) {
                                         maxcj = max_pgto_coeff(cj, jprim, jctr, jp);
-                                        logcj = log(maxcj/CINTgto_norm(jl, aj[jp]));
+                                        maxcj = maxcj/CINTgto_norm(jl, aj[jp]);
                                         aij = ai[ip] + aj[jp];
                                         off = jo + jp;
-                                        eij[off] = rr * ai[ip] * aj[jp] / aij;
+                                        eij = rr * ai[ip] * aj[jp] / aij;
+                                        expij[off] = exp(-eij);
                                         rij[off*3+0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / aij;
                                         rij[off*3+1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / aij;
                                         rij[off*3+2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / aij;
                                         /* TODO: better screen estimation,
                                          * e.g. based on (ab|cd) < (00|00) */
-                                        if (eij[off] < EXPCUTOFF/2) {
+                                        if (expij[off] > exp(-EXPCUTOFF/2)) {
                                                 screenij[off] = 0;
                                         } else {
                                                 //screenij[off] = (eij[off] > EXPCUTOFF);
-                                                //screenij[off] = (eij[off]-log(maxci)-log(maxcj) > EXPCUTOFF);
-                                                screenij[off] = (eij[off]-logci-logcj > EXPCUTOFF);
+                                                screenij[off] = (expij[off]*maxci*maxcj < exp(-EXPCUTOFF));
                                         }
                                 }
                         }
-                        opt->eij[io+ip] = eij;
-                        opt->rij[io+ip] = rij;
-                        opt->screenij[io+ip] = screenij;
                 }
         }
 }
+
+void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
+                           const int *bas, const int nbas, const double *env)
+{
+        unsigned int i, j, k, ip, io;
+        if (!opt->prim_offset) {
+                opt->prim_offset = (unsigned int *)malloc(sizeof(unsigned int) * nbas);
+                opt->tot_prim = 0;
+                for (i = 0; i < nbas; i++) {
+                        opt->prim_offset[i] = opt->tot_prim;
+                        opt->tot_prim += bas(NPRIM_OF, i);
+                }
+        }
+
+        unsigned int iprim, ictr;
+        const double *ci;
+        double *non0coeff;
+        unsigned int *non0idx;
+        opt->non0ctr = (unsigned int *)malloc(sizeof(unsigned int) * opt->tot_prim);
+        opt->non0idx = (unsigned int **)malloc(sizeof(unsigned int *) * opt->tot_prim);
+        opt->non0coeff = (double **)malloc(sizeof(double *) * opt->tot_prim);
+        for (i = 0; i < nbas; i++) {
+                io = opt->prim_offset[i];
+                iprim = bas(NPRIM_OF,i);
+                ictr = bas(NCTR_OF,i);
+                ci = env + bas(PTR_COEFF,i);
+                for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
+                        non0idx = (unsigned int *)malloc(sizeof(unsigned int) * ictr);
+                        non0coeff = (double *)malloc(sizeof(double) * ictr);
+                        opt->non0idx[io+ip] = non0idx;
+                        opt->non0coeff[io+ip] = non0coeff;
+
+                        for (j = 0, k = 0; j < ictr; j++) {
+                                if (ci[iprim*j+ip] != 0) {
+                                        non0coeff[k] = ci[iprim*j+ip];
+                                        non0idx[k] = j;
+                                        k++;
+                                }
+                        }
+                        opt->non0ctr[io+ip] = k;
+                }
+        }
+}
+
