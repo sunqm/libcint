@@ -844,8 +844,8 @@ void run_all(const int *atm, const int natm,
         printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
                tt, tot/1e6/tt, wtime1-wtime0);
 
-        CINTdel_optimizer(opt_for_cint2e);
-        CINTdel_optimizer(opt_for_ip1);
+        CINTdel_optimizer(&opt_for_cint2e);
+        CINTdel_optimizer(&opt_for_ip1);
         free(ishls);
         free(jshls);
 }
