@@ -85,6 +85,7 @@
 #define NCTR_MAX        0x7fffffff
 // ~ 1e-30
 #define EXPCUTOFF       69
+#define CUTOFF15        36
 
 #define OF_CMPLX        2
 

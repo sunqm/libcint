@@ -160,7 +160,7 @@ int main()
         nbas = n;
 
         run_all(atm, natm, bas, nbas, env);
-        // 8068s on one core of 3.1G I5 CPU
+        // 6478s on one core of 3.1G I5 CPU
         free(atm);
         free(bas);
         free(env);
@@ -188,7 +188,8 @@ void run_all(const int *atm, const int natm,
                nbas, ncgto,
                CINTtot_pgto_spheric(bas, nbas));
 
-        long pct, count;
+        int pct;
+        long count;
         clock_t time0, time1 = 0;
         double wtime0, wtime1;
         double tt, tot;

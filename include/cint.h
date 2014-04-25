@@ -88,7 +88,7 @@ typedef struct {
     double **non0coeff;
     double **expij;
     double **rij;
-    int **screenij;
+    int **cceij;
     unsigned int tot_prim;
 } CINTOpt;
 #endif
@@ -126,19 +126,19 @@ void CINTdel_optimizer(CINTOpt **opt);
 int cint2e_cart(double *opijkl, const unsigned int *shls,
                 const int *atm, const int natm,
                 const int *bas, const int nbas, const double *env,
-                CINTOpt *opt);
+                const CINTOpt *opt);
 void cint2e_cart_optimizer(CINTOpt **opt, const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
 int cint2e_sph(double *opijkl, const unsigned int *shls,
                const int *atm, const int natm,
                const int *bas, const int nbas, const double *env,
-               CINTOpt *opt);
+               const CINTOpt *opt);
 void cint2e_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
                           const int *bas, const int nbas, const double *env);
 int cint2e(double *opijkl, const unsigned int *shls,
            const int *atm, const int natm,
            const int *bas, const int nbas, const double *env,
-           CINTOpt *opt);
+           const CINTOpt *opt);
 void cint2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
                       const int *bas, const int nbas, const double *env);
 

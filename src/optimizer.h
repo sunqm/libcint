@@ -13,7 +13,7 @@ typedef struct {
     double **non0coeff;
     double **expij;
     double **rij;
-    int **screenij;
+    int **cceij;
     unsigned int tot_prim;
 } CINTOpt;
 #endif

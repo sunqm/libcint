@@ -28,7 +28,7 @@ void CINTinit_2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
         opt0->non0coeff = NULL;
         opt0->expij = NULL;
         opt0->rij = NULL;
-        opt0->screenij = NULL;
+        opt0->cceij = NULL;
         opt0->tot_prim = 0;
         *opt = opt0;
 }
@@ -60,11 +60,11 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 for (i = 0; i < opt0->tot_prim; i++) {
                         free(opt0->expij[i]);
                         free(opt0->rij[i]);
-                        free(opt0->screenij[i]);
+                        free(opt0->cceij[i]);
                 }
                 free(opt0->expij);
                 free(opt0->rij);
-                free(opt0->screenij);
+                free(opt0->cceij);
         }
 
         if (opt0->non0ctr) {
@@ -183,13 +183,13 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
         }
 
         unsigned int iprim, ictr, jprim, jctr, il, jl;
-        double eij, aij, rr, maxci, maxcj;
+        double eij, aij, rr, maxci, maxcj, compensation;
         const double *ai, *aj, *ri, *rj, *ci, *cj;
         double *expij, *rij;
-        int *screenij;
+        int *cceij;
         opt->expij = (double **)malloc(sizeof(double *) * opt->tot_prim);
         opt->rij = (double **)malloc(sizeof(double *) * opt->tot_prim);
-        opt->screenij = (int **)malloc(sizeof(int *) * opt->tot_prim);
+        opt->cceij = (int **)malloc(sizeof(int *) * opt->tot_prim);
         for (i = 0; i < nbas; i++) {
                 ri = env + atm(PTR_COORD,bas(ATOM_OF,i));
                 ai = env + bas(PTR_EXP,i);
@@ -203,10 +203,10 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                         maxci = maxci / CINTgto_norm(il, ai[ip]);
                         expij = (double *)malloc(sizeof(double)*opt->tot_prim);
                         rij = (double *)malloc(sizeof(double)*opt->tot_prim*3);
-                        screenij = (int *)malloc(sizeof(int)*opt->tot_prim);
+                        cceij = (int *)malloc(sizeof(int)*opt->tot_prim);
                         opt->expij[io+ip] = expij;
                         opt->rij[io+ip] = rij;
-                        opt->screenij[io+ip] = screenij;
+                        opt->cceij[io+ip] = cceij;
 
                         for (j = 0; j < nbas; j++) {
                                 rj = env + atm(PTR_COORD,bas(ATOM_OF,j));
@@ -230,13 +230,17 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                                         rij[off*3+1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / aij;
                                         rij[off*3+2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / aij;
                                         /* TODO: better screen estimation,
-                                         * e.g. based on (ab|cd) < (00|00) */
+                                         * e.g. based on (ab|cd) ~< (00|00)
                                         if (expij[off] > exp(-EXPCUTOFF/2)) {
-                                                screenij[off] = 0;
+                                                cceij[off] = 0;
                                         } else {
-                                                //screenij[off] = (eij[off] > EXPCUTOFF);
-                                                screenij[off] = (expij[off]*maxci*maxcj < exp(-EXPCUTOFF));
-                                        }
+                                                //cceij[off] = (eij[off] > EXPCUTOFF);
+                                                cceij[off] = (expij[off]*maxci*maxcj < exp(-EXPCUTOFF));
+                                        } */
+                                        /* in experiment */
+                                        compensation = exp(il*2+jl*2);
+                                        cceij[off] =-log(expij[off]*maxci*maxcj
+                                                         *compensation);
                                 }
                         }
                 }
