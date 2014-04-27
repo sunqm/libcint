@@ -258,16 +258,16 @@ int CINT1e_drv(double *opij, unsigned int *ng, double fac,
                                 shls, atm, bas, env);
 
         if (f_c2s == c2s_sph_1e) {
-                ip = CINTcgtos_spheric(i_sh, bas);
-                jp = CINTcgtos_spheric(j_sh, bas);
+                ip = CINTcgto_spheric(i_sh, bas);
+                jp = CINTcgto_spheric(j_sh, bas);
                 nop = ip * jp;
         } else if (f_c2s == c2s_cart_1e) {
-                ip = CINTcgtos_cart(i_sh, bas);
-                jp = CINTcgtos_cart(j_sh, bas);
+                ip = CINTcgto_cart(i_sh, bas);
+                jp = CINTcgto_cart(j_sh, bas);
                 nop = ip * jp;
         } else {
-                ip = CINTcgtos_spinor(i_sh, bas);
-                jp = CINTcgtos_spinor(j_sh, bas);
+                ip = CINTcgto_spinor(i_sh, bas);
+                jp = CINTcgto_spinor(j_sh, bas);
                 nop = ip * jp * OF_CMPLX;
         }
 
@@ -314,16 +314,16 @@ int CINT1e_rinv_drv(double *opij, unsigned int *ng, double fac,
                                     shls, atm, bas, env);
 
         if (f_c2s == c2s_sph_1e) {
-                ip = CINTcgtos_spheric(i_sh, bas);
-                jp = CINTcgtos_spheric(j_sh, bas);
+                ip = CINTcgto_spheric(i_sh, bas);
+                jp = CINTcgto_spheric(j_sh, bas);
                 nop = ip * jp;
         } else if (f_c2s == c2s_cart_1e) {
-                ip = CINTcgtos_cart(i_sh, bas);
-                jp = CINTcgtos_cart(j_sh, bas);
+                ip = CINTcgto_cart(i_sh, bas);
+                jp = CINTcgto_cart(j_sh, bas);
                 nop = ip * jp;
         } else {
-                ip = CINTcgtos_spinor(i_sh, bas);
-                jp = CINTcgtos_spinor(j_sh, bas);
+                ip = CINTcgto_spinor(i_sh, bas);
+                jp = CINTcgto_spinor(j_sh, bas);
                 nop = ip * jp * OF_CMPLX;
         }
 
@@ -374,16 +374,16 @@ int CINT1e_nuc_drv(double *opij, unsigned int *ng, double fac,
         }
 
         if (f_c2s == c2s_sph_1e) {
-                ip = CINTcgtos_spheric(i_sh, bas);
-                jp = CINTcgtos_spheric(j_sh, bas);
+                ip = CINTcgto_spheric(i_sh, bas);
+                jp = CINTcgto_spheric(j_sh, bas);
                 nop = ip * jp;
         } else if (f_c2s == c2s_cart_1e) {
-                ip = CINTcgtos_cart(i_sh, bas);
-                jp = CINTcgtos_cart(j_sh, bas);
+                ip = CINTcgto_cart(i_sh, bas);
+                jp = CINTcgto_cart(j_sh, bas);
                 nop = ip * jp;
         } else {
-                ip = CINTcgtos_spinor(i_sh, bas);
-                jp = CINTcgtos_spinor(j_sh, bas);
+                ip = CINTcgto_spinor(i_sh, bas);
+                jp = CINTcgto_spinor(j_sh, bas);
                 nop = ip * jp * OF_CMPLX;
         }
 

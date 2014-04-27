@@ -57,7 +57,7 @@ integer :: i, j, k, l
 integer :: di, dj, dk, dl
 integer :: shls(4)
 double precision,allocatable :: buf1e(:,:,:), buf2e(:,:,:,:,:)
-integer,external :: CINTcgtos_cart
+integer,external :: CINTcgto_cart
 integer,external :: cint1e_ipovlp_cart, cint2e_ip1_cart
 integer(8) :: opt
 allocate (atm(ATM_SLOTS,natm))
@@ -140,8 +140,8 @@ n = n + 1
 ! note the index of shell is 0-based
 ! the integral has 3 components
 !
-i = 0; shls(1) = i; di = CINTcgtos_cart(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_cart(j, bas)
+i = 0; shls(1) = i; di = CINTcgto_cart(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_cart(j, bas)
 allocate (buf1e(di,dj,3))
 if (0 /= cint1e_ipovlp_cart(buf1e, shls, atm, natm, bas, nbas, env)) then
   print*, "This gradient integral is not 0.\n"
@@ -153,20 +153,20 @@ deallocate (buf1e)
 ! the index of shell is 0-based
 ! the integral has 3 components
 !
-i = 0; shls(1) = i; di = CINTcgtos_cart(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_cart(j, bas)
-k = 2; shls(3) = k; dk = CINTcgtos_cart(k, bas)
-l = 2; shls(4) = l; dl = CINTcgtos_cart(l, bas)
+i = 0; shls(1) = i; di = CINTcgto_cart(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_cart(j, bas)
+k = 2; shls(3) = k; dk = CINTcgto_cart(k, bas)
+l = 2; shls(4) = l; dl = CINTcgto_cart(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
 if (0 /= cint2e_ip1_cart(buf2e, shls, atm, natm, bas, nbas, env, 0_8)) then
   print*, "This gradient integral is not 0.\n"
 endif
 
 call cint2e_ip1_cart_optimizer(opt, atm, natm, bas, nbas, env)
-i = 0; shls(1) = i; di = CINTcgtos_cart(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_cart(j, bas)
-k = 2; shls(3) = k; dk = CINTcgtos_cart(k, bas)
-l = 2; shls(4) = l; dl = CINTcgtos_cart(l, bas)
+i = 0; shls(1) = i; di = CINTcgto_cart(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_cart(j, bas)
+k = 2; shls(3) = k; dk = CINTcgto_cart(k, bas)
+l = 2; shls(4) = l; dl = CINTcgto_cart(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
 if (0 /= cint2e_ip1_cart(buf2e, shls, atm, natm, bas, nbas, env, opt)) then
   print*, "This gradient integral is not 0.\n"

@@ -70,9 +70,9 @@ _cint = ctypes.cdll.LoadLibrary('/path/to/libcint.so')
 c_natm = ctypes.c_int(atm.size)
 c_nbas = ctypes.c_int(bas.size)
 
-_cint.cgtos_spheric.restype = ctypes.c_int
-di = _cint.cgtos_spheric(ctypes.c_int(0), bas.ctype.data)
-dj = _cint.cgtos_spheric(ctypes.c_int(1), bas.ctype.data)
+_cint.CINTcgto_spheric.restype = ctypes.c_int
+di = _cint.CINTcgto_spheric(ctypes.c_int(0), bas.ctype.data)
+dj = _cint.CINTcgto_spheric(ctypes.c_int(1), bas.ctype.data)
 
 c_shls = (ctypes.c_int * 2)(0, 1)
 buf = numpy.empty((di.value, dj.value, 3))

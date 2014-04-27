@@ -26,17 +26,29 @@ int cintlen_spinor_(const unsigned int *bas_id, const int *bas)
 
 int cintcgtos_cart_(const unsigned int *bas_id, const int *bas)
 {
-        return CINTcgtos_cart(*bas_id, bas);
+        return CINTcgto_cart(*bas_id, bas);
+}
+int cintcgto_cart_(const unsigned int *bas_id, const int *bas)
+{
+        return CINTcgto_cart(*bas_id, bas);
 }
 
 int cintcgtos_spheric_(const unsigned int *bas_id, const int *bas)
 {
-        return CINTcgtos_spheric(*bas_id, bas);
+        return CINTcgto_spheric(*bas_id, bas);
+}
+int cintcgto_spheric_(const unsigned int *bas_id, const int *bas)
+{
+        return CINTcgto_spheric(*bas_id, bas);
 }
 
 int cintcgtos_spinor_(const unsigned int *bas_id, const int *bas)
 {
-        return CINTcgtos_spinor(*bas_id, bas);
+        return CINTcgto_spinor(*bas_id, bas);
+}
+int cintcgto_spinor_(const unsigned int *bas_id, const int *bas)
+{
+        return CINTcgto_spinor(*bas_id, bas);
 }
 
 /* 

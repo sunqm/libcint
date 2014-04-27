@@ -88,7 +88,7 @@ typedef struct {
     double **non0coeff;
     double **expij;
     double **rij;
-    int **screenij;
+    int **cceij;
     unsigned int tot_prim;
 } CINTOpt;
 #endif
@@ -99,6 +99,9 @@ unsigned int CINTlen_spinor(const unsigned int bas_id, const int *bas);
 unsigned int CINTcgtos_cart(const unsigned int bas_id, const int *bas);
 unsigned int CINTcgtos_spheric(const unsigned int bas_id, const int *bas);
 unsigned int CINTcgtos_spinor(const unsigned int bas_id, const int *bas);
+unsigned int CINTcgto_cart(const unsigned int bas_id, const int *bas);
+unsigned int CINTcgto_spheric(const unsigned int bas_id, const int *bas);
+unsigned int CINTcgto_spinor(const unsigned int bas_id, const int *bas);
 
 unsigned int CINTtot_pgto_spheric(const int *bas, const int nbas);
 unsigned int CINTtot_pgto_spinor(const int *bas, const int nbas);
@@ -126,19 +129,19 @@ void CINTdel_optimizer(CINTOpt **opt);
 int cint2e_cart(double *opijkl, const unsigned int *shls,
                 const int *atm, const int natm,
                 const int *bas, const int nbas, const double *env,
-                CINTOpt *opt);
+                const CINTOpt *opt);
 void cint2e_cart_optimizer(CINTOpt **opt, const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
 int cint2e_sph(double *opijkl, const unsigned int *shls,
                const int *atm, const int natm,
                const int *bas, const int nbas, const double *env,
-               CINTOpt *opt);
+               const CINTOpt *opt);
 void cint2e_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
                           const int *bas, const int nbas, const double *env);
 int cint2e(double *opijkl, const unsigned int *shls,
            const int *atm, const int natm,
            const int *bas, const int nbas, const double *env,
-           CINTOpt *opt);
+           const CINTOpt *opt);
 void cint2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
                       const int *bas, const int nbas, const double *env);
 

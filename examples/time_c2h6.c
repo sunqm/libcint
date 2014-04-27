@@ -9,7 +9,6 @@
 
 #define atm(X,Y) atm[(X)+(Y)*ATM_SLOTS]
 
-double get_wall_time();
 void run_plain(const int *atm, const int natm,
                const int *bas, const int nbas, const double *env);
 void run_all(const int *atm, const int natm,
@@ -704,11 +703,9 @@ void run_all(const int *atm, const int natm,
 
         int pct, count;
         clock_t time0, time1 = 0;
-        double wtime0, wtime1;
         double tt, tot;
         tot = (double)ncgto*ncgto*ncgto*ncgto/8;
         time0 = clock();
-        wtime0 = get_wall_time();
 
         CINTOpt *non_opt = NULL;
         CINTOpt *opt_for_cint2e = NULL;
@@ -725,15 +722,15 @@ void run_all(const int *atm, const int natm,
         for (ij = 0; ij < nbas*(nbas+1)/2; ij++) {
                 i = ishls[ij];
                 j = jshls[ij];
-                di = CINTcgtos_spheric(i, bas);
-                dj = CINTcgtos_spheric(j, bas);
+                di = CINTcgto_spheric(i, bas);
+                dj = CINTcgto_spheric(j, bas);
                 // when ksh==ish, there exists k<i, so it's possible kl>ij
                 kl_max = (i+1)*(i+2)/2;
                 for (kl = 0; kl < kl_max; kl++) {
                         k = ishls[kl];
                         l = jshls[kl];
-                        dk = CINTcgtos_spheric(k, bas);
-                        dl = CINTcgtos_spheric(l, bas);
+                        dk = CINTcgto_spheric(k, bas);
+                        dl = CINTcgto_spheric(l, bas);
                         shls[0] = i;
                         shls[1] = j;
                         shls[2] = k;
@@ -753,12 +750,10 @@ void run_all(const int *atm, const int natm,
         }
         time1 = clock();
         tt = (double)(time1-time0)/CLOCKS_PER_SEC;
-        wtime1 = get_wall_time();
-        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
-               tt, tot/1e6/tt, wtime1-wtime0);
+        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n",
+               tt, tot/1e6/tt);
         /* */
         time0 = time1;
-        wtime0 = wtime1;
         printf("\tcint2e_sph with optimizer: total num ERI = %.2e\n", tot);
         pct = 0; count = 0;
 
@@ -769,15 +764,15 @@ void run_all(const int *atm, const int natm,
         for (ij = 0; ij < nbas*(nbas+1)/2; ij++) {
                 i = ishls[ij];
                 j = jshls[ij];
-                di = CINTcgtos_spheric(i, bas);
-                dj = CINTcgtos_spheric(j, bas);
+                di = CINTcgto_spheric(i, bas);
+                dj = CINTcgto_spheric(j, bas);
                 // when ksh==ish, there exists k<i, so it's possible kl>ij
                 kl_max = (i+1)*(i+2)/2;
                 for (kl = 0; kl < kl_max; kl++) {
                         k = ishls[kl];
                         l = jshls[kl];
-                        dk = CINTcgtos_spheric(k, bas);
-                        dl = CINTcgtos_spheric(l, bas);
+                        dk = CINTcgto_spheric(k, bas);
+                        dl = CINTcgto_spheric(l, bas);
                         shls[0] = i;
                         shls[1] = j;
                         shls[2] = k;
@@ -797,13 +792,11 @@ void run_all(const int *atm, const int natm,
         }
         time1 = clock();
         tt = (double)(time1-time0)/CLOCKS_PER_SEC;
-        wtime1 = get_wall_time();
-        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
-               tt, tot/1e6/tt, wtime1-wtime0);
+        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n",
+               tt, tot/1e6/tt);
 
         /* */
         time0 = time1;
-        wtime0 = wtime1;
         tot = (double)ncgto*ncgto*ncgto*ncgto/2*3;
         printf("\tGradients with optimizer: total num ERI = %.2e\n", tot);
         pct = 0; count = 0;
@@ -814,13 +807,13 @@ void run_all(const int *atm, const int natm,
         for (ij = 0; ij < nbas*nbas; ij++) {
                 i = ij / nbas;
                 j = ij - nbas*i;
-                di = CINTcgtos_spheric(i, bas);
-                dj = CINTcgtos_spheric(j, bas);
+                di = CINTcgto_spheric(i, bas);
+                dj = CINTcgto_spheric(j, bas);
                 for (kl = 0; kl < nbas*(nbas+1)/2; kl++) {
                         k = ishls[kl];
                         l = jshls[kl];
-                        dk = CINTcgtos_spheric(k, bas);
-                        dl = CINTcgtos_spheric(l, bas);
+                        dk = CINTcgto_spheric(k, bas);
+                        dl = CINTcgto_spheric(l, bas);
                         shls[0] = i;
                         shls[1] = j;
                         shls[2] = k;
@@ -839,23 +832,13 @@ void run_all(const int *atm, const int natm,
                 }
         }
         time1 = clock();
-        wtime1 = get_wall_time();
         tt = (double)(time1-time0)/CLOCKS_PER_SEC;
-        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops; Wall time = %8.2f\n",
-               tt, tot/1e6/tt, wtime1-wtime0);
+        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n",
+               tt, tot/1e6/tt);
 
         CINTdel_optimizer(&opt_for_cint2e);
         CINTdel_optimizer(&opt_for_ip1);
         free(ishls);
         free(jshls);
-}
-
-double get_wall_time()
-{
-    struct timeval time;
-    if (gettimeofday(&time, NULL)) {
-        return 0;
-    }
-    return (double)time.tv_sec + (double)time.tv_usec * 1e-6;
 }
 
