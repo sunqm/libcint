@@ -50,7 +50,7 @@ integer :: i, j, k, l
 integer :: di, dj, dk, dl
 integer :: shls(4)
 double complex,allocatable :: buf1e(:,:), buf2e(:,:,:,:)
-integer,external :: CINTcgtos_spinor
+integer,external :: CINTcgto_spinor
 external :: cint1e_spnucsp, cint2e_spsp1
 integer(8) :: opt
 allocate (atm(ATM_SLOTS,natm))
@@ -135,8 +135,8 @@ n = n + 1
 ! call one-electron spinor integrals
 ! the index of shell is 0-based
 !
-i = 0; shls(1) = i; di = CINTcgtos_spinor(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_spinor(j, bas)
+i = 0; shls(1) = i; di = CINTcgto_spinor(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_spinor(j, bas)
 allocate (buf1e(di,dj))
 call cint1e_spnucsp(buf1e, shls, atm, natm, bas, nbas, env)
 deallocate (buf1e)
@@ -145,19 +145,19 @@ deallocate (buf1e)
 ! call two-electron spinor integrals
 ! the index of shell is 0-based
 !
-i = 0; shls(1) = i; di = CINTcgtos_spinor(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_spinor(j, bas)
-k = 2; shls(3) = k; dk = CINTcgtos_spinor(k, bas)
-l = 2; shls(4) = l; dl = CINTcgtos_spinor(l, bas)
+i = 0; shls(1) = i; di = CINTcgto_spinor(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_spinor(j, bas)
+k = 2; shls(3) = k; dk = CINTcgto_spinor(k, bas)
+l = 2; shls(4) = l; dl = CINTcgto_spinor(l, bas)
 allocate (buf2e(di,dj,dk,dl))
 call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env, 0_8)
 deallocate (buf2e)
 
 call cint2e_spsp1_optimizer(opt, atm, natm, bas, nbas, env)
-i = 0; shls(1) = i; di = CINTcgtos_spinor(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_spinor(j, bas)
-k = 2; shls(3) = k; dk = CINTcgtos_spinor(k, bas)
-l = 2; shls(4) = l; dl = CINTcgtos_spinor(l, bas)
+i = 0; shls(1) = i; di = CINTcgto_spinor(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_spinor(j, bas)
+k = 2; shls(3) = k; dk = CINTcgto_spinor(k, bas)
+l = 2; shls(4) = l; dl = CINTcgto_spinor(l, bas)
 allocate (buf2e(di,dj,dk,dl))
 call cint2e_spsp1(buf2e, shls, atm, natm, bas, nbas, env, opt)
 deallocate (buf2e)

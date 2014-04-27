@@ -10,7 +10,7 @@ What is libcint
 
 libcint is an open source library for computation of Gaussian type
 integrals.  It provides C/Fortran function to evaluate one-electron /
-two-electron integrals with Cartesian / real-spheric / spinor Gaussian type
+two-electron integrals for Cartesian / real-spheric / spinor Gaussian type
 functions.
 
 
@@ -18,13 +18,13 @@ Features
 --------
 
 * Various GTO type:
-  - Cartesian GTO:  6d, 10f, 15g Gaussian type functions.
-  - Real-spheric GTO:  5d, 7f, 9g Gaussian type functions.
+  - Cartesian GTO:  s, p, 6d, 10f, 15g, 21h Gaussian type functions.
+  - Real-spheric GTO:  s, p, 5d, 7f, 9g, 11h Gaussian type functions.
   - Spinor GTO:  J-adapted spinor Gaussian functions.
 * One electron integrals.
-  - Besides the regular kinetic, or nuclear attraction etc.,
-    nuclear attraction due to Gaussian nuclear model are supported.
-* Two electron integrals (value < 1e-20 are neglected) include
+  - Regular kinetic-like integrals.
+  - Nuclear attraction-like integrals (Gaussian nuclear model are supported).
+* Two electron integrals (value < 1e-15 are neglected) include
   - Coulomb repulsion
   - Gaunt interaction
 * Common lisp script to generate C code for new integrals.
@@ -39,17 +39,17 @@ Features
 * Minimal overhead of initialization
   - Pre-comuptation is not required.  Only basic info (see previous API)
     of basis function need to be initialized, within a plain integer or
-    double precision array, once.  (For 2e integral, there is an optional
-    argument called optimizer which can increase the performance by ~10%.
-    Using NULL to swith off the optimizer does not affect the value of
-    integral.)
+    double precision array.  (For 2e integral, there is an optional
+    argument called optimizer which can be switched off by setting it to
+    NULL.  Using optimizer should not affect the value of integral, but
+    can increase the performance by ~10%.)
 * Minimal dependence on external library.
   - BLAS is the only library needed.  Normally, the performance
     difference due to various BLAS implementations is less than 1%.
 * Small memory usage.
-  - Very few intermediate data are allocated.  ~80% of the memory are
-    used for holding the whole contracted Cartesion integrals, which
-    typically should be less than 1 Mega bytes.
+  - Very few intermediate data are stored.  ~80% of the memory are
+    allocated for holding the whole contracted Cartesion integrals,
+    which typically should be less than 1 Mega bytes.
 
 
 Getting libcint
@@ -108,9 +108,9 @@ or
     sigma means    three pauli matrix
     dot, cross     can be used to combine operator-bra or operator-ket
 * Supported 1e-operator and 2e-operator include
-    rinv        means   1 / |\vec{r} - \vec{R}_(env[PTR_COMMON_ORIG])|
+    rinv        means   1 / |\vec{r} - \vec{R}_(env[PTR_RINV_ORIG])|
     nuc         means   \sum_N Z_N / |\vec{r} - \vec{R}_N|
-    nabla-rinv  means   \nabla (1 / |\vec{r} - \vec{R}_(env[PTR_COMMON_ORIG])|)
+    nabla-rinv  means   \nabla (1 / |\vec{r} - \vec{R}_(env[PTR_RINV_ORIG])|)
     gaunt       means   \alpha_i \dot \alpha_j / |\vec{r}_i - \vec{r}_j|
 
 
@@ -130,11 +130,11 @@ Installation
     make install
 
 * Use Intel MKL as BLAS library
-    - MKL version 10.2 or older or CPU without Intel AVX support
+    - MKL version 10.2 or older or CPU without Intel AVX instruction
       ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
           -lmkl_intel_lp64 -lmkl_sequential -lmkl_core \
           -Wl,--end-group -lpthread"
-    - MKL version 10.3 or newer and CPU with Intel AVX support
+    - MKL version 10.3 or newer and CPU with Intel AVX instruction
       ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
           -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_avx \
           -Wl,--end-group -lpthread"
@@ -150,9 +150,9 @@ Known problems
     MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
 
   This problem is caused by the conflict between Python and MKL library.
-  Add -lmkl_avx or -lmkl_mc -lmkl_def to MKL link flags to replace the
-  default blas link flags.  Be *careful* with the order of -lmkl_mc and
-  -lmkl_def.  e.g.
+  It can be fixed by adding -lmkl_avx or -lmkl_mc -lmkl_def to MKL link
+  flags to replace the default blas link flags.  Be careful with the
+  *order* of -lmkl_mc and -lmkl_def.  e.g.
     ../configure --with-blas="-Wl,--start-group -L$MKLROOT/lib/intel64 \
         -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def \
         -Wl,--end-group -lpthread"
@@ -167,7 +167,7 @@ Known problems
     - cint2e_ipspsp1
     - cint2e_ip1spsp2
 
-* The package have not been fully tested on 32-bit system.
+* The package is not fully tested on 32-bit platform.
 
 
 Bug report

@@ -57,7 +57,7 @@ integer :: i, j, k, l
 integer :: di, dj, dk, dl
 integer :: shls(4)
 double precision,allocatable :: buf1e(:,:,:), buf2e(:,:,:,:,:)
-integer,external :: CINTcgtos_spheric
+integer,external :: CINTcgto_spheric
 integer,external :: cint1e_ipovlp_sph, cint2e_ip1_sph
 integer(8) :: opt
 allocate (atm(ATM_SLOTS,natm))
@@ -139,8 +139,8 @@ n = n + 1
 ! the index of shell is 0-based
 ! the integral has 3 components
 !
-i = 0; shls(1) = i; di = CINTcgtos_spheric(i, bas)
-j = 0; shls(2) = j; dj = CINTcgtos_spheric(j, bas)
+i = 0; shls(1) = i; di = CINTcgto_spheric(i, bas)
+j = 0; shls(2) = j; dj = CINTcgto_spheric(j, bas)
 allocate (buf1e(di,dj,3))
 if (0 /= cint1e_ipovlp_sph(buf1e, shls, atm, natm, bas, nbas, env)) then
   print*, "This gradient integral is not 0.\n"
@@ -152,10 +152,10 @@ deallocate (buf1e)
 ! the index of shell is 0-based
 ! the integral has 3 components
 !
-i = 0; shls(1) = i; di = CINTcgtos_spheric(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_spheric(j, bas)
-k = 2; shls(3) = k; dk = CINTcgtos_spheric(k, bas)
-l = 2; shls(4) = l; dl = CINTcgtos_spheric(l, bas)
+i = 0; shls(1) = i; di = CINTcgto_spheric(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_spheric(j, bas)
+k = 2; shls(3) = k; dk = CINTcgto_spheric(k, bas)
+l = 2; shls(4) = l; dl = CINTcgto_spheric(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
 if (0 /= cint2e_ip1_sph(buf2e, shls, atm, natm, bas, nbas, env, 0_8)) then
   print*, "This gradient integral is not 0.\n"
@@ -163,10 +163,10 @@ endif
 deallocate (buf2e)
 
 call cint2e_ip1_sph_optimizer(opt, atm, natm, bas, nbas, env)
-i = 0; shls(1) = i; di = CINTcgtos_spheric(i, bas)
-j = 1; shls(2) = j; dj = CINTcgtos_spheric(j, bas)
-k = 2; shls(3) = k; dk = CINTcgtos_spheric(k, bas)
-l = 2; shls(4) = l; dl = CINTcgtos_spheric(l, bas)
+i = 0; shls(1) = i; di = CINTcgto_spheric(i, bas)
+j = 1; shls(2) = j; dj = CINTcgto_spheric(j, bas)
+k = 2; shls(3) = k; dk = CINTcgto_spheric(k, bas)
+l = 2; shls(4) = l; dl = CINTcgto_spheric(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
 if (0 /= cint2e_ip1_sph(buf2e, shls, atm, natm, bas, nbas, env, opt)) then
   print*, "This gradient integral is not 0.\n"

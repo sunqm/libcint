@@ -991,10 +991,10 @@ int CINT2e_cart_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
           + ((envs->k_ctr==1) << 1) +  (envs->l_ctr==1);
         has_value = CINTf_2e_loop[n](gctr, envs, opt);
 
-        ip = CINTcgtos_cart(envs->shls[0], envs->bas);
-        jp = CINTcgtos_cart(envs->shls[1], envs->bas);
-        kp = CINTcgtos_cart(envs->shls[2], envs->bas);
-        lp = CINTcgtos_cart(envs->shls[3], envs->bas);
+        ip = CINTcgto_cart(envs->shls[0], envs->bas);
+        jp = CINTcgto_cart(envs->shls[1], envs->bas);
+        kp = CINTcgto_cart(envs->shls[2], envs->bas);
+        lp = CINTcgto_cart(envs->shls[3], envs->bas);
         nop = ip * jp * kp * lp;
 
         if (has_value) {
@@ -1024,10 +1024,10 @@ int CINT2e_spheric_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
           + ((envs->k_ctr==1) << 1) +  (envs->l_ctr==1);
         has_value = CINTf_2e_loop[n](gctr, envs, opt);
 
-        ip = CINTcgtos_spheric(envs->shls[0], envs->bas);
-        jp = CINTcgtos_spheric(envs->shls[1], envs->bas);
-        kp = CINTcgtos_spheric(envs->shls[2], envs->bas);
-        lp = CINTcgtos_spheric(envs->shls[3], envs->bas);
+        ip = CINTcgto_spheric(envs->shls[0], envs->bas);
+        jp = CINTcgto_spheric(envs->shls[1], envs->bas);
+        kp = CINTcgto_spheric(envs->shls[2], envs->bas);
+        lp = CINTcgto_spheric(envs->shls[3], envs->bas);
         nop = ip * jp * kp * lp;
 
         if (has_value) {
@@ -1059,10 +1059,10 @@ int CINT2e_spinor_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt,
           + ((envs->k_ctr==1) << 1) +  (envs->l_ctr==1);
         has_value = CINTf_2e_loop[n](gctr, envs, opt);
 
-        ip = CINTcgtos_spinor(envs->shls[0], envs->bas);
-        jp = CINTcgtos_spinor(envs->shls[1], envs->bas);
-        kp = CINTcgtos_spinor(envs->shls[2], envs->bas);
-        lp = CINTcgtos_spinor(envs->shls[3], envs->bas);
+        ip = CINTcgto_spinor(envs->shls[0], envs->bas);
+        jp = CINTcgto_spinor(envs->shls[1], envs->bas);
+        kp = CINTcgto_spinor(envs->shls[2], envs->bas);
+        lp = CINTcgto_spinor(envs->shls[3], envs->bas);
         nop = ip * jp * kp * lp;
 
         if (has_value) {

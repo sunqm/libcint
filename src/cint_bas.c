@@ -46,6 +46,10 @@ unsigned int CINTcgtos_cart(const unsigned int bas_id, const int *bas)
 {
         return CINTlen_cart(bas(ANG_OF, bas_id)) * bas(NCTR_OF, bas_id);
 }
+unsigned int CINTcgto_cart(const unsigned int bas_id, const int *bas)
+{
+        return CINTlen_cart(bas(ANG_OF, bas_id)) * bas(NCTR_OF, bas_id);
+}
 
 /* 
  * Num. of contracted spheric GTO = 2j+1 * n_contraction
@@ -54,11 +58,19 @@ unsigned int CINTcgtos_spheric(const unsigned int bas_id, const int *bas)
 {
         return (bas(ANG_OF, bas_id) * 2 + 1) * bas(NCTR_OF, bas_id);
 }
+unsigned int CINTcgto_spheric(const unsigned int bas_id, const int *bas)
+{
+        return (bas(ANG_OF, bas_id) * 2 + 1) * bas(NCTR_OF, bas_id);
+}
 
 /* 
  * Num. of contracted spinor GTO
  */
 unsigned int CINTcgtos_spinor(const unsigned int bas_id, const int *bas)
+{
+        return CINTlen_spinor(bas_id, bas) * bas(NCTR_OF, bas_id);
+}
+unsigned int CINTcgto_spinor(const unsigned int bas_id, const int *bas)
 {
         return CINTlen_spinor(bas_id, bas) * bas(NCTR_OF, bas_id);
 }
@@ -107,7 +119,7 @@ static unsigned int tot_cgto_accum(unsigned int (*f)(), const int *bas, const in
  */
 unsigned int CINTtot_cgto_spheric(const int *bas, const int nbas)
 {
-        return tot_cgto_accum(&CINTcgtos_spheric, bas, nbas);
+        return tot_cgto_accum(&CINTcgto_spheric, bas, nbas);
 }
 
 /*
@@ -115,7 +127,7 @@ unsigned int CINTtot_cgto_spheric(const int *bas, const int nbas)
  */
 unsigned int CINTtot_cgto_spinor(const int *bas, const int nbas)
 {
-        return tot_cgto_accum(&CINTcgtos_spinor, bas, nbas);
+        return tot_cgto_accum(&CINTcgto_spinor, bas, nbas);
 }
 
 /*
@@ -123,7 +135,7 @@ unsigned int CINTtot_cgto_spinor(const int *bas, const int nbas)
  */
 unsigned int CINTtot_cgto_cart(const int *bas, const int nbas)
 {
-        return tot_cgto_accum(&CINTcgtos_cart, bas, nbas);
+        return tot_cgto_accum(&CINTcgto_cart, bas, nbas);
 }
 
 static void shells_cgto_offset(unsigned int (*f)(), int ao_loc[],
@@ -140,7 +152,7 @@ static void shells_cgto_offset(unsigned int (*f)(), int ao_loc[],
  */
 void CINTshells_cart_offset(int ao_loc[], const int *bas, const int nbas)
 {
-        shells_cgto_offset(&CINTcgtos_cart, ao_loc, bas, nbas);
+        shells_cgto_offset(&CINTcgto_cart, ao_loc, bas, nbas);
 }
 
 /*
@@ -148,7 +160,7 @@ void CINTshells_cart_offset(int ao_loc[], const int *bas, const int nbas)
  */
 void CINTshells_spheric_offset(int ao_loc[], const int *bas, const int nbas)
 {
-        shells_cgto_offset(&CINTcgtos_spheric, ao_loc, bas, nbas);
+        shells_cgto_offset(&CINTcgto_spheric, ao_loc, bas, nbas);
 }
 
 /*
@@ -156,7 +168,7 @@ void CINTshells_spheric_offset(int ao_loc[], const int *bas, const int nbas)
  */
 void CINTshells_spinor_offset(int ao_loc[], const int *bas, const int nbas)
 {
-        shells_cgto_offset(&CINTcgtos_spinor, ao_loc, bas, nbas);
+        shells_cgto_offset(&CINTcgto_spinor, ao_loc, bas, nbas);
 }
 
 

@@ -16,6 +16,9 @@ unsigned int CINTlen_spinor(const unsigned int bas_id, const int *bas);
 unsigned int CINTcgtos_cart(const unsigned int bas_id, const int *bas);
 unsigned int CINTcgtos_spheric(const unsigned int bas_id, const int *bas);
 unsigned int CINTcgtos_spinor(const unsigned int bas_id, const int *bas);
+unsigned int CINTcgto_cart(const unsigned int bas_id, const int *bas);
+unsigned int CINTcgto_spheric(const unsigned int bas_id, const int *bas);
+unsigned int CINTcgto_spinor(const unsigned int bas_id, const int *bas);
 
 unsigned int CINTtot_pgto_spheric(const int *bas, const int nbas);
 unsigned int CINTtot_pgto_spinor(const int *bas, const int nbas);

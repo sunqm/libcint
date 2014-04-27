@@ -122,8 +122,8 @@ int main()
         int shls[4];
         double *buf;
 
-        i = 0; shls[0] = i; di = CINTcgtos_spinor(i, bas);
-        j = 1; shls[1] = j; dj = CINTcgtos_spinor(j, bas);
+        i = 0; shls[0] = i; di = CINTcgto_spinor(i, bas);
+        j = 1; shls[1] = j; dj = CINTcgto_spinor(j, bas);
         buf = malloc(sizeof(double) * di * dj * OF_CMPLX);
         if (0 != cint1e_spnucsp(buf, shls, atm, natm, bas, nbas, env)) {
                 printf("This integral is not 0.\n");
@@ -133,10 +133,10 @@ int main()
         /*
          * call two-electron spinor integrals
          */
-        i = 0; shls[0] = i; di = CINTcgtos_spinor(i, bas);
-        j = 1; shls[1] = j; dj = CINTcgtos_spinor(j, bas);
-        k = 2; shls[2] = k; dk = CINTcgtos_spinor(k, bas);
-        l = 2; shls[3] = l; dl = CINTcgtos_spinor(l, bas);
+        i = 0; shls[0] = i; di = CINTcgto_spinor(i, bas);
+        j = 1; shls[1] = j; dj = CINTcgto_spinor(j, bas);
+        k = 2; shls[2] = k; dk = CINTcgto_spinor(k, bas);
+        l = 2; shls[3] = l; dl = CINTcgto_spinor(l, bas);
         buf = malloc(sizeof(double) * di * dj * dk * dl * OF_CMPLX);
         if (0 != cint2e_spsp1(buf, shls, atm, natm, bas, nbas, env, NULL)) {
                 printf("This integral is not 0.\n");
@@ -145,10 +145,10 @@ int main()
 
         CINTOpt *opt = NULL;
         cint2e_spsp1_optimizer(&opt, atm, natm, bas, nbas, env);
-        i = 0; shls[0] = i; di = CINTcgtos_spinor(i, bas);
-        j = 1; shls[1] = j; dj = CINTcgtos_spinor(j, bas);
-        k = 2; shls[2] = k; dk = CINTcgtos_spinor(k, bas);
-        l = 2; shls[3] = l; dl = CINTcgtos_spinor(l, bas);
+        i = 0; shls[0] = i; di = CINTcgto_spinor(i, bas);
+        j = 1; shls[1] = j; dj = CINTcgto_spinor(j, bas);
+        k = 2; shls[2] = k; dk = CINTcgto_spinor(k, bas);
+        l = 2; shls[3] = l; dl = CINTcgto_spinor(l, bas);
         buf = malloc(sizeof(double) * di * dj * dk * dl * OF_CMPLX);
         if (0 != cint2e_spsp1(buf, shls, atm, natm, bas, nbas, env, opt)) {
                 printf("This integral is not 0.\n");
