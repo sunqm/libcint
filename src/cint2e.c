@@ -140,7 +140,7 @@
                         } \
                         break; \
                 default: \
-                        for (kp = 0; kp < n_comp-3; kp+=4) { \
+                        for (kp = 0; kp+3 < n_comp; kp+=4) { \
                                 gctr1 = gctr  + nf*nc; \
                                 gctr2 = gctr1 + nf*nc; \
                                 gctr3 = gctr2 + nf*nc; \
@@ -929,7 +929,7 @@ k_contracted: ;
                         }
                         break;
                 default:
-                        for (kp = 0; kp < n_comp-3; kp+=4) {
+                        for (kp = 0; kp+3 < n_comp; kp+=4) {
                                 gctr1 = gctr  + nf*nc;
                                 gctr2 = gctr1 + nf*nc;
                                 gctr3 = gctr2 + nf*nc;
