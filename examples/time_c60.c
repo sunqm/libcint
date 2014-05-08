@@ -224,7 +224,7 @@ void run_all(const int *atm, const int natm,
                         free(buf);
                 }
                 count += kl_max;
-                if (100l*count/(nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
+                if (100l*count/((long)nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
                         pct++;
                         time1 = clock();
                         printf("\t%d%%, CPU time = %8.2f\r", pct,

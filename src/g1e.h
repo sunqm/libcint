@@ -13,50 +13,50 @@ typedef struct {
         const int *atm;
         const int *bas;
         const double *env;
-        const unsigned int *shls;
+        const int *shls;
 
-        unsigned int i_l;
-        unsigned int j_l;
-        unsigned int k_l;
-        unsigned int l_l;
-        unsigned int i_prim;
-        unsigned int j_prim;
-        unsigned int k_prim;
-        unsigned int l_prim;
-        unsigned int i_ctr;
-        unsigned int j_ctr;
-        unsigned int k_ctr;
-        unsigned int l_ctr;
-        unsigned int nfi;  // number of cartesion components
-        unsigned int nfj;
-        unsigned int nfk;
-        unsigned int nfl;
-        unsigned int nf;  // = nfi*nfj*nfk*nfl;
+        int i_l;
+        int j_l;
+        int k_l;
+        int l_l;
+        int i_prim;
+        int j_prim;
+        int k_prim;
+        int l_prim;
+        int i_ctr;
+        int j_ctr;
+        int k_ctr;
+        int l_ctr;
+        int nfi;  // number of cartesion components
+        int nfj;
+        int nfk;
+        int nfl;
+        int nf;  // = nfi*nfj*nfk*nfl;
         const double *ri;
         const double *rj;
         const double *rk;
         const double *rl;
         double common_factor;
 
-        unsigned int gbits;
-        unsigned int ncomp_e1; // = 1 if spin free, = 4 when spin included, it
-        unsigned int ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
-        unsigned int ncomp_tensor; // e.g. = 3 for gradients
+        int gbits;
+        int ncomp_e1; // = 1 if spin free, = 4 when spin included, it
+        int ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
+        int ncomp_tensor; // e.g. = 3 for gradients
 
         /* values may diff based on the g0_2d4d algorithm */
-        unsigned int nrys_roots;
-        unsigned int li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
-        unsigned int lj_ceil;
-        unsigned int lk_ceil;
-        unsigned int ll_ceil;
-        unsigned int g_stride_i; // nrys_roots * shift of (i++,k,l,j)
-        unsigned int g_stride_k; // nrys_roots * shift of (i,k++,l,j)
-        unsigned int g_stride_l; // nrys_roots * shift of (i,k,l++,j)
-        unsigned int g_stride_j; // nrys_roots * shift of (i,k,l,j++)
-        unsigned int g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
+        int nrys_roots;
+        int li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
+        int lj_ceil;
+        int lk_ceil;
+        int ll_ceil;
+        int g_stride_i; // nrys_roots * shift of (i++,k,l,j)
+        int g_stride_k; // nrys_roots * shift of (i,k++,l,j)
+        int g_stride_l; // nrys_roots * shift of (i,k,l++,j)
+        int g_stride_j; // nrys_roots * shift of (i,k,l,j++)
+        int g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
 
-        unsigned int g2d_ijmax;
-        unsigned int g2d_klmax;
+        int g2d_ijmax;
+        int g2d_klmax;
         const double *rx_in_rijrx;
         const double *rx_in_rklrx;
         double rirj[3]; // diff by an sign in different g0_2d4d algorithm
@@ -68,7 +68,7 @@ typedef struct {
         void (*f_gout)();
 
         /* values are assigned during calculation */
-        unsigned int *idx;
+        int *idx;
         double ai;
         double aj;
         double ak;
@@ -82,39 +82,39 @@ typedef struct {
 } CINTEnvVars;
 #endif
 
-void CINTg1e_index_xyz(unsigned int idx[], const unsigned int *ng,
-                       const unsigned int shls[], const int *bas);
+void CINTg1e_index_xyz(int idx[], const int *ng,
+                       const int shls[], const int *bas);
 
-void CINTg_ovlp(double *g, const unsigned int *ng,
+void CINTg_ovlp(double *g, const int *ng,
                 const double ai, const double aj,
                 const double *ri, const double *rj, const double fac);
 
-void CINTg_nuc(double *g, const unsigned int *ng,
+void CINTg_nuc(double *g, const int *ng,
                const double aij, const double *rij,
                const double *ri, const double *rj,
                const double *cr, const double t2, const double fac);
 
-void CINTnabla1i_1e(double *f, const double *g, const unsigned int *ng,
+void CINTnabla1i_1e(double *f, const double *g, const int *ng,
                     const int li, const int lj,
                     const double ai);
 
-void CINTnabla1j_1e(double *f, const double *g, const unsigned int *ng,
+void CINTnabla1j_1e(double *f, const double *g, const int *ng,
                     const int li, const int lj,
                     const double aj);
 
-void CINTx1i_1e(double *f, const double *g, const unsigned int *ng,
+void CINTx1i_1e(double *f, const double *g, const int *ng,
                 const int li, const int lj,
                 const double ri[3]);
 
-void CINTx1j_1e(double *f, const double *g, const unsigned int *ng,
+void CINTx1j_1e(double *f, const double *g, const int *ng,
                 const int li, const int lj,
                 const double rj[3]);
 
-void CINTprim_to_ctr(double *gc, const unsigned int nf, const double *gp,
-                     const unsigned int inc, const unsigned int nprim,
-                     const unsigned int nctr, const double *pcoeff);
+void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
+                     const int inc, const int nprim,
+                     const int nctr, const double *pcoeff);
 
-double CINTcommon_fac_sp(unsigned int l);
+double CINTcommon_fac_sp(int l);
 
 #define G1E_D_I(f, g, li, lj)   CINTnabla1i_1e(f, g, ng, li, lj, ai)
 #define G1E_D_J(f, g, li, lj)   CINTnabla1j_1e(f, g, ng, li, lj, aj)

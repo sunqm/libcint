@@ -7,10 +7,10 @@
 
 #include "g1e.h"
 
-void CINTg2e_index_xyz(unsigned int *idx, const CINTEnvVars *envs);
+void CINTg2e_index_xyz(int *idx, const CINTEnvVars *envs);
 
-int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const unsigned int ng[],
-                           const unsigned int *shls,
+int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const int ng[],
+                           const int *shls,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
 
@@ -19,43 +19,35 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
 double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs);
 
 void CINTnabla1i_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs);
 
 void CINTnabla1j_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs);
 
 void CINTnabla1k_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs);
 
 void CINTnabla1l_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs);
 
 void CINTx1i_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *ri, const CINTEnvVars *envs);
 
 void CINTx1j_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *rj, const CINTEnvVars *envs);
 
 void CINTx1k_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *rk, const CINTEnvVars *envs);
 
 void CINTx1l_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *rl, const CINTEnvVars *envs);
 
 

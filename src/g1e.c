@@ -10,8 +10,8 @@
 #include "g1e.h"
 
 
-void CINTg1e_index_xyz(unsigned int idx[], const unsigned int *ng,
-                       const unsigned int shls[], const int *bas)
+void CINTg1e_index_xyz(int idx[], const int *ng,
+                       const int shls[], const int *bas)
 {
         const int i_l = bas(ANG_OF, shls[0]);
         const int j_l = bas(ANG_OF, shls[1]);
@@ -19,10 +19,10 @@ void CINTg1e_index_xyz(unsigned int idx[], const unsigned int *ng,
         const int nfj = CINTlen_cart(j_l);
         int i, j, n;
         int ofx, ofy, ofz;
-        unsigned int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
-        unsigned int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
-        unsigned int *idy = idx + nfi * nfj;
-        unsigned int *idz = idx + nfi * nfj * 2;
+        int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
+        int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
+        int *idy = idx + nfi * nfj;
+        int *idz = idx + nfi * nfj * 2;
 
         CINTcart_comp(i_nx, i_ny, i_nz, i_l);
         CINTcart_comp(j_nx, j_ny, j_nz, j_l);
@@ -42,7 +42,7 @@ void CINTg1e_index_xyz(unsigned int idx[], const unsigned int *ng,
 }
 
 
-void CINTg_ovlp(double *g, const unsigned int *ng,
+void CINTg_ovlp(double *g, const int *ng,
                 const double ai, const double aj,
                 const double *ri, const double *rj, const double fac)
 {
@@ -88,7 +88,7 @@ void CINTg_ovlp(double *g, const unsigned int *ng,
         }
 }
 
-void CINTg_nuc(double *g, const unsigned int *ng,
+void CINTg_nuc(double *g, const int *ng,
                const double aij, const double *rij,
                const double *ri, const double *rj,
                const double *cr, const double t2, const double fac)
@@ -134,7 +134,7 @@ void CINTg_nuc(double *g, const unsigned int *ng,
         }
 }
 
-void CINTnabla1i_1e(double *f, const double *g, const unsigned int *ng,
+void CINTnabla1i_1e(double *f, const double *g, const int *ng,
                     const int li, const int lj, const double ai)
 {
         int i, j, ptr;
@@ -160,7 +160,7 @@ void CINTnabla1i_1e(double *f, const double *g, const unsigned int *ng,
         }
 }
 
-void CINTnabla1j_1e(double *f, const double *g, const unsigned int *ng,
+void CINTnabla1j_1e(double *f, const double *g, const int *ng,
                     const int li, const int lj, const double aj)
 {
         int i, j, ptr;
@@ -194,7 +194,7 @@ void CINTnabla1j_1e(double *f, const double *g, const unsigned int *ng,
  * ri is the shift from the center R_O to the center of |i>
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
-void CINTx1i_1e(double *f, const double *g, const unsigned int *ng,
+void CINTx1i_1e(double *f, const double *g, const int *ng,
                 const int li, const int lj, const double ri[3])
 {
         int i, j, ptr;
@@ -216,7 +216,7 @@ void CINTx1i_1e(double *f, const double *g, const unsigned int *ng,
         }
 }
 
-void CINTx1j_1e(double *f, const double *g, const unsigned int *ng,
+void CINTx1j_1e(double *f, const double *g, const int *ng,
                 const int li, const int lj, const double rj[3])
 {
         int i, j, ptr;
@@ -248,12 +248,12 @@ void CINTx1j_1e(double *f, const double *g, const unsigned int *ng,
  * shl   nth shell
  * ip    ith-1 primitive GTO
  */
-void CINTprim_to_ctr(double *gc, const unsigned int nf, const double *gp,
-                     const unsigned int inc, const unsigned int nprim,
-                     const unsigned int nctr, const double *pcoeff)
+void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
+                     const int inc, const int nprim,
+                     const int nctr, const double *pcoeff)
 {
-        const unsigned int INC1 = 1;
-        unsigned int n, i;
+        const int INC1 = 1;
+        int n, i;
         double *pgc = gc;
 
         for (i = 0; i < inc; i++) {
@@ -272,7 +272,7 @@ void CINTprim_to_ctr(double *gc, const unsigned int nf, const double *gp,
  * to optimize memory copy in cart2sph.c, remove the common factor for s
  * and p function in cart2sph
  */
-double CINTcommon_fac_sp(unsigned int l)
+double CINTcommon_fac_sp(int l)
 {
         switch (l) {
                 case 0: return 0.282094791773878143;

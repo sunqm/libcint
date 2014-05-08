@@ -18,8 +18,8 @@
 /*
  * 1e GTO integral basic loop for < i|j>, no 1/r
  */
-int CINT1e_loop(double *gctr, const unsigned int *ng, double fac,
-                void (*const f_gout)(), const unsigned int *shls,
+int CINT1e_loop(double *gctr, const int *ng, double fac,
+                void (*const f_gout)(), const int *shls,
                 const int *atm, const int *bas, const double *env)
 {
         const int i_sh = shls[0];
@@ -40,7 +40,7 @@ int CINT1e_loop(double *gctr, const unsigned int *ng, double fac,
         const double *cj = env + bas(PTR_COEFF, j_sh);
         int ip, jp, n;
         int has_value = 0;
-        unsigned int *const idx = malloc(sizeof(unsigned int) * nf * 3);
+        int *const idx = malloc(sizeof(int) * nf * 3);
         double aij, dij, eij, rrij;
         double *const g = (double *)malloc(sizeof(double) * ng[0] * ng[1] * 3 * ((1<<ng[GSHIFT])+1)); // +1 as buffer
         double *const gout = (double *)malloc(sizeof(double) * nf * n_comp);
@@ -138,9 +138,9 @@ static double CINTno_nuc_mod(const double aij, const int nuc_id,
  * if nuc_id >= 0: nuclear attraction, use nuclear model
  * if nuc_id <  0: 1/r potential, do not use nuclear model
  */
-int CINT1e_nuc_loop(double *gctr, const unsigned int *ng, double fac,
+int CINT1e_nuc_loop(double *gctr, const int *ng, double fac,
                 void (*const f_gout)(), const int nuc_id,
-                const unsigned int *shls,
+                const int *shls,
                 const int *atm, const int *bas, const double *env)
 {
         const int i_sh = shls[0];
@@ -165,7 +165,7 @@ int CINT1e_nuc_loop(double *gctr, const unsigned int *ng, double fac,
         const double *cr;
         double (*f_nuc_mod)();
         double x, u[MXRYSROOTS], w[MXRYSROOTS];
-        unsigned int *const idx = malloc(sizeof(unsigned int) * nf * 3);
+        int *const idx = malloc(sizeof(int) * nf * 3);
         double rij[3], aij, dij, eij, rrij, t2;
         double *const g = (double *)malloc(sizeof(double) * ng[0] * ng[1] * 3 * ((1<<ng[GSHIFT])+1)); // +1 as buffer
         double *const gout = (double *)malloc(sizeof(double) * nf * n_comp);
@@ -233,9 +233,9 @@ int CINT1e_nuc_loop(double *gctr, const unsigned int *ng, double fac,
 /*
  * 1e integrals <i|O|j> without 1/r
  */
-int CINT1e_drv(double *opij, unsigned int *ng, double fac,
+int CINT1e_drv(double *opij, int *ng, double fac,
                void (*const f_gout)(), void (*const f_c2s)(),
-               const unsigned int *shls, const int *atm, const int natm,
+               const int *shls, const int *atm, const int natm,
                const int *bas, const int nbas, const double *env)
 {
         const int i_sh = shls[0];
@@ -288,9 +288,9 @@ int CINT1e_drv(double *opij, unsigned int *ng, double fac,
 /*
  * 1e integrals <i|O|j> with 1/r
  */
-int CINT1e_rinv_drv(double *opij, unsigned int *ng, double fac,
+int CINT1e_rinv_drv(double *opij, int *ng, double fac,
                     void (*const f_gout)(), void (*const f_c2s)(),
-                    const unsigned int *shls, const int *atm, const int natm,
+                    const int *shls, const int *atm, const int natm,
                     const int *bas, const int nbas, const double *env)
 {
         const int i_sh = shls[0];
@@ -345,9 +345,9 @@ int CINT1e_rinv_drv(double *opij, unsigned int *ng, double fac,
  * 1e integrals <i|O|j> with nuclear attraction
  * TODO: add the gaussian nuclear model
  */
-int CINT1e_nuc_drv(double *opij, unsigned int *ng, double fac,
+int CINT1e_nuc_drv(double *opij, int *ng, double fac,
                    void (*const f_gout)(), void (*const f_c2s)(),
-                   const unsigned int *shls, const int *atm, const int natm,
+                   const int *shls, const int *atm, const int natm,
                    const int *bas, const int nbas, const double *env)
 {
         const int i_sh = shls[0];

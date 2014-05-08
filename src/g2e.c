@@ -33,8 +33,7 @@ static void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTset_g2e_params(CINTEnvVars *envs);
 
 
-int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const unsigned int *ng,
-                           const unsigned int *shls,
+int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env)
 {
@@ -45,10 +44,10 @@ int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const unsigned int *ng,
         envs->env = env;
         envs->shls = shls;
 
-        const unsigned int i_sh = shls[0];
-        const unsigned int j_sh = shls[1];
-        const unsigned int k_sh = shls[2];
-        const unsigned int l_sh = shls[3];
+        const int i_sh = shls[0];
+        const int j_sh = shls[1];
+        const int k_sh = shls[2];
+        const int l_sh = shls[3];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
@@ -125,7 +124,7 @@ int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const unsigned int *ng,
 /* set strides and parameters for g0_2d4d algorithm */
 static void CINTset_g2e_params(CINTEnvVars *envs)
 {
-        unsigned int dli, dlj, dlk, dll;
+        int dli, dlj, dlk, dll;
         int ibase = envs->li_ceil > envs->lj_ceil;
         int kbase = envs->lk_ceil > envs->ll_ceil;
         if (envs->nrys_roots <= 2) { // use the fully optimized lj_4d algorithm
@@ -196,28 +195,28 @@ static void CINTset_g2e_params(CINTEnvVars *envs)
         }
 }
 
-void CINTg2e_index_xyz(unsigned int *idx, const CINTEnvVars *envs)
+void CINTg2e_index_xyz(int *idx, const CINTEnvVars *envs)
 {
-        const unsigned int i_l = envs->i_l;
-        const unsigned int j_l = envs->j_l;
-        const unsigned int k_l = envs->k_l;
-        const unsigned int l_l = envs->l_l;
-        const unsigned int nfi = envs->nfi;
-        const unsigned int nfj = envs->nfj;
-        const unsigned int nfk = envs->nfk;
-        const unsigned int nfl = envs->nfl;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
-        unsigned int i, j, k, l, n;
-        unsigned int ofx, ofkx, oflx;
-        unsigned int ofy, ofky, ofly;
-        unsigned int ofz, ofkz, oflz;
-        unsigned int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
-        unsigned int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
-        unsigned int k_nx[CART_MAX], k_ny[CART_MAX], k_nz[CART_MAX];
-        unsigned int l_nx[CART_MAX], l_ny[CART_MAX], l_nz[CART_MAX];
+        const int i_l = envs->i_l;
+        const int j_l = envs->j_l;
+        const int k_l = envs->k_l;
+        const int l_l = envs->l_l;
+        const int nfi = envs->nfi;
+        const int nfj = envs->nfj;
+        const int nfk = envs->nfk;
+        const int nfl = envs->nfl;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
+        int i, j, k, l, n;
+        int ofx, ofkx, oflx;
+        int ofy, ofky, ofly;
+        int ofz, ofkz, oflz;
+        int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
+        int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
+        int k_nx[CART_MAX], k_ny[CART_MAX], k_nz[CART_MAX];
+        int l_nx[CART_MAX], l_ny[CART_MAX], l_nz[CART_MAX];
 
         CINTcart_comp(i_nx, i_ny, i_nz, i_l);
         CINTcart_comp(j_nx, j_ny, j_nz, j_l);
@@ -296,12 +295,12 @@ void CINTg2e_index_xyz(unsigned int *idx, const CINTEnvVars *envs)
  */
 static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
-        const unsigned int nroots = envs->nrys_roots;
-        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
-        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
-        const unsigned int dm = envs->g2d_klmax;
-        const unsigned int dn = envs->g2d_ijmax;
-        unsigned int i, m, n, off;
+        const int nroots = envs->nrys_roots;
+        const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int mmax = envs->lk_ceil + envs->ll_ceil;
+        const int dm = envs->g2d_klmax;
+        const int dn = envs->g2d_ijmax;
+        int i, m, n, off;
         DEF_GXYZ(double, g, gx, gy, gz);
         const double *c00;
         const double *c0p;
@@ -397,17 +396,17 @@ static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 /* 2d is based on l,j */
 void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
 {
-        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
-        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
-        const unsigned int li = envs->li_ceil;
-        const unsigned int lk = envs->lk_ceil;
-        //const unsigned int ll = envs->ll_ceil;
-        const unsigned int lj = envs->lj_ceil;
-        unsigned int i, j, k, l, ptr, n;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int mmax = envs->lk_ceil + envs->ll_ceil;
+        const int li = envs->li_ceil;
+        const int lk = envs->lk_ceil;
+        //const int ll = envs->ll_ceil;
+        const int lj = envs->lj_ceil;
+        int i, j, k, l, ptr, n;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
@@ -440,17 +439,17 @@ void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
 /* 2d is based on k,j */
 void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
 {
-        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
-        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
-        const unsigned int li = envs->li_ceil;
-        //const unsigned int lk = envs->lk_ceil;
-        const unsigned int ll = envs->ll_ceil;
-        const unsigned int lj = envs->lj_ceil;
-        unsigned int i, j, k, l, ptr, n;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int mmax = envs->lk_ceil + envs->ll_ceil;
+        const int li = envs->li_ceil;
+        //const int lk = envs->lk_ceil;
+        const int ll = envs->ll_ceil;
+        const int lj = envs->lj_ceil;
+        int i, j, k, l, ptr, n;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
@@ -483,17 +482,17 @@ void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
 /* 2d is based on i,l */
 void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
 {
-        //const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
-        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
-        //const unsigned int li = envs->li_ceil;
-        const unsigned int lk = envs->lk_ceil;
-        const unsigned int ll = envs->ll_ceil;
-        const unsigned int lj = envs->lj_ceil;
-        unsigned int j, k, l, ptr, n;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        //const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int mmax = envs->lk_ceil + envs->ll_ceil;
+        //const int li = envs->li_ceil;
+        const int lk = envs->lk_ceil;
+        const int ll = envs->ll_ceil;
+        const int lj = envs->lj_ceil;
+        int j, k, l, ptr, n;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
@@ -525,17 +524,17 @@ void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
 /* 2d is based on i,k */
 void static CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
 {
-        //const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
-        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
-        //const unsigned int li = envs->li_ceil;
-        const unsigned int lk = envs->lk_ceil;
-        const unsigned int ll = envs->ll_ceil;
-        const unsigned int lj = envs->lj_ceil;
-        unsigned int j, k, l, ptr, n;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        //const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int mmax = envs->lk_ceil + envs->ll_ceil;
+        //const int li = envs->li_ceil;
+        const int lk = envs->lk_ceil;
+        const int ll = envs->ll_ceil;
+        const int lj = envs->lj_ceil;
+        int j, k, l, ptr, n;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
@@ -1522,8 +1521,8 @@ static inline void _g0_lj_4d_2100(double *g, double *c0, double *cp,
 
 static void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 {
-        const unsigned int nmax = envs->li_ceil + envs->lj_ceil;
-        const unsigned int mmax = envs->lk_ceil + envs->ll_ceil;
+        const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int mmax = envs->lk_ceil + envs->ll_ceil;
         switch (nmax) {
                 case 0: switch(mmax) {
                         case 0: goto _g0_4d_default; // ssss
@@ -1652,7 +1651,7 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                + rijrkl[2] * rijrkl[2]);
         CINTrys_roots(envs->nrys_roots, x, u, w);
 
-        unsigned int irys;
+        int irys;
         double u2, div;
         const double *rijrx = envs->rijrx;
         const double *rklrx = envs->rklrx;
@@ -1759,15 +1758,14 @@ double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs)
  * ( \nabla i j | kl )
  */
 void CINTnabla1i_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, n, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, n, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double ai = envs->ai;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
@@ -1800,15 +1798,14 @@ void CINTnabla1i_2e(double *f, const double *g,
  * ( i \nabla j | kl )
  */
 void CINTnabla1j_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double aj = envs->aj;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
@@ -1845,15 +1842,14 @@ void CINTnabla1j_2e(double *f, const double *g,
  * ( ij | \nabla k l )
  */
 void CINTnabla1k_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double ak = envs->ak;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
@@ -1885,15 +1881,14 @@ void CINTnabla1k_2e(double *f, const double *g,
  * ( ij | k \nabla l )
  */
 void CINTnabla1l_2e(double *f, const double *g,
-                    const unsigned int li, const unsigned int lj,
-                    const unsigned int lk, const unsigned int ll,
+                    const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         const double al = envs->al;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
@@ -1930,15 +1925,14 @@ void CINTnabla1l_2e(double *f, const double *g,
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
 void CINTx1i_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *ri, const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
@@ -1962,15 +1956,14 @@ void CINTx1i_2e(double *f, const double *g,
  * ( i x^1 j | kl )
  */
 void CINTx1j_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *rj, const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
@@ -1995,15 +1988,14 @@ void CINTx1j_2e(double *f, const double *g,
  * ( ij | x^1 k l )
  */
 void CINTx1k_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *rk, const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
@@ -2028,15 +2020,14 @@ void CINTx1k_2e(double *f, const double *g,
  * ( i j | x^1 kl )
  */
 void CINTx1l_2e(double *f, const double *g,
-                const unsigned int li, const unsigned int lj,
-                const unsigned int lk, const unsigned int ll,
+                const int li, const int lj, const int lk, const int ll,
                 const double *rl, const CINTEnvVars *envs)
 {
-        unsigned int i, j, k, l, ptr;
-        const unsigned int di = envs->g_stride_i;
-        const unsigned int dk = envs->g_stride_k;
-        const unsigned int dl = envs->g_stride_l;
-        const unsigned int dj = envs->g_stride_j;
+        int i, j, k, l, ptr;
+        const int di = envs->g_stride_i;
+        const int dk = envs->g_stride_k;
+        const int dl = envs->g_stride_l;
+        const int dj = envs->g_stride_j;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 

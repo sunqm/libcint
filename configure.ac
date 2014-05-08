@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([libcint], [1.0], [osirpt.sun@gmail.com])
+AC_INIT([libcint], [2.0], [osirpt.sun@gmail.com])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_CONFIG_SRCDIR([src/cint_bas.c])
 AC_CONFIG_HEADERS([config.h])

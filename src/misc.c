@@ -7,9 +7,9 @@
 
 #include <math.h>
 
-void CINTdcmplx_re(const unsigned int n, double *z, const double *re)
+void CINTdcmplx_re(const int n, double *z, const double *re)
 {
-        unsigned int i;
+        int i;
         for (i = 0; i < n; i++) {
                 z[0] = re[i];
                 z[1] = 0;
@@ -17,9 +17,9 @@ void CINTdcmplx_re(const unsigned int n, double *z, const double *re)
         }
 }
 
-void CINTdcmplx_im(const unsigned int n, double *z, const double *im)
+void CINTdcmplx_im(const int n, double *z, const double *im)
 {
-        unsigned int i;
+        int i;
         for (i = 0; i < n; i++) {
                 z[0] = 0;
                 z[1] = im[i];
@@ -27,30 +27,27 @@ void CINTdcmplx_im(const unsigned int n, double *z, const double *im)
         }
 }
 
-void CINTdcmplx_pp(const unsigned int n, double *z,
-                   const double *re, const double *im)
+void CINTdcmplx_pp(const int n, double *z, const double *re, const double *im)
 {
-        unsigned int i;
+        int i;
         for (i = 0; i < n; i++) {
                 z[0] = re[i];
                 z[1] = im[i];
                 z += 2;
         }
 }
-void CINTdcmplx_pn(const unsigned int n, double *z,
-                   const double *re, const double *im)
+void CINTdcmplx_pn(const int n, double *z, const double *re, const double *im)
 {
-        unsigned int i;
+        int i;
         for (i = 0; i < n; i++) {
                 z[0] =  re[i];
                 z[1] = -im[i];
                 z += 2;
         }
 }
-void CINTdcmplx_np(const unsigned int n, double *z,
-                   const double *re, const double *im)
+void CINTdcmplx_np(const int n, double *z, const double *re, const double *im)
 {
-        unsigned int i;
+        int i;
         for (i = 0; i < n; i++) {
                 z[0] = -re[i];
                 z[1] =  im[i];

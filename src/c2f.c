@@ -19,34 +19,34 @@
  * for cint_bas.c
  */
 
-int cintlen_spinor_(const unsigned int *bas_id, const int *bas)
+int cintlen_spinor_(const int *bas_id, const int *bas)
 {
         return CINTlen_spinor(*bas_id, bas);
 }
 
-int cintcgtos_cart_(const unsigned int *bas_id, const int *bas)
+int cintcgtos_cart_(const int *bas_id, const int *bas)
 {
         return CINTcgto_cart(*bas_id, bas);
 }
-int cintcgto_cart_(const unsigned int *bas_id, const int *bas)
+int cintcgto_cart_(const int *bas_id, const int *bas)
 {
         return CINTcgto_cart(*bas_id, bas);
 }
 
-int cintcgtos_spheric_(const unsigned int *bas_id, const int *bas)
+int cintcgtos_spheric_(const int *bas_id, const int *bas)
 {
         return CINTcgto_spheric(*bas_id, bas);
 }
-int cintcgto_spheric_(const unsigned int *bas_id, const int *bas)
+int cintcgto_spheric_(const int *bas_id, const int *bas)
 {
         return CINTcgto_spheric(*bas_id, bas);
 }
 
-int cintcgtos_spinor_(const unsigned int *bas_id, const int *bas)
+int cintcgtos_spinor_(const int *bas_id, const int *bas)
 {
         return CINTcgto_spinor(*bas_id, bas);
 }
-int cintcgto_spinor_(const unsigned int *bas_id, const int *bas)
+int cintcgto_spinor_(const int *bas_id, const int *bas)
 {
         return CINTcgto_spinor(*bas_id, bas);
 }
@@ -119,8 +119,7 @@ void cintshells_spinor_offset_(int ao_loc[], const int *bas, const int *nbas)
 /* 
  * GTO = x^{nx}y^{ny}z^{nz}e^{-ar^2}
  */
-void cintcart_comp_(unsigned int *nx, unsigned int *ny, unsigned int *nz,
-                    const unsigned int *lmax)
+void cintcart_comp_(int *nx, int *ny, int *nz, const int *lmax)
 {
         CINTcart_comp(nx, ny, nz, *lmax);
 }

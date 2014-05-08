@@ -4,14 +4,12 @@
  *
  */
 
-void CINTprim_to_ctr_0(double *gc, const unsigned int nf, const double *gp,
-                       const unsigned int nprim, const unsigned int nctr,
-                       const double *coeff);
-void CINTprim_to_ctr_1(double *gc, const unsigned int nf, const double *gp,
-                       const unsigned int nprim, const unsigned int nctr,
-                       const double *coeff);
+void CINTprim_to_ctr_0(double *gc, const int nf, const double *gp,
+                       const int nprim, const int nctr, const double *coeff);
+void CINTprim_to_ctr_1(double *gc, const int nf, const double *gp,
+                       const int nprim, const int nctr, const double *coeff);
 
-void CINTgout2e(double *g, double *gout, const unsigned int *idx,
+void CINTgout2e(double *g, double *gout, const int *idx,
                 const CINTEnvVars *envs, int gout_empty);
 
 int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt);

@@ -6,15 +6,15 @@
 #if !defined HAVE_DEFINED_CINTOPT_H
 #define HAVE_DEFINED_CINTOPT_H
 typedef struct {
-    unsigned int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
-    unsigned int *prim_offset;
-    unsigned int *non0ctr;
-    unsigned int **non0idx;
+    int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
+    int *prim_offset;
+    int *non0ctr;
+    int **non0idx;
     double **non0coeff;
     double **expij;
     double **rij;
     int **cceij;
-    unsigned int tot_prim;
+    int tot_prim;
 } CINTOpt;
 #endif
 
@@ -24,7 +24,7 @@ void CINTinit_optimizer(CINTOpt **opt, const int *atm, const int natm,
                         const int *bas, const int nbas, const double *env);
 void CINTdel_2e_optimizer(CINTOpt **opt);
 void CINTdel_optimizer(CINTOpt **opt);
-void CINTOpt_set_index_xyz(CINTOpt *opt, unsigned int *ng,
+void CINTOpt_set_index_xyz(CINTOpt *opt, int *ng,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
 void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
@@ -35,7 +35,7 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
 // optimizer examples
 void CINTno_optimizer(CINTOpt **opt, const int *atm, const int natm,
                       const int *bas, const int nbas, const double *env);
-void CINTuse_all_optimizer(CINTOpt **opt, unsigned int *ng,
+void CINTuse_all_optimizer(CINTOpt **opt, int *ng,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
 

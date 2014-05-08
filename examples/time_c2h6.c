@@ -740,7 +740,7 @@ void run_all(const int *atm, const int natm,
                         free(buf);
                 }
                 count += kl_max;
-                if (100*count/(nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
+                if (100*count/((long)nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
                         pct++;
                         time1 = clock();
                         printf("\t%d%%, CPU time = %8.2f\r", pct,
@@ -782,7 +782,7 @@ void run_all(const int *atm, const int natm,
                         free(buf);
                 }
                 count += kl_max;
-                if (100*count/(nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
+                if (100*count/((long)nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
                         pct++;
                         time1 = clock();
                         printf("\t%d%%, CPU time = %8.2f\r", pct,
@@ -823,7 +823,7 @@ void run_all(const int *atm, const int natm,
                         free(buf);
                 }
                 count += nbas*(nbas+1)/2;
-                if (100*count/(nbas*nbas*nbas*(nbas+1)/2) > pct) {
+                if (100*count/((long)nbas*nbas*nbas*(nbas+1)/2) > pct) {
                         pct++;
                         time1 = clock();
                         printf("\t%d%%, CPU time = %8.2f\r", pct,
