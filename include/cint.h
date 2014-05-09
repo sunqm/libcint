@@ -81,34 +81,34 @@
 #if !defined HAVE_DEFINED_CINTOPT_H
 #define HAVE_DEFINED_CINTOPT_H
 typedef struct {
-    unsigned int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
-    unsigned int *prim_offset;
-    unsigned int *non0ctr;
-    unsigned int **non0idx;
+    int **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
+    int *prim_offset;
+    int *non0ctr;
+    int **non0idx;
     double **non0coeff;
     double **expij;
     double **rij;
     int **cceij;
-    unsigned int tot_prim;
+    int tot_prim;
 } CINTOpt;
 #endif
 
-unsigned int CINTlen_cart(const unsigned int l);
-unsigned int CINTlen_spinor(const unsigned int bas_id, const int *bas);
+int CINTlen_cart(const int l);
+int CINTlen_spinor(const int bas_id, const int *bas);
 
-unsigned int CINTcgtos_cart(const unsigned int bas_id, const int *bas);
-unsigned int CINTcgtos_spheric(const unsigned int bas_id, const int *bas);
-unsigned int CINTcgtos_spinor(const unsigned int bas_id, const int *bas);
-unsigned int CINTcgto_cart(const unsigned int bas_id, const int *bas);
-unsigned int CINTcgto_spheric(const unsigned int bas_id, const int *bas);
-unsigned int CINTcgto_spinor(const unsigned int bas_id, const int *bas);
+int CINTcgtos_cart(const int bas_id, const int *bas);
+int CINTcgtos_spheric(const int bas_id, const int *bas);
+int CINTcgtos_spinor(const int bas_id, const int *bas);
+int CINTcgto_cart(const int bas_id, const int *bas);
+int CINTcgto_spheric(const int bas_id, const int *bas);
+int CINTcgto_spinor(const int bas_id, const int *bas);
 
-unsigned int CINTtot_pgto_spheric(const int *bas, const int nbas);
-unsigned int CINTtot_pgto_spinor(const int *bas, const int nbas);
+int CINTtot_pgto_spheric(const int *bas, const int nbas);
+int CINTtot_pgto_spinor(const int *bas, const int nbas);
 
-unsigned int CINTtot_cgto_cart(const int *bas, const int nbas);
-unsigned int CINTtot_cgto_spheric(const int *bas, const int nbas);
-unsigned int CINTtot_cgto_spinor(const int *bas, const int nbas);
+int CINTtot_cgto_cart(const int *bas, const int nbas);
+int CINTtot_cgto_spheric(const int *bas, const int nbas);
+int CINTtot_cgto_spinor(const int *bas, const int nbas);
 
 void CINTshells_cart_offset(int ao_loc[], const int *bas, const int nbas);
 void CINTshells_spheric_offset(int ao_loc[], const int *bas, const int nbas);
@@ -126,19 +126,19 @@ void CINTdel_2e_optimizer(CINTOpt **opt);
 void CINTdel_optimizer(CINTOpt **opt);
 
 
-int cint2e_cart(double *opijkl, const unsigned int *shls,
+int cint2e_cart(double *opijkl, const int *shls,
                 const int *atm, const int natm,
                 const int *bas, const int nbas, const double *env,
                 const CINTOpt *opt);
 void cint2e_cart_optimizer(CINTOpt **opt, const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
-int cint2e_sph(double *opijkl, const unsigned int *shls,
+int cint2e_sph(double *opijkl, const int *shls,
                const int *atm, const int natm,
                const int *bas, const int nbas, const double *env,
                const CINTOpt *opt);
 void cint2e_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
                           const int *bas, const int nbas, const double *env);
-int cint2e(double *opijkl, const unsigned int *shls,
+int cint2e(double *opijkl, const int *shls,
            const int *atm, const int natm,
            const int *bas, const int nbas, const double *env,
            const CINTOpt *opt);
