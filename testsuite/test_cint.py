@@ -47,6 +47,7 @@ bas = (ctypes.c_int * 200)()
 env = (ctypes.c_double * 400)()
 natm = ctypes.c_int()
 nbas = ctypes.c_int()
+opt = ctypes.c_ulong(0)
 _cint.init_test_env(atm, ctypes.addressof(natm), bas, ctypes.addressof(nbas), env)
 
 _cint.CINTlen_spinor.restype = ctypes.c_int
@@ -140,7 +141,7 @@ def test_int2e_sph(name, vref, dim, place):
                     dk = (bas[ANG_OF+BAS_SLOTS*k] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*k]
                     dl = (bas[ANG_OF+BAS_SLOTS*l] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*l]
                     shls = (ctypes.c_int * 4)(i, j, k, l)
-                    intor(op, shls, atm, natm, bas, nbas, env);
+                    intor(op, shls, atm, natm, bas, nbas, env, opt);
                     v1 += abs(numpy.array(op[:di*dj*dk*dl*dim])).sum()
     if round(abs(v1-vref), place):
         print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
@@ -160,7 +161,7 @@ def test_int2e_spinor(name, vref, dim, place):
                     dk = _cint.CINTlen_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
                     dl = _cint.CINTlen_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
                     shls = (ctypes.c_int * 4)(i, j, k, l)
-                    intor(op, shls, atm, natm, bas, nbas, env);
+                    intor(op, shls, atm, natm, bas, nbas, env, opt);
                     v1 += abs(cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2])).sum()
     if round(abs(v1-vref), place):
         print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
@@ -192,9 +193,9 @@ def test_comp2e_spinor(name1, name_ref, shift, dim, place):
                     dk = _cint.CINTlen_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
                     dl = _cint.CINTlen_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
                     shls = (ctypes.c_int * 4)(i+shift[0], j+shift[1], k+shift[2], l+shift[3])
-                    intor(op, shls, atm, natm, bas, nbas, env);
+                    intor(op, shls, atm, natm, bas, nbas, env, opt);
                     shls_ref = (ctypes.c_int * 4)(i, j, k, l)
-                    intor_ref(op_ref, shls_ref, atm, natm, bas, nbas, env);
+                    intor_ref(op_ref, shls_ref, atm, natm, bas, nbas, env, opt);
                     dd = abs(pfac * cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2]).reshape(di,dj,dk,dl,dim)
                              - cdouble_to_cmplx(op_ref[:di*dj*dk*dl*dim*2]).reshape(di,dj,dk,dl,dim))
                     if numpy.round(dd, place).sum():
