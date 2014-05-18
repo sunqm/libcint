@@ -1172,6 +1172,21 @@ void CINTgout2e(double *g, double *gout, const int *idx,
                                                 + g[ix+6] * g[iy+6] * g[iz+6];
                                 }
                                 break;
+                        case 8:
+                                for (n = 0; n < nf; n++, idx+=3) {
+                                        ix = idx[0];
+                                        iy = idx[1];
+                                        iz = idx[2];
+                                        gout[n] = g[ix  ] * g[iy  ] * g[iz  ]
+                                                + g[ix+1] * g[iy+1] * g[iz+1]
+                                                + g[ix+2] * g[iy+2] * g[iz+2]
+                                                + g[ix+3] * g[iy+3] * g[iz+3]
+                                                + g[ix+4] * g[iy+4] * g[iz+4]
+                                                + g[ix+5] * g[iy+5] * g[iz+5]
+                                                + g[ix+6] * g[iy+6] * g[iz+6]
+                                                + g[ix+7] * g[iy+7] * g[iz+7];
+                                }
+                                break;
                         default:
                                 for (n = 0; n < nf; n++, idx+=3) {
                                         ix = idx[0];
@@ -1260,6 +1275,21 @@ void CINTgout2e(double *g, double *gout, const int *idx,
                                                 + g[ix+4] * g[iy+4] * g[iz+4]
                                                 + g[ix+5] * g[iy+5] * g[iz+5]
                                                 + g[ix+6] * g[iy+6] * g[iz+6];
+                                }
+                                break;
+                        case 8:
+                                for (n = 0; n < nf; n++, idx+=3) {
+                                        ix = idx[0];
+                                        iy = idx[1];
+                                        iz = idx[2];
+                                        gout[n] +=g[ix  ] * g[iy  ] * g[iz  ]
+                                                + g[ix+1] * g[iy+1] * g[iz+1]
+                                                + g[ix+2] * g[iy+2] * g[iz+2]
+                                                + g[ix+3] * g[iy+3] * g[iz+3]
+                                                + g[ix+4] * g[iy+4] * g[iz+4]
+                                                + g[ix+5] * g[iy+5] * g[iz+5]
+                                                + g[ix+6] * g[iy+6] * g[iz+6]
+                                                + g[ix+7] * g[iy+7] * g[iz+7];
                                 }
                                 break;
                         default:

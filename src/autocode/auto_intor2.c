@@ -1588,6 +1588,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -1599,7 +1689,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[6]) + (-1*s[2]);
 gout[2] = + (1*s[1]) + (-1*s[3]);
@@ -1610,6 +1700,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -1621,7 +1801,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
@@ -1956,6 +2136,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -1967,7 +2237,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[6]) + (-1*s[2]);
 gout[2] = + (1*s[1]) + (-1*s[3]);
@@ -1978,6 +2248,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -1989,7 +2349,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
@@ -2328,6 +2688,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -2339,7 +2789,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[8]) + (1*s[4]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -2358,6 +2808,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -2369,7 +2909,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[8]) + (1*s[4]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -2780,6 +3320,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -2791,7 +3421,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[8]) + (1*s[4]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -2810,6 +3440,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -2821,7 +3541,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[8]) + (1*s[4]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -3232,12 +3952,54 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
 CINTdset0(3, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-}
+} break;}
 gout[0] = + (1*c[1]*s[2]) + (-1*c[2]*s[1]);
 gout[1] = + (1*c[2]*s[0]) + (-1*c[0]*s[2]);
 gout[2] = + (1*c[0]*s[1]) + (-1*c[1]*s[0]);
@@ -3247,12 +4009,54 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
 CINTdset0(3, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-}
+} break;}
 gout[0] += + (1*c[1]*s[2]) + (-1*c[2]*s[1]);
 gout[1] += + (1*c[2]*s[0]) + (-1*c[0]*s[2]);
 gout[2] += + (1*c[0]*s[1]) + (-1*c[1]*s[0]);
@@ -4506,12 +5310,54 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
 CINTdset0(3, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-}
+} break;}
 gout[0] = + (1*s[0]);
 gout[1] = + (1*s[1]);
 gout[2] = + (1*s[2]);
@@ -4522,12 +5368,54 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
 CINTdset0(3, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-}
+} break;}
 gout[0] += + (1*s[0]);
 gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
@@ -4578,12 +5466,54 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
 CINTdset0(3, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-}
+} break;}
 gout[0] = + (-1*s[0]);
 gout[1] = + (-1*s[1]);
 gout[2] = + (-1*s[2]);
@@ -4594,12 +5524,54 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
 CINTdset0(3, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-}
+} break;}
 gout[0] += + (-1*s[0]);
 gout[1] += + (-1*s[1]);
 gout[2] += + (-1*s[2]);
@@ -4654,6 +5626,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4665,7 +5727,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[6]) + (-1*s[2]);
 gout[2] = + (1*s[1]) + (-1*s[3]);
@@ -4676,6 +5738,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4687,7 +5839,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
@@ -4742,6 +5894,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4753,7 +5995,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[0]);
 gout[1] = + (1*s[3]);
 gout[2] = + (1*s[6]);
@@ -4776,6 +6018,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4787,7 +6119,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[0]);
 gout[1] += + (1*s[3]);
 gout[2] += + (1*s[6]);
@@ -4854,6 +6186,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4865,7 +6287,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (-1*s[0]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -4888,6 +6310,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4899,7 +6411,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (-1*s[0]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -4966,6 +6478,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -4977,7 +6579,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (-1*s[0]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -5000,6 +6602,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -5011,7 +6703,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (-1*s[0]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -5078,6 +6770,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -5089,7 +6871,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] = + (1*s[0]);
 gout[1] = + (1*s[3]);
 gout[2] = + (1*s[6]);
@@ -5112,6 +6894,96 @@ for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+break;
+case 2:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1];
+break;
+case 3:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2];
+break;
+case 4:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3];
+break;
+case 5:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4];
+break;
+case 6:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5];
+break;
+case 7:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6];
+break;
+case 8:
+s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0]+ g3[ix+1]*g0[iy+1]*g0[iz+1]+ g3[ix+2]*g0[iy+2]*g0[iz+2]+ g3[ix+3]*g0[iy+3]*g0[iz+3]+ g3[ix+4]*g0[iy+4]*g0[iz+4]+ g3[ix+5]*g0[iy+5]*g0[iz+5]+ g3[ix+6]*g0[iy+6]*g0[iz+6]+ g3[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0]+ g2[ix+1]*g1[iy+1]*g0[iz+1]+ g2[ix+2]*g1[iy+2]*g0[iz+2]+ g2[ix+3]*g1[iy+3]*g0[iz+3]+ g2[ix+4]*g1[iy+4]*g0[iz+4]+ g2[ix+5]*g1[iy+5]*g0[iz+5]+ g2[ix+6]*g1[iy+6]*g0[iz+6]+ g2[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0]+ g2[ix+1]*g0[iy+1]*g1[iz+1]+ g2[ix+2]*g0[iy+2]*g1[iz+2]+ g2[ix+3]*g0[iy+3]*g1[iz+3]+ g2[ix+4]*g0[iy+4]*g1[iz+4]+ g2[ix+5]*g0[iy+5]*g1[iz+5]+ g2[ix+6]*g0[iy+6]*g1[iz+6]+ g2[ix+7]*g0[iy+7]*g1[iz+7];
+s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0]+ g1[ix+1]*g2[iy+1]*g0[iz+1]+ g1[ix+2]*g2[iy+2]*g0[iz+2]+ g1[ix+3]*g2[iy+3]*g0[iz+3]+ g1[ix+4]*g2[iy+4]*g0[iz+4]+ g1[ix+5]*g2[iy+5]*g0[iz+5]+ g1[ix+6]*g2[iy+6]*g0[iz+6]+ g1[ix+7]*g2[iy+7]*g0[iz+7];
+s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0]+ g0[ix+1]*g3[iy+1]*g0[iz+1]+ g0[ix+2]*g3[iy+2]*g0[iz+2]+ g0[ix+3]*g3[iy+3]*g0[iz+3]+ g0[ix+4]*g3[iy+4]*g0[iz+4]+ g0[ix+5]*g3[iy+5]*g0[iz+5]+ g0[ix+6]*g3[iy+6]*g0[iz+6]+ g0[ix+7]*g3[iy+7]*g0[iz+7];
+s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0]+ g0[ix+1]*g2[iy+1]*g1[iz+1]+ g0[ix+2]*g2[iy+2]*g1[iz+2]+ g0[ix+3]*g2[iy+3]*g1[iz+3]+ g0[ix+4]*g2[iy+4]*g1[iz+4]+ g0[ix+5]*g2[iy+5]*g1[iz+5]+ g0[ix+6]*g2[iy+6]*g1[iz+6]+ g0[ix+7]*g2[iy+7]*g1[iz+7];
+s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0]+ g1[ix+1]*g0[iy+1]*g2[iz+1]+ g1[ix+2]*g0[iy+2]*g2[iz+2]+ g1[ix+3]*g0[iy+3]*g2[iz+3]+ g1[ix+4]*g0[iy+4]*g2[iz+4]+ g1[ix+5]*g0[iy+5]*g2[iz+5]+ g1[ix+6]*g0[iy+6]*g2[iz+6]+ g1[ix+7]*g0[iy+7]*g2[iz+7];
+s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0]+ g0[ix+1]*g1[iy+1]*g2[iz+1]+ g0[ix+2]*g1[iy+2]*g2[iz+2]+ g0[ix+3]*g1[iy+3]*g2[iz+3]+ g0[ix+4]*g1[iy+4]*g2[iz+4]+ g0[ix+5]*g1[iy+5]*g2[iz+5]+ g0[ix+6]*g1[iy+6]*g2[iz+6]+ g0[ix+7]*g1[iy+7]*g2[iz+7];
+s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0]+ g0[ix+1]*g0[iy+1]*g3[iz+1]+ g0[ix+2]*g0[iy+2]*g3[iz+2]+ g0[ix+3]*g0[iy+3]*g3[iz+3]+ g0[ix+4]*g0[iy+4]*g3[iz+4]+ g0[ix+5]*g0[iy+5]*g3[iz+5]+ g0[ix+6]*g0[iy+6]*g3[iz+6]+ g0[ix+7]*g0[iy+7]*g3[iz+7];
+break;
+default:
 CINTdset0(9, s);
 for (i = 0; i < envs->nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
@@ -5123,7 +6995,7 @@ s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} break;}
 gout[0] += + (1*s[0]);
 gout[1] += + (1*s[3]);
 gout[2] += + (1*s[6]);
