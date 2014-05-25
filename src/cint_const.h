@@ -69,6 +69,10 @@
 #define TSRZZ       8
 
 // ng[*]
+#define IINC            0
+#define JINC            1
+#define KINC            2
+#define LINC            3
 #define RYS_ROOTS       4
 #define GSHIFT          5
 #define POS_E1          6

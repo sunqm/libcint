@@ -392,20 +392,67 @@ CINTdset0(ip * jp * ng[TENSOR], opij);~%"))
         (format fout ";~%")))))
 
 (defun dump-s-2e (fout n)
-  (format fout "for (n = 0; n < nf; n++, idx+=3) {
+  (flet ((dump-s-for-nroots (nroots)
+           (loop
+             for i upto (1- (expt 3 n)) do
+             (let* ((ybin (dec-to-ybin i))
+                    (zbin (dec-to-zbin i))
+                    (xbin (- (ash 1 n) 1 ybin zbin)))
+               (format fout "s[~a] = " i)
+               (loop
+                 for k upto (1- nroots) do
+                 (format fout "+ g~a[ix+~a]*g~a[iy+~a]*g~a[iz+~a]"
+                         xbin k ybin k zbin k))
+               (format fout ";~%"))))
+         (dump-s-loop ()
+           (loop
+             for i upto (1- (expt 3 n)) do
+             (let* ((ybin (dec-to-ybin i))
+                    (zbin (dec-to-zbin i))
+                    (xbin (- (ash 1 n) 1 ybin zbin)))
+               (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
+                       i xbin ybin zbin))))) ; end do i = 1, envs->nrys_roots
+    (format fout "for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
-iz = idx[2];
+iz = idx[2];~%")
+    (if (< n 2) ; we don't want to torture compiler
+      (progn
+        (format fout "switch (envs->nrys_roots) {~%")
+        (format fout "case 1:~%")
+        (dump-s-for-nroots 1)
+        (format fout "break;~%" )
+        (format fout "case 2:~%")
+        (dump-s-for-nroots 2)
+        (format fout "break;~%" )
+        (format fout "case 3:~%")
+        (dump-s-for-nroots 3)
+        (format fout "break;~%" )
+        (format fout "case 4:~%")
+        (dump-s-for-nroots 4)
+        (format fout "break;~%" )
+        (format fout "case 5:~%")
+        (dump-s-for-nroots 5)
+        (format fout "break;~%" )
+        (format fout "case 6:~%")
+        (dump-s-for-nroots 6)
+        (format fout "break;~%" )
+        (format fout "case 7:~%" )
+        (dump-s-for-nroots 7)
+        (format fout "break;~%" )
+        (format fout "case 8:~%" )
+        (dump-s-for-nroots 8)
+        (format fout "break;~%" )
+        (format fout "default:
 CINTdset0(~a, s);
 for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
-  (loop
-    for i upto (1- (expt 3 n)) do
-    (let* ((ybin (dec-to-ybin i))
-           (zbin (dec-to-zbin i))
-           (xbin (- (ash 1 n) 1 ybin zbin)))
-      (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
-              i xbin ybin zbin)))
-  (format fout "}~%")) ; end do i = 1, envs->nrys_roots
+        (dump-s-loop)
+        (format fout "} break;}~%")) ; else
+      (progn
+        (format fout "CINTdset0(~a, s);
+for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
+        (dump-s-loop)
+        (format fout "}~%")))))
 
 (defun gen-code-int2e (fout intname raw-infix &optional (sp 'spinor))
   (destructuring-bind (op bra-i ket-j bra-k ket-l)

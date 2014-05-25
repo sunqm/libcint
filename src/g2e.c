@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include "cint_const.h"
 #include "cint_bas.h"
 #include "misc.h"
 #include "g2e.h"
@@ -80,10 +81,10 @@ int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         envs->ncomp_e2 =  ng[POS_E2];
         envs->ncomp_tensor = ng[TENSOR];
 
-        envs->li_ceil = envs->i_l + ng[0]; // ng[0] has different meaning in cint1e
-        envs->lj_ceil = envs->j_l + ng[1];
-        envs->lk_ceil = envs->k_l + ng[2];
-        envs->ll_ceil = envs->l_l + ng[3];
+        envs->li_ceil = envs->i_l + ng[IINC]; // ng[0] has different meaning in cint1e
+        envs->lj_ceil = envs->j_l + ng[JINC];
+        envs->lk_ceil = envs->k_l + ng[KINC];
+        envs->ll_ceil = envs->l_l + ng[LINC];
         envs->nrys_roots =(envs->li_ceil + envs->lj_ceil
                          + envs->lk_ceil + envs->ll_ceil)/2 + 1;
 
@@ -300,13 +301,15 @@ static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         const int mmax = envs->lk_ceil + envs->ll_ceil;
         const int dm = envs->g2d_klmax;
         const int dn = envs->g2d_ijmax;
-        int i, m, n, off;
+        int i, j, m, n, off;
         DEF_GXYZ(double, g, gx, gy, gz);
         const double *c00;
         const double *c0p;
         const double *b01 = bc->b01;
         const double *b00 = bc->b00;
         const double *b10 = bc->b10;
+        double *p0x, *p0y, *p0z;
+        const double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
 
         for (i = 0; i < nroots; i++) {
                 gx[i] = 1;
@@ -315,61 +318,85 @@ static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         }
 
         if (nmax > 0) {
+                p0x = gx + dn;
+                p0y = gy + dn;
+                p0z = gz + dn;
+                p1x = gx - dn;
+                p1y = gy - dn;
+                p1z = gz - dn;
                 // gx(irys,0,1) = c00(irys) * gx(irys,0,0)
                 for (c00 = bc->c00, i = 0; i < nroots; i++, c00+=3) {
-                        gx[i+dn] = c00[0] * gx[i];
-                        gy[i+dn] = c00[1] * gy[i];
-                        gz[i+dn] = c00[2] * gz[i];
+                        p0x[i] = c00[0] * gx[i];
+                        p0y[i] = c00[1] * gy[i];
+                        p0z[i] = c00[2] * gz[i];
                 }
                 // gx(irys,0,n+1) = c00(irys)*gx(irys,0,n)
                 // + n*b10(irys)*gx(irys,0,n-1)
                 for (n = 1; n < nmax; n++) {
-                        for (c00 = bc->c00, off = n*dn, i = 0;
-                             i < nroots; i++, c00+=3) {
-                                gx[off+i+dn] = c00[0] * gx[off+i] + n * b10[i] * gx[off+i-dn];
-                                gy[off+i+dn] = c00[1] * gy[off+i] + n * b10[i] * gy[off+i-dn];
-                                gz[off+i+dn] = c00[2] * gz[off+i] + n * b10[i] * gz[off+i-dn];
+                        off = n * dn;
+                        for (c00 = bc->c00, i = 0, j = off;
+                             i < nroots; i++, j++, c00+=3) {
+                                p0x[j] = c00[0] * gx[j] + n * b10[i] * p1x[j];
+                                p0y[j] = c00[1] * gy[j] + n * b10[i] * p1y[j];
+                                p0z[j] = c00[2] * gz[j] + n * b10[i] * p1z[j];
                         }
                 }
         }
 
         if (mmax > 0) {
+                p0x = gx + dm;
+                p0y = gy + dm;
+                p0z = gz + dm;
+                p1x = gx - dm;
+                p1y = gy - dm;
+                p1z = gz - dm;
                 // gx(irys,1,0) = c0p(irys) * gx(irys,0,0)
                 for (c0p = bc->c0p, i = 0; i < nroots; i++, c0p+=3) {
-                        gx[i+dm] = c0p[0] * gx[i];
-                        gy[i+dm] = c0p[1] * gy[i];
-                        gz[i+dm] = c0p[2] * gz[i];
+                        p0x[i] = c0p[0] * gx[i];
+                        p0y[i] = c0p[1] * gy[i];
+                        p0z[i] = c0p[2] * gz[i];
                 }
                 // gx(irys,m+1,0) = c0p(irys)*gx(irys,m,0)
                 // + m*b01(irys)*gx(irys,m-1,0)
                 for (m = 1; m < mmax; m++) {
-                        for (c0p = bc->c0p, off = m*dm, i = 0;
-                             i < nroots; i++, c0p+=3) {
-                                gx[off+i+dm] = c0p[0] * gx[off+i] + m * b01[i] * gx[off+i-dm];
-                                gy[off+i+dm] = c0p[1] * gy[off+i] + m * b01[i] * gy[off+i-dm];
-                                gz[off+i+dm] = c0p[2] * gz[off+i] + m * b01[i] * gz[off+i-dm];
+                        off = m * dm;
+                        for (c0p = bc->c0p, i = 0, j = off;
+                             i < nroots; i++, j++, c0p+=3) {
+                                p0x[j] = c0p[0] * gx[j] + m * b01[i] * p1x[j];
+                                p0y[j] = c0p[1] * gy[j] + m * b01[i] * p1y[j];
+                                p0z[j] = c0p[2] * gz[j] + m * b01[i] * p1z[j];
                         }
                 }
         }
 
         if (nmax > 0 && mmax > 0) {
+                p0x = gx + dn;
+                p0y = gy + dn;
+                p0z = gz + dn;
+                p1x = gx - dn;
+                p1y = gy - dn;
+                p1z = gz - dn;
+                p2x = gx - dm;
+                p2y = gy - dm;
+                p2z = gz - dm;
                 // gx(irys,1,1) = c0p(irys)*gx(irys,0,1)
                 // + b00(irys)*gx(irys,0,0)
                 for (c0p = bc->c0p, i = 0; i < nroots; i++, c0p+=3) {
-                        gx[i+dn+dm] = c0p[0] * gx[i+dn] + b00[i] * gx[i];
-                        gy[i+dn+dm] = c0p[1] * gy[i+dn] + b00[i] * gy[i];
-                        gz[i+dn+dm] = c0p[2] * gz[i+dn] + b00[i] * gz[i];
+                        p0x[i+dm] = c0p[0] * p0x[i] + b00[i] * gx[i];
+                        p0y[i+dm] = c0p[1] * p0y[i] + b00[i] * gy[i];
+                        p0z[i+dm] = c0p[2] * p0z[i] + b00[i] * gz[i];
                 }
 
                 // gx(irys,m+1,1) = c0p(irys)*gx(irys,m,1)
                 // + m*b01(irys)*gx(irys,m-1,1)
                 // + b00(irys)*gx(irys,m,0)
                 for (m = 1; m < mmax; m++) {
-                        for (c0p = bc->c0p, off = m*dm+dn, i = 0;
-                             i < nroots; i++, c0p+=3) {
-                                gx[off+i+dm] = c0p[0]*gx[off+i] + m*b01[i]*gx[off+i-dm] + b00[i]*gx[off+i-dn];
-                                gy[off+i+dm] = c0p[1]*gy[off+i] + m*b01[i]*gy[off+i-dm] + b00[i]*gy[off+i-dn];
-                                gz[off+i+dm] = c0p[2]*gz[off+i] + m*b01[i]*gz[off+i-dm] + b00[i]*gz[off+i-dn];
+                        off = m * dm + dn;
+                        for (c0p = bc->c0p, i = 0, j = off;
+                             i < nroots; i++, j++, c0p+=3) {
+                                gx[j+dm] = c0p[0]*gx[j] + m*b01[i]*p2x[j] +b00[i]*p1x[j];
+                                gy[j+dm] = c0p[1]*gy[j] + m*b01[i]*p2y[j] +b00[i]*p1y[j];
+                                gz[j+dm] = c0p[2]*gz[j] + m*b01[i]*p2z[j] +b00[i]*p1z[j];
                         }
                 }
 
@@ -378,11 +405,12 @@ static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
                 // + m*b00(irys)*gx(irys,m-1,n)
                 for (m = 1; m <= mmax; m++) {
                         for (n = 1; n < nmax; n++) {
-                                for (c00 = bc->c00, i = 0, off = m*dm+n*dn;
-                                     i < nroots; i++, c00+=3) {
-                                        gx[off+i+dn] = c00[0]*gx[off+i] +n*b10[i]*gx[off+i-dn] + m*b00[i]*gx[off+i-dm];
-                                        gy[off+i+dn] = c00[1]*gy[off+i] +n*b10[i]*gy[off+i-dn] + m*b00[i]*gy[off+i-dm];
-                                        gz[off+i+dn] = c00[2]*gz[off+i] +n*b10[i]*gz[off+i-dn] + m*b00[i]*gz[off+i-dm];
+                                off = m * dm + n * dn;
+                                for (c00 = bc->c00, i = 0, j = off;
+                                     i < nroots; i++, j++, c00+=3) {
+                                        p0x[j] = c00[0]*gx[j] +n*b10[i]*p1x[j] + m*b00[i]*p2x[j];
+                                        p0y[j] = c00[1]*gy[j] +n*b10[i]*p1y[j] + m*b00[i]*p2y[j];
+                                        p0z[j] = c00[2]*gz[j] +n*b10[i]*p1z[j] + m*b00[i]*p2z[j];
                                 }
                         }
                 }
@@ -402,6 +430,7 @@ void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
         const int lk = envs->lk_ceil;
         //const int ll = envs->ll_ceil;
         const int lj = envs->lj_ceil;
+        const int nroots = envs->nrys_roots;
         int i, j, k, l, ptr, n;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
@@ -410,28 +439,41 @@ void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
+        const double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
 
         // g(i,...,j) = rirj * g(i-1,...,j) +  g(i-1,...,j+1)
+        p1x = gx - di;
+        p1y = gy - di;
+        p1z = gz - di;
+        p2x = gx - di + dj;
+        p2y = gy - di + dj;
+        p2z = gz - di + dj;
         for (i = 1; i <= li; i++) {
         for (j = 0; j <= nmax-i; j++) {
         for (l = 0; l <= mmax; l++) {
                 ptr = j*dj + l*dl + i*di;
-                for (n = ptr; n < ptr+di; n++) {
-                        gx[n] = rirj[0]*gx[n-di] + gx[n-di+dj];
-                        gy[n] = rirj[1]*gy[n-di] + gy[n-di+dj];
-                        gz[n] = rirj[2]*gz[n-di] + gz[n-di+dj];
+                for (n = ptr; n < ptr+nroots; n++) {
+                        gx[n] = rirj[0] * p1x[n] + p2x[n];
+                        gy[n] = rirj[1] * p1y[n] + p2y[n];
+                        gz[n] = rirj[2] * p1z[n] + p2z[n];
                 }
         } } }
 
         // g(...,k,l,..) = rkrl * g(...,k-1,l,..) + g(...,k-1,l+1,..)
+        p1x = gx - dk;
+        p1y = gy - dk;
+        p1z = gz - dk;
+        p2x = gx - dk + dl;
+        p2y = gy - dk + dl;
+        p2z = gz - dk + dl;
         for (j = 0; j <= lj; j++) {
         for (k = 1; k <= lk; k++) {
                 for (l = 0; l <= mmax-k; l++) {
                         ptr = j*dj + l*dl + k*dk;
                         for (n = ptr; n < ptr+dk; n++) {
-                                gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
-                                gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
-                                gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
+                                gx[n] = rkrl[0] * p1x[n] + p2x[n];
+                                gy[n] = rkrl[1] * p1y[n] + p2y[n];
+                                gz[n] = rkrl[2] * p1z[n] + p2z[n];
                         }
                 }
         } }
@@ -445,6 +487,7 @@ void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
         //const int lk = envs->lk_ceil;
         const int ll = envs->ll_ceil;
         const int lj = envs->lj_ceil;
+        const int nroots = envs->nrys_roots;
         int i, j, k, l, ptr, n;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
@@ -453,42 +496,56 @@ void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
+        const double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
 
         // g(i,...,j) = rirj * g(i-1,...,j) +  g(i-1,...,j+1)
+        p1x = gx - di;
+        p1y = gy - di;
+        p1z = gz - di;
+        p2x = gx - di + dj;
+        p2y = gy - di + dj;
+        p2z = gz - di + dj;
         for (i = 1; i <= li; i++) {
         for (j = 0; j <= nmax-i; j++) {
         for (k = 0; k <= mmax; k++) {
                 ptr = j*dj + k*dk + i*di;
-                for (n = ptr; n < ptr+di; n++) {
-                        gx[n] = rirj[0]*gx[n-di] + gx[n-di+dj];
-                        gy[n] = rirj[1]*gy[n-di] + gy[n-di+dj];
-                        gz[n] = rirj[2]*gz[n-di] + gz[n-di+dj];
+                for (n = ptr; n < ptr+nroots; n++) {
+                        gx[n] = rirj[0] * p1x[n] + p2x[n];
+                        gy[n] = rirj[1] * p1y[n] + p2y[n];
+                        gz[n] = rirj[2] * p1z[n] + p2z[n];
                 }
         } } }
 
         // g(...,k,l,..) = rkrl * g(...,k,l-1,..) + g(...,k+1,l-1,..)
+        p1x = gx - dl;
+        p1y = gy - dl;
+        p1z = gz - dl;
+        p2x = gx - dl + dk;
+        p2y = gy - dl + dk;
+        p2z = gz - dl + dk;
         for (j = 0; j <= lj; j++) {
         for (l = 1; l <= ll; l++) {
-                for (k = 0; k <= mmax-l; k++) {
-                        ptr = j*dj + l*dl + k*dk;
-                        for (n = ptr; n < ptr+dk; n++) {
-                                gx[n  ] = rkrl[0]*gx[n-dl] + gx[n-dl+dk];
-                                gy[n  ] = rkrl[1]*gy[n-dl] + gy[n-dl+dk];
-                                gz[n  ] = rkrl[2]*gz[n-dl] + gz[n-dl+dk];
-                        }
+        for (k = 0; k <= mmax-l; k++) {
+                ptr = j*dj + l*dl + k*dk;
+                for (n = ptr; n < ptr+dk; n++) {
+                        gx[n] = rkrl[0] * p1x[n] + p2x[n];
+                        gy[n] = rkrl[1] * p1y[n] + p2y[n];
+                        gz[n] = rkrl[2] * p1z[n] + p2z[n];
+                }
                 }
         } }
 }
 /* 2d is based on i,l */
 void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
 {
-        //const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int nmax = envs->li_ceil + envs->lj_ceil;
         const int mmax = envs->lk_ceil + envs->ll_ceil;
         //const int li = envs->li_ceil;
         const int lk = envs->lk_ceil;
         const int ll = envs->ll_ceil;
         const int lj = envs->lj_ceil;
-        int j, k, l, ptr, n;
+        const int nroots = envs->nrys_roots;
+        int i, j, k, l, ptr, n;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
@@ -496,41 +553,55 @@ void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
+        const double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
 
         // g(...,k,l,..) = rkrl * g(...,k-1,l,..) + g(...,k-1,l+1,..)
+        p1x = gx - dk;
+        p1y = gy - dk;
+        p1z = gz - dk;
+        p2x = gx - dk + dl;
+        p2y = gy - dk + dl;
+        p2z = gz - dk + dl;
         for (k = 1; k <= lk; k++) {
         for (l = 0; l <= mmax-k; l++) {
-                ptr = l*dl + k*dk;
-                for (n = ptr; n < ptr+dk; n++) {
-                        gx[n] = rkrl[0]*gx[n-dk] + gx[n-dk+dl];
-                        gy[n] = rkrl[1]*gy[n-dk] + gy[n-dk+dl];
-                        gz[n] = rkrl[2]*gz[n-dk] + gz[n-dk+dl];
+        for (i = 0; i <= nmax; i++) {
+                ptr = l*dl + k*dk + i*di;
+                for (n = ptr; n < ptr+nroots; n++) {
+                        gx[n] = rkrl[0] * p1x[n] + p2x[n];
+                        gy[n] = rkrl[1] * p1y[n] + p2y[n];
+                        gz[n] = rkrl[2] * p1z[n] + p2z[n];
                 }
-        } }
+        } } }
 
         // g(i,...,j) = rirj * g(i,...,j-1) +  g(i+1,...,j-1)
+        p1x = gx - dj;
+        p1y = gy - dj;
+        p1z = gz - dj;
+        p2x = gx - dj + di;
+        p2y = gy - dj + di;
+        p2z = gz - dj + di;
         for (j = 1; j <= lj; j++) {
         for (l = 0; l <= ll; l++) {
-                for (k = 0; k <= lk; k++) {
-                        ptr = j*dj + l*dl + k*dk;
-                        for (n = ptr; n < ptr+dk-di*j; n++) {
-                                gx[n] = rirj[0] * gx[n-dj] + gx[n-dj+di];
-                                gy[n] = rirj[1] * gy[n-dj] + gy[n-dj+di];
-                                gz[n] = rirj[2] * gz[n-dj] + gz[n-dj+di];
-                        }
+        for (k = 0; k <= lk; k++) {
+                ptr = j*dj + l*dl + k*dk;
+                for (n = ptr; n < ptr+dk-di*j; n++) {
+                        gx[n] = rirj[0] * p1x[n] + p2x[n];
+                        gy[n] = rirj[1] * p1y[n] + p2y[n];
+                        gz[n] = rirj[2] * p1z[n] + p2z[n];
                 }
-        } }
+        } } }
 }
 /* 2d is based on i,k */
 void static CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
 {
-        //const int nmax = envs->li_ceil + envs->lj_ceil;
+        const int nmax = envs->li_ceil + envs->lj_ceil;
         const int mmax = envs->lk_ceil + envs->ll_ceil;
         //const int li = envs->li_ceil;
         const int lk = envs->lk_ceil;
         const int ll = envs->ll_ceil;
         const int lj = envs->lj_ceil;
-        int j, k, l, ptr, n;
+        const int nroots = envs->nrys_roots;
+        int i, j, k, l, ptr, n;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
@@ -538,33 +609,46 @@ void static CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
         const double *rirj = envs->rirj;
         const double *rkrl = envs->rkrl;
         DEF_GXYZ(double, g, gx, gy, gz);
+        const double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
 
         // g(...,k,l,..) = rkrl * g(...,k,l-1,..) + g(...,k+1,l-1,..)
+        p1x = gx - dl;
+        p1y = gy - dl;
+        p1z = gz - dl;
+        p2x = gx - dl + dk;
+        p2y = gy - dl + dk;
+        p2z = gz - dl + dk;
         for (l = 1; l <= ll; l++) {
                 // (:,i) is full, so loop:k and loop:n can be merged to
                 // for(n = l*dl; n < ptr+dl-dk*l; n++)
                 for (k = 0; k <= mmax-l; k++) {
-                        ptr = l*dl + k*dk;
-                        for (n = ptr; n < ptr+dk; n++) {
-                                gx[n] = rkrl[0]*gx[n-dl] + gx[n-dl+dk];
-                                gy[n] = rkrl[1]*gy[n-dl] + gy[n-dl+dk];
-                                gz[n] = rkrl[2]*gz[n-dl] + gz[n-dl+dk];
+                for (i = 0; i <= nmax; i++) {
+                        ptr = l*dl + k*dk + i*di;
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                gx[n] = rkrl[0] * p1x[n] + p2x[n];
+                                gy[n] = rkrl[1] * p1y[n] + p2y[n];
+                                gz[n] = rkrl[2] * p1z[n] + p2z[n];
                         }
-                }
+                } }
         }
 
         // g(i,...,j) = rirj * g(i,...,j-1) +  g(i+1,...,j-1)
+        p1x = gx - dj;
+        p1y = gy - dj;
+        p1z = gz - dj;
+        p2x = gx - dj + di;
+        p2y = gy - dj + di;
+        p2z = gz - dj + di;
         for (j = 1; j <= lj; j++) {
         for (l = 0; l <= ll; l++) {
-                for (k = 0; k <= lk; k++) {
-                        ptr = j*dj + l*dl + k*dk;
-                        for (n = ptr; n < ptr+dk-di*j; n++) {
-                                gx[n] = rirj[0] * gx[n-dj] + gx[n-dj+di];
-                                gy[n] = rirj[1] * gy[n-dj] + gy[n-dj+di];
-                                gz[n] = rirj[2] * gz[n-dj] + gz[n-dj+di];
-                        }
+        for (k = 0; k <= lk; k++) {
+                ptr = j*dj + l*dl + k*dk;
+                for (n = ptr; n < ptr+dk-di*j; n++) {
+                        gx[n] = rirj[0] * p1x[n] + p2x[n];
+                        gy[n] = rirj[1] * p1y[n] + p2y[n];
+                        gz[n] = rirj[2] * p1z[n] + p2z[n];
                 }
-        } }
+        } } }
 }
 /************* some special g0_4d results *************/
 /* 4 digits stand for i_ceil, k_ceil, l_ceil, j_ceil */
@@ -1652,7 +1736,7 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         CINTrys_roots(envs->nrys_roots, x, u, w);
 
         int irys;
-        double u2, div;
+        double u2, div, tmp1, tmp2, tmp3, tmp4;
         const double *rijrx = envs->rijrx;
         const double *rklrx = envs->rklrx;
         struct _BC bc;
@@ -1666,16 +1750,20 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                  *u2 = aij*akl/(aij+akl)*t2/(1-t2)
                  */
                 u2 = a0 * u[irys];
-                div = 1 / (u2 * (aij + akl) + aij * akl);
-                bc.b00[irys] = 0.5 * u2 * div;
-                bc.b10[irys] = 0.5 * (u2 + akl) * div;
-                bc.b01[irys] = 0.5 * (u2 + aij) * div;
-                c00[0] = rijrx[0] - u2 * akl * rijrkl[0] * div;
-                c00[1] = rijrx[1] - u2 * akl * rijrkl[1] * div;
-                c00[2] = rijrx[2] - u2 * akl * rijrkl[2] * div;
-                c0p[0] = rklrx[0] + u2 * aij * rijrkl[0] * div;
-                c0p[1] = rklrx[1] + u2 * aij * rijrkl[1] * div;
-                c0p[2] = rklrx[2] + u2 * aij * rijrkl[2] * div;
+                div = 1 / (u2 * (aij + akl) + a1);
+                tmp1 = u2 * div;
+                tmp2 = tmp1 * akl;
+                tmp3 = tmp1 * aij;
+                tmp4 = .5 * div;
+                bc.b00[irys] = 0.5 * tmp1;
+                bc.b10[irys] = bc.b00[irys] + tmp4 * akl;
+                bc.b01[irys] = bc.b00[irys] + tmp4 * aij;
+                c00[0] = rijrx[0] - tmp2 * rijrkl[0];
+                c00[1] = rijrx[1] - tmp2 * rijrkl[1];
+                c00[2] = rijrx[2] - tmp2 * rijrkl[2];
+                c0p[0] = rklrx[0] + tmp3 * rijrkl[0];
+                c0p[1] = rklrx[1] + tmp3 * rijrkl[1];
+                c0p[2] = rklrx[2] + tmp3 * rijrkl[2];
                 w[irys] *= fac1;
         }
 
@@ -1766,31 +1854,38 @@ void CINTnabla1i_2e(double *f, const double *g,
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
-        const double ai = envs->ai;
+        const int nroots = envs->nrys_roots;
+        const double ai2 = -2 * envs->ai;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx - di;
+        const double *p1y = gy - di;
+        const double *p1z = gz - di;
+        const double *p2x = gx + di;
+        const double *p2y = gy + di;
+        const double *p2z = gz + di;
         for (j = 0; j <= lj; j++)
-                for (l = 0; l <= ll; l++)
-                        for (k = 0; k <= lk; k++) {
-                                ptr = dj * j + dl * l + dk * k;
-                                //f(...,0,...) = -2*ai*g(...,1,...)
-                                for (n = ptr; n < ptr + di; n++) {
-                                        fx[n] = - 2 * ai * gx[n+di];
-                                        fy[n] = - 2 * ai * gy[n+di];
-                                        fz[n] = - 2 * ai * gz[n+di];
-                                }
-                                ptr += di;
-                                //f(...,i,...) = i*g(...,i-1,...)-2*ai*g(...,i+1,...)
-                                for (i = 1; i <= li; i++) {
-                                        for (n = ptr; n < ptr + di; n++) {
-                                                fx[n] = i*gx[n-di] - 2*ai*gx[n+di];
-                                                fy[n] = i*gy[n-di] - 2*ai*gy[n+di];
-                                                fz[n] = i*gz[n-di] - 2*ai*gz[n+di];
-                                        }
-                                        ptr += di;
-                                }
+        for (l = 0; l <= ll; l++)
+        for (k = 0; k <= lk; k++) {
+                ptr = dj * j + dl * l + dk * k;
+                //f(...,0,...) = -2*ai*g(...,1,...)
+                for (n = ptr; n < ptr+nroots; n++) {
+                        fx[n] = ai2 * p2x[n];
+                        fy[n] = ai2 * p2y[n];
+                        fz[n] = ai2 * p2z[n];
+                }
+                ptr += di;
+                //f(...,i,...) = i*g(...,i-1,...)-2*ai*g(...,i+1,...)
+                for (i = 1; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = i*p1x[n] + ai2*p2x[n];
+                                fy[n] = i*p1y[n] + ai2*p2y[n];
+                                fz[n] = i*p1z[n] + ai2*p2z[n];
                         }
+                        ptr += di;
+                }
+        }
 }
 
 
@@ -1801,40 +1896,50 @@ void CINTnabla1j_2e(double *f, const double *g,
                     const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
-        const double aj = envs->aj;
+        const int nroots = envs->nrys_roots;
+        const double aj2 = -2 * envs->aj;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx - dj;
+        const double *p1y = gy - dj;
+        const double *p1z = gz - dj;
+        const double *p2x = gx + dj;
+        const double *p2y = gy + dj;
+        const double *p2z = gz + dj;
         //f(...,0,...) = -2*aj*g(...,1,...)
         for (l = 0; l <= ll; l++) {
-                ptr = dl * l;
-                for (k = 0; k <= lk; k++) {
-                        for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                fx[i] = - 2 * aj * gx[i+dj];
-                                fy[i] = - 2 * aj * gy[i+dj];
-                                fz[i] = - 2 * aj * gz[i+dj];
+        for (k = 0; k <= lk; k++) {
+                ptr = dl * l + dk * k;
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = aj2 * p2x[n];
+                                fy[n] = aj2 * p2y[n];
+                                fz[n] = aj2 * p2z[n];
                         }
-                        ptr += dk;
+                        ptr += di;
                 }
-        }
+        } }
         //f(...,j,...) = j*g(...,j-1,...)-2*aj*g(...,j+1,...)
-        for (j = 1; j <= lj; j++)
+        for (j = 1; j <= lj; j++) {
                 for (l = 0; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
-                        for (k = 0; k <= lk; k++) {
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = j*gx[i-dj] - 2*aj*gx[i+dj];
-                                        fy[i] = j*gy[i-dj] - 2*aj*gy[i+dj];
-                                        fz[i] = j*gz[i-dj] - 2*aj*gz[i+dj];
+                for (k = 0; k <= lk; k++) {
+                        ptr = dj * j + dl * l + dk * k;
+                        for (i = 0; i <= li; i++) {
+                                for (n = ptr; n < ptr+nroots; n++) {
+                                        fx[n] = j*p1x[n] + aj2*p2x[n];
+                                        fy[n] = j*p1y[n] + aj2*p2y[n];
+                                        fz[n] = j*p1z[n] + aj2*p2z[n];
                                 }
-                                ptr += dk;
+                                ptr += di;
                         }
-                }
+                } }
+        }
 }
 
 
@@ -1845,35 +1950,47 @@ void CINTnabla1k_2e(double *f, const double *g,
                     const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
-        const double ak = envs->ak;
+        const int nroots = envs->nrys_roots;
+        const double ak2 = -2 * envs->ak;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx - dk;
+        const double *p1y = gy - dk;
+        const double *p1z = gz - dk;
+        const double *p2x = gx + dk;
+        const double *p2y = gy + dk;
+        const double *p2z = gz + dk;
         for (j = 0; j <= lj; j++)
-                for (l = 0; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
-                        //f(...,0,...) = -2*ak*g(...,1,...)
-                        for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                fx[i] = - 2 * ak * gx[i+dk];
-                                fy[i] = - 2 * ak * gy[i+dk];
-                                fz[i] = - 2 * ak * gz[i+dk];
+        for (l = 0; l <= ll; l++) {
+                ptr = dj * j + dl * l;
+                //f(...,0,...) = -2*ak*g(...,1,...)
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = ak2 * p2x[n];
+                                fy[n] = ak2 * p2y[n];
+                                fz[n] = ak2 * p2z[n];
                         }
-                        ptr += dk;
-                        //f(...,k,...) = k*g(...,k-1,...)-2*ak*g(...,k+1,...)
-                        for (k = 1; k <= lk; k++) {
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = k*gx[i-dk] - 2*ak*gx[i+dk];
-                                        fy[i] = k*gy[i-dk] - 2*ak*gy[i+dk];
-                                        fz[i] = k*gz[i-dk] - 2*ak*gz[i+dk];
+                        ptr += di;
+                }
+                //f(...,k,...) = k*g(...,k-1,...)-2*ak*g(...,k+1,...)
+                for (k = 1; k <= lk; k++) {
+                        ptr = dj * j + dl * l + dk * k;
+                        for (i = 0; i <= li; i++) {
+                                for (n = ptr; n < ptr+nroots; n++) {
+                                        fx[n] = k*p1x[n] + ak2*p2x[n];
+                                        fy[n] = k*p1y[n] + ak2*p2y[n];
+                                        fz[n] = k*p1z[n] + ak2*p2z[n];
                                 }
-                                ptr += dk;
+                                ptr += di;
                         }
                 }
+        }
 }
 
 
@@ -1884,36 +2001,45 @@ void CINTnabla1l_2e(double *f, const double *g,
                     const int li, const int lj, const int lk, const int ll,
                     const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
-        const double al = envs->al;
+        const int nroots = envs->nrys_roots;
+        const double al2 = -2 * envs->al;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx - dl;
+        const double *p1y = gy - dl;
+        const double *p1z = gz - dl;
+        const double *p2x = gx + dl;
+        const double *p2y = gy + dl;
+        const double *p2z = gz + dl;
         for (j = 0; j <= lj; j++) {
-                ptr = dj * j;
                 //f(...,0,...) = -2*al*g(...,1,...)
                 for (k = 0; k <= lk; k++) {
-                        for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                fx[i] = - 2 * al * gx[i+dl];
-                                fy[i] = - 2 * al * gy[i+dl];
-                                fz[i] = - 2 * al * gz[i+dl];
+                        ptr = dj * j + dk * k;
+                        for (i = 0; i <= li; i++) {
+                                for (n = ptr; n < ptr+nroots; n++) {
+                                        fx[n] = al2 * p2x[n];
+                                        fy[n] = al2 * p2y[n];
+                                        fz[n] = al2 * p2z[n];
+                                }
+                                ptr += di;
                         }
-                        ptr += dk;
                 }
                 //f(...,l,...) = l*g(...,l-1,...)-2*al*g(...,l+1,...)
                 for (l = 1; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
                         for (k = 0; k <= lk; k++) {
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = l*gx[i-dl] - 2*al*gx[i+dl];
-                                        fy[i] = l*gy[i-dl] - 2*al*gy[i+dl];
-                                        fz[i] = l*gz[i-dl] - 2*al*gz[i+dl];
-                                }
-                                ptr += dk;
+                                ptr = dj * j + dl * l + dk * k;
+                                for (i = 0; i <= li; i++, ptr += di) {
+                                for (n = ptr; n < ptr+nroots; n++) {
+                                        fx[n] = l*p1x[n] + al2*p2x[n];
+                                        fy[n] = l*p1y[n] + al2*p2y[n];
+                                        fz[n] = l*p1z[n] + al2*p2z[n];
+                                } }
                         }
                 }
         }
@@ -1928,27 +2054,32 @@ void CINTx1i_2e(double *f, const double *g,
                 const int li, const int lj, const int lk, const int ll,
                 const double *ri, const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
+        const int nroots = envs->nrys_roots;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx + di;
+        const double *p1y = gy + di;
+        const double *p1z = gz + di;
         for (j = 0; j <= lj; j++)
-                for (l = 0; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
-                        for (k = 0; k <= lk; k++) {
-                                //f(...,0:li,...) = g(...,1:li+1,...) + ri(1)*g(...,0:li,...)
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = gx[i+di] + ri[0] * gx[i];
-                                        fy[i] = gy[i+di] + ri[1] * gy[i];
-                                        fz[i] = gz[i+di] + ri[2] * gz[i];
-                                }
-                                ptr += dk;
+        for (l = 0; l <= ll; l++) {
+        for (k = 0; k <= lk; k++) {
+                //f(...,0:li,...) = g(...,1:li+1,...) + ri(1)*g(...,0:li,...)
+                ptr = dj * j + dl * l + dk * k;
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = p1x[n] + ri[0] * gx[n];
+                                fy[n] = p1y[n] + ri[1] * gy[n];
+                                fz[n] = p1z[n] + ri[2] * gz[n];
                         }
+                        ptr += di;
                 }
+        } }
 }
 
 
@@ -1959,28 +2090,32 @@ void CINTx1j_2e(double *f, const double *g,
                 const int li, const int lj, const int lk, const int ll,
                 const double *rj, const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
+        const int nroots = envs->nrys_roots;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx + dj;
+        const double *p1y = gy + dj;
+        const double *p1z = gz + dj;
         for (j = 0; j <= lj; j++)
-                for (l = 0; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
-                        for (k = 0; k <= lk; k++) {
-                                // f(...,0:lj,...) = g(...,1:lj+1,...)
-                                // + rj(1)*g(...,0:lj,...)
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = gx[i+dj] + rj[0] * gx[i];
-                                        fy[i] = gy[i+dj] + rj[1] * gy[i];
-                                        fz[i] = gz[i+dj] + rj[2] * gz[i];
-                                }
-                                ptr += dk;
+        for (l = 0; l <= ll; l++) {
+        for (k = 0; k <= lk; k++) {
+                // f(...,0:lj,...) = g(...,1:lj+1,...) + rj(1)*g(...,0:lj,...)
+                ptr = dj * j + dl * l + dk * k;
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = p1x[n] + rj[0] * gx[n];
+                                fy[n] = p1y[n] + rj[1] * gy[n];
+                                fz[n] = p1z[n] + rj[2] * gz[n];
                         }
+                        ptr += di;
                 }
+        } }
 }
 
 
@@ -1991,28 +2126,32 @@ void CINTx1k_2e(double *f, const double *g,
                 const int li, const int lj, const int lk, const int ll,
                 const double *rk, const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
+        const int nroots = envs->nrys_roots;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx + dk;
+        const double *p1y = gy + dk;
+        const double *p1z = gz + dk;
         for (j = 0; j <= lj; j++)
-                for (l = 0; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
-                        for (k = 0; k <= lk; k++) {
-                                // f(...,0:lk,...) = g(...,1:lk+1,...)
-                                // + rk(1)*g(...,0:lk,...)
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = gx[i+dk] + rk[0] * gx[i];
-                                        fy[i] = gy[i+dk] + rk[1] * gy[i];
-                                        fz[i] = gz[i+dk] + rk[2] * gz[i];
-                                }
-                                ptr += dk;
+        for (l = 0; l <= ll; l++) {
+        for (k = 0; k <= lk; k++) {
+                // f(...,0:lk,...) = g(...,1:lk+1,...) + rk(1)*g(...,0:lk,...)
+                ptr = dj * j + dl * l + dk * k;
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = p1x[n] + rk[0] * gx[n];
+                                fy[n] = p1y[n] + rk[1] * gy[n];
+                                fz[n] = p1z[n] + rk[2] * gz[n];
                         }
+                        ptr += di;
                 }
+        } }
 }
 
 
@@ -2023,27 +2162,31 @@ void CINTx1l_2e(double *f, const double *g,
                 const int li, const int lj, const int lk, const int ll,
                 const double *rl, const CINTEnvVars *envs)
 {
-        int i, j, k, l, ptr;
+        int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
         const int dk = envs->g_stride_k;
         const int dl = envs->g_stride_l;
         const int dj = envs->g_stride_j;
+        const int nroots = envs->nrys_roots;
         DEF_GXYZ(const double, g, gx, gy, gz);
         DEF_GXYZ(double, f, fx, fy, fz);
 
+        const double *p1x = gx + dl;
+        const double *p1y = gy + dl;
+        const double *p1z = gz + dl;
         for (j = 0; j <= lj; j++)
-                for (l = 0; l <= ll; l++) {
-                        ptr = dj * j + dl * l;
-                        for (k = 0; k <= lk; k++) {
-                                // f(...,0:ll,...) = g(...,1:ll+1,...)
-                                // + rl(1)*g(...,0:ll,...)
-                                for (i = ptr; i < ptr + di * (li + 1); i++) {
-                                        fx[i] = gx[i+dl] + rl[0] * gx[i];
-                                        fy[i] = gy[i+dl] + rl[1] * gy[i];
-                                        fz[i] = gz[i+dl] + rl[2] * gz[i];
-                                }
-                                ptr += dk;
+        for (l = 0; l <= ll; l++) {
+        for (k = 0; k <= lk; k++) {
+                // f(...,0:ll,...) = g(...,1:ll+1,...) + rl(1)*g(...,0:ll,...)
+                ptr = dj * j + dl * l + dk * k;
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = p1x[n] + rl[0] * gx[n];
+                                fy[n] = p1y[n] + rl[1] * gy[n];
+                                fz[n] = p1z[n] + rl[2] * gz[n];
                         }
+                        ptr += di;
                 }
+        } }
 }
 

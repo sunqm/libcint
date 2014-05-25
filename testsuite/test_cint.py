@@ -282,3 +282,12 @@ if __name__ == "__main__":
               ('cint2e_ipspsp1spsp2', 1443719.034699620, 3, 9 ),
              ):
         test_int2e_spinor(*f)
+    test_comp2e_spinor('cint2e_spsp1', 'cint2e', (4,4,0,0), 1, 12)
+    test_comp2e_spinor('cint2e_spsp1spsp2', 'cint2e', (4,4,4,4), 1, 12)
+    test_comp2e_spinor('cint2e_spsp1spsp2', 'cint2e_spsp1', (0,0,4,4), 1, 12)
+    test_comp2e_spinor('cint2e_spgsp1', 'cint2e_g1', (4,4,0,0), 3, 12)
+    test_comp2e_spinor('cint2e_g1spsp2', 'cint2e_g1', (0,0,4,4), 3, 12)
+    test_comp2e_spinor('cint2e_spgsp1spsp2', 'cint2e_g1', (4,4,4,4), 3, 12)
+    test_comp2e_spinor('cint2e_ipspsp1', 'cint2e_ip1', (4,4,0,0), 3, 12)
+    test_comp2e_spinor('cint2e_ip1spsp2', 'cint2e_ip1', (0,0,4,4), 3, 12)
+    test_comp2e_spinor('cint2e_ipspsp1spsp2', 'cint2e_ip1', (4,4,4,4), 3, 12)

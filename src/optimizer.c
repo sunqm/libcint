@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "cint_const.h"
 #include "cint_bas.h"
 #include "g2e.h"
 #include "optimizer.h"
@@ -106,7 +107,6 @@ void CINTuse_all_optimizer(CINTOpt **opt, int *ng,
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         CINTOpt_set_index_xyz(*opt, ng, atm, natm, bas, nbas, env);
 }
-
 
 /* len(ng) = 9. The first 4 items are the increment adding to envs.li_ceil
  * ... envs.ll_ceil for shell i, j, k, l */
