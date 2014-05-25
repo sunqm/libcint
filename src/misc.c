@@ -6,52 +6,46 @@
  */
 
 #include <math.h>
+#include <complex.h>
 
-void CINTdcmplx_re(const int n, double *z, const double *re)
+void CINTdcmplx_re(const int n, double complex *z, const double *re)
 {
         int i;
         for (i = 0; i < n; i++) {
-                z[0] = re[i];
-                z[1] = 0;
-                z += 2;
-        }
-}
-
-void CINTdcmplx_im(const int n, double *z, const double *im)
-{
-        int i;
-        for (i = 0; i < n; i++) {
-                z[0] = 0;
-                z[1] = im[i];
-                z += 2;
+                z[i] = re[i] + 0 * _Complex_I;
         }
 }
 
-void CINTdcmplx_pp(const int n, double *z, const double *re, const double *im)
+void CINTdcmplx_im(const int n, double complex *z, const double *im)
 {
         int i;
         for (i = 0; i < n; i++) {
-                z[0] = re[i];
-                z[1] = im[i];
-                z += 2;
+                z[i] = 0 + im[i] * _Complex_I;
         }
 }
-void CINTdcmplx_pn(const int n, double *z, const double *re, const double *im)
+
+void CINTdcmplx_pp(const int n, double complex *z,
+                   const double *re, const double *im)
 {
         int i;
         for (i = 0; i < n; i++) {
-                z[0] =  re[i];
-                z[1] = -im[i];
-                z += 2;
+                z[i] = re[i] + im[i] * _Complex_I;
         }
 }
-void CINTdcmplx_np(const int n, double *z, const double *re, const double *im)
+void CINTdcmplx_pn(const int n, double complex *z,
+                   const double *re, const double *im)
 {
         int i;
         for (i = 0; i < n; i++) {
-                z[0] = -re[i];
-                z[1] =  im[i];
-                z += 2;
+                z[i] = re[i] - im[i] * _Complex_I;
+        }
+}
+void CINTdcmplx_np(const int n, double complex *z,
+                   const double *re, const double *im)
+{
+        int i;
+        for (i = 0; i < n; i++) {
+                z[i] = -re[i] + im[i] * _Complex_I;
         }
 }
 

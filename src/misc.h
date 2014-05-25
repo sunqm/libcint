@@ -6,11 +6,11 @@
  */
 #include "fblas.h"
 
-void CINTdcmplx_re(const int n, double *z, const double *re);
-void CINTdcmplx_im(const int n, double *z, const double *im);
-void CINTdcmplx_pp(const int n, double *z, const double *re, const double *im);
-void CINTdcmplx_pn(const int n, double *z, const double *re, const double *im);
-void CINTdcmplx_np(const int n, double *z, const double *re, const double *im);
+void CINTdcmplx_re(const int n, double complex *z, const double *re);
+void CINTdcmplx_im(const int n, double complex *z, const double *im);
+void CINTdcmplx_pp(const int n, double complex *z, const double *re, const double *im);
+void CINTdcmplx_pn(const int n, double complex *z, const double *re, const double *im);
+void CINTdcmplx_np(const int n, double complex *z, const double *re, const double *im);
 
 double CINTsquare_dist(const double *r1, const double *r2);
 

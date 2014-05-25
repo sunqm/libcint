@@ -169,6 +169,10 @@ Known problems
 
 * The package is not fully tested on 32-bit platform.
 
+* SSE instructions was not applied in this version for portability.
+  Using SSE3 instructions can increase the performance 5 ~ 50%.
+  Please contact the author for the Libcint(SSE3) code.
+
 
 Bug report
 ----------

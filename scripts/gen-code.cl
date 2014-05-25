@@ -416,7 +416,7 @@ CINTdset0(ip * jp * ng[TENSOR], opij);~%"))
 ix = idx[0];
 iy = idx[1];
 iz = idx[2];~%")
-    (if (< n 3) ; we don't want to torture compiler
+    (if (< n 2) ; we don't want to torture compiler
       (progn
         (format fout "switch (envs->nrys_roots) {~%")
         (format fout "case 1:~%")
