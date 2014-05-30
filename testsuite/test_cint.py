@@ -222,6 +222,7 @@ if __name__ == "__main__":
               ('cint1e_ipkin_sph' , 1307.395170673386, 3, 10),
               ('cint1e_ipnuc_sph' , 8358.422626593954, 3, 10),
               ('cint1e_iprinv_sph', 385.1108471512923, 3, 11),
+              ('cint1e_prinvxp_sph', 210.475021425001, 3, 11),
              ):
         test_int1e_sph(*f)
 

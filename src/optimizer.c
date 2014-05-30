@@ -203,7 +203,7 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                         maxci = maxci / CINTgto_norm(il, ai[ip]);
                         expij = (double *)malloc(sizeof(double)*opt->tot_prim);
                         rij = (double *)malloc(sizeof(double)*opt->tot_prim*3);
-                        cceij = (int *)malloc(sizeof(int)*opt->tot_prim);
+                        cceij = (int *)malloc(sizeof(int) * opt->tot_prim);
                         opt->expij[io+ip] = expij;
                         opt->rij[io+ip] = rij;
                         opt->cceij[io+ip] = cceij;

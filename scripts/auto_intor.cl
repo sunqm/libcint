@@ -15,6 +15,9 @@
   '("cint1e_igkin_sph"  (#C(0 .5) g \| p dot p))
   '("cint1e_igovlp_sph" (#C(0 1) g \|))
   '("cint1e_ignuc_sph"  (#C(0 1) g \| nuc \|))
+  ; use p* instead of p, to ignore the operator after it, then it can
+  ; cross to the next p
+  '("cint1e_prinvxp_sph" (p* \| rinv cross p \| ))
   ;'("cint2e_sph"        ( \, \| \, ))
   '("cint2e_ig1_sph"    (#C(0 1) g \, \| \, ))
 )

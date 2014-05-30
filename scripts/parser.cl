@@ -25,6 +25,7 @@
 ;;; r12   = 1/r_12
 ;;; translate these keys in function dress-other combo-op
 (defparameter *one-electron-operator-keywords* '(ovlp rinv nuc nabla-rinv))
+(defparameter *one-componet-operator-kewords* '(rinv nuc r12))
 (defparameter *two-electron-operator-keywords* '(r12 gaunt))
 
 ;;; *operator-keywords*: precedence from high to low
@@ -41,7 +42,12 @@
 ;;; r = ri/rj/rk/rl; associate with the basis it acts on
 ;;; g = (R_m - R_n) cross r0
 ;;; modify dress-other cons-bra-ket g?e-of factor-of if add new keys
-(defparameter *intvar-keywords* '(p ip nabla r r0 rc ri rj rk rl g x y z px py pz))
+;;; sticker symbol *, which means the operator stick to the next one
+;;;      it affects (p V cross p)
+(defparameter *intvar-keywords* '(p ip nabla px py pz
+                                  p* ip* nabla* px* py* pz*
+                                  r r0 rc ri rj rk rl g x y z))
+(defparameter *var-sticker-keywords* '(p* ip* nabla* px* py* pz*))
 
 ;;;;;; convert to reversed polish notation ;;;;;;;;;;;
 (defun complex? (n)
@@ -108,13 +114,16 @@
      (make-vec (make-quat '(0 ()) '(1 ()) '(0 ()) '(0 ()))
                (make-quat '(0 ()) '(0 ()) '(1 ()) '(0 ()))
                (make-quat '(0 ()) '(0 ()) '(0 ()) '(1 ()))))
-    ((r ri rj rk rl r0 rc nabla)
+    ((r ri rj rk rl r0 rc nabla nabla*)
      (make-vec (make-cell 1 '() `(,item x))
                (make-cell 1 '() `(,item y))
                (make-cell 1 '() `(,item z))))
     ((p) (make-vec (make-cell #C(0 -1) '() '(nabla x))
                    (make-cell #C(0 -1) '() '(nabla y))
                    (make-cell #C(0 -1) '() '(nabla z))))
+    ((p*) (make-vec (make-cell #C(0 -1) '() '(nabla* x))
+                    (make-cell #C(0 -1) '() '(nabla* y))
+                    (make-cell #C(0 -1) '() '(nabla* z))))
     ((g) ; Rmn cross r0
      (v-cross-v (make-vec (make-cell #C(0 1) '(Rmn x) '())
                           (make-cell #C(0 1) '(Rmn y) '())
@@ -129,6 +138,12 @@
     ;((ipx nablax) (make-cell 1 '() '(nabla x)))
     ;((ipy nablay) (make-cell 1 '() '(nabla y)))
     ;((ipz nablaz) (make-cell 1 '() '(nabla z)))
+    ((px*) (make-cell #C(0 -1) '() '(nabla* z)))
+    ((py*) (make-cell #C(0 -1) '() '(nabla* y)))
+    ((pz*) (make-cell #C(0 -1) '() '(nabla* z)))
+    ;((ipx nablax*) (make-cell 1 '() '(nabla* x)))
+    ;((ipy nablay*) (make-cell 1 '() '(nabla* y)))
+    ;((ipz nablaz*) (make-cell 1 '() '(nabla* z)))
     ((nuc rinv) ; *one-electron-operator-keywords*
      (make-cell 1 '() (make-op item 'S)))
     ((nabla-rinv)
@@ -342,6 +357,12 @@
            (values (imagpart fac) #C(0 1)))
           (t (error "cannot handle complex factor ~a" fac)))))
 
+(defun remove-sticker-next (expr) ; remove the operator behind sticker
+  (cond ((last-one? expr) expr)
+        ((member (car expr) *var-sticker-keywords*)
+         (cons (car expr) (remove-sticker-next (cddr expr))))
+        (t (cons (car expr) (remove-sticker-next (cdr expr))))))
+
 (defun cons-bra-ket (bra ket &optional op)
   (labels ((dagger-append (bra ket)
              (cond ((null bra) ket)
@@ -351,9 +372,12 @@
                    (t (dagger-append (cdr bra)
                                      (cons (car bra) ket))))))
     ; when bra is reversed, every 'cross gives -1 and p^* = -p
-    (let ((fac (* (expt -1 (count 'p bra))
+    (let ((fac (* (expt -1 (count-if (lambda (x)
+                                       (member x '(p p* px py pz px* py* pz*)))
+                                     bra))
                   (expt -1 (count 'cross bra)))))
-      (cons fac (dagger-append bra (append op ket))))))
+      (cons fac (remove-sticker-next
+                  (dagger-append bra (append op ket)))))))
 
 (defun format-vs-1e (ops)
   (let* ((vs (reduce-vs (reduce-rpn (infix-to-rpn ops))))

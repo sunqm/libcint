@@ -97,7 +97,7 @@
                  ops))
 (defun g?e-of (key)
   (case key
-    ((p ip nabla px py pz) "D_")
+    ((p ip nabla px py pz p* ip* nabla* px* py* pz*) "D_")
     ((r x y z) "R_") ; the vector origin is on the center of the basis it acts on
     ((ri rj rk rl) "RC") ; the vector origin is R[ijkl]
     ((r0 g) "R0") ; R0 ~ the vector origin is (0,0,0)

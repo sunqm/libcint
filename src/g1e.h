@@ -8,12 +8,12 @@
 #define HAVE_DEFINED_CINTENVVARS_H
 // ref to CINTinit_int1e_EnvVars, CINTinit_int2e_EnvVars
 typedef struct {
-        int natm;
-        int nbas;
         const int *atm;
         const int *bas;
         const double *env;
         const int *shls;
+        int natm;
+        int nbas;
 
         int i_l;
         int j_l;
