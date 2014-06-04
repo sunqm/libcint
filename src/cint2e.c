@@ -18,139 +18,19 @@
 
 #define SQUARE(r)       (r)[0]*(r)[0] + (r)[1]*(r)[1] + (r)[2]*(r)[2]
 
-#define COMMON_ENVS_AND_DECLARE \
-        const int *shls = envs->shls; \
-        const int *bas = envs->bas; \
-        const double *env = envs->env; \
-        const int i_ctr  = envs->i_ctr; \
-        const int j_ctr  = envs->j_ctr; \
-        const int k_ctr  = envs->k_ctr; \
-        const int l_ctr  = envs->l_ctr; \
-        const double *ri = envs->ri; \
-        const double *rj = envs->rj; \
-        const double *rk = envs->rk; \
-        const double *rl = envs->rl; \
-        const int i_sh = shls[0]; \
-        const int j_sh = shls[1]; \
-        const int k_sh = shls[2]; \
-        const int l_sh = shls[3]; \
-        const double *ai = env + bas(PTR_EXP, i_sh); \
-        const double *aj = env + bas(PTR_EXP, j_sh); \
-        const double *ak = env + bas(PTR_EXP, k_sh); \
-        const double *al = env + bas(PTR_EXP, l_sh); \
-        const double *ci = env + bas(PTR_COEFF, i_sh); \
-        const double *cj = env + bas(PTR_COEFF, j_sh); \
-        const double *ck = env + bas(PTR_COEFF, k_sh); \
-        const double *cl = env + bas(PTR_COEFF, l_sh); \
-        const int n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor; \
-        double fac1i, fac1j, fac1k, fac1l; \
-        int ip, jp, kp, lp, n; \
-        int empty[5] = {1, 1, 1, 1, 1}; \
-        int *iempty = empty + 0; \
-        int *jempty = empty + 1; \
-        int *kempty = empty + 2; \
-        int *lempty = empty + 3; \
-        int *gempty = empty + 4;
-
-#define USE_OPT \
-        int io, jo, ko, lo, off; \
-        double eij, ekl, expij, expkl; \
-        double dist_ij, dist_kl; \
-        double *prij; \
-        if (opt) { \
-                io = opt->prim_offset[i_sh]; \
-                jo = opt->prim_offset[j_sh]; \
-                ko = opt->prim_offset[k_sh]; \
-                lo = opt->prim_offset[l_sh]; \
-        } else { \
-                dist_ij = SQUARE(envs->rirj); \
-                dist_kl = SQUARE(envs->rkrl); \
-        } \
-        envs->idx = _init_index_array(envs, opt, envs->nf);
-
-#define SET_RIJ(I,J)    \
-        envs->a##I = a##I[I##p]; \
-        envs->a##I##J = a##I[I##p] + a##J[J##p]; \
-        if (opt) { \
-                off = I##o + I##p; \
-                if (opt->cceij[J##o+J##p][off] > CUTOFF15) { \
-                        goto I##_contracted; } \
-                exp##I##J = opt->expij[J##o+J##p][off]; \
-                prij = opt->rij[J##o+J##p]; \
-                envs->r##I##J[0] = prij[off*3+0]; \
-                envs->r##I##J[1] = prij[off*3+1]; \
-                envs->r##I##J[2] = prij[off*3+2]; \
-        } else { \
-                e##I##J = dist_##I##J * a##I[I##p] * a##J[J##p] / envs->a##I##J; \
-                if (e##I##J > EXPCUTOFF) { \
-                        goto I##_contracted; } \
-                envs->r##I##J[0] = (a##I[I##p]*r##I[0]+a##J[J##p]*r##J[0]) / envs->a##I##J; \
-                envs->r##I##J[1] = (a##I[I##p]*r##I[1]+a##J[J##p]*r##J[1]) / envs->a##I##J; \
-                envs->r##I##J[2] = (a##I[I##p]*r##I[2]+a##J[J##p]*r##J[2]) / envs->a##I##J; \
-        } \
-        envs->r##I##J##rx[0] = envs->r##I##J[0] - envs->rx_in_r##I##J##rx[0]; \
-        envs->r##I##J##rx[1] = envs->r##I##J[1] - envs->rx_in_r##I##J##rx[1]; \
-        envs->r##I##J##rx[2] = envs->r##I##J[2] - envs->rx_in_r##I##J##rx[2];
-
-#define PRIM2CTR(ctrsymb, gp, ngp) \
+#define PRIM2CTR0(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
                         CINTprim_to_ctr_0(gctr##ctrsymb, ngp, gp, \
                                           envs->ctrsymb##_prim, \
                                           ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
                 } else { \
-                        if (opt) { \
-                                off = ctrsymb##o + ctrsymb##p; \
-                                prim_to_ctr_opt(gctr##ctrsymb, ngp, gp, \
-                                                opt->non0coeff[off], \
-                                                opt->non0idx[off], \
-                                                opt->non0ctr[off]); \
-                        } else { \
-                                CINTprim_to_ctr_1(gctr##ctrsymb, ngp, gp, \
-                                                  envs->ctrsymb##_prim, \
-                                                  ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
-                        } \
+                        CINTprim_to_ctr_1(gctr##ctrsymb, ngp, gp, \
+                                          envs->ctrsymb##_prim, \
+                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
                 } \
         } \
         *ctrsymb##empty = 0
-
-#define COPY_AND_CLOSING(GCTRL, EMPTY) \
-        if (n_comp > 1 && !(EMPTY)) { \
-                const int INC1 = 1; \
-                double *gctr1, *gctr2, *gctr3; \
-                switch (n_comp) { \
-                case 3: \
-                        gctr1 = gctr  +envs->nf*nc; \
-                        gctr2 = gctr1 +envs->nf*nc; \
-                        for (n = 0, ip = 0; n <envs->nf*nc; n++, ip+=3) { \
-                                gctr [n] = GCTRL[ip+0]; \
-                                gctr1[n] = GCTRL[ip+1]; \
-                                gctr2[n] = GCTRL[ip+2]; \
-                        } \
-                        break; \
-                default: \
-                        for (kp = 0; kp < n_comp-3; kp+=4) { \
-                                gctr1 = gctr  +envs->nf*nc; \
-                                gctr2 = gctr1 +envs->nf*nc; \
-                                gctr3 = gctr2 +envs->nf*nc; \
-                                for (n = 0, ip = kp; n <envs->nf*nc; n++,ip+=n_comp) { \
-                                        gctr [n] = GCTRL[ip+0]; \
-                                        gctr1[n] = GCTRL[ip+1]; \
-                                        gctr2[n] = GCTRL[ip+2]; \
-                                        gctr3[n] = GCTRL[ip+3]; \
-                                } \
-                                gctr +=envs->nf*nc * 4; \
-                        } \
-                        for (; kp < n_comp; kp++) { \
-                                n =envs->nf*nc; \
-                                dcopy_(&n, GCTRL+kp, &n_comp, gctr, &INC1); \
-                                gctr +=envs->nf*nc; \
-                        } \
-                } \
-        } \
-        free(g); \
-        _del_index_array(envs->idx, opt); \
-        return !(EMPTY);
 
 void CINTprim_to_ctr_0(double *gc, const int nf, const double *gp,
                        const int nprim, const int nctr, const double *coeff)
@@ -281,32 +161,6 @@ void CINTprim_to_ctr_1(double *gc, const int nf, const double *gp,
         prim_to_ctr_opt(gc, nf, gp, non0coeff, non0idx, non0ctr);
 }
 
-static int *_init_index_array(CINTEnvVars *envs, const CINTOpt *opt, const int nf)
-{
-        int *idx;
-        if (opt) {
-                if (opt->index_xyz_array) {
-                        idx = opt->index_xyz_array[envs->i_l*ANG_MAX*ANG_MAX*ANG_MAX
-                                                  +envs->j_l*ANG_MAX*ANG_MAX
-                                                  +envs->k_l*ANG_MAX
-                                                  +envs->l_l];
-                } else {
-                        idx = (int *)malloc(sizeof(int) * nf * 3);
-                        CINTg2e_index_xyz(idx, envs);
-                }
-        } else {
-                idx = (int *)malloc(sizeof(int) * nf * 3);
-                CINTg2e_index_xyz(idx, envs);
-        }
-        return idx;
-}
-static void _del_index_array(int *idx, const CINTOpt *opt)
-{
-        if (!opt || !opt->index_xyz_array) {
-                free(idx);
-        }
-}
-
 inline void CINT2e_core(double *gout, double *g, double fac1i,
                         CINTEnvVars *envs, int empty)
 {
@@ -323,298 +177,7 @@ inline void CINT2e_core(double *gout, double *g, double fac1i,
         }
 }
 
-// i_ctr = j_ctr = k_ctr = l_ctr = 1;
-int CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
-{
-        COMMON_ENVS_AND_DECLARE;
-        const int nc = 1;
-        const int leng = envs->g_size * 3 * (1<<envs->gbits);
-        const int len0 = envs->nf * n_comp;
-        const int len = leng + len0;
-        double *const g = (double *)malloc(sizeof(double) * len);
-        double *gout;
-        if (n_comp == 1) {
-                gout = gctr;
-        } else {
-                gout = g + leng;
-        }
-
-        USE_OPT;
-
-        for (lp = 0; lp < envs->l_prim; lp++) {
-                envs->al = al[lp];
-                fac1l = envs->common_factor * cl[lp];
-                for (kp = 0; kp < envs->k_prim; kp++) {
-                        SET_RIJ(k, l);
-                        fac1k = fac1l * ck[kp];
-
-                        for (jp = 0; jp < envs->j_prim; jp++) {
-                                envs->aj = aj[jp];
-                                fac1j = fac1k * cj[jp];
-                                for (ip = 0; ip < envs->i_prim; ip++) {
-                                        if (opt && (opt->cceij[lo+lp][ko+kp]
-                                                    +opt->cceij[jo+jp][io+ip]
-                                                    > CUTOFF15)) {
-                                                goto i_contracted;
-                                        }
-                                        SET_RIJ(i, j);
-                                        if (opt) {
-                                                fac1i = fac1j*ci[ip]*expij*expkl;;
-                                        } else {
-                                                fac1i = fac1j*ci[ip]*exp(-(eij+ekl));
-                                        }
-                                        CINT2e_core(gout, g, fac1i, envs, *empty);
-                                        *empty = 0;
-i_contracted: ;
-                                } // end loop i_prim
-                        } // end loop j_prim
-k_contracted: ;
-                } // end loop k_prim
-        } // end loop l_prim
-
-        COPY_AND_CLOSING(gout, *empty);
-}
-
-// i_ctr = n; j_ctr = k_ctr = l_ctr = 1;
-int CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
-{
-        COMMON_ENVS_AND_DECLARE;
-
-        const int nc = i_ctr;
-        const int leng = envs->g_size * 3 * (1<<envs->gbits);
-        const int leni = envs->nf * i_ctr * n_comp; // gctri
-        const int len0 = envs->nf * n_comp; // gout
-        const int len = leng + leni + len0;
-        double *const g = (double *)malloc(sizeof(double) * len);
-        double *g1 = g + leng;
-        double *gout, *gctri;
-        if (n_comp == 1) {
-                gctri = gctr;
-        } else {
-                gctri = g1;
-                g1 += leni;
-        }
-        gout = g1;
-
-        USE_OPT;
-
-        for (lp = 0; lp < envs->l_prim; lp++) {
-                envs->al = al[lp];
-                fac1l = envs->common_factor * cl[lp];
-                for (kp = 0; kp < envs->k_prim; kp++) {
-                        SET_RIJ(k, l);
-                        fac1k = fac1l * ck[kp];
-
-                        for (jp = 0; jp < envs->j_prim; jp++) {
-                                envs->aj = aj[jp];
-                                fac1j = fac1k * cj[jp];
-                                for (ip = 0; ip < envs->i_prim; ip++) {
-                                        if (opt && (opt->cceij[lo+lp][ko+kp]
-                                                    +opt->cceij[jo+jp][io+ip]
-                                                    > CUTOFF15)) {
-                                                goto i_contracted;
-                                        }
-                                        SET_RIJ(i, j);
-                                        if (opt) {
-                                                fac1i = fac1j*expij*expkl;;
-                                        } else {
-                                                fac1i = fac1j*exp(-(eij+ekl));
-                                        }
-                                        CINT2e_core(gout, g, fac1i, envs, 1);
-                                        PRIM2CTR(i, gout,envs->nf*n_comp);
-i_contracted: ;
-                                } // end loop i_prim
-                        } // end loop j_prim
-k_contracted: ;
-                } // end loop k_prim
-        } // end loop l_prim
-
-        COPY_AND_CLOSING(gctri, *iempty);
-}
-
-// j_ctr = n; i_ctr = k_ctr = l_ctr = 1;
-int CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
-{
-        COMMON_ENVS_AND_DECLARE;
-
-        const int nc = j_ctr;
-        const int leng = envs->g_size * 3 * (1<<envs->gbits);
-        const int lenj = envs->nf * j_ctr * n_comp; // gctrj
-        const int len0 = envs->nf * n_comp; // gout
-        const int len = leng + lenj + len0;
-        double *const g = (double *)malloc(sizeof(double) * len);
-        double *g1 = g + leng;
-        double *gout, *gctrj;
-        if (n_comp == 1) {
-                gctrj = gctr;
-        } else {
-                gctrj = g1;
-                g1 += lenj;
-        }
-        gout = g1;
-
-        USE_OPT;
-
-        for (lp = 0; lp < envs->l_prim; lp++) {
-                envs->al = al[lp];
-                fac1l = envs->common_factor * cl[lp];
-                for (kp = 0; kp < envs->k_prim; kp++) {
-                        SET_RIJ(k, l);
-                        fac1k = fac1l * ck[kp];
-
-                        for (jp = 0; jp < envs->j_prim; jp++) {
-                                envs->aj = aj[jp];
-                                fac1j = fac1k;
-                                *iempty = 1;
-                                for (ip = 0; ip < envs->i_prim; ip++) {
-                                        if (opt && (opt->cceij[lo+lp][ko+kp]
-                                                    +opt->cceij[jo+jp][io+ip]
-                                                    > CUTOFF15)) {
-                                                goto i_contracted;
-                                        }
-                                        SET_RIJ(i, j);
-                                        if (opt) {
-                                                fac1i = fac1j*ci[ip]*expij*expkl;;
-                                        } else {
-                                                fac1i = fac1j*ci[ip]*exp(-(eij+ekl));
-                                        }
-                                        CINT2e_core(gout, g, fac1i, envs, *iempty);
-                                        *iempty = 0;
-i_contracted: ;
-                                } // end loop i_prim
-                                if (!*iempty) {
-                                        PRIM2CTR(j, gout,envs->nf*n_comp);
-                                }
-                        } // end loop j_prim
-k_contracted: ;
-                } // end loop k_prim
-        } // end loop l_prim
-
-        COPY_AND_CLOSING(gctrj, *jempty);
-}
-
-// k_ctr = n; i_ctr = j_ctr = l_ctr = 1;
-int CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
-{
-        COMMON_ENVS_AND_DECLARE;
-
-        const int nc = k_ctr;
-        const int leng = envs->g_size * 3 * (1<<envs->gbits);
-        const int lenk = envs->nf * k_ctr * n_comp; // gctrk
-        const int len0 = envs->nf * n_comp; // gout
-        const int len = leng + lenk + len0;
-        double *const g = (double *)malloc(sizeof(double) * len);
-        double *g1 = g + leng;
-        double *gout, *gctrk;
-        if (n_comp == 1) {
-                gctrk = gctr;
-        } else {
-                gctrk = g1;
-                g1 += lenk;
-        }
-        gout = g1;
-
-        USE_OPT;
-
-        for (lp = 0; lp <envs-> l_prim; lp++) {
-                envs->al = al[lp];
-                fac1l = envs->common_factor * cl[lp];
-                for (kp = 0; kp <envs-> k_prim; kp++) {
-                        SET_RIJ(k, l);
-                        fac1k = fac1l;
-                        *jempty = 1;
-                        for (jp = 0; jp <envs-> j_prim; jp++) {
-                                envs->aj = aj[jp];
-                                fac1j = fac1k * cj[jp];
-                                for (ip = 0; ip <envs-> i_prim; ip++) {
-                                        if (opt && (opt->cceij[lo+lp][ko+kp]
-                                                    +opt->cceij[jo+jp][io+ip]
-                                                    > CUTOFF15)) {
-                                                goto i_contracted;
-                                        }
-                                        SET_RIJ(i, j);
-                                        if (opt) {
-                                                fac1i = fac1j*ci[ip]*expij*expkl;;
-                                        } else {
-                                                fac1i = fac1j*ci[ip]*exp(-(eij+ekl));
-                                        }
-                                        CINT2e_core(gout, g, fac1i, envs, *jempty);
-                                        *jempty = 0;
-i_contracted: ;
-                                } // end loop i_prim
-                        } // end loop j_prim
-                        if (!*jempty) {
-                                PRIM2CTR(k, gout,envs->nf*n_comp);
-                        }
-k_contracted: ;
-                } // end loop k_prim
-        } // end loop l_prim
-
-        COPY_AND_CLOSING(gctrk, *kempty);
-}
-
-// l_ctr = n; i_ctr = j_ctr = k_ctr = 1;
-int CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
-{
-        COMMON_ENVS_AND_DECLARE;
-
-        const int nc = l_ctr;
-        const int leng = envs->g_size * 3 * (1<<envs->gbits);
-        const int lenl = envs->nf * l_ctr * n_comp; // gctrl
-        const int len0 = envs->nf * n_comp; // gout
-        const int len = leng + lenl + len0;
-        double *const g = (double *)malloc(sizeof(double) * len);
-        double *g1 = g + leng;
-        double *gout, *gctrl;
-        if (n_comp == 1) {
-                gctrl = gctr;
-        } else {
-                gctrl = g1;
-                g1 += lenl;
-        }
-        gout = g1;
-
-        USE_OPT;
-
-        for (lp = 0; lp <envs-> l_prim; lp++) {
-                envs->al = al[lp];
-                fac1l = envs->common_factor;
-                *kempty = 1;
-                for (kp = 0; kp <envs-> k_prim; kp++) {
-                        SET_RIJ(k, l);
-                        fac1k = fac1l * ck[kp];
-                        for (jp = 0; jp <envs-> j_prim; jp++) {
-                                envs->aj = aj[jp];
-                                fac1j = fac1k * cj[jp];
-                                for (ip = 0; ip <envs-> i_prim; ip++) {
-                                        if (opt && (opt->cceij[lo+lp][ko+kp]
-                                                    +opt->cceij[jo+jp][io+ip]
-                                                    > CUTOFF15)) {
-                                                goto i_contracted;
-                                        }
-                                        SET_RIJ(i, j);
-                                        if (opt) {
-                                                fac1i = fac1j*ci[ip]*expij*expkl;;
-                                        } else {
-                                                fac1i = fac1j*ci[ip]*exp(-(eij+ekl));
-                                        }
-                                        CINT2e_core(gout, g, fac1i, envs, *kempty);
-                                        *kempty = 0;
-i_contracted: ;
-                                } // end loop i_prim
-                        } // end loop j_prim
-k_contracted: ;
-                } // end loop k_prim
-                if (!*kempty) {
-                        PRIM2CTR(l, gout,envs->nf*n_comp);
-                }
-        } // end loop l_prim
-
-        COPY_AND_CLOSING(gctrl, *lempty);
-}
-
-
-int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+int CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs)
 {
         /* COMMON_ENVS_AND_DECLARE */
         const int *shls  = envs->shls;
@@ -652,7 +215,560 @@ int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
         int *gempty = empty + 4;
         /* COMMON_ENVS_AND_DECLARE end */
         const int nc = i_ctr * j_ctr * k_ctr * l_ctr;
-        const int leng = envs->g_size * 3 * (1<<envs->gbits); // (irys,i,j,k,l,coord,0:1);
+        // (irys,i,j,k,l,coord,0:1); +1 for nabla-r12
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
+        const int lenl = envs->nf * nc * n_comp; // gctrl
+        const int lenk = envs->nf * i_ctr * j_ctr * k_ctr * n_comp; // gctrk
+        const int lenj = envs->nf * i_ctr * j_ctr * n_comp; // gctrj
+        const int leni = envs->nf * i_ctr * n_comp; // gctri
+        const int len0 = envs->nf * n_comp; // gout
+        const int len = leng + lenl + lenk + lenj + leni + len0;
+        double *const g = (double *)malloc(sizeof(double)*len);
+        double *g1 = g + leng;
+        double *gout, *gctri, *gctrj, *gctrk, *gctrl;
+
+        if (n_comp == 1) {
+                gctrl = gctr;
+        } else {
+                gctrl = g1;
+                g1 += lenl;
+        }
+        if (l_ctr == 1) {
+                gctrk = gctrl;
+                kempty = lempty;
+        } else {
+                gctrk = g1;
+                g1 += lenk;
+        }
+        if (k_ctr == 1) {
+                gctrj = gctrk;
+                jempty = kempty;
+        } else {
+                gctrj = g1;
+                g1 += lenj;
+        }
+        if (j_ctr == 1) {
+                gctri = gctrj;
+                iempty = jempty;
+        } else {
+                gctri = g1;
+                g1 += leni;
+        }
+        if (i_ctr == 1) {
+                gout = gctri;
+                gempty = iempty;
+        } else {
+                gout = g1;
+        }
+
+        double eij, ekl, expijkl;
+        const double dist_ij = SQUARE(envs->rirj);
+        const double dist_kl = SQUARE(envs->rkrl);
+        envs->idx = (int *)malloc(sizeof(int) * envs->nf * 3);
+        CINTg2e_index_xyz(envs->idx, envs);
+
+        *lempty = 1;
+        for (lp = 0; lp < envs->l_prim; lp++) {
+                envs->al = al[lp];
+                if (l_ctr == 1) {
+                        fac1l = envs->common_factor * cl[lp];
+                } else {
+                        fac1l = envs->common_factor;
+                        *kempty = 1;
+                }
+                for (kp = 0; kp < envs->k_prim; kp++) {
+                        envs->ak = ak[kp];
+                        envs->akl = ak[kp] + al[lp];
+                        ekl = dist_kl * ak[kp] * al[lp] / envs->akl;
+                        if (ekl > EXPCUTOFF) {
+                                goto k_contracted;
+                        }
+                        envs->rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / envs->akl;
+                        envs->rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / envs->akl;
+                        envs->rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / envs->akl;
+                        envs->rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
+                        envs->rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
+                        envs->rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
+                        if (k_ctr == 1) {
+                                fac1k = fac1l * ck[kp];
+                        } else {
+                                fac1k = fac1l;
+                                *jempty = 1;
+                        }
+
+                        for (jp = 0; jp < envs->j_prim; jp++) {
+                                envs->aj = aj[jp];
+                                if (j_ctr == 1) {
+                                        fac1j = fac1k * cj[jp];
+                                } else {
+                                        fac1j = fac1k;
+                                        *iempty = 1;
+                                }
+                                for (ip = 0; ip < envs->i_prim; ip++) {
+                                        envs->ai = ai[ip];
+                                        envs->aij = ai[ip] + aj[jp];
+                                        eij = dist_ij * ai[ip] * aj[jp] / envs->aij;
+                                        if (eij > EXPCUTOFF) {
+                                                goto i_contracted;
+                                        }
+                                        envs->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / envs->aij;
+                                        envs->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / envs->aij;
+                                        envs->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / envs->aij;
+                                        envs->rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
+                                        envs->rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
+                                        envs->rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
+                                        expijkl = exp(-(eij+ekl));
+                                        if (i_ctr == 1) {
+                                                fac1i = fac1j*ci[ip]*expijkl;
+                                        } else {
+                                                fac1i = fac1j*expijkl;
+                                        }
+                                        CINT2e_core(gout, g, fac1i, envs, *gempty);
+                                        PRIM2CTR0(i, gout, envs->nf*n_comp);
+i_contracted: ;
+                                } // end loop i_prim
+                                if (!*iempty) {
+                                        PRIM2CTR0(j, gctri, envs->nf*i_ctr*n_comp);
+                                }
+                        } // end loop j_prim
+                        if (!*jempty) {
+                                PRIM2CTR0(k, gctrj,envs->nf*i_ctr*j_ctr*n_comp);
+                        }
+k_contracted: ;
+                } // end loop k_prim
+                if (!*kempty) {
+                        PRIM2CTR0(l, gctrk, envs->nf*i_ctr*j_ctr*k_ctr*n_comp);
+                }
+        } // end loop l_prim
+
+        /* COPY_AND_CLOSING(gctrl, *lempty); */
+        if (n_comp > 1 && !*lempty) {
+                const int INC1 = 1;
+                double *gctr1, *gctr2, *gctr3;
+                switch (n_comp) {
+                case 3:
+                        gctr1 = gctr  + envs->nf*nc;
+                        gctr2 = gctr1 + envs->nf*nc;
+                        for (n = 0, ip = 0; n < envs->nf*nc; n++, ip+=3) {
+                                gctr [n] = gctrl[ip+0];
+                                gctr1[n] = gctrl[ip+1];
+                                gctr2[n] = gctrl[ip+2];
+                        }
+                        break;
+                default:
+                        for (kp = 0; kp < n_comp-3; kp+=4) {
+                                gctr1 = gctr  + envs->nf*nc;
+                                gctr2 = gctr1 + envs->nf*nc;
+                                gctr3 = gctr2 + envs->nf*nc;
+                                for (n = 0, ip = kp; n < envs->nf*nc; n++,ip+=n_comp) {
+                                        gctr [n] = gctrl[ip+0];
+                                        gctr1[n] = gctrl[ip+1];
+                                        gctr2[n] = gctrl[ip+2];
+                                        gctr3[n] = gctrl[ip+3];
+                                }
+                                gctr += envs->nf*nc * 4;
+                        }
+                        for (; kp < n_comp; kp++) {
+                                n = envs->nf*nc;
+                                dcopy_(&n, gctrl+kp, &n_comp, gctr, &INC1);
+                                gctr += envs->nf*nc;
+                        }
+                }
+        }
+        free(g);
+        free(envs->idx);
+        return !*lempty;
+        /* COPY_AND_CLOSING(gctrl, *lempty); end */
+}
+
+
+#define COMMON_ENVS_AND_DECLARE \
+        const int *shls = envs->shls; \
+        const int *bas = envs->bas; \
+        const double *env = envs->env; \
+        const int i_ctr  = envs->i_ctr; \
+        const int j_ctr  = envs->j_ctr; \
+        const int k_ctr  = envs->k_ctr; \
+        const int l_ctr  = envs->l_ctr; \
+        const int i_sh = shls[0]; \
+        const int j_sh = shls[1]; \
+        const int k_sh = shls[2]; \
+        const int l_sh = shls[3]; \
+        const double *ai = env + bas(PTR_EXP, i_sh); \
+        const double *aj = env + bas(PTR_EXP, j_sh); \
+        const double *ak = env + bas(PTR_EXP, k_sh); \
+        const double *al = env + bas(PTR_EXP, l_sh); \
+        const double *ci = env + bas(PTR_COEFF, i_sh); \
+        const double *cj = env + bas(PTR_COEFF, j_sh); \
+        const double *ck = env + bas(PTR_COEFF, k_sh); \
+        const double *cl = env + bas(PTR_COEFF, l_sh); \
+        const int n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor; \
+        double fac1i, fac1j, fac1k, fac1l; \
+        int ip, jp, kp, lp, n; \
+        int empty[5] = {1, 1, 1, 1, 1}; \
+        int *iempty = empty + 0; \
+        int *jempty = empty + 1; \
+        int *kempty = empty + 2; \
+        int *lempty = empty + 3; \
+        int *gempty = empty + 4;
+
+#define USE_OPT \
+        int off; \
+        double expij, expkl; \
+        double *prij; \
+        const int io = opt->prim_offset[i_sh]; \
+        const int jo = opt->prim_offset[j_sh]; \
+        const int ko = opt->prim_offset[k_sh]; \
+        const int lo = opt->prim_offset[l_sh]; \
+        envs->idx = opt->index_xyz_array[envs->i_l*ANG_MAX*ANG_MAX*ANG_MAX \
+                                        +envs->j_l*ANG_MAX*ANG_MAX \
+                                        +envs->k_l*ANG_MAX \
+                                        +envs->l_l]
+
+#define SET_RIJ(I,J)    \
+        envs->a##I = a##I[I##p]; \
+        envs->a##I##J = a##I[I##p] + a##J[J##p]; \
+        off = I##o + I##p; \
+        if (opt->cceij[J##o+J##p][off] > CUTOFF15) { \
+                goto I##_contracted; } \
+        exp##I##J = opt->expij[J##o+J##p][off]; \
+        prij = opt->rij[J##o+J##p]; \
+        envs->r##I##J[0] = prij[off*3+0]; \
+        envs->r##I##J[1] = prij[off*3+1]; \
+        envs->r##I##J[2] = prij[off*3+2]; \
+        envs->r##I##J##rx[0] = envs->r##I##J[0] - envs->rx_in_r##I##J##rx[0]; \
+        envs->r##I##J##rx[1] = envs->r##I##J[1] - envs->rx_in_r##I##J##rx[1]; \
+        envs->r##I##J##rx[2] = envs->r##I##J[2] - envs->rx_in_r##I##J##rx[2];
+
+#define PRIM2CTR(ctrsymb, gp, ngp) \
+        if (ctrsymb##_ctr > 1) {\
+                if (*ctrsymb##empty) { \
+                        CINTprim_to_ctr_0(gctr##ctrsymb, ngp, gp, \
+                                          envs->ctrsymb##_prim, \
+                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
+                } else { \
+                        off = ctrsymb##o + ctrsymb##p; \
+                        prim_to_ctr_opt(gctr##ctrsymb, ngp, gp, \
+                                        opt->non0coeff[off], \
+                                        opt->non0idx[off], \
+                                        opt->non0ctr[off]); \
+                } \
+        } \
+        *ctrsymb##empty = 0
+
+#define COPY_AND_CLOSING(GCTRL, EMPTY) \
+        if (n_comp > 1 && !(EMPTY)) { \
+                const int INC1 = 1; \
+                double *gctr1, *gctr2, *gctr3; \
+                switch (n_comp) { \
+                case 3: \
+                        gctr1 = gctr  +envs->nf*nc; \
+                        gctr2 = gctr1 +envs->nf*nc; \
+                        for (n = 0, ip = 0; n <envs->nf*nc; n++, ip+=3) { \
+                                gctr [n] = GCTRL[ip+0]; \
+                                gctr1[n] = GCTRL[ip+1]; \
+                                gctr2[n] = GCTRL[ip+2]; \
+                        } \
+                        break; \
+                default: \
+                        for (kp = 0; kp < n_comp-3; kp+=4) { \
+                                gctr1 = gctr  +envs->nf*nc; \
+                                gctr2 = gctr1 +envs->nf*nc; \
+                                gctr3 = gctr2 +envs->nf*nc; \
+                                for (n = 0, ip = kp; n <envs->nf*nc; n++,ip+=n_comp) { \
+                                        gctr [n] = GCTRL[ip+0]; \
+                                        gctr1[n] = GCTRL[ip+1]; \
+                                        gctr2[n] = GCTRL[ip+2]; \
+                                        gctr3[n] = GCTRL[ip+3]; \
+                                } \
+                                gctr +=envs->nf*nc * 4; \
+                        } \
+                        for (; kp < n_comp; kp++) { \
+                                n =envs->nf*nc; \
+                                dcopy_(&n, GCTRL+kp, &n_comp, gctr, &INC1); \
+                                gctr +=envs->nf*nc; \
+                        } \
+                } \
+        } \
+        free(g); \
+        return !(EMPTY);
+
+// i_ctr = j_ctr = k_ctr = l_ctr = 1;
+int CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+{
+        COMMON_ENVS_AND_DECLARE;
+        const int nc = 1;
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
+        const int len0 = envs->nf * n_comp;
+        const int len = leng + len0;
+        double *const g = (double *)malloc(sizeof(double) * len);
+        double *gout;
+        if (n_comp == 1) {
+                gout = gctr;
+        } else {
+                gout = g + leng;
+        }
+
+        USE_OPT;
+
+        for (lp = 0; lp < envs->l_prim; lp++) {
+                envs->al = al[lp];
+                fac1l = envs->common_factor * cl[lp];
+                for (kp = 0; kp < envs->k_prim; kp++) {
+                        SET_RIJ(k, l);
+                        fac1k = fac1l * ck[kp];
+
+                        for (jp = 0; jp < envs->j_prim; jp++) {
+                                envs->aj = aj[jp];
+                                fac1j = fac1k * cj[jp];
+                                for (ip = 0; ip < envs->i_prim; ip++) {
+                                        if (opt->cceij[lo+lp][ko+kp]
+                                            +opt->cceij[jo+jp][io+ip]
+                                            > CUTOFF15) {
+                                                goto i_contracted;
+                                        }
+                                        SET_RIJ(i, j);
+                                        fac1i = fac1j*ci[ip]*expij*expkl;
+                                        CINT2e_core(gout, g, fac1i, envs, *empty);
+                                        *empty = 0;
+i_contracted: ;
+                                } // end loop i_prim
+                        } // end loop j_prim
+k_contracted: ;
+                } // end loop k_prim
+        } // end loop l_prim
+
+        COPY_AND_CLOSING(gout, *empty);
+}
+
+// i_ctr = n; j_ctr = k_ctr = l_ctr = 1;
+int CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+{
+        COMMON_ENVS_AND_DECLARE;
+
+        const int nc = i_ctr;
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
+        const int leni = envs->nf * i_ctr * n_comp; // gctri
+        const int len0 = envs->nf * n_comp; // gout
+        const int len = leng + leni + len0;
+        double *const g = (double *)malloc(sizeof(double) * len);
+        double *g1 = g + leng;
+        double *gout, *gctri;
+        if (n_comp == 1) {
+                gctri = gctr;
+        } else {
+                gctri = g1;
+                g1 += leni;
+        }
+        gout = g1;
+
+        USE_OPT;
+
+        for (lp = 0; lp < envs->l_prim; lp++) {
+                envs->al = al[lp];
+                fac1l = envs->common_factor * cl[lp];
+                for (kp = 0; kp < envs->k_prim; kp++) {
+                        SET_RIJ(k, l);
+                        fac1k = fac1l * ck[kp];
+
+                        for (jp = 0; jp < envs->j_prim; jp++) {
+                                envs->aj = aj[jp];
+                                fac1j = fac1k * cj[jp];
+                                for (ip = 0; ip < envs->i_prim; ip++) {
+                                        if (opt->cceij[lo+lp][ko+kp]
+                                            +opt->cceij[jo+jp][io+ip]
+                                            > CUTOFF15) {
+                                                goto i_contracted;
+                                        }
+                                        SET_RIJ(i, j);
+                                        fac1i = fac1j*expij*expkl;
+                                        CINT2e_core(gout, g, fac1i, envs, 1);
+                                        PRIM2CTR(i, gout,envs->nf*n_comp);
+i_contracted: ;
+                                } // end loop i_prim
+                        } // end loop j_prim
+k_contracted: ;
+                } // end loop k_prim
+        } // end loop l_prim
+
+        COPY_AND_CLOSING(gctri, *iempty);
+}
+
+// j_ctr = n; i_ctr = k_ctr = l_ctr = 1;
+int CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+{
+        COMMON_ENVS_AND_DECLARE;
+
+        const int nc = j_ctr;
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
+        const int lenj = envs->nf * j_ctr * n_comp; // gctrj
+        const int len0 = envs->nf * n_comp; // gout
+        const int len = leng + lenj + len0;
+        double *const g = (double *)malloc(sizeof(double) * len);
+        double *g1 = g + leng;
+        double *gout, *gctrj;
+        if (n_comp == 1) {
+                gctrj = gctr;
+        } else {
+                gctrj = g1;
+                g1 += lenj;
+        }
+        gout = g1;
+
+        USE_OPT;
+
+        for (lp = 0; lp < envs->l_prim; lp++) {
+                envs->al = al[lp];
+                fac1l = envs->common_factor * cl[lp];
+                for (kp = 0; kp < envs->k_prim; kp++) {
+                        SET_RIJ(k, l);
+                        fac1k = fac1l * ck[kp];
+
+                        for (jp = 0; jp < envs->j_prim; jp++) {
+                                envs->aj = aj[jp];
+                                fac1j = fac1k;
+                                *iempty = 1;
+                                for (ip = 0; ip < envs->i_prim; ip++) {
+                                        if (opt->cceij[lo+lp][ko+kp]
+                                            +opt->cceij[jo+jp][io+ip]
+                                            > CUTOFF15) {
+                                                goto i_contracted;
+                                        }
+                                        SET_RIJ(i, j);
+                                        fac1i = fac1j*ci[ip]*expij*expkl;
+                                        CINT2e_core(gout, g, fac1i, envs, *iempty);
+                                        *iempty = 0;
+i_contracted: ;
+                                } // end loop i_prim
+                                if (!*iempty) {
+                                        PRIM2CTR(j, gout,envs->nf*n_comp);
+                                }
+                        } // end loop j_prim
+k_contracted: ;
+                } // end loop k_prim
+        } // end loop l_prim
+
+        COPY_AND_CLOSING(gctrj, *jempty);
+}
+
+// k_ctr = n; i_ctr = j_ctr = l_ctr = 1;
+int CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+{
+        COMMON_ENVS_AND_DECLARE;
+
+        const int nc = k_ctr;
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
+        const int lenk = envs->nf * k_ctr * n_comp; // gctrk
+        const int len0 = envs->nf * n_comp; // gout
+        const int len = leng + lenk + len0;
+        double *const g = (double *)malloc(sizeof(double) * len);
+        double *g1 = g + leng;
+        double *gout, *gctrk;
+        if (n_comp == 1) {
+                gctrk = gctr;
+        } else {
+                gctrk = g1;
+                g1 += lenk;
+        }
+        gout = g1;
+
+        USE_OPT;
+
+        for (lp = 0; lp <envs-> l_prim; lp++) {
+                envs->al = al[lp];
+                fac1l = envs->common_factor * cl[lp];
+                for (kp = 0; kp <envs-> k_prim; kp++) {
+                        SET_RIJ(k, l);
+                        fac1k = fac1l;
+                        *jempty = 1;
+                        for (jp = 0; jp <envs-> j_prim; jp++) {
+                                envs->aj = aj[jp];
+                                fac1j = fac1k * cj[jp];
+                                for (ip = 0; ip <envs-> i_prim; ip++) {
+                                        if (opt->cceij[lo+lp][ko+kp]
+                                            +opt->cceij[jo+jp][io+ip]
+                                            > CUTOFF15) {
+                                                goto i_contracted;
+                                        }
+                                        SET_RIJ(i, j);
+                                        fac1i = fac1j*ci[ip]*expij*expkl;
+                                        CINT2e_core(gout, g, fac1i, envs, *jempty);
+                                        *jempty = 0;
+i_contracted: ;
+                                } // end loop i_prim
+                        } // end loop j_prim
+                        if (!*jempty) {
+                                PRIM2CTR(k, gout,envs->nf*n_comp);
+                        }
+k_contracted: ;
+                } // end loop k_prim
+        } // end loop l_prim
+
+        COPY_AND_CLOSING(gctrk, *kempty);
+}
+
+// l_ctr = n; i_ctr = j_ctr = k_ctr = 1;
+int CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+{
+        COMMON_ENVS_AND_DECLARE;
+
+        const int nc = l_ctr;
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
+        const int lenl = envs->nf * l_ctr * n_comp; // gctrl
+        const int len0 = envs->nf * n_comp; // gout
+        const int len = leng + lenl + len0;
+        double *const g = (double *)malloc(sizeof(double) * len);
+        double *g1 = g + leng;
+        double *gout, *gctrl;
+        if (n_comp == 1) {
+                gctrl = gctr;
+        } else {
+                gctrl = g1;
+                g1 += lenl;
+        }
+        gout = g1;
+
+        USE_OPT;
+
+        for (lp = 0; lp <envs-> l_prim; lp++) {
+                envs->al = al[lp];
+                fac1l = envs->common_factor;
+                *kempty = 1;
+                for (kp = 0; kp <envs-> k_prim; kp++) {
+                        SET_RIJ(k, l);
+                        fac1k = fac1l * ck[kp];
+                        for (jp = 0; jp <envs-> j_prim; jp++) {
+                                envs->aj = aj[jp];
+                                fac1j = fac1k * cj[jp];
+                                for (ip = 0; ip <envs-> i_prim; ip++) {
+                                        if (opt->cceij[lo+lp][ko+kp]
+                                            +opt->cceij[jo+jp][io+ip]
+                                            > CUTOFF15) {
+                                                goto i_contracted;
+                                        }
+                                        SET_RIJ(i, j);
+                                        fac1i = fac1j*ci[ip]*expij*expkl;
+                                        CINT2e_core(gout, g, fac1i, envs, *kempty);
+                                        *kempty = 0;
+i_contracted: ;
+                                } // end loop i_prim
+                        } // end loop j_prim
+k_contracted: ;
+                } // end loop k_prim
+                if (!*kempty) {
+                        PRIM2CTR(l, gout,envs->nf*n_comp);
+                }
+        } // end loop l_prim
+
+        COPY_AND_CLOSING(gctrl, *lempty);
+}
+
+
+int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
+{
+        COMMON_ENVS_AND_DECLARE;
+        const int nc = i_ctr * j_ctr * k_ctr * l_ctr;
+        const int leng = envs->g_size * 3 * ((1<<envs->gbits)+1); // (irys,i,j,k,l,coord,0:1);
         const int lenl = envs->nf * nc * n_comp; // gctrl
         const int lenk = envs->nf * i_ctr * j_ctr * k_ctr * n_comp; // gctrk
         const int lenj = envs->nf * i_ctr * j_ctr * n_comp; // gctrj
@@ -698,20 +814,17 @@ int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
         }
 
         /* USE_OPT */
-        int io, jo, ko, lo, off;
-        double eij, ekl, expij, expkl, expijkl;
-        double dist_ij, dist_kl;
+        int off;
+        double expij, expkl, expijkl;
         double *prij;
-        if (opt) {
-                io = opt->prim_offset[i_sh];
-                jo = opt->prim_offset[j_sh];
-                ko = opt->prim_offset[k_sh];
-                lo = opt->prim_offset[l_sh];
-        } else {
-                dist_ij = SQUARE(envs->rirj);
-                dist_kl = SQUARE(envs->rkrl);
-        }
-        envs->idx = _init_index_array(envs, opt, envs->nf);
+        const int io = opt->prim_offset[i_sh];
+        const int jo = opt->prim_offset[j_sh];
+        const int ko = opt->prim_offset[k_sh];
+        const int lo = opt->prim_offset[l_sh];
+        envs->idx = opt->index_xyz_array[envs->i_l*ANG_MAX*ANG_MAX*ANG_MAX
+                                        +envs->j_l*ANG_MAX*ANG_MAX
+                                        +envs->k_l*ANG_MAX
+                                        +envs->l_l];
         /* USE_OPT end */
 
         *lempty = 1;
@@ -727,25 +840,15 @@ int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
                         /* SET_RIJ(k, l); */
                         envs->ak = ak[kp];
                         envs->akl = ak[kp] + al[lp];
-                        if (opt) {
-                                off = ko + kp;
-                                if (opt->cceij[lo+lp][off] > CUTOFF15) {
-                                        goto k_contracted;
-                                }
-                                expkl = opt->expij[lo+lp][off];
-                                prij = opt->rij[lo+lp];
-                                envs->rkl[0] = prij[off*3+0];
-                                envs->rkl[1] = prij[off*3+1];
-                                envs->rkl[2] = prij[off*3+2];
-                        } else {
-                                ekl = dist_kl * ak[kp] * al[lp] / envs->akl;
-                                if (ekl > EXPCUTOFF) {
-                                        goto k_contracted;
-                                }
-                                envs->rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / envs->akl;
-                                envs->rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / envs->akl;
-                                envs->rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / envs->akl;
+                        off = ko + kp;
+                        if (opt->cceij[lo+lp][off] > CUTOFF15) {
+                                goto k_contracted;
                         }
+                        expkl = opt->expij[lo+lp][off];
+                        prij = opt->rij[lo+lp];
+                        envs->rkl[0] = prij[off*3+0];
+                        envs->rkl[1] = prij[off*3+1];
+                        envs->rkl[2] = prij[off*3+2];
                         envs->rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
                         envs->rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
                         envs->rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
@@ -766,42 +869,28 @@ int CINT2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
                                         *iempty = 1;
                                 }
                                 for (ip = 0; ip < envs->i_prim; ip++) {
-                                        if (opt && (opt->cceij[lo+lp][ko+kp]
-                                                    +opt->cceij[jo+jp][io+ip]
-                                                    > CUTOFF15)) {
+                                        if (opt->cceij[lo+lp][ko+kp]
+                                            +opt->cceij[jo+jp][io+ip]
+                                            > CUTOFF15) {
                                                 goto i_contracted;
                                         }
                                         /* SET_RIJ(i, j); */
                                         envs->ai = ai[ip];
                                         envs->aij = ai[ip] + aj[jp];
-                                        if (opt) {
-                                                off = io + ip;
-                                                if (opt->cceij[jo+jp][off] > CUTOFF15) {
-                                                        goto i_contracted;
-                                                }
-                                                expij = opt->expij[jo+jp][off];
-                                                prij = opt->rij[jo+jp];
-                                                envs->rij[0] = prij[off*3+0];
-                                                envs->rij[1] = prij[off*3+1];
-                                                envs->rij[2] = prij[off*3+2];
-                                        } else {
-                                                eij = dist_ij * ai[ip] * aj[jp] / envs->aij;
-                                                if (eij > EXPCUTOFF) {
-                                                        goto i_contracted;
-                                                }
-                                                envs->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / envs->aij;
-                                                envs->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / envs->aij;
-                                                envs->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / envs->aij;
+                                        off = io + ip;
+                                        if (opt->cceij[jo+jp][off] > CUTOFF15) {
+                                                goto i_contracted;
                                         }
+                                        expij = opt->expij[jo+jp][off];
+                                        prij = opt->rij[jo+jp];
+                                        envs->rij[0] = prij[off*3+0];
+                                        envs->rij[1] = prij[off*3+1];
+                                        envs->rij[2] = prij[off*3+2];
                                         envs->rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
                                         envs->rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
                                         envs->rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
                                         /* SET_RIJ(i, j); end */
-                                        if (opt) {
-                                                expijkl = expij*expkl;
-                                        } else {
-                                                expijkl = exp(-(eij+ekl));
-                                        }
+                                        expijkl = expij*expkl;
                                         if (i_ctr == 1) {
                                                 fac1i = fac1j*ci[ip]*expijkl;
                                         } else {
@@ -826,44 +915,7 @@ k_contracted: ;
                 }
         } // end loop l_prim
 
-        /* COPY_AND_CLOSING(gctrl, *lempty); */
-        if (n_comp > 1 && !*lempty) {
-                const int INC1 = 1;
-                double *gctr1, *gctr2, *gctr3;
-                switch (n_comp) {
-                case 3:
-                        gctr1 = gctr  + envs->nf*nc;
-                        gctr2 = gctr1 + envs->nf*nc;
-                        for (n = 0, ip = 0; n < envs->nf*nc; n++, ip+=3) {
-                                gctr [n] = gctrl[ip+0];
-                                gctr1[n] = gctrl[ip+1];
-                                gctr2[n] = gctrl[ip+2];
-                        }
-                        break;
-                default:
-                        for (kp = 0; kp < n_comp-3; kp+=4) {
-                                gctr1 = gctr  + envs->nf*nc;
-                                gctr2 = gctr1 + envs->nf*nc;
-                                gctr3 = gctr2 + envs->nf*nc;
-                                for (n = 0, ip = kp; n < envs->nf*nc; n++,ip+=n_comp) {
-                                        gctr [n] = gctrl[ip+0];
-                                        gctr1[n] = gctrl[ip+1];
-                                        gctr2[n] = gctrl[ip+2];
-                                        gctr3[n] = gctrl[ip+3];
-                                }
-                                gctr += envs->nf*nc * 4;
-                        }
-                        for (; kp < n_comp; kp++) {
-                                n = envs->nf*nc;
-                                dcopy_(&n, gctrl+kp, &n_comp, gctr, &INC1);
-                                gctr += envs->nf*nc;
-                        }
-                }
-        }
-        free(g);
-        _del_index_array(envs->idx, opt);
-        return !*lempty;
-        /* COPY_AND_CLOSING(gctrl, *lempty); end */
+        COPY_AND_CLOSING(gctrl, *lempty);
 }
 
 
@@ -903,8 +955,11 @@ int CINT2e_cart_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
 
         n = ((envs->i_ctr==1) << 3) + ((envs->j_ctr==1) << 2)
           + ((envs->k_ctr==1) << 1) +  (envs->l_ctr==1);
-        has_value = CINTf_2e_loop[n](gctr, envs, opt);
-
+        if (opt) {
+                has_value = CINTf_2e_loop[n](gctr, envs, opt);
+        } else {
+                has_value = CINT2e_loop_nopt(gctr, envs);
+        }
 
         if (has_value) {
                 for (n = 0; n < envs->ncomp_tensor; n++) {
@@ -935,8 +990,11 @@ int CINT2e_spheric_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
 
         n = ((envs->i_ctr==1) << 3) + ((envs->j_ctr==1) << 2)
           + ((envs->k_ctr==1) << 1) +  (envs->l_ctr==1);
-        has_value = CINTf_2e_loop[n](gctr, envs, opt);
-
+        if (opt) {
+                has_value = CINTf_2e_loop[n](gctr, envs, opt);
+        } else {
+                has_value = CINT2e_loop_nopt(gctr, envs);
+        }
 
         if (has_value) {
                 for (n = 0; n < envs->ncomp_tensor; n++) {
@@ -969,8 +1027,11 @@ int CINT2e_spinor_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt,
 
         n = ((envs->i_ctr==1) << 3) + ((envs->j_ctr==1) << 2)
           + ((envs->k_ctr==1) << 1) +  (envs->l_ctr==1);
-        has_value = CINTf_2e_loop[n](gctr, envs, opt);
-
+        if (opt) {
+                has_value = CINTf_2e_loop[n](gctr, envs, opt);
+        } else {
+                has_value = CINT2e_loop_nopt(gctr, envs);
+        }
 
         if (has_value) {
                 double *pgctr = gctr;
