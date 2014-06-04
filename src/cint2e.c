@@ -36,59 +36,69 @@ void CINTprim_to_ctr_0(double *gc, const int nf, const double *gp,
                        const int nprim, const int nctr, const double *coeff)
 {
         int n, i;
+        double c0, c1, c2;
         double *p0, *p1, *p2;
         double non0coeff[32];
-        int non0idx[32];
-        int non0ctr = 0;
+        double *non0pgc[32];
+        int ncoeff = 0;
 
         for (i = 0; i < nctr; i++) {
                 if (coeff[nprim*i] != 0) {
-                        non0coeff[non0ctr] = coeff[nprim*i];
-                        non0idx[non0ctr] = i;
-                        non0ctr++;
+                        non0coeff[ncoeff] = coeff[nprim*i];
+                        non0pgc[ncoeff] = gc + nf * i;
+                        ncoeff++;
                 } else { // need to initialize the memory, since += is used later
                         memset(gc+nf*i, 0, sizeof(double)*nf);
                 }
         }
 
-        switch (non0ctr) {
+        switch (ncoeff) {
                 case 1:
-                        p0 = gc + nf*non0idx[0];
+                        c0 = non0coeff[0];
+                        p0 = non0pgc[0];
                         for (n = 0; n < nf; n++) {
-                                p0[n] = non0coeff[0] * gp[n];
+                                p0[n] = c0 * gp[n];
                         }
                         break;
                 case 2:
-                        p0 = gc + nf*non0idx[0];
-                        p1 = gc + nf*non0idx[1];
+                        c0 = non0coeff[0];
+                        c1 = non0coeff[1];
+                        p0 = non0pgc[0];
+                        p1 = non0pgc[1];
                         for (n = 0; n < nf; n++) {
-                                p0[n] = non0coeff[0] * gp[n];
-                                p1[n] = non0coeff[1] * gp[n];
+                                p0[n] = c0 * gp[n];
+                                p1[n] = c1 * gp[n];
                         }
                         break;
                 case 3:
-                        p0 = gc + nf*non0idx[0];
-                        p1 = gc + nf*non0idx[1];
-                        p2 = gc + nf*non0idx[2];
+                        c0 = non0coeff[0];
+                        c1 = non0coeff[1];
+                        c2 = non0coeff[2];
+                        p0 = non0pgc[0];
+                        p1 = non0pgc[1];
+                        p2 = non0pgc[2];
                         for (n = 0; n < nf; n++) {
-                                p0[n] = non0coeff[0] * gp[n];
-                                p1[n] = non0coeff[1] * gp[n];
-                                p2[n] = non0coeff[2] * gp[n];
+                                p0[n] = c0 * gp[n];
+                                p1[n] = c1 * gp[n];
+                                p2[n] = c2 * gp[n];
                         }
                         break;
                 default:
-                        for (i = 0; i < non0ctr-1; i+=2) {
-                                p0 = gc + nf*non0idx[i  ];
-                                p1 = gc + nf*non0idx[i+1];
+                        for (i = 0; i < ncoeff-1; i+=2) {
+                                c0 = non0coeff[i  ];
+                                c1 = non0coeff[i+1];
+                                p0 = non0pgc[i  ];
+                                p1 = non0pgc[i+1];
                                 for (n = 0; n < nf; n++) {
-                                        p0[n] = non0coeff[i  ] * gp[n];
-                                        p1[n] = non0coeff[i+1] * gp[n];
+                                        p0[n] = c0 * gp[n];
+                                        p1[n] = c1 * gp[n];
                                 }
                         }
-                        if (i < non0ctr) {
-                                p0 = gc + nf*non0idx[i];
+                        if (i < ncoeff) {
+                                c0 = non0coeff[i];
+                                p0 = non0pgc[i];
                                 for (n = 0; n < nf; n++) {
-                                        p0[n] = non0coeff[i] * gp[n];
+                                        p0[n] = c0 * gp[n];
                                 }
                         }
         }
@@ -98,46 +108,56 @@ static void prim_to_ctr_opt(double *gc, const int nf, const double *gp,
                             double *non0coeff, int *non0idx, int non0ctr)
 {
         int n, i;
+        double c0, c1, c2;
         double *p0, *p1, *p2;
 
         switch (non0ctr) {
                 case 1:
+                        c0 = non0coeff[0];
                         p0 = gc + nf*non0idx[0];
                         for (n = 0; n < nf; n++) {
-                                p0[n] += non0coeff[0] * gp[n];
+                                p0[n] += c0 * gp[n];
                         }
                         break;
                 case 2:
+                        c0 = non0coeff[0];
+                        c1 = non0coeff[1];
                         p0 = gc + nf*non0idx[0];
                         p1 = gc + nf*non0idx[1];
                         for (n = 0; n < nf; n++) {
-                                p0[n] += non0coeff[0] * gp[n];
-                                p1[n] += non0coeff[1] * gp[n];
+                                p0[n] += c0 * gp[n];
+                                p1[n] += c1 * gp[n];
                         }
                         break;
                 case 3:
+                        c0 = non0coeff[0];
+                        c1 = non0coeff[1];
+                        c2 = non0coeff[2];
                         p0 = gc + nf*non0idx[0];
                         p1 = gc + nf*non0idx[1];
                         p2 = gc + nf*non0idx[2];
                         for (n = 0; n < nf; n++) {
-                                p0[n] += non0coeff[0] * gp[n];
-                                p1[n] += non0coeff[1] * gp[n];
-                                p2[n] += non0coeff[2] * gp[n];
+                                p0[n] += c0 * gp[n];
+                                p1[n] += c1 * gp[n];
+                                p2[n] += c2 * gp[n];
                         }
                         break;
                 default:
                         for (i = 0; i < non0ctr-1; i+=2) {
+                                c0 = non0coeff[i  ];
+                                c1 = non0coeff[i+1];
                                 p0 = gc + nf*non0idx[i  ];
                                 p1 = gc + nf*non0idx[i+1];
                                 for (n = 0; n < nf; n++) {
-                                        p0[n] += non0coeff[i  ] * gp[n];
-                                        p1[n] += non0coeff[i+1] * gp[n];
+                                        p0[n] += c0 * gp[n];
+                                        p1[n] += c1 * gp[n];
                                 }
                         }
                         if (i < non0ctr) {
+                                c0 = non0coeff[i];
                                 p0 = gc + nf*non0idx[i];
                                 for (n = 0; n < nf; n++) {
-                                        p0[n] += non0coeff[i] * gp[n];
+                                        p0[n] += c0 * gp[n];
                                 }
                         }
         }
