@@ -1583,7 +1583,6 @@ double s[9];
 G2E_D_J(g1, g0, i_l+1, j_l+0, k_l, l_l);
 G2E_D_I(g2, g0, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g3, g1, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -1600,28 +1599,13 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[6]) + (-1*s[2]);
 gout[2] = + (1*s[1]) + (-1*s[3]);
 gout[3] = + (1*s[0]) + (1*s[4]) + (1*s[8]);
 gout += 4;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
@@ -1695,7 +1679,6 @@ G2E_D_I(g12, g4, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g13, g5, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g14, g6, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g15, g7, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -1784,6 +1767,7 @@ s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
 s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
 s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[50]) + (-1*s[68]) + (-1*s[52]) + (1*s[70]);
 gout[1] = + (1*s[59]) + (-1*s[23]) + (-1*s[61]) + (1*s[25]);
 gout[2] = + (1*s[14]) + (-1*s[32]) + (-1*s[16]) + (1*s[34]);
@@ -1801,95 +1785,7 @@ gout[13] = + (1*s[54]) + (-1*s[18]) + (1*s[58]) + (-1*s[22]) + (1*s[62]) + (-1*s
 gout[14] = + (1*s[9]) + (-1*s[27]) + (1*s[13]) + (-1*s[31]) + (1*s[17]) + (-1*s[35]);
 gout[15] = + (1*s[0]) + (1*s[36]) + (1*s[72]) + (1*s[4]) + (1*s[40]) + (1*s[76]) + (1*s[8]) + (1*s[44]) + (1*s[80]);
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(81, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g15[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g14[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g14[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g13[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g12[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g12[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g13[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g12[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g12[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g11[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g10[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g10[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g9[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g8[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g8[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g9[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g8[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g8[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g11[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g10[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g10[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g9[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g8[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g8[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g9[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g8[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g8[ix+i] * g0[iy+i] * g7[iz+i];
-s[27] += g7[ix+i] * g8[iy+i] * g0[iz+i];
-s[28] += g6[ix+i] * g9[iy+i] * g0[iz+i];
-s[29] += g6[ix+i] * g8[iy+i] * g1[iz+i];
-s[30] += g5[ix+i] * g10[iy+i] * g0[iz+i];
-s[31] += g4[ix+i] * g11[iy+i] * g0[iz+i];
-s[32] += g4[ix+i] * g10[iy+i] * g1[iz+i];
-s[33] += g5[ix+i] * g8[iy+i] * g2[iz+i];
-s[34] += g4[ix+i] * g9[iy+i] * g2[iz+i];
-s[35] += g4[ix+i] * g8[iy+i] * g3[iz+i];
-s[36] += g3[ix+i] * g12[iy+i] * g0[iz+i];
-s[37] += g2[ix+i] * g13[iy+i] * g0[iz+i];
-s[38] += g2[ix+i] * g12[iy+i] * g1[iz+i];
-s[39] += g1[ix+i] * g14[iy+i] * g0[iz+i];
-s[40] += g0[ix+i] * g15[iy+i] * g0[iz+i];
-s[41] += g0[ix+i] * g14[iy+i] * g1[iz+i];
-s[42] += g1[ix+i] * g12[iy+i] * g2[iz+i];
-s[43] += g0[ix+i] * g13[iy+i] * g2[iz+i];
-s[44] += g0[ix+i] * g12[iy+i] * g3[iz+i];
-s[45] += g3[ix+i] * g8[iy+i] * g4[iz+i];
-s[46] += g2[ix+i] * g9[iy+i] * g4[iz+i];
-s[47] += g2[ix+i] * g8[iy+i] * g5[iz+i];
-s[48] += g1[ix+i] * g10[iy+i] * g4[iz+i];
-s[49] += g0[ix+i] * g11[iy+i] * g4[iz+i];
-s[50] += g0[ix+i] * g10[iy+i] * g5[iz+i];
-s[51] += g1[ix+i] * g8[iy+i] * g6[iz+i];
-s[52] += g0[ix+i] * g9[iy+i] * g6[iz+i];
-s[53] += g0[ix+i] * g8[iy+i] * g7[iz+i];
-s[54] += g7[ix+i] * g0[iy+i] * g8[iz+i];
-s[55] += g6[ix+i] * g1[iy+i] * g8[iz+i];
-s[56] += g6[ix+i] * g0[iy+i] * g9[iz+i];
-s[57] += g5[ix+i] * g2[iy+i] * g8[iz+i];
-s[58] += g4[ix+i] * g3[iy+i] * g8[iz+i];
-s[59] += g4[ix+i] * g2[iy+i] * g9[iz+i];
-s[60] += g5[ix+i] * g0[iy+i] * g10[iz+i];
-s[61] += g4[ix+i] * g1[iy+i] * g10[iz+i];
-s[62] += g4[ix+i] * g0[iy+i] * g11[iz+i];
-s[63] += g3[ix+i] * g4[iy+i] * g8[iz+i];
-s[64] += g2[ix+i] * g5[iy+i] * g8[iz+i];
-s[65] += g2[ix+i] * g4[iy+i] * g9[iz+i];
-s[66] += g1[ix+i] * g6[iy+i] * g8[iz+i];
-s[67] += g0[ix+i] * g7[iy+i] * g8[iz+i];
-s[68] += g0[ix+i] * g6[iy+i] * g9[iz+i];
-s[69] += g1[ix+i] * g4[iy+i] * g10[iz+i];
-s[70] += g0[ix+i] * g5[iy+i] * g10[iz+i];
-s[71] += g0[ix+i] * g4[iy+i] * g11[iz+i];
-s[72] += g3[ix+i] * g0[iy+i] * g12[iz+i];
-s[73] += g2[ix+i] * g1[iy+i] * g12[iz+i];
-s[74] += g2[ix+i] * g0[iy+i] * g13[iz+i];
-s[75] += g1[ix+i] * g2[iy+i] * g12[iz+i];
-s[76] += g0[ix+i] * g3[iy+i] * g12[iz+i];
-s[77] += g0[ix+i] * g2[iy+i] * g13[iz+i];
-s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
-s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
-s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
-}
+} else {
 gout[0] += + (1*s[50]) + (-1*s[68]) + (-1*s[52]) + (1*s[70]);
 gout[1] += + (1*s[59]) + (-1*s[23]) + (-1*s[61]) + (1*s[25]);
 gout[2] += + (1*s[14]) + (-1*s[32]) + (-1*s[16]) + (1*s[34]);
@@ -1951,7 +1847,6 @@ double s[9];
 G2E_R_J(g1, g0, i_l+1, j_l+0, k_l, l_l);
 G2E_R_I(g2, g0, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g3, g1, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -1968,28 +1863,13 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[6]) + (-1*s[2]);
 gout[2] = + (1*s[1]) + (-1*s[3]);
 gout[3] = + (1*s[0]) + (1*s[4]) + (1*s[8]);
 gout += 4;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
@@ -2063,7 +1943,6 @@ G2E_R_I(g12, g4, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g13, g5, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g14, g6, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g15, g7, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -2152,6 +2031,7 @@ s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
 s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
 s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[50]) + (-1*s[68]) + (-1*s[52]) + (1*s[70]);
 gout[1] = + (1*s[59]) + (-1*s[23]) + (-1*s[61]) + (1*s[25]);
 gout[2] = + (1*s[14]) + (-1*s[32]) + (-1*s[16]) + (1*s[34]);
@@ -2169,95 +2049,7 @@ gout[13] = + (1*s[54]) + (-1*s[18]) + (1*s[58]) + (-1*s[22]) + (1*s[62]) + (-1*s
 gout[14] = + (1*s[9]) + (-1*s[27]) + (1*s[13]) + (-1*s[31]) + (1*s[17]) + (-1*s[35]);
 gout[15] = + (1*s[0]) + (1*s[36]) + (1*s[72]) + (1*s[4]) + (1*s[40]) + (1*s[76]) + (1*s[8]) + (1*s[44]) + (1*s[80]);
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(81, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g15[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g14[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g14[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g13[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g12[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g12[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g13[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g12[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g12[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g11[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g10[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g10[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g9[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g8[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g8[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g9[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g8[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g8[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g11[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g10[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g10[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g9[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g8[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g8[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g9[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g8[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g8[ix+i] * g0[iy+i] * g7[iz+i];
-s[27] += g7[ix+i] * g8[iy+i] * g0[iz+i];
-s[28] += g6[ix+i] * g9[iy+i] * g0[iz+i];
-s[29] += g6[ix+i] * g8[iy+i] * g1[iz+i];
-s[30] += g5[ix+i] * g10[iy+i] * g0[iz+i];
-s[31] += g4[ix+i] * g11[iy+i] * g0[iz+i];
-s[32] += g4[ix+i] * g10[iy+i] * g1[iz+i];
-s[33] += g5[ix+i] * g8[iy+i] * g2[iz+i];
-s[34] += g4[ix+i] * g9[iy+i] * g2[iz+i];
-s[35] += g4[ix+i] * g8[iy+i] * g3[iz+i];
-s[36] += g3[ix+i] * g12[iy+i] * g0[iz+i];
-s[37] += g2[ix+i] * g13[iy+i] * g0[iz+i];
-s[38] += g2[ix+i] * g12[iy+i] * g1[iz+i];
-s[39] += g1[ix+i] * g14[iy+i] * g0[iz+i];
-s[40] += g0[ix+i] * g15[iy+i] * g0[iz+i];
-s[41] += g0[ix+i] * g14[iy+i] * g1[iz+i];
-s[42] += g1[ix+i] * g12[iy+i] * g2[iz+i];
-s[43] += g0[ix+i] * g13[iy+i] * g2[iz+i];
-s[44] += g0[ix+i] * g12[iy+i] * g3[iz+i];
-s[45] += g3[ix+i] * g8[iy+i] * g4[iz+i];
-s[46] += g2[ix+i] * g9[iy+i] * g4[iz+i];
-s[47] += g2[ix+i] * g8[iy+i] * g5[iz+i];
-s[48] += g1[ix+i] * g10[iy+i] * g4[iz+i];
-s[49] += g0[ix+i] * g11[iy+i] * g4[iz+i];
-s[50] += g0[ix+i] * g10[iy+i] * g5[iz+i];
-s[51] += g1[ix+i] * g8[iy+i] * g6[iz+i];
-s[52] += g0[ix+i] * g9[iy+i] * g6[iz+i];
-s[53] += g0[ix+i] * g8[iy+i] * g7[iz+i];
-s[54] += g7[ix+i] * g0[iy+i] * g8[iz+i];
-s[55] += g6[ix+i] * g1[iy+i] * g8[iz+i];
-s[56] += g6[ix+i] * g0[iy+i] * g9[iz+i];
-s[57] += g5[ix+i] * g2[iy+i] * g8[iz+i];
-s[58] += g4[ix+i] * g3[iy+i] * g8[iz+i];
-s[59] += g4[ix+i] * g2[iy+i] * g9[iz+i];
-s[60] += g5[ix+i] * g0[iy+i] * g10[iz+i];
-s[61] += g4[ix+i] * g1[iy+i] * g10[iz+i];
-s[62] += g4[ix+i] * g0[iy+i] * g11[iz+i];
-s[63] += g3[ix+i] * g4[iy+i] * g8[iz+i];
-s[64] += g2[ix+i] * g5[iy+i] * g8[iz+i];
-s[65] += g2[ix+i] * g4[iy+i] * g9[iz+i];
-s[66] += g1[ix+i] * g6[iy+i] * g8[iz+i];
-s[67] += g0[ix+i] * g7[iy+i] * g8[iz+i];
-s[68] += g0[ix+i] * g6[iy+i] * g9[iz+i];
-s[69] += g1[ix+i] * g4[iy+i] * g10[iz+i];
-s[70] += g0[ix+i] * g5[iy+i] * g10[iz+i];
-s[71] += g0[ix+i] * g4[iy+i] * g11[iz+i];
-s[72] += g3[ix+i] * g0[iy+i] * g12[iz+i];
-s[73] += g2[ix+i] * g1[iy+i] * g12[iz+i];
-s[74] += g2[ix+i] * g0[iy+i] * g13[iz+i];
-s[75] += g1[ix+i] * g2[iy+i] * g12[iz+i];
-s[76] += g0[ix+i] * g3[iy+i] * g12[iz+i];
-s[77] += g0[ix+i] * g2[iy+i] * g13[iz+i];
-s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
-s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
-s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
-}
+} else {
 gout[0] += + (1*s[50]) + (-1*s[68]) + (-1*s[52]) + (1*s[70]);
 gout[1] += + (1*s[59]) + (-1*s[23]) + (-1*s[61]) + (1*s[25]);
 gout[2] += + (1*s[14]) + (-1*s[32]) + (-1*s[16]) + (1*s[34]);
@@ -2323,7 +2115,6 @@ dri[2] = ri[2] - env[PTR_COMMON_ORIG+2];
 G2E_D_J(g1, g0, i_l+1, j_l+0, k_l, l_l);
 G2E_RCI(g2, g0, i_l+0, j_l, k_l, l_l);
 G2E_RCI(g3, g1, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -2340,6 +2131,7 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[8]) + (1*s[4]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -2353,23 +2145,7 @@ gout[9] = + (-1*s[5]);
 gout[10] = + (1*s[4]) + (1*s[0]);
 gout[11] = + (1*s[3]) + (-1*s[1]);
 gout += 12;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[8]) + (1*s[4]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -2455,7 +2231,6 @@ G2E_RCI(g12, g4, i_l+0, j_l, k_l, l_l);
 G2E_RCI(g13, g5, i_l+0, j_l, k_l, l_l);
 G2E_RCI(g14, g6, i_l+0, j_l, k_l, l_l);
 G2E_RCI(g15, g7, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -2544,6 +2319,7 @@ s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
 s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
 s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[77]) + (1*s[41]) + (-1*s[79]) + (-1*s[43]);
 gout[1] = + (-1*s[32]) + (1*s[34]);
 gout[2] = + (-1*s[59]) + (1*s[61]);
@@ -2593,95 +2369,7 @@ gout[45] = + (-1*s[45]) + (-1*s[49]) + (-1*s[53]);
 gout[46] = + (1*s[36]) + (1*s[0]) + (1*s[40]) + (1*s[4]) + (1*s[44]) + (1*s[8]);
 gout[47] = + (1*s[27]) + (-1*s[9]) + (1*s[31]) + (-1*s[13]) + (1*s[35]) + (-1*s[17]);
 gout += 48;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(81, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g15[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g14[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g14[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g13[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g12[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g12[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g13[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g12[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g12[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g11[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g10[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g10[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g9[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g8[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g8[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g9[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g8[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g8[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g11[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g10[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g10[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g9[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g8[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g8[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g9[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g8[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g8[ix+i] * g0[iy+i] * g7[iz+i];
-s[27] += g7[ix+i] * g8[iy+i] * g0[iz+i];
-s[28] += g6[ix+i] * g9[iy+i] * g0[iz+i];
-s[29] += g6[ix+i] * g8[iy+i] * g1[iz+i];
-s[30] += g5[ix+i] * g10[iy+i] * g0[iz+i];
-s[31] += g4[ix+i] * g11[iy+i] * g0[iz+i];
-s[32] += g4[ix+i] * g10[iy+i] * g1[iz+i];
-s[33] += g5[ix+i] * g8[iy+i] * g2[iz+i];
-s[34] += g4[ix+i] * g9[iy+i] * g2[iz+i];
-s[35] += g4[ix+i] * g8[iy+i] * g3[iz+i];
-s[36] += g3[ix+i] * g12[iy+i] * g0[iz+i];
-s[37] += g2[ix+i] * g13[iy+i] * g0[iz+i];
-s[38] += g2[ix+i] * g12[iy+i] * g1[iz+i];
-s[39] += g1[ix+i] * g14[iy+i] * g0[iz+i];
-s[40] += g0[ix+i] * g15[iy+i] * g0[iz+i];
-s[41] += g0[ix+i] * g14[iy+i] * g1[iz+i];
-s[42] += g1[ix+i] * g12[iy+i] * g2[iz+i];
-s[43] += g0[ix+i] * g13[iy+i] * g2[iz+i];
-s[44] += g0[ix+i] * g12[iy+i] * g3[iz+i];
-s[45] += g3[ix+i] * g8[iy+i] * g4[iz+i];
-s[46] += g2[ix+i] * g9[iy+i] * g4[iz+i];
-s[47] += g2[ix+i] * g8[iy+i] * g5[iz+i];
-s[48] += g1[ix+i] * g10[iy+i] * g4[iz+i];
-s[49] += g0[ix+i] * g11[iy+i] * g4[iz+i];
-s[50] += g0[ix+i] * g10[iy+i] * g5[iz+i];
-s[51] += g1[ix+i] * g8[iy+i] * g6[iz+i];
-s[52] += g0[ix+i] * g9[iy+i] * g6[iz+i];
-s[53] += g0[ix+i] * g8[iy+i] * g7[iz+i];
-s[54] += g7[ix+i] * g0[iy+i] * g8[iz+i];
-s[55] += g6[ix+i] * g1[iy+i] * g8[iz+i];
-s[56] += g6[ix+i] * g0[iy+i] * g9[iz+i];
-s[57] += g5[ix+i] * g2[iy+i] * g8[iz+i];
-s[58] += g4[ix+i] * g3[iy+i] * g8[iz+i];
-s[59] += g4[ix+i] * g2[iy+i] * g9[iz+i];
-s[60] += g5[ix+i] * g0[iy+i] * g10[iz+i];
-s[61] += g4[ix+i] * g1[iy+i] * g10[iz+i];
-s[62] += g4[ix+i] * g0[iy+i] * g11[iz+i];
-s[63] += g3[ix+i] * g4[iy+i] * g8[iz+i];
-s[64] += g2[ix+i] * g5[iy+i] * g8[iz+i];
-s[65] += g2[ix+i] * g4[iy+i] * g9[iz+i];
-s[66] += g1[ix+i] * g6[iy+i] * g8[iz+i];
-s[67] += g0[ix+i] * g7[iy+i] * g8[iz+i];
-s[68] += g0[ix+i] * g6[iy+i] * g9[iz+i];
-s[69] += g1[ix+i] * g4[iy+i] * g10[iz+i];
-s[70] += g0[ix+i] * g5[iy+i] * g10[iz+i];
-s[71] += g0[ix+i] * g4[iy+i] * g11[iz+i];
-s[72] += g3[ix+i] * g0[iy+i] * g12[iz+i];
-s[73] += g2[ix+i] * g1[iy+i] * g12[iz+i];
-s[74] += g2[ix+i] * g0[iy+i] * g13[iz+i];
-s[75] += g1[ix+i] * g2[iy+i] * g12[iz+i];
-s[76] += g0[ix+i] * g3[iy+i] * g12[iz+i];
-s[77] += g0[ix+i] * g2[iy+i] * g13[iz+i];
-s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
-s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
-s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
-}
+} else {
 gout[0] += + (1*s[77]) + (1*s[41]) + (-1*s[79]) + (-1*s[43]);
 gout[1] += + (-1*s[32]) + (1*s[34]);
 gout[2] += + (-1*s[59]) + (1*s[61]);
@@ -2775,7 +2463,6 @@ double s[9];
 G2E_D_J(g1, g0, i_l+1, j_l+0, k_l, l_l);
 G2E_R_I(g2, g0, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g3, g1, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -2792,6 +2479,7 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[8]) + (1*s[4]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -2805,23 +2493,7 @@ gout[9] = + (-1*s[5]);
 gout[10] = + (1*s[4]) + (1*s[0]);
 gout[11] = + (1*s[3]) + (-1*s[1]);
 gout += 12;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[8]) + (1*s[4]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -2903,7 +2575,6 @@ G2E_R_I(g12, g4, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g13, g5, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g14, g6, i_l+0, j_l, k_l, l_l);
 G2E_R_I(g15, g7, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -2992,6 +2663,7 @@ s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
 s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
 s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[77]) + (1*s[41]) + (-1*s[79]) + (-1*s[43]);
 gout[1] = + (-1*s[32]) + (1*s[34]);
 gout[2] = + (-1*s[59]) + (1*s[61]);
@@ -3041,95 +2713,7 @@ gout[45] = + (-1*s[45]) + (-1*s[49]) + (-1*s[53]);
 gout[46] = + (1*s[36]) + (1*s[0]) + (1*s[40]) + (1*s[4]) + (1*s[44]) + (1*s[8]);
 gout[47] = + (1*s[27]) + (-1*s[9]) + (1*s[31]) + (-1*s[13]) + (1*s[35]) + (-1*s[17]);
 gout += 48;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(81, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g15[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g14[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g14[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g13[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g12[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g12[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g13[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g12[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g12[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g11[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g10[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g10[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g9[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g8[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g8[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g9[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g8[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g8[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g11[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g10[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g10[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g9[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g8[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g8[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g9[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g8[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g8[ix+i] * g0[iy+i] * g7[iz+i];
-s[27] += g7[ix+i] * g8[iy+i] * g0[iz+i];
-s[28] += g6[ix+i] * g9[iy+i] * g0[iz+i];
-s[29] += g6[ix+i] * g8[iy+i] * g1[iz+i];
-s[30] += g5[ix+i] * g10[iy+i] * g0[iz+i];
-s[31] += g4[ix+i] * g11[iy+i] * g0[iz+i];
-s[32] += g4[ix+i] * g10[iy+i] * g1[iz+i];
-s[33] += g5[ix+i] * g8[iy+i] * g2[iz+i];
-s[34] += g4[ix+i] * g9[iy+i] * g2[iz+i];
-s[35] += g4[ix+i] * g8[iy+i] * g3[iz+i];
-s[36] += g3[ix+i] * g12[iy+i] * g0[iz+i];
-s[37] += g2[ix+i] * g13[iy+i] * g0[iz+i];
-s[38] += g2[ix+i] * g12[iy+i] * g1[iz+i];
-s[39] += g1[ix+i] * g14[iy+i] * g0[iz+i];
-s[40] += g0[ix+i] * g15[iy+i] * g0[iz+i];
-s[41] += g0[ix+i] * g14[iy+i] * g1[iz+i];
-s[42] += g1[ix+i] * g12[iy+i] * g2[iz+i];
-s[43] += g0[ix+i] * g13[iy+i] * g2[iz+i];
-s[44] += g0[ix+i] * g12[iy+i] * g3[iz+i];
-s[45] += g3[ix+i] * g8[iy+i] * g4[iz+i];
-s[46] += g2[ix+i] * g9[iy+i] * g4[iz+i];
-s[47] += g2[ix+i] * g8[iy+i] * g5[iz+i];
-s[48] += g1[ix+i] * g10[iy+i] * g4[iz+i];
-s[49] += g0[ix+i] * g11[iy+i] * g4[iz+i];
-s[50] += g0[ix+i] * g10[iy+i] * g5[iz+i];
-s[51] += g1[ix+i] * g8[iy+i] * g6[iz+i];
-s[52] += g0[ix+i] * g9[iy+i] * g6[iz+i];
-s[53] += g0[ix+i] * g8[iy+i] * g7[iz+i];
-s[54] += g7[ix+i] * g0[iy+i] * g8[iz+i];
-s[55] += g6[ix+i] * g1[iy+i] * g8[iz+i];
-s[56] += g6[ix+i] * g0[iy+i] * g9[iz+i];
-s[57] += g5[ix+i] * g2[iy+i] * g8[iz+i];
-s[58] += g4[ix+i] * g3[iy+i] * g8[iz+i];
-s[59] += g4[ix+i] * g2[iy+i] * g9[iz+i];
-s[60] += g5[ix+i] * g0[iy+i] * g10[iz+i];
-s[61] += g4[ix+i] * g1[iy+i] * g10[iz+i];
-s[62] += g4[ix+i] * g0[iy+i] * g11[iz+i];
-s[63] += g3[ix+i] * g4[iy+i] * g8[iz+i];
-s[64] += g2[ix+i] * g5[iy+i] * g8[iz+i];
-s[65] += g2[ix+i] * g4[iy+i] * g9[iz+i];
-s[66] += g1[ix+i] * g6[iy+i] * g8[iz+i];
-s[67] += g0[ix+i] * g7[iy+i] * g8[iz+i];
-s[68] += g0[ix+i] * g6[iy+i] * g9[iz+i];
-s[69] += g1[ix+i] * g4[iy+i] * g10[iz+i];
-s[70] += g0[ix+i] * g5[iy+i] * g10[iz+i];
-s[71] += g0[ix+i] * g4[iy+i] * g11[iz+i];
-s[72] += g3[ix+i] * g0[iy+i] * g12[iz+i];
-s[73] += g2[ix+i] * g1[iy+i] * g12[iz+i];
-s[74] += g2[ix+i] * g0[iy+i] * g13[iz+i];
-s[75] += g1[ix+i] * g2[iy+i] * g12[iz+i];
-s[76] += g0[ix+i] * g3[iy+i] * g12[iz+i];
-s[77] += g0[ix+i] * g2[iy+i] * g13[iz+i];
-s[78] += g1[ix+i] * g0[iy+i] * g14[iz+i];
-s[79] += g0[ix+i] * g1[iy+i] * g14[iz+i];
-s[80] += g0[ix+i] * g0[iy+i] * g15[iz+i];
-}
+} else {
 gout[0] += + (1*s[77]) + (1*s[41]) + (-1*s[79]) + (-1*s[43]);
 gout[1] += + (-1*s[32]) + (1*s[34]);
 gout[2] += + (-1*s[59]) + (1*s[61]);
@@ -3227,7 +2811,6 @@ c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
 G2E_R0I(g1, g0, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -3280,63 +2863,12 @@ s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
 } break;}
+if (gout_empty) {
 gout[0] = + (1*c[1]*s[2]) + (-1*c[2]*s[1]);
 gout[1] = + (1*c[2]*s[0]) + (-1*c[0]*s[2]);
 gout[2] = + (1*c[0]*s[1]) + (-1*c[1]*s[0]);
 gout += 3;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-switch (envs->nrys_roots) {
-case 1:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
-break;
-case 2:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
-break;
-case 3:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
-break;
-case 4:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
-break;
-case 5:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
-break;
-case 6:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
-break;
-case 7:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
-break;
-case 8:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
-break;
-default:
-CINTdset0(3, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-} break;}
+} else {
 gout[0] += + (1*c[1]*s[2]) + (-1*c[2]*s[1]);
 gout[1] += + (1*c[2]*s[0]) + (-1*c[0]*s[2]);
 gout[2] += + (1*c[0]*s[1]) + (-1*c[1]*s[0]);
@@ -3412,7 +2944,6 @@ G2E_D_I(g4, g0, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g5, g1, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g6, g2, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g7, g3, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -3447,6 +2978,7 @@ s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
 s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
 s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*c[1]*s[17]) + (-1*c[2]*s[14]) + (-1*c[1]*s[25]) + (1*c[2]*s[22]);
 gout[1] = + (1*c[1]*s[24]) + (-1*c[2]*s[21]) + (-1*c[1]*s[8]) + (1*c[2]*s[5]);
 gout[2] = + (1*c[1]*s[7]) + (-1*c[2]*s[4]) + (-1*c[1]*s[15]) + (1*c[2]*s[12]);
@@ -3460,41 +2992,7 @@ gout[9] = + (1*c[0]*s[21]) + (-1*c[1]*s[18]) + (-1*c[0]*s[5]) + (1*c[1]*s[2]);
 gout[10] = + (1*c[0]*s[4]) + (-1*c[1]*s[1]) + (-1*c[0]*s[12]) + (1*c[1]*s[9]);
 gout[11] = + (1*c[0]*s[3]) + (-1*c[1]*s[0]) + (1*c[0]*s[13]) + (-1*c[1]*s[10]) + (1*c[0]*s[23]) + (-1*c[1]*s[20]);
 gout += 12;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(27, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
-}
+} else {
 gout[0] += + (1*c[1]*s[17]) + (-1*c[2]*s[14]) + (-1*c[1]*s[25]) + (1*c[2]*s[22]);
 gout[1] += + (1*c[1]*s[24]) + (-1*c[2]*s[21]) + (-1*c[1]*s[8]) + (1*c[2]*s[5]);
 gout[2] += + (1*c[1]*s[7]) + (-1*c[2]*s[4]) + (-1*c[1]*s[15]) + (1*c[2]*s[12]);
@@ -3579,7 +3077,6 @@ G2E_R0I(g4, g0, i_l+0, j_l, k_l, l_l);
 G2E_R0I(g5, g1, i_l+0, j_l, k_l, l_l);
 G2E_R0I(g6, g2, i_l+0, j_l, k_l, l_l);
 G2E_R0I(g7, g3, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -3614,6 +3111,7 @@ s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
 s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
 s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*c[1]*s[23]) + (-1*c[2]*s[14]) + (-1*c[1]*s[25]) + (1*c[2]*s[16]);
 gout[1] = + (1*c[1]*s[24]) + (-1*c[2]*s[15]) + (-1*c[1]*s[20]) + (1*c[2]*s[11]);
 gout[2] = + (1*c[1]*s[19]) + (-1*c[2]*s[10]) + (-1*c[1]*s[21]) + (1*c[2]*s[12]);
@@ -3627,41 +3125,7 @@ gout[9] = + (1*c[0]*s[15]) + (-1*c[1]*s[6]) + (-1*c[0]*s[11]) + (1*c[1]*s[2]);
 gout[10] = + (1*c[0]*s[10]) + (-1*c[1]*s[1]) + (-1*c[0]*s[12]) + (1*c[1]*s[3]);
 gout[11] = + (1*c[0]*s[9]) + (-1*c[1]*s[0]) + (1*c[0]*s[13]) + (-1*c[1]*s[4]) + (1*c[0]*s[17]) + (-1*c[1]*s[8]);
 gout += 12;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(27, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
-}
+} else {
 gout[0] += + (1*c[1]*s[23]) + (-1*c[2]*s[14]) + (-1*c[1]*s[25]) + (1*c[2]*s[16]);
 gout[1] += + (1*c[1]*s[24]) + (-1*c[2]*s[15]) + (-1*c[1]*s[20]) + (1*c[2]*s[11]);
 gout[2] += + (1*c[1]*s[19]) + (-1*c[2]*s[10]) + (-1*c[1]*s[21]) + (1*c[2]*s[12]);
@@ -3794,7 +3258,6 @@ G2E_D_I(g28, g12, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g29, g13, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g30, g14, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g31, g15, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -4045,6 +3508,7 @@ s[240] += g1[ix+i] * g0[iy+i] * g30[iz+i];
 s[241] += g0[ix+i] * g1[iy+i] * g30[iz+i];
 s[242] += g0[ix+i] * g0[iy+i] * g31[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*c[1]*s[158]) + (-1*c[2]*s[131]) + (-1*c[1]*s[230]) + (1*c[2]*s[203]) + (-1*c[1]*s[160]) + (1*c[2]*s[133]) + (1*c[1]*s[232]) + (-1*c[2]*s[205]);
 gout[1] = + (1*c[1]*s[221]) + (-1*c[2]*s[194]) + (-1*c[1]*s[77]) + (1*c[2]*s[50]) + (-1*c[1]*s[223]) + (1*c[2]*s[196]) + (1*c[1]*s[79]) + (-1*c[2]*s[52]);
 gout[2] = + (1*c[1]*s[68]) + (-1*c[2]*s[41]) + (-1*c[1]*s[140]) + (1*c[2]*s[113]) + (-1*c[1]*s[70]) + (1*c[2]*s[43]) + (1*c[1]*s[142]) + (-1*c[2]*s[115]);
@@ -4094,257 +3558,7 @@ gout[45] = + (1*c[0]*s[189]) + (-1*c[1]*s[162]) + (-1*c[0]*s[45]) + (1*c[1]*s[18
 gout[46] = + (1*c[0]*s[36]) + (-1*c[1]*s[9]) + (-1*c[0]*s[108]) + (1*c[1]*s[81]) + (1*c[0]*s[40]) + (-1*c[1]*s[13]) + (-1*c[0]*s[112]) + (1*c[1]*s[85]) + (1*c[0]*s[44]) + (-1*c[1]*s[17]) + (-1*c[0]*s[116]) + (1*c[1]*s[89]);
 gout[47] = + (1*c[0]*s[27]) + (-1*c[1]*s[0]) + (1*c[0]*s[117]) + (-1*c[1]*s[90]) + (1*c[0]*s[207]) + (-1*c[1]*s[180]) + (1*c[0]*s[31]) + (-1*c[1]*s[4]) + (1*c[0]*s[121]) + (-1*c[1]*s[94]) + (1*c[0]*s[211]) + (-1*c[1]*s[184]) + (1*c[0]*s[35]) + (-1*c[1]*s[8]) + (1*c[0]*s[125]) + (-1*c[1]*s[98]) + (1*c[0]*s[215]) + (-1*c[1]*s[188]);
 gout += 48;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(243, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g31[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g30[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g30[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g29[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g28[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g28[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g29[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g28[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g28[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g27[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g26[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g26[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g25[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g24[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g24[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g25[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g24[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g24[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g27[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g26[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g26[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g25[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g24[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g24[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g25[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g24[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g24[ix+i] * g0[iy+i] * g7[iz+i];
-s[27] += g23[ix+i] * g8[iy+i] * g0[iz+i];
-s[28] += g22[ix+i] * g9[iy+i] * g0[iz+i];
-s[29] += g22[ix+i] * g8[iy+i] * g1[iz+i];
-s[30] += g21[ix+i] * g10[iy+i] * g0[iz+i];
-s[31] += g20[ix+i] * g11[iy+i] * g0[iz+i];
-s[32] += g20[ix+i] * g10[iy+i] * g1[iz+i];
-s[33] += g21[ix+i] * g8[iy+i] * g2[iz+i];
-s[34] += g20[ix+i] * g9[iy+i] * g2[iz+i];
-s[35] += g20[ix+i] * g8[iy+i] * g3[iz+i];
-s[36] += g19[ix+i] * g12[iy+i] * g0[iz+i];
-s[37] += g18[ix+i] * g13[iy+i] * g0[iz+i];
-s[38] += g18[ix+i] * g12[iy+i] * g1[iz+i];
-s[39] += g17[ix+i] * g14[iy+i] * g0[iz+i];
-s[40] += g16[ix+i] * g15[iy+i] * g0[iz+i];
-s[41] += g16[ix+i] * g14[iy+i] * g1[iz+i];
-s[42] += g17[ix+i] * g12[iy+i] * g2[iz+i];
-s[43] += g16[ix+i] * g13[iy+i] * g2[iz+i];
-s[44] += g16[ix+i] * g12[iy+i] * g3[iz+i];
-s[45] += g19[ix+i] * g8[iy+i] * g4[iz+i];
-s[46] += g18[ix+i] * g9[iy+i] * g4[iz+i];
-s[47] += g18[ix+i] * g8[iy+i] * g5[iz+i];
-s[48] += g17[ix+i] * g10[iy+i] * g4[iz+i];
-s[49] += g16[ix+i] * g11[iy+i] * g4[iz+i];
-s[50] += g16[ix+i] * g10[iy+i] * g5[iz+i];
-s[51] += g17[ix+i] * g8[iy+i] * g6[iz+i];
-s[52] += g16[ix+i] * g9[iy+i] * g6[iz+i];
-s[53] += g16[ix+i] * g8[iy+i] * g7[iz+i];
-s[54] += g23[ix+i] * g0[iy+i] * g8[iz+i];
-s[55] += g22[ix+i] * g1[iy+i] * g8[iz+i];
-s[56] += g22[ix+i] * g0[iy+i] * g9[iz+i];
-s[57] += g21[ix+i] * g2[iy+i] * g8[iz+i];
-s[58] += g20[ix+i] * g3[iy+i] * g8[iz+i];
-s[59] += g20[ix+i] * g2[iy+i] * g9[iz+i];
-s[60] += g21[ix+i] * g0[iy+i] * g10[iz+i];
-s[61] += g20[ix+i] * g1[iy+i] * g10[iz+i];
-s[62] += g20[ix+i] * g0[iy+i] * g11[iz+i];
-s[63] += g19[ix+i] * g4[iy+i] * g8[iz+i];
-s[64] += g18[ix+i] * g5[iy+i] * g8[iz+i];
-s[65] += g18[ix+i] * g4[iy+i] * g9[iz+i];
-s[66] += g17[ix+i] * g6[iy+i] * g8[iz+i];
-s[67] += g16[ix+i] * g7[iy+i] * g8[iz+i];
-s[68] += g16[ix+i] * g6[iy+i] * g9[iz+i];
-s[69] += g17[ix+i] * g4[iy+i] * g10[iz+i];
-s[70] += g16[ix+i] * g5[iy+i] * g10[iz+i];
-s[71] += g16[ix+i] * g4[iy+i] * g11[iz+i];
-s[72] += g19[ix+i] * g0[iy+i] * g12[iz+i];
-s[73] += g18[ix+i] * g1[iy+i] * g12[iz+i];
-s[74] += g18[ix+i] * g0[iy+i] * g13[iz+i];
-s[75] += g17[ix+i] * g2[iy+i] * g12[iz+i];
-s[76] += g16[ix+i] * g3[iy+i] * g12[iz+i];
-s[77] += g16[ix+i] * g2[iy+i] * g13[iz+i];
-s[78] += g17[ix+i] * g0[iy+i] * g14[iz+i];
-s[79] += g16[ix+i] * g1[iy+i] * g14[iz+i];
-s[80] += g16[ix+i] * g0[iy+i] * g15[iz+i];
-s[81] += g15[ix+i] * g16[iy+i] * g0[iz+i];
-s[82] += g14[ix+i] * g17[iy+i] * g0[iz+i];
-s[83] += g14[ix+i] * g16[iy+i] * g1[iz+i];
-s[84] += g13[ix+i] * g18[iy+i] * g0[iz+i];
-s[85] += g12[ix+i] * g19[iy+i] * g0[iz+i];
-s[86] += g12[ix+i] * g18[iy+i] * g1[iz+i];
-s[87] += g13[ix+i] * g16[iy+i] * g2[iz+i];
-s[88] += g12[ix+i] * g17[iy+i] * g2[iz+i];
-s[89] += g12[ix+i] * g16[iy+i] * g3[iz+i];
-s[90] += g11[ix+i] * g20[iy+i] * g0[iz+i];
-s[91] += g10[ix+i] * g21[iy+i] * g0[iz+i];
-s[92] += g10[ix+i] * g20[iy+i] * g1[iz+i];
-s[93] += g9[ix+i] * g22[iy+i] * g0[iz+i];
-s[94] += g8[ix+i] * g23[iy+i] * g0[iz+i];
-s[95] += g8[ix+i] * g22[iy+i] * g1[iz+i];
-s[96] += g9[ix+i] * g20[iy+i] * g2[iz+i];
-s[97] += g8[ix+i] * g21[iy+i] * g2[iz+i];
-s[98] += g8[ix+i] * g20[iy+i] * g3[iz+i];
-s[99] += g11[ix+i] * g16[iy+i] * g4[iz+i];
-s[100] += g10[ix+i] * g17[iy+i] * g4[iz+i];
-s[101] += g10[ix+i] * g16[iy+i] * g5[iz+i];
-s[102] += g9[ix+i] * g18[iy+i] * g4[iz+i];
-s[103] += g8[ix+i] * g19[iy+i] * g4[iz+i];
-s[104] += g8[ix+i] * g18[iy+i] * g5[iz+i];
-s[105] += g9[ix+i] * g16[iy+i] * g6[iz+i];
-s[106] += g8[ix+i] * g17[iy+i] * g6[iz+i];
-s[107] += g8[ix+i] * g16[iy+i] * g7[iz+i];
-s[108] += g7[ix+i] * g24[iy+i] * g0[iz+i];
-s[109] += g6[ix+i] * g25[iy+i] * g0[iz+i];
-s[110] += g6[ix+i] * g24[iy+i] * g1[iz+i];
-s[111] += g5[ix+i] * g26[iy+i] * g0[iz+i];
-s[112] += g4[ix+i] * g27[iy+i] * g0[iz+i];
-s[113] += g4[ix+i] * g26[iy+i] * g1[iz+i];
-s[114] += g5[ix+i] * g24[iy+i] * g2[iz+i];
-s[115] += g4[ix+i] * g25[iy+i] * g2[iz+i];
-s[116] += g4[ix+i] * g24[iy+i] * g3[iz+i];
-s[117] += g3[ix+i] * g28[iy+i] * g0[iz+i];
-s[118] += g2[ix+i] * g29[iy+i] * g0[iz+i];
-s[119] += g2[ix+i] * g28[iy+i] * g1[iz+i];
-s[120] += g1[ix+i] * g30[iy+i] * g0[iz+i];
-s[121] += g0[ix+i] * g31[iy+i] * g0[iz+i];
-s[122] += g0[ix+i] * g30[iy+i] * g1[iz+i];
-s[123] += g1[ix+i] * g28[iy+i] * g2[iz+i];
-s[124] += g0[ix+i] * g29[iy+i] * g2[iz+i];
-s[125] += g0[ix+i] * g28[iy+i] * g3[iz+i];
-s[126] += g3[ix+i] * g24[iy+i] * g4[iz+i];
-s[127] += g2[ix+i] * g25[iy+i] * g4[iz+i];
-s[128] += g2[ix+i] * g24[iy+i] * g5[iz+i];
-s[129] += g1[ix+i] * g26[iy+i] * g4[iz+i];
-s[130] += g0[ix+i] * g27[iy+i] * g4[iz+i];
-s[131] += g0[ix+i] * g26[iy+i] * g5[iz+i];
-s[132] += g1[ix+i] * g24[iy+i] * g6[iz+i];
-s[133] += g0[ix+i] * g25[iy+i] * g6[iz+i];
-s[134] += g0[ix+i] * g24[iy+i] * g7[iz+i];
-s[135] += g7[ix+i] * g16[iy+i] * g8[iz+i];
-s[136] += g6[ix+i] * g17[iy+i] * g8[iz+i];
-s[137] += g6[ix+i] * g16[iy+i] * g9[iz+i];
-s[138] += g5[ix+i] * g18[iy+i] * g8[iz+i];
-s[139] += g4[ix+i] * g19[iy+i] * g8[iz+i];
-s[140] += g4[ix+i] * g18[iy+i] * g9[iz+i];
-s[141] += g5[ix+i] * g16[iy+i] * g10[iz+i];
-s[142] += g4[ix+i] * g17[iy+i] * g10[iz+i];
-s[143] += g4[ix+i] * g16[iy+i] * g11[iz+i];
-s[144] += g3[ix+i] * g20[iy+i] * g8[iz+i];
-s[145] += g2[ix+i] * g21[iy+i] * g8[iz+i];
-s[146] += g2[ix+i] * g20[iy+i] * g9[iz+i];
-s[147] += g1[ix+i] * g22[iy+i] * g8[iz+i];
-s[148] += g0[ix+i] * g23[iy+i] * g8[iz+i];
-s[149] += g0[ix+i] * g22[iy+i] * g9[iz+i];
-s[150] += g1[ix+i] * g20[iy+i] * g10[iz+i];
-s[151] += g0[ix+i] * g21[iy+i] * g10[iz+i];
-s[152] += g0[ix+i] * g20[iy+i] * g11[iz+i];
-s[153] += g3[ix+i] * g16[iy+i] * g12[iz+i];
-s[154] += g2[ix+i] * g17[iy+i] * g12[iz+i];
-s[155] += g2[ix+i] * g16[iy+i] * g13[iz+i];
-s[156] += g1[ix+i] * g18[iy+i] * g12[iz+i];
-s[157] += g0[ix+i] * g19[iy+i] * g12[iz+i];
-s[158] += g0[ix+i] * g18[iy+i] * g13[iz+i];
-s[159] += g1[ix+i] * g16[iy+i] * g14[iz+i];
-s[160] += g0[ix+i] * g17[iy+i] * g14[iz+i];
-s[161] += g0[ix+i] * g16[iy+i] * g15[iz+i];
-s[162] += g15[ix+i] * g0[iy+i] * g16[iz+i];
-s[163] += g14[ix+i] * g1[iy+i] * g16[iz+i];
-s[164] += g14[ix+i] * g0[iy+i] * g17[iz+i];
-s[165] += g13[ix+i] * g2[iy+i] * g16[iz+i];
-s[166] += g12[ix+i] * g3[iy+i] * g16[iz+i];
-s[167] += g12[ix+i] * g2[iy+i] * g17[iz+i];
-s[168] += g13[ix+i] * g0[iy+i] * g18[iz+i];
-s[169] += g12[ix+i] * g1[iy+i] * g18[iz+i];
-s[170] += g12[ix+i] * g0[iy+i] * g19[iz+i];
-s[171] += g11[ix+i] * g4[iy+i] * g16[iz+i];
-s[172] += g10[ix+i] * g5[iy+i] * g16[iz+i];
-s[173] += g10[ix+i] * g4[iy+i] * g17[iz+i];
-s[174] += g9[ix+i] * g6[iy+i] * g16[iz+i];
-s[175] += g8[ix+i] * g7[iy+i] * g16[iz+i];
-s[176] += g8[ix+i] * g6[iy+i] * g17[iz+i];
-s[177] += g9[ix+i] * g4[iy+i] * g18[iz+i];
-s[178] += g8[ix+i] * g5[iy+i] * g18[iz+i];
-s[179] += g8[ix+i] * g4[iy+i] * g19[iz+i];
-s[180] += g11[ix+i] * g0[iy+i] * g20[iz+i];
-s[181] += g10[ix+i] * g1[iy+i] * g20[iz+i];
-s[182] += g10[ix+i] * g0[iy+i] * g21[iz+i];
-s[183] += g9[ix+i] * g2[iy+i] * g20[iz+i];
-s[184] += g8[ix+i] * g3[iy+i] * g20[iz+i];
-s[185] += g8[ix+i] * g2[iy+i] * g21[iz+i];
-s[186] += g9[ix+i] * g0[iy+i] * g22[iz+i];
-s[187] += g8[ix+i] * g1[iy+i] * g22[iz+i];
-s[188] += g8[ix+i] * g0[iy+i] * g23[iz+i];
-s[189] += g7[ix+i] * g8[iy+i] * g16[iz+i];
-s[190] += g6[ix+i] * g9[iy+i] * g16[iz+i];
-s[191] += g6[ix+i] * g8[iy+i] * g17[iz+i];
-s[192] += g5[ix+i] * g10[iy+i] * g16[iz+i];
-s[193] += g4[ix+i] * g11[iy+i] * g16[iz+i];
-s[194] += g4[ix+i] * g10[iy+i] * g17[iz+i];
-s[195] += g5[ix+i] * g8[iy+i] * g18[iz+i];
-s[196] += g4[ix+i] * g9[iy+i] * g18[iz+i];
-s[197] += g4[ix+i] * g8[iy+i] * g19[iz+i];
-s[198] += g3[ix+i] * g12[iy+i] * g16[iz+i];
-s[199] += g2[ix+i] * g13[iy+i] * g16[iz+i];
-s[200] += g2[ix+i] * g12[iy+i] * g17[iz+i];
-s[201] += g1[ix+i] * g14[iy+i] * g16[iz+i];
-s[202] += g0[ix+i] * g15[iy+i] * g16[iz+i];
-s[203] += g0[ix+i] * g14[iy+i] * g17[iz+i];
-s[204] += g1[ix+i] * g12[iy+i] * g18[iz+i];
-s[205] += g0[ix+i] * g13[iy+i] * g18[iz+i];
-s[206] += g0[ix+i] * g12[iy+i] * g19[iz+i];
-s[207] += g3[ix+i] * g8[iy+i] * g20[iz+i];
-s[208] += g2[ix+i] * g9[iy+i] * g20[iz+i];
-s[209] += g2[ix+i] * g8[iy+i] * g21[iz+i];
-s[210] += g1[ix+i] * g10[iy+i] * g20[iz+i];
-s[211] += g0[ix+i] * g11[iy+i] * g20[iz+i];
-s[212] += g0[ix+i] * g10[iy+i] * g21[iz+i];
-s[213] += g1[ix+i] * g8[iy+i] * g22[iz+i];
-s[214] += g0[ix+i] * g9[iy+i] * g22[iz+i];
-s[215] += g0[ix+i] * g8[iy+i] * g23[iz+i];
-s[216] += g7[ix+i] * g0[iy+i] * g24[iz+i];
-s[217] += g6[ix+i] * g1[iy+i] * g24[iz+i];
-s[218] += g6[ix+i] * g0[iy+i] * g25[iz+i];
-s[219] += g5[ix+i] * g2[iy+i] * g24[iz+i];
-s[220] += g4[ix+i] * g3[iy+i] * g24[iz+i];
-s[221] += g4[ix+i] * g2[iy+i] * g25[iz+i];
-s[222] += g5[ix+i] * g0[iy+i] * g26[iz+i];
-s[223] += g4[ix+i] * g1[iy+i] * g26[iz+i];
-s[224] += g4[ix+i] * g0[iy+i] * g27[iz+i];
-s[225] += g3[ix+i] * g4[iy+i] * g24[iz+i];
-s[226] += g2[ix+i] * g5[iy+i] * g24[iz+i];
-s[227] += g2[ix+i] * g4[iy+i] * g25[iz+i];
-s[228] += g1[ix+i] * g6[iy+i] * g24[iz+i];
-s[229] += g0[ix+i] * g7[iy+i] * g24[iz+i];
-s[230] += g0[ix+i] * g6[iy+i] * g25[iz+i];
-s[231] += g1[ix+i] * g4[iy+i] * g26[iz+i];
-s[232] += g0[ix+i] * g5[iy+i] * g26[iz+i];
-s[233] += g0[ix+i] * g4[iy+i] * g27[iz+i];
-s[234] += g3[ix+i] * g0[iy+i] * g28[iz+i];
-s[235] += g2[ix+i] * g1[iy+i] * g28[iz+i];
-s[236] += g2[ix+i] * g0[iy+i] * g29[iz+i];
-s[237] += g1[ix+i] * g2[iy+i] * g28[iz+i];
-s[238] += g0[ix+i] * g3[iy+i] * g28[iz+i];
-s[239] += g0[ix+i] * g2[iy+i] * g29[iz+i];
-s[240] += g1[ix+i] * g0[iy+i] * g30[iz+i];
-s[241] += g0[ix+i] * g1[iy+i] * g30[iz+i];
-s[242] += g0[ix+i] * g0[iy+i] * g31[iz+i];
-}
+} else {
 gout[0] += + (1*c[1]*s[158]) + (-1*c[2]*s[131]) + (-1*c[1]*s[230]) + (1*c[2]*s[203]) + (-1*c[1]*s[160]) + (1*c[2]*s[133]) + (1*c[1]*s[232]) + (-1*c[2]*s[205]);
 gout[1] += + (1*c[1]*s[221]) + (-1*c[2]*s[194]) + (-1*c[1]*s[77]) + (1*c[2]*s[50]) + (-1*c[1]*s[223]) + (1*c[2]*s[196]) + (1*c[1]*s[79]) + (-1*c[2]*s[52]);
 gout[2] += + (1*c[1]*s[68]) + (-1*c[2]*s[41]) + (-1*c[1]*s[140]) + (1*c[2]*s[113]) + (-1*c[1]*s[70]) + (1*c[2]*s[43]) + (1*c[1]*s[142]) + (-1*c[2]*s[115]);
@@ -4585,7 +3799,6 @@ double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
 double s[3];
 G2E_D_I(g1, g0, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -4638,64 +3851,13 @@ s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
 } break;}
+if (gout_empty) {
 gout[0] = + (1*s[0]);
 gout[1] = + (1*s[1]);
 gout[2] = + (1*s[2]);
 gout[3] = 0;
 gout += 4;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-switch (envs->nrys_roots) {
-case 1:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
-break;
-case 2:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
-break;
-case 3:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
-break;
-case 4:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
-break;
-case 5:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
-break;
-case 6:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
-break;
-case 7:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
-break;
-case 8:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
-break;
-default:
-CINTdset0(3, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-} break;}
+} else {
 gout[0] += + (1*s[0]);
 gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
@@ -4741,7 +3903,6 @@ double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
 double s[3];
 G2E_D_J(g1, g0, i_l+0, j_l+0, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -4794,64 +3955,13 @@ s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
 } break;}
+if (gout_empty) {
 gout[0] = + (-1*s[0]);
 gout[1] = + (-1*s[1]);
 gout[2] = + (-1*s[2]);
 gout[3] = 0;
 gout += 4;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-switch (envs->nrys_roots) {
-case 1:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
-break;
-case 2:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
-break;
-case 3:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
-break;
-case 4:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
-break;
-case 5:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
-break;
-case 6:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
-break;
-case 7:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
-break;
-case 8:
-s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
-s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
-s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
-break;
-default:
-CINTdset0(3, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
-} break;}
+} else {
 gout[0] += + (-1*s[0]);
 gout[1] += + (-1*s[1]);
 gout[2] += + (-1*s[2]);
@@ -4901,7 +4011,6 @@ double s[9];
 G2E_D_L(g1, g0, i_l+0, j_l+0, k_l+1, l_l+0);
 G2E_D_K(g2, g0, i_l+0, j_l+0, k_l+0, l_l);
 G2E_D_K(g3, g1, i_l+0, j_l+0, k_l+0, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -4918,28 +4027,13 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[6]) + (-1*s[2]);
 gout[2] = + (1*s[1]) + (-1*s[3]);
 gout[3] = + (1*s[0]) + (1*s[4]) + (1*s[8]);
 gout += 4;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[6]) + (-1*s[2]);
 gout[2] += + (1*s[1]) + (-1*s[3]);
@@ -4989,7 +4083,6 @@ double s[9];
 G2E_D_K(g1, g0, i_l+1, j_l+0, k_l+0, l_l);
 G2E_D_I(g2, g0, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g3, g1, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -5006,6 +4099,7 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[0]);
 gout[1] = + (1*s[3]);
 gout[2] = + (1*s[6]);
@@ -5023,23 +4117,7 @@ gout[13] = 0;
 gout[14] = 0;
 gout[15] = 0;
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[0]);
 gout[1] += + (1*s[3]);
 gout[2] += + (1*s[6]);
@@ -5101,7 +4179,6 @@ double s[9];
 G2E_D_K(g1, g0, i_l+0, j_l+1, k_l+0, l_l);
 G2E_D_J(g2, g0, i_l+0, j_l+0, k_l, l_l);
 G2E_D_J(g3, g1, i_l+0, j_l+0, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -5118,6 +4195,7 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (-1*s[0]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -5135,23 +4213,7 @@ gout[13] = 0;
 gout[14] = 0;
 gout[15] = 0;
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (-1*s[0]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -5213,7 +4275,6 @@ double s[9];
 G2E_D_L(g1, g0, i_l+1, j_l+0, k_l+0, l_l+0);
 G2E_D_I(g2, g0, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g3, g1, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -5230,6 +4291,7 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (-1*s[0]);
 gout[1] = + (-1*s[3]);
 gout[2] = + (-1*s[6]);
@@ -5247,23 +4309,7 @@ gout[13] = 0;
 gout[14] = 0;
 gout[15] = 0;
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (-1*s[0]);
 gout[1] += + (-1*s[3]);
 gout[2] += + (-1*s[6]);
@@ -5325,7 +4371,6 @@ double s[9];
 G2E_D_L(g1, g0, i_l+0, j_l+1, k_l+0, l_l+0);
 G2E_D_J(g2, g0, i_l+0, j_l+0, k_l, l_l);
 G2E_D_J(g3, g1, i_l+0, j_l+0, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -5342,6 +4387,7 @@ s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[0]);
 gout[1] = + (1*s[3]);
 gout[2] = + (1*s[6]);
@@ -5359,23 +4405,7 @@ gout[13] = 0;
 gout[14] = 0;
 gout[15] = 0;
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(9, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
-}
+} else {
 gout[0] += + (1*s[0]);
 gout[1] += + (1*s[3]);
 gout[2] += + (1*s[6]);
@@ -5445,7 +4475,6 @@ G2E_D_I(g4, g0, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g5, g1, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g6, g2, i_l+0, j_l, k_l, l_l);
 G2E_D_I(g7, g3, i_l+0, j_l, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -5480,6 +4509,7 @@ s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
 s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
 s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (1*s[5]) + (-1*s[7]);
 gout[1] = + (1*s[14]) + (-1*s[16]);
 gout[2] = + (1*s[23]) + (-1*s[25]);
@@ -5497,41 +4527,7 @@ gout[13] = + (1*s[9]) + (1*s[13]) + (1*s[17]);
 gout[14] = + (1*s[18]) + (1*s[22]) + (1*s[26]);
 gout[15] = 0;
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(27, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
-}
+} else {
 gout[0] += + (1*s[5]) + (-1*s[7]);
 gout[1] += + (1*s[14]) + (-1*s[16]);
 gout[2] += + (1*s[23]) + (-1*s[25]);
@@ -5601,7 +4597,6 @@ G2E_D_J(g4, g0, i_l+0, j_l+0, k_l, l_l);
 G2E_D_J(g5, g1, i_l+0, j_l+0, k_l, l_l);
 G2E_D_J(g6, g2, i_l+0, j_l+0, k_l, l_l);
 G2E_D_J(g7, g3, i_l+0, j_l+0, k_l, l_l);
-if (gout_empty) {
 for (n = 0; n < nf; n++, idx+=3) {
 ix = idx[0];
 iy = idx[1];
@@ -5636,6 +4631,7 @@ s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
 s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
 s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
 }
+if (gout_empty) {
 gout[0] = + (-1*s[5]) + (1*s[7]);
 gout[1] = + (-1*s[14]) + (1*s[16]);
 gout[2] = + (-1*s[23]) + (1*s[25]);
@@ -5653,41 +4649,7 @@ gout[13] = + (-1*s[9]) + (-1*s[13]) + (-1*s[17]);
 gout[14] = + (-1*s[18]) + (-1*s[22]) + (-1*s[26]);
 gout[15] = 0;
 gout += 16;
-}} else {
-for (n = 0; n < nf; n++, idx+=3) {
-ix = idx[0];
-iy = idx[1];
-iz = idx[2];
-CINTdset0(27, s);
-for (i = 0; i < envs->nrys_roots; i++) {
-s[0] += g7[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g6[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g6[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g5[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g4[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g4[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g5[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g4[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g4[ix+i] * g0[iy+i] * g3[iz+i];
-s[9] += g3[ix+i] * g4[iy+i] * g0[iz+i];
-s[10] += g2[ix+i] * g5[iy+i] * g0[iz+i];
-s[11] += g2[ix+i] * g4[iy+i] * g1[iz+i];
-s[12] += g1[ix+i] * g6[iy+i] * g0[iz+i];
-s[13] += g0[ix+i] * g7[iy+i] * g0[iz+i];
-s[14] += g0[ix+i] * g6[iy+i] * g1[iz+i];
-s[15] += g1[ix+i] * g4[iy+i] * g2[iz+i];
-s[16] += g0[ix+i] * g5[iy+i] * g2[iz+i];
-s[17] += g0[ix+i] * g4[iy+i] * g3[iz+i];
-s[18] += g3[ix+i] * g0[iy+i] * g4[iz+i];
-s[19] += g2[ix+i] * g1[iy+i] * g4[iz+i];
-s[20] += g2[ix+i] * g0[iy+i] * g5[iz+i];
-s[21] += g1[ix+i] * g2[iy+i] * g4[iz+i];
-s[22] += g0[ix+i] * g3[iy+i] * g4[iz+i];
-s[23] += g0[ix+i] * g2[iy+i] * g5[iz+i];
-s[24] += g1[ix+i] * g0[iy+i] * g6[iz+i];
-s[25] += g0[ix+i] * g1[iy+i] * g6[iz+i];
-s[26] += g0[ix+i] * g0[iy+i] * g7[iz+i];
-}
+} else {
 gout[0] += + (-1*s[5]) + (1*s[7]);
 gout[1] += + (-1*s[14]) + (1*s[16]);
 gout[2] += + (-1*s[23]) + (1*s[25]);

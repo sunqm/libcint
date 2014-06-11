@@ -519,14 +519,12 @@ n = envs->g_size * 3;
 daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
             (fmt-j (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len)))
-      (format fout "if (gout_empty) {~%")
 ;;; generate gout
       (dump-s-2e fout tot-bits)
 ;;; dump result of eval-int
+      (format fout "if (gout_empty) {~%")
       (setf goutinc (gen-c-block fout "gout[~a] =" (last1 raw-script)))
-      (format fout "gout += ~a;~%}} else {~%" goutinc)
-      (dump-s-2e fout tot-bits)
-;;; dump result of eval-int
+      (format fout "gout += ~a;~%} else {~%" goutinc)
       (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
       (format fout "gout += ~a;~%}}}~%" goutinc)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
