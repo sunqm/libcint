@@ -6399,3 +6399,14 @@ void c2s_cart_2e1(double *fijkl, const double *gctr,
 }
 void c2s_cart_2e2() {};
 
+
+
+/*************************************************
+ *
+ * transform vectors
+ *
+ *************************************************/
+double *CINTc2s_bra_sph(double *sph, int nket, double *cart, int l)
+{
+        return (f_bra_sph[l])(sph, nket, cart, l);
+}

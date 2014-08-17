@@ -125,6 +125,8 @@ int main()
         buf = malloc(sizeof(double) * di * dj * 3);
         if (0 != cint1e_ipnuc_sph(buf, shls, atm, natm, bas, nbas, env)) {
                 printf("This gradient integral is not 0.\n");
+        } else {
+                printf("This integral is 0.\n");
         }
         free(buf);
 
@@ -138,6 +140,8 @@ int main()
         buf = malloc(sizeof(double) * di * dj * dk * dl);
         if (0 != cint2e_sph(buf, shls, atm, natm, bas, nbas, env, NULL)) {
                 printf("This integral is not 0.\n");
+        } else {
+                printf("This integral is 0.\n");
         }
         free(buf);
 
@@ -150,6 +154,8 @@ int main()
         buf = malloc(sizeof(double) * di * dj * dk * dl);
         if (0 != cint2e_sph(buf, shls, atm, natm, bas, nbas, env, opt)) {
                 printf("This integral is not 0.\n");
+        } else {
+                printf("This integral is 0.\n");
         }
         free(buf);
         CINTdel_optimizer(&opt);

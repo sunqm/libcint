@@ -1,5 +1,8 @@
+Version 2.0.4 (2014-08-16):
+	* Add external cart2sph functions
+
 Version 2.0.3 (2014-05-30):
-	* Add new integrals
+	* Add SOO and SSO integrals
 	* Update clisp script to handle new integrals
 
 Version 2.0.2 (2014-05-25):

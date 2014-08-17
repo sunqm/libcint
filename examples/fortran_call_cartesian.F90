@@ -145,6 +145,8 @@ j = 1; shls(2) = j; dj = CINTcgto_cart(j, bas)
 allocate (buf1e(di,dj,3))
 if (0 /= cint1e_ipovlp_cart(buf1e, shls, atm, natm, bas, nbas, env)) then
   print*, "This gradient integral is not 0.\n"
+else
+  print*, "This integral is 0.\n"
 endif
 deallocate (buf1e)
 
@@ -160,6 +162,8 @@ l = 2; shls(4) = l; dl = CINTcgto_cart(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
 if (0 /= cint2e_ip1_cart(buf2e, shls, atm, natm, bas, nbas, env, 0_8)) then
   print*, "This gradient integral is not 0.\n"
+else
+  print*, "This integral is 0.\n"
 endif
 
 call cint2e_ip1_cart_optimizer(opt, atm, natm, bas, nbas, env)
@@ -170,6 +174,8 @@ l = 2; shls(4) = l; dl = CINTcgto_cart(l, bas)
 allocate (buf2e(di,dj,dk,dl,3))
 if (0 /= cint2e_ip1_cart(buf2e, shls, atm, natm, bas, nbas, env, opt)) then
   print*, "This gradient integral is not 0.\n"
+else
+  print*, "This integral is 0.\n"
 endif
 deallocate (buf2e)
 call CINTdel_optimizer(opt)

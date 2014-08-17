@@ -127,6 +127,8 @@ int main()
         buf = malloc(sizeof(double) * di * dj * OF_CMPLX);
         if (0 != cint1e_spnucsp(buf, shls, atm, natm, bas, nbas, env)) {
                 printf("This integral is not 0.\n");
+        } else {
+                printf("This integral is 0.\n");
         }
         free(buf);
 
@@ -140,6 +142,8 @@ int main()
         buf = malloc(sizeof(double) * di * dj * dk * dl * OF_CMPLX);
         if (0 != cint2e_spsp1(buf, shls, atm, natm, bas, nbas, env, NULL)) {
                 printf("This integral is not 0.\n");
+        } else {
+                printf("This integral is 0.\n");
         }
         free(buf);
 
@@ -152,6 +156,8 @@ int main()
         buf = malloc(sizeof(double) * di * dj * dk * dl * OF_CMPLX);
         if (0 != cint2e_spsp1(buf, shls, atm, natm, bas, nbas, env, opt)) {
                 printf("This integral is not 0.\n");
+        } else {
+                printf("This integral is 0.\n");
         }
         free(buf);
         CINTdel_optimizer(&opt);
