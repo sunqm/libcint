@@ -114,6 +114,8 @@ void CINTshells_cart_offset(int ao_loc[], const int *bas, const int nbas);
 void CINTshells_spheric_offset(int ao_loc[], const int *bas, const int nbas);
 void CINTshells_spinor_offset(int ao_loc[], const int *bas, const int nbas);
 
+double *CINTc2s_bra_sph(double *sph, int nket, double *cart, int l);
+
 
 double CINTgto_norm(int n, double a);
 
