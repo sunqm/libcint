@@ -13,11 +13,8 @@ import os
 import ctypes
 import numpy
 
-if sys.platform == 'darwin':
-    alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.dylib'
-else:
-    alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.so'
-_cint = ctypes.cdll.LoadLibrary(alib)
+alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.so'
+_cint = ctypes.CDLL(alib)
 
 PTR_LIGHT_SPEED    = 0
 PTR_COMMON_ORIG    = 1
@@ -48,12 +45,14 @@ env = (ctypes.c_double * 400)()
 natm = ctypes.c_int()
 nbas = ctypes.c_int()
 opt = ctypes.c_ulong(0)
+_cint.init_test_env.restype = ctypes.c_void_p
 _cint.init_test_env(atm, ctypes.addressof(natm), bas, ctypes.addressof(nbas), env)
 
 _cint.CINTlen_spinor.restype = ctypes.c_int
 
 def test_int1e_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
+    intor.restype = ctypes.c_void_p
     op = (ctypes.c_double * (10000 * dim))()
     v1 = 0
     for j in range(nbas.value*2):
@@ -73,6 +72,7 @@ def cdouble_to_cmplx(arr):
 
 def test_int1e_spinor(name, vref, dim, place):
     intor = getattr(_cint, name)
+    intor.restype = ctypes.c_void_p
     op = (ctypes.c_double * (20000 * dim))()
     v1 = 0
     for j in range(nbas.value*2):
@@ -99,7 +99,9 @@ def max_loc(arr):
 
 def test_comp1e_spinor(name1, name_ref, shift, dim, place):
     intor     = getattr(_cint, name1)
+    intor.restype = ctypes.c_void_p
     intor_ref = getattr(_cint, name_ref)
+    intor_ref.restype = ctypes.c_void_p
     op =     (ctypes.c_double * (20000 * dim))()
     op_ref = (ctypes.c_double * (20000 * dim))()
 
@@ -130,6 +132,7 @@ def test_comp1e_spinor(name1, name_ref, shift, dim, place):
 ####################
 def test_int2e_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
+    intor.restype = ctypes.c_void_p
     op = (ctypes.c_double * (1000000 * dim))()
     v1 = 0
     for l in range(nbas.value*2):
@@ -150,6 +153,7 @@ def test_int2e_sph(name, vref, dim, place):
 
 def test_int2e_spinor(name, vref, dim, place):
     intor = getattr(_cint, name)
+    intor.restype = ctypes.c_void_p
     op = (ctypes.c_double * (2000000 * dim))()
     v1 = 0
     for l in range(nbas.value*2):
@@ -170,7 +174,9 @@ def test_int2e_spinor(name, vref, dim, place):
 
 def test_comp2e_spinor(name1, name_ref, shift, dim, place):
     intor     = getattr(_cint, name1)
+    intor.restype = ctypes.c_void_p
     intor_ref = getattr(_cint, name_ref)
+    intor_ref.restype = ctypes.c_void_p
     op =     (ctypes.c_double * (2000000 * dim))()
     op_ref = (ctypes.c_double * (2000000 * dim))()
 
