@@ -45,7 +45,7 @@ env = (ctypes.c_double * 400)()
 natm = ctypes.c_int()
 nbas = ctypes.c_int()
 opt = ctypes.c_ulong(0)
-_cint.init_test_env.restype = ctypes.c_void_p
+_cint.init_test_env.restype = ctypes.c_int
 _cint.init_test_env(atm, ctypes.addressof(natm), bas, ctypes.addressof(nbas), env)
 
 _cint.CINTlen_spinor.restype = ctypes.c_int

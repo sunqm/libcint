@@ -183,7 +183,7 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
         }
 
         int iprim, ictr, jprim, jctr, il, jl;
-        double eij, aij, rr, maxci, maxcj, compensation;
+        double eij, aij, rr, maxci, maxcj, rirj_g4d;
         const double *ai, *aj, *ri, *rj, *ci, *cj;
         double *expij, *rij;
         int *cceij;
@@ -229,18 +229,14 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                                         rij[off*3+0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / aij;
                                         rij[off*3+1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / aij;
                                         rij[off*3+2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / aij;
-                                        /* TODO: better screen estimation,
-                                         * e.g. based on (ab|cd) ~< (00|00)
-                                        if (expij[off] > exp(-EXPCUTOFF/2)) {
-                                                cceij[off] = 0;
-                                        } else {
-                                                //cceij[off] = (eij[off] > EXPCUTOFF);
-                                                cceij[off] = (expij[off]*maxci*maxcj < exp(-EXPCUTOFF));
-                                        } */
-                                        /* in experiment */
-                                        compensation = exp(il*2+jl*2);
+/* estimation of the value, based on g0_2e_2d and g0_xx2d_4d,
+ * value ~< exp(-eij)*(il+jl+2)!*(aij/2)^(il+jl)*(ri_or_rj-rij)^(ij+jl)*rirj^max(il,jl)
+ *       ~< *       exp(-eij)*(il+jl+2)!*(aij/2)^(il+jl)*rirj^((il+jl)+max(il,jl))
+ * But in practice, rirj^(il+jl) is always large enough to cover all other factors */
+/* rr+1 to prevent log() diverge when i,j on same center */
+                                        rirj_g4d = pow((rr+1), (il+jl+1)/2);
                                         cceij[off] =-log(expij[off]*maxci*maxcj
-                                                         *compensation);
+                                                         *rirj_g4d);
                                 }
                         }
                 }
