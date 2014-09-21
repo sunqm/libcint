@@ -129,9 +129,9 @@ CINTOpt_set_index_xyz(CINTOpt *opt, int *ng,
 
         int fakenbas = max_l+1;
         int fakebas[BAS_SLOTS*fakenbas];
+        memset(fakebas, 0, sizeof(int)*BAS_SLOTS*fakenbas);
         // fakebas only initializes ANG_OF, since the others does not
         // affect index_xyz
-        memset(fakebas, 0, sizeof(int)*BAS_SLOTS*fakenbas);
         for (i = 0; i <= max_l; i++) {
                 fakebas[BAS_SLOTS*i+ANG_OF] = i;
         }

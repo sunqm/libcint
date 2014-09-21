@@ -4,7 +4,7 @@ AM_CPPFLAGS= -I$(top_srcdir)/src
 
 lib_LTLIBRARIES = libcint.la
 
-libcint_la_LDFLAGS = -release 2.0.4
+libcint_la_LDFLAGS = -release 2.0.5
 libcint_la_LIBADD = $(BLAS_LIBS) $(LIBS)
 libcint_la_SOURCES = c2f.c \
                      cart2sph.c \

@@ -7,9 +7,7 @@
 
 #define PTR_LIGHT_SPEED         0
 #define PTR_COMMON_ORIG         1
-#define PTR_SHIELDING_ORIG      4
 #define PTR_RINV_ORIG           4
-#define PTR_AO_GAUGE            7
 #define PTR_ENV_START           20
 
 // slots of atm
@@ -17,8 +15,8 @@
 #define PTR_COORD       1
 #define NUC_MOD_OF      2
 #define PTR_MASS        3
-#define RAD_GRIDS       4
-#define ANG_GRIDS       5
+#define RESERVE_ATMLOT1 4
+#define RESERVE_ATMLOT2 5
 #define ATM_SLOTS       6
 
 
@@ -69,9 +67,8 @@
 #define TSRZY       7
 #define TSRZZ       8
 
-// some other boundary
-#define ANG_MAX         6 // l = 0..5
-#define OF_CMPLX        2
+// some other boundaries
+#define ANG_MAX         7 // l = 0..6
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
 

@@ -1,7 +1,7 @@
 libcint
 =======
 
-version 2.0.4
+version 2.0.5
 2014-08-16
 
 
@@ -157,19 +157,16 @@ Known problems
         -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_mc -lmkl_def \
         -Wl,--end-group -lpthread"
 
-* "make check" may fail in the following tests
-    - cint1e_ipspnucsp
-    - cint1e_ipsprinvsp
-    - cint2e_spsp1
-    - cint2e_spsp1spsp2
-    - cint2e_srsr1
-    - cint2e_giao_sa10sp1spsp2
-    - cint2e_ipspsp1
-    - cint2e_ip1spsp2
+* For plain ERI, the code can handle highest angular momentum up to 6
+  (present Rys-roots functions might be numerically unstable for l=5,6).
+  But it has to be reduced to 5 or less for derivative or high order ERI.
+  Depending on the derivative order, reduce 1 highest angular momentum
+  every 4 derivative order.
 
-* The package is not fully tested on 32-bit platform.
+* If stack size < 6.5 MB, Segmentation fault may occur in function
+  c2s_sph_2e1 for angular momentum l=6
 
-* SSE instructions was not applied in this version for portability.
+* For portability, SSE instructions was not applied in this version.
   Using SSE3 instructions can increase the performance 5 ~ 50%.
   Please contact the author for the Libcint(SSE3) code.
 
