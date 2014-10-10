@@ -103,7 +103,7 @@ void CINTuse_all_optimizer(CINTOpt **opt, int *ng,
                            const int *bas, const int nbas, const double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_setij(*opt, atm, natm, bas, nbas, env);
+        CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         CINTOpt_set_index_xyz(*opt, ng, atm, natm, bas, nbas, env);
 }
@@ -169,7 +169,8 @@ static double max_pgto_coeff(const double *coeff, int nprim, int nctr,
         return maxc;
 }
 
-void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
+void CINTOpt_setij(CINTOpt *opt, int *ng,
+                   const int *atm, const int natm,
                    const int *bas, const int nbas, const double *env)
 {
         int i, j, ip, jp, io, jo, off;
@@ -180,6 +181,15 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                         opt->prim_offset[i] = opt->tot_prim;
                         opt->tot_prim += bas(NPRIM_OF, i);
                 }
+        }
+
+        int ik_inc, jl_inc;
+        if ((ng[IINC]+ng[JINC]) > (ng[KINC]+ng[LINC])) {
+                ik_inc = ng[IINC];
+                jl_inc = ng[JINC];
+        } else {
+                ik_inc = ng[KINC];
+                jl_inc = ng[LINC];
         }
 
         int iprim, ictr, jprim, jctr, il, jl;
@@ -197,7 +207,8 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                 iprim = bas(NPRIM_OF,i);
                 ictr = bas(NCTR_OF,i);
                 ci = env + bas(PTR_COEFF,i);
-                il = bas(ANG_OF,i);
+// For derivative/dipole operator, the l-value in g2e is virtually increased
+                il = bas(ANG_OF,i) + ik_inc;
                 for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
                         maxci = max_pgto_coeff(ci, iprim, ictr, ip);
                         maxci = maxci / CINTgto_norm(il, ai[ip]);
@@ -215,7 +226,7 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
                                 jprim = bas(NPRIM_OF,j);
                                 jctr = bas(NCTR_OF,j);
                                 cj = env + bas(PTR_COEFF,j);
-                                jl = bas(ANG_OF,j);
+                                jl = bas(ANG_OF,j) + jl_inc;
                                 rr = (ri[0]-rj[0])*(ri[0]-rj[0])
                                    + (ri[1]-rj[1])*(ri[1]-rj[1])
                                    + (ri[2]-rj[2])*(ri[2]-rj[2]);
@@ -232,7 +243,7 @@ void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
 /* estimation of the value, based on g0_2e_2d and g0_xx2d_4d,
  * value ~< exp(-eij)*(il+jl+2)!*(aij/2)^(il+jl)*(ri_or_rj-rij)^(ij+jl)*rirj^max(il,jl)
  *       ~< *       exp(-eij)*(il+jl+2)!*(aij/2)^(il+jl)*rirj^((il+jl)+max(il,jl))
- * But in practice, rirj^(il+jl) is always large enough to cover all other factors */
+ * But in practice, rirj^((il+jl)/2) is usually large enough to cover all other factors */
 /* rr+1 to prevent log() diverge when i,j on same center */
                                         rirj_g4d = pow((rr+1), (il+jl+1)/2);
                                         cceij[off] =-log(expij[off]*maxci*maxcj

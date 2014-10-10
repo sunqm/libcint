@@ -27,7 +27,8 @@ void CINTdel_optimizer(CINTOpt **opt);
 void CINTOpt_set_index_xyz(CINTOpt *opt, int *ng,
                            const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
-void CINTOpt_setij(CINTOpt *opt, const int *atm, const int natm,
+void CINTOpt_setij(CINTOpt *opt, int *ng,
+                   const int *atm, const int natm,
                    const int *bas, const int nbas, const double *env);
 void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
                            const int *bas, const int nbas, const double *env);
