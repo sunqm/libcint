@@ -1,3 +1,6 @@
+Version 2.0.5 (2014-09-21):
+	* Support angular momentum l=6
+
 Version 2.0.4 (2014-08-16):
 	* Add external cart2sph functions
 
@@ -9,7 +12,7 @@ Version 2.0.2 (2014-05-25):
 	* Small optimization
 
 Version 2.0.1 (2014-04-20):
-	* Fix a serious bug in optimizer
+	* Fix bug in optimizer which write data cross array boundary
 
 Version 2.0 (2014-04-20):
 	* Change API
