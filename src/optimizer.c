@@ -246,8 +246,9 @@ void CINTOpt_setij(CINTOpt *opt, int *ng,
  * But in practice, rirj^((il+jl)/2) is usually large enough to cover all other factors */
 /* rr+1 to prevent log() diverge when i,j on same center */
                                         rirj_g4d = pow((rr+1), (il+jl+1)/2);
-                                        cceij[off] =-log(expij[off]*maxci*maxcj
-                                                         *rirj_g4d);
+/*cceij[off] =-log(expij[off]*maxci*maxcj*rirj_g4d);
+  when eij is big, expij == 0, singular value in cceij */
+                                        cceij[off] = eij - log(maxci*maxcj*rirj_g4d);
                                 }
                         }
                 }

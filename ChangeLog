@@ -1,3 +1,6 @@
+Version 2.0.6 (2014-09-21):
+	* Fix bug in optimizer.c
+
 Version 2.0.5 (2014-09-21):
 	* Support angular momentum l=6
 
