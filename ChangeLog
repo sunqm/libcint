@@ -1,4 +1,8 @@
-Version 2.0.6 (2014-09-21):
+Version 2.0.7 (2014-10-16):
+	* Fix bug in examples/c_call_cartesian.c
+	* Add new 1e integrals
+
+Version 2.0.6 (2014-10-13):
 	* Fix bug in optimizer.c
 
 Version 2.0.5 (2014-09-21):

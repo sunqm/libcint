@@ -13,14 +13,13 @@ import os
 import ctypes
 import numpy
 
-alib = os.environ['buildir'] + '/testsuite/.libs/libtestcint.so'
+alib = os.environ['buildir'] + '/src/.libs/libcint.so'
 _cint = ctypes.CDLL(alib)
 
 PTR_LIGHT_SPEED    = 0
 PTR_COMMON_ORIG    = 1
 PTR_SHIELDING_ORIG = 4
 PTR_RINV_ORIG      = 4
-PTR_ENV_START      = 20
 
 CHARGE_OF  = 0
 PTR_COORD  = 1
@@ -39,16 +38,108 @@ PTR_EXP   = 5
 PTR_COEFF = 6
 BAS_SLOTS = 8
 
-atm = (ctypes.c_int * 200)()
-bas = (ctypes.c_int * 200)()
-env = (ctypes.c_double * 400)()
-natm = ctypes.c_int()
-nbas = ctypes.c_int()
-opt = ctypes.POINTER(ctypes.c_void_p)()
-_cint.init_test_env.restype = ctypes.c_int
-_cint.init_test_env(atm, ctypes.addressof(natm), bas, ctypes.addressof(nbas), env)
+natm = 4
+nbas = 0
+atm = numpy.zeros((natm,ATM_SLOTS), dtype=numpy.int32)
+bas = numpy.zeros((1000,BAS_SLOTS), dtype=numpy.int32)
+env = numpy.zeros(10000)
+off = 10
+for i in range(natm):
+    atm[i, CHARGE_OF] = (i+1)*2
+    atm[i, PTR_COORD] = off
+    env[off+0] = .2 * (i+1)
+    env[off+1] = .3 + (i+1) * .5
+    env[off+2] = .1 - (i+1) * .5
+    off += 3
+off0 = off
 
+# basis with kappa > 0
+nh = 0
+
+bas[nh,ATOM_OF ]  = 0
+bas[nh,ANG_OF  ]  = 1
+bas[nh,KAPPA_OF]  = 1
+bas[nh,NPRIM_OF]  = 1
+bas[nh,NCTR_OF ]  = 1
+bas[nh,PTR_EXP]   = off
+env[off+0] = 1
+bas[nh,PTR_COEFF] = off + 1
+env[off+1] = 1
+off += 2
+nh += 1
+
+bas[nh,ATOM_OF ]  = 1
+bas[nh,ANG_OF  ]  = 2
+bas[nh,KAPPA_OF]  = 2
+bas[nh,NPRIM_OF]  = 2
+bas[nh,NCTR_OF ]  = 2
+bas[nh,PTR_EXP]   = off
+env[off+0] = 5
+env[off+1] = 3
+bas[nh,PTR_COEFF] = off + 2
+env[off+2] = 1
+env[off+3] = 2
+env[off+4] = 4
+env[off+5] = 1
+off += 6
+nh += 1
+
+bas[nh,ATOM_OF ]  = 2
+bas[nh,ANG_OF  ]  = 3
+bas[nh,KAPPA_OF]  = 3
+bas[nh,NPRIM_OF]  = 1
+bas[nh,NCTR_OF ]  = 1
+bas[nh,PTR_EXP ]  = off
+env[off+0] = 1
+bas[nh,PTR_COEFF] = off + 1
+env[off+1] = 1
+off += 2
+nh += 1
+
+bas[nh,ATOM_OF ]  = 3
+bas[nh,ANG_OF  ]  = 4
+bas[nh,KAPPA_OF]  = 4
+bas[nh,NPRIM_OF]  = 1
+bas[nh,NCTR_OF ]  = 1
+bas[nh,PTR_EXP ]  = off
+env[off+0] = .5
+bas[nh,PTR_COEFF] = off + 1
+env[off+1] = 1.
+off = off + 2
+nh += 1
+
+nbas = nh
+
+# basis with kappa < 0
+n = off - off0
+for i in range(n):
+    env[off+i] = env[off0+i]
+
+for i in range(nh):
+        bas[i+nh,ATOM_OF ] = bas[i,ATOM_OF ]
+        bas[i+nh,ANG_OF  ] = bas[i,ANG_OF  ] - 1
+        bas[i+nh,KAPPA_OF] =-bas[i,KAPPA_OF]
+        bas[i+nh,NPRIM_OF] = bas[i,NPRIM_OF]
+        bas[i+nh,NCTR_OF ] = bas[i,NCTR_OF ]
+        bas[i+nh,PTR_EXP ] = bas[i,PTR_EXP ]  + n
+        bas[i+nh,PTR_COEFF]= bas[i,PTR_COEFF] + n
+        env[bas[i+nh,PTR_COEFF]] /= 2 * env[bas[i,PTR_EXP]]
+
+env[bas[5,PTR_COEFF]+0] = env[bas[1,PTR_COEFF]+0] / (2 * env[bas[1,PTR_EXP]+0])
+env[bas[5,PTR_COEFF]+1] = env[bas[1,PTR_COEFF]+1] / (2 * env[bas[1,PTR_EXP]+1])
+env[bas[5,PTR_COEFF]+2] = env[bas[1,PTR_COEFF]+2] / (2 * env[bas[1,PTR_EXP]+0])
+env[bas[5,PTR_COEFF]+3] = env[bas[1,PTR_COEFF]+3] / (2 * env[bas[1,PTR_EXP]+1])
+
+natm = ctypes.c_int(natm)
+nbas = ctypes.c_int(nbas)
+c_atm = atm.ctypes.data_as(ctypes.c_void_p)
+c_bas = bas.ctypes.data_as(ctypes.c_void_p)
+c_env = env.ctypes.data_as(ctypes.c_void_p)
+
+opt = ctypes.POINTER(ctypes.c_void_p)()
 _cint.CINTlen_spinor.restype = ctypes.c_int
+
+
 
 def test_int1e_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
@@ -57,10 +148,10 @@ def test_int1e_sph(name, vref, dim, place):
     v1 = 0
     for j in range(nbas.value*2):
         for i in range(j+1):
-            di = (bas[ANG_OF+BAS_SLOTS*i] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*i]
-            dj = (bas[ANG_OF+BAS_SLOTS*j] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*j]
+            di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
+            dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
             shls = (ctypes.c_int * 2)(i, j)
-            intor(op, shls, atm, natm, bas, nbas, env);
+            intor(op, shls, c_atm, natm, c_bas, nbas, c_env);
             v1 += abs(numpy.array(op[:di*dj*dim])).sum()
     if round(abs(v1-vref), place):
         print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
@@ -77,10 +168,10 @@ def test_int1e_spinor(name, vref, dim, place):
     v1 = 0
     for j in range(nbas.value*2):
         for i in range(j+1):
-            di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-            dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
+            di = _cint.CINTlen_spinor(i, c_bas, nbas) * bas[i,NCTR_OF]
+            dj = _cint.CINTlen_spinor(j, c_bas, nbas) * bas[j,NCTR_OF]
             shls = (ctypes.c_int * 2)(i, j)
-            intor(op, shls, atm, natm, bas, nbas, env);
+            intor(op, shls, c_atm, natm, c_bas, nbas, c_env);
             v1 += abs(cdouble_to_cmplx(op[:di*dj*dim*2])).sum()
     if round(abs(v1-vref), place):
         print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
@@ -113,12 +204,12 @@ def test_comp1e_spinor(name1, name_ref, shift, dim, place):
 
     for j in range(nbas.value*2 - shift[1]):
         for i in range(min(nbas.value*2-shift[0],j+1)):
-            di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-            dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
+            di = _cint.CINTlen_spinor(i, c_bas, nbas) * bas[i,NCTR_OF]
+            dj = _cint.CINTlen_spinor(j, c_bas, nbas) * bas[j,NCTR_OF]
             shls = (ctypes.c_int * 2)(i+shift[0], j+shift[1])
-            intor(op, shls, atm, natm, bas, nbas, env);
+            intor(op, shls, c_atm, natm, c_bas, nbas, c_env);
             shls_ref = (ctypes.c_int * 2)(i, j)
-            intor_ref(op_ref, shls_ref, atm, natm, bas, nbas, env);
+            intor_ref(op_ref, shls_ref, c_atm, natm, c_bas, nbas, c_env);
             dd = abs(pfac * cdouble_to_cmplx(op[:di*dj*dim*2]).reshape(di,dj,dim)
                      - cdouble_to_cmplx(op_ref[:di*dj*dim*2]).reshape(di,dj,dim))
             if numpy.round(dd, place).sum():
@@ -139,12 +230,12 @@ def test_int2e_sph(name, vref, dim, place):
         for k in range(l+1):
             for j in range(nbas.value*2):
                 for i in range(j+1):
-                    di = (bas[ANG_OF+BAS_SLOTS*i] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*i]
-                    dj = (bas[ANG_OF+BAS_SLOTS*j] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*j]
-                    dk = (bas[ANG_OF+BAS_SLOTS*k] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*k]
-                    dl = (bas[ANG_OF+BAS_SLOTS*l] * 2 + 1) * bas[NCTR_OF+BAS_SLOTS*l]
+                    di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
+                    dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
+                    dk = (bas[k,ANG_OF] * 2 + 1) * bas[k,NCTR_OF]
+                    dl = (bas[l,ANG_OF] * 2 + 1) * bas[l,NCTR_OF]
                     shls = (ctypes.c_int * 4)(i, j, k, l)
-                    intor(op, shls, atm, natm, bas, nbas, env, opt);
+                    intor(op, shls, c_atm, natm, c_bas, nbas, c_env, opt);
                     v1 += abs(numpy.array(op[:di*dj*dk*dl*dim])).sum()
     if round(abs(v1-vref), place):
         print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
@@ -160,12 +251,12 @@ def test_int2e_spinor(name, vref, dim, place):
         for k in range(l+1):
             for j in range(nbas.value*2):
                 for i in range(j+1):
-                    di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-                    dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
-                    dk = _cint.CINTlen_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
-                    dl = _cint.CINTlen_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
+                    di = _cint.CINTlen_spinor(i, c_bas, nbas) * bas[i,NCTR_OF]
+                    dj = _cint.CINTlen_spinor(j, c_bas, nbas) * bas[j,NCTR_OF]
+                    dk = _cint.CINTlen_spinor(k, c_bas, nbas) * bas[k,NCTR_OF]
+                    dl = _cint.CINTlen_spinor(l, c_bas, nbas) * bas[l,NCTR_OF]
                     shls = (ctypes.c_int * 4)(i, j, k, l)
-                    intor(op, shls, atm, natm, bas, nbas, env, opt);
+                    intor(op, shls, c_atm, natm, c_bas, nbas, c_env, opt);
                     v1 += abs(cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2])).sum()
     if round(abs(v1-vref), place):
         print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
@@ -194,14 +285,14 @@ def test_comp2e_spinor(name1, name_ref, shift, dim, place):
         for k in range(min(nbas.value*2-shift[0],l+1)):
             for j in range(nbas.value*2 - shift[1]):
                 for i in range(min(nbas.value*2-shift[0],j+1)):
-                    di = _cint.CINTlen_spinor(i, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*i]
-                    dj = _cint.CINTlen_spinor(j, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*j]
-                    dk = _cint.CINTlen_spinor(k, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*k]
-                    dl = _cint.CINTlen_spinor(l, bas, nbas) * bas[NCTR_OF+BAS_SLOTS*l]
+                    di = _cint.CINTlen_spinor(i, c_bas, nbas) * bas[i,NCTR_OF]
+                    dj = _cint.CINTlen_spinor(j, c_bas, nbas) * bas[j,NCTR_OF]
+                    dk = _cint.CINTlen_spinor(k, c_bas, nbas) * bas[k,NCTR_OF]
+                    dl = _cint.CINTlen_spinor(l, c_bas, nbas) * bas[l,NCTR_OF]
                     shls = (ctypes.c_int * 4)(i+shift[0], j+shift[1], k+shift[2], l+shift[3])
-                    intor(op, shls, atm, natm, bas, nbas, env, opt);
+                    intor(op, shls, c_atm, natm, c_bas, nbas, c_env, opt)
                     shls_ref = (ctypes.c_int * 4)(i, j, k, l)
-                    intor_ref(op_ref, shls_ref, atm, natm, bas, nbas, env, opt);
+                    intor_ref(op_ref, shls_ref, c_atm, natm, c_bas, nbas, c_env, opt)
                     dd = abs(pfac * cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2]).reshape(di,dj,dk,dl,dim)
                              - cdouble_to_cmplx(op_ref[:di*dj*dk*dl*dim*2]).reshape(di,dj,dk,dl,dim))
                     if numpy.round(dd, place).sum():
@@ -228,7 +319,12 @@ if __name__ == "__main__":
               ('cint1e_ipkin_sph' , 1307.395170673386, 3, 10),
               ('cint1e_ipnuc_sph' , 8358.422626593954, 3, 10),
               ('cint1e_iprinv_sph', 385.1108471512923, 3, 11),
-              ('cint1e_prinvxp_sph', 210.475021425001, 3, 11),
+              ('cint1e_prinvxp_sph',210.475021425001, 3, 11),
+              ('cint1e_z_sph'     , 124.1257796073575, 1, 11),
+              ('cint1e_zz_sph'    , 564.4544677145996, 1, 11),
+              ('cint1e_r_sph'     , 393.6751864989187, 3, 11),
+              ('cint1e_rr_sph'    , 3562.635898010234, 9, 11),
+              ('cint1e_r2_sph'    , 1644.066343756889, 1, 11),
              ):
         test_int1e_sph(*f)
 
@@ -299,3 +395,30 @@ if __name__ == "__main__":
     test_comp2e_spinor('cint2e_ipspsp1', 'cint2e_ip1', (4,4,0,0), 3, 12)
     test_comp2e_spinor('cint2e_ip1spsp2', 'cint2e_ip1', (0,0,4,4), 3, 12)
     test_comp2e_spinor('cint2e_ipspsp1spsp2', 'cint2e_ip1', (4,4,4,4), 3, 12)
+
+#    fz  = getattr(_cint, 'cint1e_z_sph')
+#    fzz = getattr(_cint, 'cint1e_zz_sph')
+#    fr  = getattr(_cint, 'cint1e_r_sph')
+#    fr2 = getattr(_cint, 'cint1e_r2_sph')
+#    frr = getattr(_cint, 'cint1e_rr_sph')
+#    v1 = 0
+#    for j in range(nbas.value*2):
+#        for i in range(j+1):
+#            di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
+#            dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
+#            opz  = numpy.empty((di,dj)  , order='F')
+#            opzz = numpy.empty((di,dj)  , order='F')
+#            opr  = numpy.empty((di,dj,3), order='F')
+#            opr2 = numpy.empty((di,dj)  , order='F')
+#            oprr = numpy.empty((di,dj,9), order='F')
+#            shls = (ctypes.c_int * 2)(i, j)
+#            fz ( opz.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+#            fzz(opzz.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+#            fr ( opr.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+#            fr2(opr2.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+#            frr(oprr.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+#            v1 = abs(opz-opr[:,:,2]).sum()
+#            v1 += abs(opzz-oprr[:,:,8]).sum()
+#            v1 += abs(opr2-oprr[:,:,0]-oprr[:,:,4]-oprr[:,:,8]).sum()
+#            if round(v1, 13):
+#                print "* FAIL: ", i, j, v1

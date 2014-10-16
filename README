@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 2.0.6
-2014-10-13
+version 2.0.7
+2014-10-16
 
 
 What is libcint
@@ -126,7 +126,6 @@ Installation
     mkdir build; cd build
     ../configure <options>
     make
-    make check  # optional
     make install
 
 * Use Intel MKL as BLAS library

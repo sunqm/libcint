@@ -5,10 +5,6 @@
 
 int cint1e_ipnuc_cart(double *buf, int *shls,
                       int *atm, int natm, int *bas, int nbas, double *env);
-int cint2e_cart(double *buf, int *shls,
-                int *atm, int natm, int *bas, int nbas, double *env);
-void cint2e_cart_optimizer(CINTOpt *opt, int *atm, int natm,
-                           int *bas, int nbas, double *env);
 
 int factorial(int n)
 {

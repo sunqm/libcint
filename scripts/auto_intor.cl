@@ -17,6 +17,11 @@
   '("cint1e_ignuc_sph"  (#C(0 1) g \| nuc \|))
   ; use p* instead of p, to ignore the operator after it, then it can
   ; cross to the next p
+  '("cint1e_z_sph"      ( \| z \| ))
+  '("cint1e_zz_sph"     ( \| z z \| ))
+  '("cint1e_r_sph"      ( \| r \| ))
+  '("cint1e_r2_sph"     ( \| r dot r \| ))
+  '("cint1e_rr_sph"     ( \| r r \| ))
   '("cint1e_prinvxp_sph" (p* \| rinv cross p \| ))
   '("cint2e_p1vxp1_sph" ( p* \, cross p \| \, )) ; SSO
   ;'("cint2e_sph"        ( \, \| \, ))
