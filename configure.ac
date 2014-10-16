@@ -44,7 +44,6 @@ fi
 ## output files
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 testsuite/Makefile
                  examples/Makefile])
 AC_OUTPUT
 
