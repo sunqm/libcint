@@ -1,3 +1,6 @@
+Version 2.1.0 (2014-10-16):
+	* use cmake
+
 Version 2.0.7 (2014-10-16):
 	* Fix bug in examples/c_call_cartesian.c
 	* Add new 1e integrals

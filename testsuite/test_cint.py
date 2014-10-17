@@ -13,7 +13,7 @@ import os
 import ctypes
 import numpy
 
-alib = os.environ['buildir'] + '/src/.libs/libcint.so'
+alib = 'libcint.so'
 _cint = ctypes.CDLL(alib)
 
 PTR_LIGHT_SPEED    = 0
