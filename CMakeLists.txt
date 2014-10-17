@@ -38,6 +38,5 @@ message(STATUS ${PYTHON_EXECUTABLE})
 if (PYTHONINTERP_FOUND)
   enable_testing()
   add_test(NAME cinttest
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
 endif()
