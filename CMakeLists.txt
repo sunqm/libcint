@@ -30,6 +30,7 @@ set_target_properties(cint PROPERTIES
 target_link_libraries(cint ${BLAS_LIBRARIES})
 
 install(TARGETS cint DESTINATION lib)
+install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
 
 add_subdirectory(examples)
 
