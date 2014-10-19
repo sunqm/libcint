@@ -76,9 +76,9 @@ int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
                 * CINTcommon_fac_sp(envs->k_l) * CINTcommon_fac_sp(envs->l_l);
 
-        envs->gbits =  ng[GSHIFT];
-        envs->ncomp_e1 =  ng[POS_E1];
-        envs->ncomp_e2 =  ng[POS_E2];
+        envs->gbits = ng[GSHIFT];
+        envs->ncomp_e1 = ng[POS_E1];
+        envs->ncomp_e2 = ng[POS_E2];
         envs->ncomp_tensor = ng[TENSOR];
 
         envs->li_ceil = envs->i_l + ng[IINC]; // ng[0] has different meaning in cint1e

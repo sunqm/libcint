@@ -418,7 +418,7 @@ k_contracted: ;
                 case 3: \
                         gctr1 = gctr  +envs->nf*nc; \
                         gctr2 = gctr1 +envs->nf*nc; \
-                        for (n = 0, ip = 0; n <envs->nf*nc; n++, ip+=3) { \
+                        for (n = 0, ip = 0; n < envs->nf*nc; n++, ip+=3) { \
                                 gctr [n] = GCTRL[ip+0]; \
                                 gctr1[n] = GCTRL[ip+1]; \
                                 gctr2[n] = GCTRL[ip+2]; \
@@ -429,7 +429,7 @@ k_contracted: ;
                                 gctr1 = gctr  +envs->nf*nc; \
                                 gctr2 = gctr1 +envs->nf*nc; \
                                 gctr3 = gctr2 +envs->nf*nc; \
-                                for (n = 0, ip = kp; n <envs->nf*nc; n++,ip+=n_comp) { \
+                                for (n = 0, ip = kp; n < envs->nf*nc; n++,ip+=n_comp) { \
                                         gctr [n] = GCTRL[ip+0]; \
                                         gctr1[n] = GCTRL[ip+1]; \
                                         gctr2[n] = GCTRL[ip+2]; \

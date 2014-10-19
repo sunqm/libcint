@@ -32,6 +32,7 @@ typedef struct {
         int nfk;
         int nfl;
         int nf;  // = nfi*nfj*nfk*nfl;
+        int _padding1;
         const double *ri;
         const double *rj;
         const double *rk;
@@ -44,7 +45,6 @@ typedef struct {
         int ncomp_tensor; // e.g. = 3 for gradients
 
         /* values may diff based on the g0_2d4d algorithm */
-        int nrys_roots;
         int li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
         int lj_ceil;
         int lk_ceil;
@@ -53,6 +53,7 @@ typedef struct {
         int g_stride_k; // nrys_roots * shift of (i,k++,l,j)
         int g_stride_l; // nrys_roots * shift of (i,k,l++,j)
         int g_stride_j; // nrys_roots * shift of (i,k,l,j++)
+        int nrys_roots;
         int g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
 
         int g2d_ijmax;
