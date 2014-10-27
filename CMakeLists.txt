@@ -23,31 +23,37 @@ set(cintSrc
   src/autocode/auto_intor3.c src/autocode/gaunt1.c src/autocode/grad1.c
   src/autocode/grad2.c src/autocode/grad3.c)
 
-add_library(cint SHARED ${cintSrc})
-
-set_target_properties(cint PROPERTIES
-  VERSION ${cint_VERSION}
-  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-
-target_link_libraries(cint ${BLAS_LIBRARIES})
-
-install(TARGETS cint DESTINATION lib)
-install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
-
-add_subdirectory(examples)
-
-find_package(PythonInterp)
-message(STATUS ${PYTHON_EXECUTABLE})
-if (PYTHONINTERP_FOUND)
-  enable_testing()
-  add_test(NAME cinttest
-    COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
-endif()
 
 if (${ENABLE_STATIC})
   add_library(cintStatic STATIC ${cintSrc})
   set_target_properties(cintStatic PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     OUTPUT_NAME cint)
+
   install(TARGETS cintStatic DESTINATION lib)
+  install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
+
+else()
+
+  add_library(cint SHARED ${cintSrc})
+
+  set_target_properties(cint PROPERTIES
+    VERSION ${cint_VERSION}
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
+  target_link_libraries(cint ${BLAS_LIBRARIES})
+
+  install(TARGETS cint DESTINATION lib)
+  install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
+
+  add_subdirectory(examples)
+
+  find_package(PythonInterp)
+  message(STATUS ${PYTHON_EXECUTABLE})
+  if (PYTHONINTERP_FOUND)
+    enable_testing()
+    add_test(NAME cinttest
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
+  endif()
+
 endif()
