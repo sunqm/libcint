@@ -18,8 +18,8 @@ Features
 --------
 
 * Various GTO type:
-  - Cartesian GTO:  s, p, 6d, 10f, 15g, 21h Gaussian type functions.
-  - Real-spheric GTO:  s, p, 5d, 7f, 9g, 11h Gaussian type functions.
+  - Cartesian GTO:  s, p, 6d, 10f, 15g, 21h, 28i Gaussian type functions.
+  - Real-spheric GTO:  s, p, 5d, 7f, 9g, 11h, 13i Gaussian type functions.
   - Spinor GTO:  J-adapted spinor Gaussian functions.
 * One electron integrals.
   - Regular kinetic-like integrals.
@@ -127,6 +127,12 @@ Installation
     cmake ..
     make
     make test ARGS=-V (optional)
+    make install
+
+* Build static library (optional)
+    mkdir build; cd build
+    cmake -DENABLE_STATIC=1 ..
+    make
     make install
 
 
