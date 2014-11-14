@@ -8,10 +8,9 @@ version 2.1.0
 What is libcint
 ---------------
 
-libcint is an open source library for computation of Gaussian type
-integrals.  It provides C/Fortran function to evaluate one-electron /
-two-electron integrals for Cartesian / real-spheric / spinor Gaussian type
-functions.
+libcint is an open source library for analytical Gaussian integrals.
+It provides C/Fortran API to evaluate one-electron / two-electron
+integrals for Cartesian / real-spheric / spinor Gaussian type functions.
 
 
 Features

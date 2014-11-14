@@ -46,14 +46,17 @@ else()
   install(TARGETS cint DESTINATION lib)
   install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
 
-  add_subdirectory(examples)
+  if (${DISABLE_EXAMPLE})
+  else()
+    add_subdirectory(examples)
 
-  find_package(PythonInterp)
-  message(STATUS ${PYTHON_EXECUTABLE})
-  if (PYTHONINTERP_FOUND)
-    enable_testing()
-    add_test(NAME cinttest
-      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
+    find_package(PythonInterp)
+    message(STATUS "Found python  ${PYTHON_EXECUTABLE}")
+    if (PYTHONINTERP_FOUND)
+      enable_testing()
+      add_test(NAME cinttest
+        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
+    endif()
   endif()
 
 endif()

@@ -13,8 +13,8 @@ import os
 import ctypes
 import numpy
 
-alib = 'libcint.so'
-_cint = ctypes.CDLL(alib)
+_cint = numpy.ctypeslib.load_library('libcint', '.')
+
 
 PTR_LIGHT_SPEED    = 0
 PTR_COMMON_ORIG    = 1
