@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 2.1.0
-2014-10-16
+version 2.1.1
+2014-11-16
 
 
 What is libcint
@@ -156,6 +156,10 @@ Known problems
 * For portability, SSE instructions was not applied in this version.
   Using SSE3 instructions can increase the performance 5 ~ 50%.
   Please contact the author for the Libcint(SSE3) code.
+
+* Compiling examples
+
+        cmake -DENABLE_EXAMPLE=1
 
 
 Bug report
