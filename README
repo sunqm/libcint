@@ -154,9 +154,9 @@ Known problems
   every 4 derivative order.
 
 * Using SSE3 instructions can increase the performance 5 ~ 50%.
-  Please refer to *qints* library (under GPL v3 license)
+  Please refer to *qcint* library (under GPL v3 license)
 
-        https://github.com/sunqm/qints.git
+        https://github.com/sunqm/qcint.git
 
 
 * examples are not compiled by default. Compiling examples by
