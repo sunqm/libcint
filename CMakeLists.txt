@@ -1,9 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.1.1")
+set(cint_VERSION "2.1.2")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -funroll-loops -ftree-vectorize")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNDEBUG -ffast-math -fno-strict-overflow -fomit-frame-pointer")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)

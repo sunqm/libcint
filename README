@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 2.1.1
-2014-11-16
+version 2.1.2
+2014-11-25
 
 
 What is libcint
@@ -153,11 +153,13 @@ Known problems
   Depending on the derivative order, reduce 1 highest angular momentum
   every 4 derivative order.
 
-* For portability, SSE instructions was not applied in this version.
-  Using SSE3 instructions can increase the performance 5 ~ 50%.
-  Please contact the author for the Libcint(SSE3) code.
+* Using SSE3 instructions can increase the performance 5 ~ 50%.
+  Please refer to *qints* library (under GPL v3 license)
 
-* Compiling examples
+        https://github.com/sunqm/qints.git
+
+
+* examples are not compiled by default. Compiling examples by
 
         cmake -DENABLE_EXAMPLE=1
 
@@ -165,3 +167,4 @@ Known problems
 Bug report
 ----------
 Qiming Sun <osirpt.sun@gmail.com>
+

@@ -5,6 +5,11 @@
  * Cartisen GTO to spheric or spinor GTO transformation
  * (and reorder the integrals from block(i,j,k,l)_{contr_idx(I,K,L,J)}
  * to (iI,jJ,kK,lL))
+ *
+ * Cartesian to real-spheric coefficients
+ * ref: H. B. Schlegel and M. J.  Frisch, Int. J. Quant. Chem., 54(1995), 83-87.
+ * different from the usual definition such as
+ *
  */
 
 #include <stdlib.h>
@@ -14,28 +19,6 @@
 #include "cart2sph.h"
 #include "misc.h"
 
-
-/*
- * Cartesian to real-spheric coefficients
- * ref: H. B. Schlegel and M. J.  Frisch, Int. J. Quant. Chem., 54(1995), 83-87.
- * different from the usual definition such as
- *   p_-1 p_0 p_1 => (px, py, pz) ...
- * the map here is
- *   p_-1 p_0 p_1 => (py, pz, px) ...
- *
-void fill_cart2sph(const int l, double *t)
-{
-        int m, lx, ly, lz;
-        for (m = -l; m <= l; m++) {
-                for (lx = l; lx >= 0; lx--) {
-                        for (ly = *lmax - lx; ly >= 0; ly--) {
-                                lz = *lmax - lx - ly;
-                                *t++ = dxyzfactor_real_spheric_UPI_(&lx, &ly, &lz, &m);
-                        }
-                }
-        }
-}
- */
 
 static const double g_trans_cart2sph[] = {
         1, /* factors of s and p are moved to CINTcommon_fac_sp */

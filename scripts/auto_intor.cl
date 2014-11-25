@@ -113,6 +113,9 @@
   '("cint2e_ipspsp1"      (nabla sigma dot p \, sigma dot p \| \,))
   '("cint2e_ip1spsp2"     (nabla \, \| sigma dot p \, sigma dot p))
   '("cint2e_ipspsp1spsp2" (nabla sigma dot p \, sigma dot p \| sigma dot p \, sigma dot p))
+  '("cint2e_ipsrsr1"      (nabla sigma dot r \, sigma dot r \| \,))
+  '("cint2e_ip1srsr2"     (nabla \, \| sigma dot r \, sigma dot r))
+  '("cint2e_ipsrsr1srsr2" (nabla sigma dot r \, sigma dot r \| sigma dot r \, sigma dot r))
 )
 
 (gen-cint "grad3.c" 'cart
