@@ -1,4 +1,5 @@
 #!/usr/bin/env clisp 
+;;;; Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
 
 (load "gen-code.cl")
 

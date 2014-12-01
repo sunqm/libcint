@@ -1,6 +1,5 @@
 /*
- * File: cint1e.c
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  *
  * basic cGTO integrals
  */

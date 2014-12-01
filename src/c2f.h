@@ -1,6 +1,5 @@
 /*
- * File: c2f.h
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  *
  */
 

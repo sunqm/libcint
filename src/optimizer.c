@@ -1,6 +1,5 @@
 /*
- * File: optimizer.c
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  *
  * optimizer for 2e integrals.  Note if CINT2e_drv is only called a few
  * hundred times, this optimizer cannot really speed up the integration. 

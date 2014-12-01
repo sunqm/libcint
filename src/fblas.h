@@ -1,6 +1,5 @@
 /*
- * File: fblas.h
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  *
  * blas interface and blas-like functions
  */

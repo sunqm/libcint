@@ -1,6 +1,5 @@
 /*
- * File: cart2sph.c
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  *
  * Cartisen GTO to spheric or spinor GTO transformation
  * (and reorder the integrals from block(i,j,k,l)_{contr_idx(I,K,L,J)}

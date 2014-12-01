@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
+ *
  * This macro define the parameters for cgto bas
  */
 

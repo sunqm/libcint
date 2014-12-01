@@ -1,6 +1,5 @@
 ;;;;
-;;;; File: derivator.cl
-;;;; Author: Qiming Sun <osirpt.sun@gmail.com>
+;;;; Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
 ;;;; Description:
 
 (load "utility.cl")

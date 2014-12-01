@@ -1,6 +1,5 @@
 /*
- * File: g2e.h
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  *
  * Provide the intermediate variable g(nroots,i,j,k,l,[xyz])
  */

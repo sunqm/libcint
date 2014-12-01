@@ -1,6 +1,5 @@
 /*
- * File: optimizer.h
- * Author: Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  */
 
 #if !defined HAVE_DEFINED_CINTOPT_H

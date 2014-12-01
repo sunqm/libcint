@@ -7,7 +7,6 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#enable_language(Fortran)
 find_package(BLAS REQUIRED)
 
 include_directories(
@@ -46,6 +45,7 @@ else()
   install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
 
   if (${ENABLE_EXAMPLE})
+    enable_language(Fortran)
     add_subdirectory(examples)
 
     find_package(PythonInterp)

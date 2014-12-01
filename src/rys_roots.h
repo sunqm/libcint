@@ -1,5 +1,4 @@
 /*
- * File: rys_roots.h
  *
  * Rys quadrature
  

@@ -1,6 +1,5 @@
 ;;;;
-;;;; File: parser.cl
-;;;; Author: Qiming Sun <osirpt.sun@gmail.com>
+;;;; Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
 ;;;; Description:
 ;;;;    translate the short expression to the expression which is
 ;;;;    suitable for derivator
