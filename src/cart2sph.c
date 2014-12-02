@@ -7,8 +7,6 @@
  *
  * Cartesian to real-spheric coefficients
  * ref: H. B. Schlegel and M. J.  Frisch, Int. J. Quant. Chem., 54(1995), 83-87.
- * different from the usual definition such as
- *
  */
 
 #include <stdlib.h>
@@ -2670,7 +2668,7 @@ static const double complex g_trans_cart2j[] = {
 };
 
 
-static inline FINT _len_spinor(FINT l, FINT kappa)
+static FINT _len_spinor(FINT l, FINT kappa)
 {
         if (0 == kappa) {
                 return 4 * l + 2;
