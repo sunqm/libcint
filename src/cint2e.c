@@ -627,17 +627,17 @@ int CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
 
         USE_OPT;
 
-        for (lp = 0; lp <envs-> l_prim; lp++) {
+        for (lp = 0; lp < envs->l_prim; lp++) {
                 envs->al = al[lp];
                 fac1l = envs->common_factor * cl[lp];
-                for (kp = 0; kp <envs-> k_prim; kp++) {
+                for (kp = 0; kp < envs->k_prim; kp++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l;
                         *jempty = 1;
-                        for (jp = 0; jp <envs-> j_prim; jp++) {
+                        for (jp = 0; jp < envs->j_prim; jp++) {
                                 envs->aj = aj[jp];
                                 fac1j = fac1k * cj[jp];
-                                for (ip = 0; ip <envs-> i_prim; ip++) {
+                                for (ip = 0; ip < envs->i_prim; ip++) {
                                         if (opt->cceij[lo+lp][ko+kp]
                                             +opt->cceij[jo+jp][io+ip]
                                             > CUTOFF15) {
@@ -683,17 +683,17 @@ int CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
 
         USE_OPT;
 
-        for (lp = 0; lp <envs-> l_prim; lp++) {
+        for (lp = 0; lp < envs->l_prim; lp++) {
                 envs->al = al[lp];
                 fac1l = envs->common_factor;
                 *kempty = 1;
-                for (kp = 0; kp <envs-> k_prim; kp++) {
+                for (kp = 0; kp < envs->k_prim; kp++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l * ck[kp];
-                        for (jp = 0; jp <envs-> j_prim; jp++) {
+                        for (jp = 0; jp < envs->j_prim; jp++) {
                                 envs->aj = aj[jp];
                                 fac1j = fac1k * cj[jp];
-                                for (ip = 0; ip <envs-> i_prim; ip++) {
+                                for (ip = 0; ip < envs->i_prim; ip++) {
                                         if (opt->cceij[lo+lp][ko+kp]
                                             +opt->cceij[jo+jp][io+ip]
                                             > CUTOFF15) {
@@ -1233,7 +1233,7 @@ int cint2e_sph(double *opijkl, const int *shls,
                const int *bas, const int nbas, const double *env,
                const CINTOpt *opt)
 {
-        int ng[] = {0, 0, 0, 0, 0, 0, 1, 1, 1};
+        int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e;
@@ -1242,7 +1242,7 @@ int cint2e_sph(double *opijkl, const int *shls,
 void cint2e_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
                           const int *bas, const int nbas, const double *env)
 {
-        int ng[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+        int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 
@@ -1251,7 +1251,7 @@ int cint2e_cart(double *opijkl, const int *shls,
                 const int *bas, const int nbas, const double *env,
                 const CINTOpt *opt)
 {
-        int ng[] = {0, 0, 0, 0, 0, 0, 1, 1, 1};
+        int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e;
@@ -1272,7 +1272,7 @@ int cint2e(double *opijkl, const int *shls,
            const int *bas, const int nbas, const double *env,
            const CINTOpt *opt)
 {
-        int ng[] = {0, 0, 0, 0, 0, 0, 1, 1, 1};
+        int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e;

@@ -73,11 +73,10 @@
 #define JINC            1
 #define KINC            2
 #define LINC            3
-#define RYS_ROOTS       4
-#define GSHIFT          5
-#define POS_E1          6
-#define POS_E2          7
-#define TENSOR          8
+#define GSHIFT          4
+#define POS_E1          5
+#define POS_E2          6
+#define TENSOR          7
 
 // some other boundaries
 #define MXRYSROOTS      16 // > ANG_MAX*2+1

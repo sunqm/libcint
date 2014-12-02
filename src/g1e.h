@@ -82,33 +82,26 @@ typedef struct {
 } CINTEnvVars;
 #endif
 
-void CINTg1e_index_xyz(int idx[], const int *ng,
-                       const int shls[], const int *bas);
+void CINTg1e_index_xyz(int *idx, const CINTEnvVars *envs);
 
-void CINTg_ovlp(double *g, const int *ng,
-                const double ai, const double aj,
-                const double *ri, const double *rj, const double fac);
+void CINTg_ovlp(double *g, const double ai, const double aj,
+                const double fac, const CINTEnvVars *envs);
 
-void CINTg_nuc(double *g, const int *ng,
-               const double aij, const double *rij,
-               const double *ri, const double *rj,
-               const double *cr, const double t2, const double fac);
+void CINTg_nuc(double *g, const double aij, const double *rij,
+               const double *cr, const double t2, const double fac,
+               const CINTEnvVars *envs);
 
-void CINTnabla1i_1e(double *f, const double *g, const int *ng,
-                    const int li, const int lj,
-                    const double ai);
+void CINTnabla1i_1e(double *f, const double *g,
+                    const int li, const int lj, const CINTEnvVars *envs);
 
-void CINTnabla1j_1e(double *f, const double *g, const int *ng,
-                    const int li, const int lj,
-                    const double aj);
+void CINTnabla1j_1e(double *f, const double *g,
+                    const int li, const int lj, const CINTEnvVars *envs);
 
-void CINTx1i_1e(double *f, const double *g, const int *ng,
-                const int li, const int lj,
-                const double ri[3]);
+void CINTx1i_1e(double *f, const double *g, const double ri[3],
+                const int li, const int lj, const CINTEnvVars *envs);
 
-void CINTx1j_1e(double *f, const double *g, const int *ng,
-                const int li, const int lj,
-                const double rj[3]);
+void CINTx1j_1e(double *f, const double *g, const double rj[3],
+                const int li, const int lj, const CINTEnvVars *envs);
 
 void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
                      const int inc, const int nprim,
@@ -116,15 +109,15 @@ void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
 
 double CINTcommon_fac_sp(int l);
 
-#define G1E_D_I(f, g, li, lj)   CINTnabla1i_1e(f, g, ng, li, lj, ai)
-#define G1E_D_J(f, g, li, lj)   CINTnabla1j_1e(f, g, ng, li, lj, aj)
+#define G1E_D_I(f, g, li, lj)   CINTnabla1i_1e(f, g, li, lj, envs)
+#define G1E_D_J(f, g, li, lj)   CINTnabla1j_1e(f, g, li, lj, envs)
 /* r-R_0, R_0 is (0,0,0) */
-#define G1E_R0I(f, g, li, lj)   CINTx1i_1e(f, g, ng, li, lj, ri)
-#define G1E_R0J(f, g, li, lj)   CINTx1j_1e(f, g, ng, li, lj, rj)
+#define G1E_R0I(f, g, li, lj)   CINTx1i_1e(f, g, ri, li, lj, envs)
+#define G1E_R0J(f, g, li, lj)   CINTx1j_1e(f, g, rj, li, lj, envs)
 /* r-R_C, R_C is common origin */
-#define G1E_RCI(f, g, li, lj)   CINTx1i_1e(f, g, ng, li, lj, dri)
-#define G1E_RCJ(f, g, li, lj)   CINTx1j_1e(f, g, ng, li, lj, drj)
+#define G1E_RCI(f, g, li, lj)   CINTx1i_1e(f, g, dri, li, lj, envs)
+#define G1E_RCJ(f, g, li, lj)   CINTx1j_1e(f, g, drj, li, lj, envs)
 /* origin from center of each basis
  * x1[ij]_1e(f, g, ng, li, lj, 0d0) */
 #define G1E_R_I(f, g, li, lj)   f = g + 1
-#define G1E_R_J(f, g, li, lj)   f = g + ng[0]
+#define G1E_R_J(f, g, li, lj)   f = g + envs->g_stride_j

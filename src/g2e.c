@@ -80,7 +80,7 @@ int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         envs->ncomp_e2 = ng[POS_E2];
         envs->ncomp_tensor = ng[TENSOR];
 
-        envs->li_ceil = envs->i_l + ng[IINC]; // ng[0] has different meaning in cint1e
+        envs->li_ceil = envs->i_l + ng[IINC];
         envs->lj_ceil = envs->j_l + ng[JINC];
         envs->lk_ceil = envs->k_l + ng[KINC];
         envs->ll_ceil = envs->l_l + ng[LINC];
@@ -2049,9 +2049,9 @@ void CINTnabla1l_2e(double *f, const double *g,
  * ri is the shift from the center R_O to the center of |i>
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
-void CINTx1i_2e(double *f, const double *g,
+void CINTx1i_2e(double *f, const double *g, const double *ri,
                 const int li, const int lj, const int lk, const int ll,
-                const double *ri, const CINTEnvVars *envs)
+                const CINTEnvVars *envs)
 {
         int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
@@ -2085,9 +2085,9 @@ void CINTx1i_2e(double *f, const double *g,
 /*
  * ( i x^1 j | kl )
  */
-void CINTx1j_2e(double *f, const double *g,
+void CINTx1j_2e(double *f, const double *g, const double *rj,
                 const int li, const int lj, const int lk, const int ll,
-                const double *rj, const CINTEnvVars *envs)
+                const CINTEnvVars *envs)
 {
         int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
@@ -2121,9 +2121,9 @@ void CINTx1j_2e(double *f, const double *g,
 /*
  * ( ij | x^1 k l )
  */
-void CINTx1k_2e(double *f, const double *g,
+void CINTx1k_2e(double *f, const double *g, const double *rk,
                 const int li, const int lj, const int lk, const int ll,
-                const double *rk, const CINTEnvVars *envs)
+                const CINTEnvVars *envs)
 {
         int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
@@ -2157,9 +2157,9 @@ void CINTx1k_2e(double *f, const double *g,
 /*
  * ( i j | x^1 kl )
  */
-void CINTx1l_2e(double *f, const double *g,
+void CINTx1l_2e(double *f, const double *g, const double *rl,
                 const int li, const int lj, const int lk, const int ll,
-                const double *rl, const CINTEnvVars *envs)
+                const CINTEnvVars *envs)
 {
         int i, j, k, l, n, ptr;
         const int di = envs->g_stride_i;
