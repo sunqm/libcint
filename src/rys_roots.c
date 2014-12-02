@@ -20,7 +20,7 @@
 #define MXROOTS1  MXROOTS
 
 // FIXME: R_dsmit causes big errors for nroots > 13
-void CINTrys_roots(int nroots, double x, double *u, double *w)
+void CINTrys_roots(FINT nroots, double x, double *u, double *w)
 {
         switch (nroots) {
                 case 0: case 1: case 2: case 3:
@@ -40,7 +40,7 @@ void CINTrys_roots(int nroots, double x, double *u, double *w)
         }
 }
 
-static void Root123(int nroots, double X, double roots[], double weights[]){
+static void Root123(FINT nroots, double X, double roots[], double weights[]){
 
   double R12, PIE4, R22, W22, R13, R23, W23, R33, W33;
   double RT1=0,RT2=0,RT3=0,WW1=0,WW2=0,WW3=0;
@@ -1369,12 +1369,12 @@ static void Root5(double X, double roots[], double weights[]){
 }
 
 /* bdf_cvwint_dnode_ */
-static void R_dnode(double *a, double *rt, int k)
+static void R_dnode(double *a, double *rt, FINT k)
 {
     const double accrt = 1e-11;
 
-    int i, m;
-    int icoun2, icount;
+    FINT i, m;
+    FINT icoun2, icount;
     double r;
     double p1, p2, r1, r2, p5, p6, r5, r6, r3, p3, r4, p4, dr, prod, delta;
 
@@ -1392,7 +1392,8 @@ static void R_dnode(double *a, double *rt, int k)
 	if (prod < 0) {
 	    goto L20;
 	}
-        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n", m, k);
+        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n",
+                (int)m, (int)k);
 L20:
 	r5 = r1;
 	p5 = p1;
@@ -1465,11 +1466,11 @@ L90:
 }
 
 /* Incomplete gamma function
- * f(2n,x) = \int t^{2n} exp(-xt^2) dt
- *         = 1/2 \int r^{n-1/2} exp(-xr) dr
+ * f(2n,x) = \FINT t^{2n} exp(-xt^2) dt
+ *         = 1/2 \FINT r^{n-1/2} exp(-xr) dr
  *         = 1/2 scipy.special.gammainc(n+1/2, x) * gamma(n+1/2) / x^{n+1/2}
  */
-void gamma_inc_like(double *ff, double x, int n)
+void gamma_inc_like(double *ff, double x, FINT n)
 {
         const double pie4 = .7853981633974483096156608; // PI/4
         const double xsw = 33.;
@@ -1477,8 +1478,8 @@ void gamma_inc_like(double *ff, double x, int n)
         const double fac0 = n + .5;
         double term[200];
         double sum, fac, sum1, suma, term0;
-        int k;
-        int nterm = 0;
+        FINT k;
+        FINT nterm = 0;
 
         if (x > xsw) {
                 sum = sqrt(pie4 / x);
@@ -1494,7 +1495,7 @@ void gamma_inc_like(double *ff, double x, int n)
                         goto _CONV;
                 }
                 fac = fac0;
-                for (nterm = 1; nterm < (int)(x+fac0-1); ++nterm) {
+                for (nterm = 1; nterm < (FINT)(x+fac0-1); ++nterm) {
                         fac -= 1;
                         term[nterm] = term[nterm-1] * fac / x;
                         sum1 = suma;
@@ -1509,7 +1510,7 @@ void gamma_inc_like(double *ff, double x, int n)
         fac = fac0;
         term0 = e / fac;
         sum = term0;
-        for (k = 0; k < (int)(x-fac0); ++k) {
+        for (k = 0; k < (FINT)(x-fac0); ++k) {
                 fac += 1;
                 term0 *= x / fac;
                 sum += term0;
@@ -1534,7 +1535,7 @@ void gamma_inc_like(double *ff, double x, int n)
         if (nterm > 199) {
                 fprintf(stderr, "libcint::rys_roots power series of gamma_inc_like not converge"
                         "val=%.16g last term=%.16g x=%.16g n=%d\n",
-                        suma, term[199], x, n);
+                        suma, term[199], x, (int)n);
                 exit(1);
         }
 
@@ -1552,10 +1553,10 @@ _CONV:
 }
 
 /* bdf_cvwint_dsmit_ */
-static void R_dsmit(double *cs, double *s, int n)
+static void R_dsmit(double *cs, double *s, FINT n)
 {
-    int i, j, k;
-    int kmax;
+    FINT i, j, k;
+    FINT kmax;
     double fac, dot;
     double v[MXROOTS1];
     double *y;
@@ -1608,10 +1609,10 @@ L100:
 }
 
 /* bdf_cvwint_droot_ */
-static void R_droot(int nroots, double x,
+static void R_droot(FINT nroots, double x,
                     double roots[], double weights[])
 {
-    int i, k, j, m, jmax;
+    FINT i, k, j, m, jmax;
     double r[MXROOTS*MXROOTS] = {0};
     double w[MXROOTS*MXROOTS] = {0};
     double cs[MXROOTS1*MXROOTS1];
@@ -1692,12 +1693,12 @@ L70:
  ******************************************************
  * float128
  */
-static void R_qnode(long double *a, long double *rt, int k)
+static void R_qnode(long double *a, long double *rt, FINT k)
 {
     const long double accrt = 1e-11l;
 
-    int i, m;
-    int icoun2, icount;
+    FINT i, m;
+    FINT icoun2, icount;
     long double r;
     long double p1, p2, r1, r2, p5, p6, r5, r6, r3, p3, r4, p4, dr, prod, delta;
 
@@ -1715,7 +1716,8 @@ static void R_qnode(long double *a, long double *rt, int k)
 	if (prod < 0) {
 	    goto L20;
 	}
-        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n", m, k);
+        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n",
+                (int)m, (int)k);
 L20:
 	r5 = r1;
 	p5 = p1;
@@ -1787,7 +1789,7 @@ L90:
     return;
 }
 
-static void qgamma_inc_like(long double *ff, long double x, int n)
+static void qgamma_inc_like(long double *ff, long double x, FINT n)
 {
         const long double pie4 = .7853981633974483096156608458l; // PI/4
         const long double xsw = 33.;
@@ -1795,8 +1797,8 @@ static void qgamma_inc_like(long double *ff, long double x, int n)
         const long double fac0 = n + .5l;
         long double term[200];
         long double sum, fac, sum1, suma, term0;
-        int k;
-        int nterm = 0;
+        FINT k;
+        FINT nterm = 0;
 
         if (x > xsw) {
                 sum = sqrtl(pie4 / x);
@@ -1812,7 +1814,7 @@ static void qgamma_inc_like(long double *ff, long double x, int n)
                         goto _CONV;
                 }
                 fac = fac0;
-                for (nterm = 1; nterm < (int)(x+fac0-1); ++nterm) {
+                for (nterm = 1; nterm < (FINT)(x+fac0-1); ++nterm) {
                         fac -= 1;
                         term[nterm] = term[nterm-1] * fac / x;
                         sum1 = suma;
@@ -1827,7 +1829,7 @@ static void qgamma_inc_like(long double *ff, long double x, int n)
         fac = fac0;
         term0 = e / fac;
         sum = term0;
-        for (k = 0; k < (int)(x-fac0); ++k) {
+        for (k = 0; k < (FINT)(x-fac0); ++k) {
                 fac += 1;
                 term0 *= x / fac;
                 sum += term0;
@@ -1852,7 +1854,7 @@ static void qgamma_inc_like(long double *ff, long double x, int n)
         if (nterm > 199) {
                 fprintf(stderr, "libcint::rys_roots power series of gamma_inc_like not converge"
                         "val=%.16Lg last term=%.16Lg x=%.16Lg n=%d\n",
-                        suma, term[199], x, n);
+                        suma, term[199], x, (int)n);
                 exit(1);
         }
 
@@ -1869,10 +1871,10 @@ _CONV:
         }
 }
 
-static void R_qsmit(long double *cs, long double *s, int n)
+static void R_qsmit(long double *cs, long double *s, FINT n)
 {
-    int i, j, k;
-    int kmax;
+    FINT i, j, k;
+    FINT kmax;
     long double fac, dot;
     long double v[MXROOTS1];
     long double *y;
@@ -1924,10 +1926,10 @@ L100:
     }
 }
 
-static void R_qroot(int nroots, double x,
+static void R_qroot(FINT nroots, double x,
                     double roots[], double weights[])
 {
-    int i, k, j, m, jmax;
+    FINT i, k, j, m, jmax;
     long double r[MXROOTS*MXROOTS] = {0};
     long double w[MXROOTS*MXROOTS] = {0};
     long double cs[MXROOTS1*MXROOTS1];

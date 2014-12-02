@@ -7,56 +7,56 @@
 #define HAVE_DEFINED_CINTENVVARS_H
 // ref to CINTinit_int1e_EnvVars, CINTinit_int2e_EnvVars
 typedef struct {
-        const int *atm;
-        const int *bas;
+        const FINT *atm;
+        const FINT *bas;
         const double *env;
-        const int *shls;
-        int natm;
-        int nbas;
+        const FINT *shls;
+        FINT natm;
+        FINT nbas;
 
-        int i_l;
-        int j_l;
-        int k_l;
-        int l_l;
-        int i_prim;
-        int j_prim;
-        int k_prim;
-        int l_prim;
-        int i_ctr;
-        int j_ctr;
-        int k_ctr;
-        int l_ctr;
-        int nfi;  // number of cartesion components
-        int nfj;
-        int nfk;
-        int nfl;
-        int nf;  // = nfi*nfj*nfk*nfl;
-        int _padding1;
+        FINT i_l;
+        FINT j_l;
+        FINT k_l;
+        FINT l_l;
+        FINT i_prim;
+        FINT j_prim;
+        FINT k_prim;
+        FINT l_prim;
+        FINT i_ctr;
+        FINT j_ctr;
+        FINT k_ctr;
+        FINT l_ctr;
+        FINT nfi;  // number of cartesion components
+        FINT nfj;
+        FINT nfk;
+        FINT nfl;
+        FINT nf;  // = nfi*nfj*nfk*nfl;
+        FINT _padding1;
         const double *ri;
         const double *rj;
         const double *rk;
         const double *rl;
         double common_factor;
 
-        int gbits;
-        int ncomp_e1; // = 1 if spin free, = 4 when spin included, it
-        int ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
-        int ncomp_tensor; // e.g. = 3 for gradients
+        FINT gbits;
+        FINT ncomp_e1; // = 1 if spin free, = 4 when spin included, it
+        FINT ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
+        FINT ncomp_tensor; // e.g. = 3 for gradients
 
         /* values may diff based on the g0_2d4d algorithm */
-        int li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
-        int lj_ceil;
-        int lk_ceil;
-        int ll_ceil;
-        int g_stride_i; // nrys_roots * shift of (i++,k,l,j)
-        int g_stride_k; // nrys_roots * shift of (i,k++,l,j)
-        int g_stride_l; // nrys_roots * shift of (i,k,l++,j)
-        int g_stride_j; // nrys_roots * shift of (i,k,l,j++)
-        int nrys_roots;
-        int g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
+        FINT li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
+        FINT lj_ceil;
+        FINT lk_ceil;
+        FINT ll_ceil;
+        FINT g_stride_i; // nrys_roots * shift of (i++,k,l,j)
+        FINT g_stride_k; // nrys_roots * shift of (i,k++,l,j)
+        FINT g_stride_l; // nrys_roots * shift of (i,k,l++,j)
+        FINT g_stride_j; // nrys_roots * shift of (i,k,l,j++)
+        FINT nrys_roots;
+        FINT g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
 
-        int g2d_ijmax;
-        int g2d_klmax;
+        FINT g2d_ijmax;
+        FINT g2d_klmax;
         const double *rx_in_rijrx;
         const double *rx_in_rklrx;
         double rirj[3]; // diff by an sign in different g0_2d4d algorithm
@@ -68,7 +68,7 @@ typedef struct {
         void (*f_gout)();
 
         /* values are assigned during calculation */
-        int *idx;
+        FINT *idx;
         double ai;
         double aj;
         double ak;
@@ -82,7 +82,7 @@ typedef struct {
 } CINTEnvVars;
 #endif
 
-void CINTg1e_index_xyz(int *idx, const CINTEnvVars *envs);
+void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs);
 
 void CINTg_ovlp(double *g, const double ai, const double aj,
                 const double fac, const CINTEnvVars *envs);
@@ -92,22 +92,22 @@ void CINTg_nuc(double *g, const double aij, const double *rij,
                const CINTEnvVars *envs);
 
 void CINTnabla1i_1e(double *f, const double *g,
-                    const int li, const int lj, const CINTEnvVars *envs);
+                    const FINT li, const FINT lj, const CINTEnvVars *envs);
 
 void CINTnabla1j_1e(double *f, const double *g,
-                    const int li, const int lj, const CINTEnvVars *envs);
+                    const FINT li, const FINT lj, const CINTEnvVars *envs);
 
 void CINTx1i_1e(double *f, const double *g, const double ri[3],
-                const int li, const int lj, const CINTEnvVars *envs);
+                const FINT li, const FINT lj, const CINTEnvVars *envs);
 
 void CINTx1j_1e(double *f, const double *g, const double rj[3],
-                const int li, const int lj, const CINTEnvVars *envs);
+                const FINT li, const FINT lj, const CINTEnvVars *envs);
 
-void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
-                     const int inc, const int nprim,
-                     const int nctr, const double *pcoeff);
+void CINTprim_to_ctr(double *gc, const FINT nf, const double *gp,
+                     const FINT inc, const FINT nprim,
+                     const FINT nctr, const double *pcoeff);
 
-double CINTcommon_fac_sp(int l);
+double CINTcommon_fac_sp(FINT l);
 
 #define G1E_D_I(f, g, li, lj)   CINTnabla1i_1e(f, g, li, lj, envs)
 #define G1E_D_J(f, g, li, lj)   CINTnabla1j_1e(f, g, li, lj, envs)

@@ -14,18 +14,18 @@
 /* <k i|GAUNT |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (i SIGMA DOT P j|GAUNT |k SIGMA DOT P l) */
 static void CINTgout2e_cint2e_ssp1ssp2(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
-const int k_l = envs->k_l;
-const int l_l = envs->l_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
 const double *rk = envs->rk;
 const double *rl = envs->rl;
-int ix, iy, iz, i, n;
+FINT ix, iy, iz, i, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
@@ -88,15 +88,15 @@ gout[14] += + (1*s[3]) + (-1*s[1]);
 gout[15] += + (1*s[0]) + (1*s[4]) + (1*s[8]);
 gout += 16;
 }}}
-void cint2e_ssp1ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {0, 1, 0, 1, 0, 0, 0, 0};
+void cint2e_ssp1ssp2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 1, 0, 1, 0, 0, 0, 0};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int cint2e_ssp1ssp2(double *opkijl, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env, CINTOpt *opt) {
-int ng[] = {0, 1, 0, 1, 2, 4, 4, 1};
+FINT cint2e_ssp1ssp2(double *opkijl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {0, 1, 0, 1, 2, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_cint2e_ssp1ssp2;
@@ -108,18 +108,18 @@ C2Fo_(cint2e_ssp1ssp2)
 /* <k RC CROSS SIGMA i|GAUNT |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (RC CROSS SIGMA i j|GAUNT |k SIGMA DOT P l) */
 static void CINTgout2e_cint2e_cg_ssa10ssp2(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
-const int k_l = envs->k_l;
-const int l_l = envs->l_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
 const double *rk = envs->rk;
 const double *rl = envs->rl;
-int ix, iy, iz, i, n;
+FINT ix, iy, iz, i, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
@@ -250,15 +250,15 @@ gout[46] += + (1*s[0]) + (1*s[4]);
 gout[47] += + (1*s[3]) + (-1*s[1]);
 gout += 48;
 }}}
-void cint2e_cg_ssa10ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 0, 0, 1, 0, 0, 0, 0};
+void cint2e_cg_ssa10ssp2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 1, 0, 0, 0, 0};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int cint2e_cg_ssa10ssp2(double *opkijl, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env, CINTOpt *opt) {
-int ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
+FINT cint2e_cg_ssa10ssp2(double *opkijl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_cint2e_cg_ssa10ssp2;
@@ -270,18 +270,18 @@ C2Fo_(cint2e_cg_ssa10ssp2)
 /* <k R CROSS SIGMA i|GAUNT |j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (R CROSS SIGMA i j|GAUNT |k SIGMA DOT P l) */
 static void CINTgout2e_cint2e_giao_ssa10ssp2(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
-const int k_l = envs->k_l;
-const int l_l = envs->l_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
 const double *rk = envs->rk;
 const double *rl = envs->rl;
-int ix, iy, iz, i, n;
+FINT ix, iy, iz, i, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
@@ -408,15 +408,15 @@ gout[46] += + (1*s[0]) + (1*s[4]);
 gout[47] += + (1*s[3]) + (-1*s[1]);
 gout += 48;
 }}}
-void cint2e_giao_ssa10ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 0, 0, 1, 0, 0, 0, 0};
+void cint2e_giao_ssa10ssp2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 1, 0, 0, 0, 0};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int cint2e_giao_ssa10ssp2(double *opkijl, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env, CINTOpt *opt) {
-int ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
+FINT cint2e_giao_ssa10ssp2(double *opkijl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_cint2e_giao_ssa10ssp2;
@@ -428,18 +428,18 @@ C2Fo_(cint2e_giao_ssa10ssp2)
 /* <k G i|GAUNT |SIGMA DOT P j SIGMA DOT P l> : i,jin electron 1; k,lin electron 2
  * = (G i SIGMA DOT P j|GAUNT |k SIGMA DOT P l) */
 static void CINTgout2e_cint2e_gssp1ssp2(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
-const int k_l = envs->k_l;
-const int l_l = envs->l_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
 const double *rk = envs->rk;
 const double *rl = envs->rl;
-int ix, iy, iz, i, n;
+FINT ix, iy, iz, i, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
@@ -600,24 +600,24 @@ gout[46] += + (-1*c[0]*s[12]) + (1*c[1]*s[3]) + (1*c[0]*s[10]) + (-1*c[1]*s[1]);
 gout[47] += + (-1*c[0]*s[9]) + (1*c[1]*s[0]) + (-1*c[0]*s[13]) + (1*c[1]*s[4]) + (-1*c[0]*s[17]) + (1*c[1]*s[8]);
 gout += 48;
 }}}
-void cint2e_gssp1ssp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 1, 0, 1, 0, 0, 0, 0};
+void cint2e_gssp1ssp2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 1, 0, 1, 0, 0, 0, 0};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int cint2e_gssp1ssp2(double *opkijl, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env, CINTOpt *opt) {
-int ng[] = {1, 1, 0, 1, 3, 4, 4, 3};
-const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int k_sh = shls[2];
-const int l_sh = shls[3];
+FINT cint2e_gssp1ssp2(double *opkijl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 1, 0, 1, 3, 4, 4, 3};
+const FINT i_sh = shls[0];
+const FINT j_sh = shls[1];
+const FINT k_sh = shls[2];
+const FINT l_sh = shls[3];
 if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
-int ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-int jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
-int kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
-int lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
+FINT ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+FINT jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+FINT kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+FINT lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
 CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);
 return 0; }
 CINTEnvVars envs;

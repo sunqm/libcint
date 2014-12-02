@@ -4,49 +4,50 @@
  * Provide the intermediate variable g(nroots,i,j,k,l,[xyz])
  */
 
+#include "config.h"
 #include "g1e.h"
 
-void CINTg2e_index_xyz(int *idx, const CINTEnvVars *envs);
+void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs);
 
-int CINTinit_int2e_EnvVars(CINTEnvVars *envs, const int ng[],
-                           const int *shls,
-                           const int *atm, const int natm,
-                           const int *bas, const int nbas, const double *env);
+FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT ng[],
+                            const FINT *shls,
+                            const FINT *atm, const FINT natm,
+                            const FINT *bas, const FINT nbas, const double *env);
 
 void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
 
 double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs);
 
 void CINTnabla1i_2e(double *f, const double *g,
-                    const int li, const int lj, const int lk, const int ll,
+                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
                     const CINTEnvVars *envs);
 
 void CINTnabla1j_2e(double *f, const double *g,
-                    const int li, const int lj, const int lk, const int ll,
+                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
                     const CINTEnvVars *envs);
 
 void CINTnabla1k_2e(double *f, const double *g,
-                    const int li, const int lj, const int lk, const int ll,
+                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
                     const CINTEnvVars *envs);
 
 void CINTnabla1l_2e(double *f, const double *g,
-                    const int li, const int lj, const int lk, const int ll,
+                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
                     const CINTEnvVars *envs);
 
 void CINTx1i_2e(double *f, const double *g, const double *ri,
-                const int li, const int lj, const int lk, const int ll,
+                const FINT li, const FINT lj, const FINT lk, const FINT ll,
                 const CINTEnvVars *envs);
 
 void CINTx1j_2e(double *f, const double *g, const double *rj,
-                const int li, const int lj, const int lk, const int ll,
+                const FINT li, const FINT lj, const FINT lk, const FINT ll,
                 const CINTEnvVars *envs);
 
 void CINTx1k_2e(double *f, const double *g, const double *rk,
-                const int li, const int lj, const int lk, const int ll,
+                const FINT li, const FINT lj, const FINT lk, const FINT ll,
                 const CINTEnvVars *envs);
 
 void CINTx1l_2e(double *f, const double *g, const double *rl,
-                const int li, const int lj, const int lk, const int ll,
+                const FINT li, const FINT lj, const FINT lk, const FINT ll,
                 const CINTEnvVars *envs);
 
 

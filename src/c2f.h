@@ -3,14 +3,16 @@
  *
  */
 
+#include "config.h"
+
 #define __CVAR_CALL__   atm, *natm, bas, *nbas, env
-#define __FVAR_FUNC__   const int *atm, const int *natm, \
-                        const int *bas, const int *nbas, const double *env
-#define C2F_(NAME)      int NAME##_(double *op, const int *shls, \
+#define __FVAR_FUNC__   const FINT *atm, const FINT *natm, \
+                        const FINT *bas, const FINT *nbas, const double *env
+#define C2F_(NAME)      FINT NAME##_(double *op, const FINT *shls, \
                                     __FVAR_FUNC__) \
                         { return NAME(op, shls, __CVAR_CALL__); }
 // C2Fo for 2e integrals with optimizer
-#define C2Fo_(NAME)     int NAME##_(double *op, const int *shls, \
+#define C2Fo_(NAME)     FINT NAME##_(double *op, const FINT *shls, \
                                     __FVAR_FUNC__, unsigned long *optptr) \
                         { CINTOpt *opt = (CINTOpt *)*optptr; \
                             return NAME(op, shls, __CVAR_CALL__, opt); }

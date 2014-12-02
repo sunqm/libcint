@@ -10,9 +10,9 @@
 #include "g1e.h"
 
 
-int CINTinit_int1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
-                           const int *atm, const int natm,
-                           const int *bas, const int nbas, const double *env)
+FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
+                           const FINT *atm, const FINT natm,
+                           const FINT *bas, const FINT nbas, const double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -21,8 +21,8 @@ int CINTinit_int1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         envs->env = env;
         envs->shls = shls;
 
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
+        const FINT i_sh = shls[0];
+        const FINT j_sh = shls[1];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->i_prim = bas(NPRIM_OF, i_sh);
@@ -60,8 +60,8 @@ int CINTinit_int1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         assert(bas(ATOM_OF,j_sh) < natm);
         assert(envs->nrys_roots < MXRYSROOTS);
 
-        int dli = envs->li_ceil + envs->lj_ceil + 1;
-        int dlj = envs->lj_ceil + 1;
+        FINT dli = envs->li_ceil + envs->lj_ceil + 1;
+        FINT dlj = envs->lj_ceil + 1;
         envs->g_stride_i = 1;
         envs->g_stride_j = dli;
         envs->g_size     = dli * dlj;
@@ -69,17 +69,17 @@ int CINTinit_int1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         return 0;
 }
 
-void CINTg1e_index_xyz(int *idx, const CINTEnvVars *envs)
+void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 {
-        const int i_l = envs->i_l;
-        const int j_l = envs->j_l;
-        const int nfi = envs->nfi;
-        const int nfj = envs->nfj;
-        const int dj = envs->g_stride_j;
-        int i, j, n;
-        int ofx, ofy, ofz;
-        int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
-        int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT dj = envs->g_stride_j;
+        FINT i, j, n;
+        FINT ofx, ofy, ofz;
+        FINT i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
+        FINT j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
 
         CINTcart_comp(i_nx, i_ny, i_nz, i_l);
         CINTcart_comp(j_nx, j_ny, j_nz, j_l);
@@ -102,13 +102,13 @@ void CINTg1e_index_xyz(int *idx, const CINTEnvVars *envs)
 void CINTg_ovlp(double *g, const double ai, const double aj,
                 const double fac, const CINTEnvVars *envs)
 {
-        const int nmax = envs->li_ceil + envs->lj_ceil;
-        const int lj = envs->lj_ceil;
-        const int dj = envs->g_stride_j;
+        const FINT nmax = envs->li_ceil + envs->lj_ceil;
+        const FINT lj = envs->lj_ceil;
+        const FINT dj = envs->g_stride_j;
         const double aij = ai + aj;
         const double *ri = envs->ri;
         const double *rj = envs->rj;
-        int i, j, ptr;
+        FINT i, j, ptr;
         double rirj[3], ririj[3];
         double *gx = g;
         double *gy = g + envs->g_size;
@@ -150,12 +150,12 @@ void CINTg_nuc(double *g, const double aij, const double *rij,
                const double *cr, const double t2, const double fac,
                const CINTEnvVars *envs)
 {
-        const int nmax = envs->li_ceil + envs->lj_ceil;
-        const int lj = envs->lj_ceil;
-        const int dj = envs->g_stride_j;
+        const FINT nmax = envs->li_ceil + envs->lj_ceil;
+        const FINT lj = envs->lj_ceil;
+        const FINT dj = envs->g_stride_j;
         const double *ri = envs->ri;
         const double *rj = envs->rj;
-        int i, j, ptr;
+        FINT i, j, ptr;
         double rir0[3], rirj[3];
         double *gx = g;
         double *gy = g + envs->g_size;
@@ -194,11 +194,11 @@ void CINTg_nuc(double *g, const double aij, const double *rij,
 }
 
 void CINTnabla1i_1e(double *f, const double *g,
-                    const int li, const int lj, const CINTEnvVars *envs)
+                    const FINT li, const FINT lj, const CINTEnvVars *envs)
 {
-        const int dj = envs->g_stride_j;
+        const FINT dj = envs->g_stride_j;
         const double ai2 = -2 * envs->ai;
-        int i, j, ptr;
+        FINT i, j, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -222,11 +222,11 @@ void CINTnabla1i_1e(double *f, const double *g,
 }
 
 void CINTnabla1j_1e(double *f, const double *g,
-                    const int li, const int lj, const CINTEnvVars *envs)
+                    const FINT li, const FINT lj, const CINTEnvVars *envs)
 {
-        const int dj = envs->g_stride_j;
+        const FINT dj = envs->g_stride_j;
         const double aj2 = -2 * envs->aj;
-        int i, j, ptr;
+        FINT i, j, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -257,10 +257,10 @@ void CINTnabla1j_1e(double *f, const double *g,
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
 void CINTx1i_1e(double *f, const double *g, const double ri[3],
-                const int li, const int lj, const CINTEnvVars *envs)
+                const FINT li, const FINT lj, const CINTEnvVars *envs)
 {
-        const int dj = envs->g_stride_j;
-        int i, j, ptr;
+        const FINT dj = envs->g_stride_j;
+        FINT i, j, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -280,10 +280,10 @@ void CINTx1i_1e(double *f, const double *g, const double ri[3],
 }
 
 void CINTx1j_1e(double *f, const double *g, const double rj[3],
-                const int li, const int lj, const CINTEnvVars *envs)
+                const FINT li, const FINT lj, const CINTEnvVars *envs)
 {
-        const int dj = envs->g_stride_j;
-        int i, j, ptr;
+        const FINT dj = envs->g_stride_j;
+        FINT i, j, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -311,19 +311,23 @@ void CINTx1j_1e(double *f, const double *g, const double rj[3],
  * shl   nth shell
  * ip    ith-1 primitive GTO
  */
-void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
-                     const int inc, const int nprim,
-                     const int nctr, const double *pcoeff)
+void CINTprim_to_ctr(double *gc, const FINT nf, const double *gp,
+                     const FINT inc, const FINT nprim,
+                     const FINT nctr, const double *pcoeff)
 {
-        const int INC1 = 1;
-        int n, i;
+        const FINT INC1 = 1;
+        FINT n, i, k;
         double *pgc = gc;
+        double c;
 
         for (i = 0; i < inc; i++) {
                 //dger(nf, nctr, 1.d0, gp(i+1), inc, env(ptr), nprim, gc(1,i*nctr+1), nf)
                 for (n = 0; n < nctr; n++) {
-                        if (pcoeff[nprim*n] != 0) {
-                                daxpy_(&nf, pcoeff+nprim*n, gp+i, &inc, pgc, &INC1);
+                        c = pcoeff[nprim*n];
+                        if (c != 0) {
+                                for (k = 0; k < nf; k++) {
+                                        pgc[k] += c * gp[k*inc+i];
+                                }
                         }
                         // next cgto block
                         pgc += nf;
@@ -335,7 +339,7 @@ void CINTprim_to_ctr(double *gc, const int nf, const double *gp,
  * to optimize memory copy in cart2sph.c, remove the common factor for s
  * and p function in cart2sph
  */
-double CINTcommon_fac_sp(int l)
+double CINTcommon_fac_sp(FINT l)
 {
         switch (l) {
                 case 0: return 0.282094791773878143;

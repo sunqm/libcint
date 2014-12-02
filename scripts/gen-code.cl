@@ -279,14 +279,14 @@ iz = idx[2];~%")
            (goutinc))
       (format fout "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */~%" bra-i op ket-j)
       (format fout "static void CINTgout1e_~a(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs) {~%" intname)
+double *gout, const FINT *idx, const CINTEnvVars *envs) {~%" intname)
       (format fout "const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
-int ix, iy, iz, n;
+FINT ix, iy, iz, n;
 double *g0 = g;~%")
       (loop
         for i in (range (ash 1 tot-bits)) do
@@ -311,26 +311,26 @@ for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
       (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
       (format fout "gout += ~a;~%}}~%" goutinc)
 ;;; generate function int1e
-      (format fout "int ~a(double *opij, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {~%" intname)
-      (format fout "int ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+      (format fout "FINT ~a(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
               i-len (+ op-len j-len) tot-bits
               (if (eql sf 'sf) 1 4)
               (if (eql sf 'sf) goutinc (/ goutinc 4)))
 ;;; determine factor
       (when (member 'g raw-infix)
-        (format fout "const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int i_l = bas(ANG_OF, i_sh);
-const int j_l = bas(ANG_OF, j_sh);")
+        (format fout "const FINT i_sh = shls[0];
+const FINT j_sh = shls[1];
+const FINT i_l = bas(ANG_OF, i_sh);
+const FINT j_l = bas(ANG_OF, j_sh);")
         (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {~%")
         (if (eql sp 'spinor)
-           (format fout "int ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-int jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+           (format fout "FINT ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+FINT jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
 CINTdset0(ip * jp * OF_CMPLX * ng[TENSOR], opij);~%")
-           (format fout "int ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
-int jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
+           (format fout "FINT ip = (i_l * 2 + 1) * bas(NCTR_OF,i_sh);
+FINT jp = (j_l * 2 + 1) * bas(NCTR_OF,j_sh);
 CINTdset0(ip * jp * ng[TENSOR], opij);~%"))
         (format fout "return 0; }~%"))
 ;;; determine function caller
@@ -469,18 +469,18 @@ for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate function gout2e
       (format fout "static void CINTgout2e_~a(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {~%" intname)
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
-const int k_l = envs->k_l;
-const int l_l = envs->l_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
 const double *rk = envs->rk;
 const double *rl = envs->rl;
-int ix, iy, iz, i, n;
+FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
       (loop
         for i in (range (ash 1 tot-bits)) do
@@ -515,17 +515,17 @@ for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout "gout += ~a;~%}}}~%" goutinc)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate optimizer for function int2e
-      (format fout "void ~a_optimizer(CINTOpt **opt, const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {~%" intname)
-      (format fout "int ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
+      (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
               i-len j-len k-len (+ op-len l-len))
       (format fout "CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate function int2e
-      (format fout "int ~a(double *opkijl, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env, CINTOpt *opt) {~%" intname)
-      (format fout "int ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+      (format fout "FINT ~a(double *opkijl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
               i-len j-len k-len (+ op-len l-len) tot-bits
               (if (eql sf1 'sf) 1 4) (if (eql sf2 'sf) 1 4)
               (cond ((and (eql sf1 'sf) (eql sf2 'sf)) goutinc)
@@ -533,19 +533,19 @@ const int *bas, const int nbas, const double *env, CINTOpt *opt) {~%" intname)
                     (t (/ goutinc 4))))
 ;;; determine factor
       (when (member 'g raw-infix)
-        (format fout "const int i_sh = shls[0];
-const int j_sh = shls[1];
-const int k_sh = shls[2];
-const int l_sh = shls[3];~%")
-        (let ((set0sph "int ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
-int jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
-int kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
-int lp = (bas(ANG_OF,l_sh) * 2 + 1) * bas(NCTR_OF,l_sh);
+        (format fout "const FINT i_sh = shls[0];
+const FINT j_sh = shls[1];
+const FINT k_sh = shls[2];
+const FINT l_sh = shls[3];~%")
+        (let ((set0sph "FINT ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
+FINT jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
+FINT kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
+FINT lp = (bas(ANG_OF,l_sh) * 2 + 1) * bas(NCTR_OF,l_sh);
 CINTdset0(kp * ip * jp * lp * ng[TENSOR], opkijl);")
-              (set0spin "int ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
-int jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
-int kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
-int lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
+              (set0spin "FINT ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+FINT jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+FINT kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+FINT lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
 CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);"))
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {

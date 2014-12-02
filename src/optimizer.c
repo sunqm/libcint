@@ -17,8 +17,8 @@
 #define MAX(X,Y) (X)>(Y)?(X):(Y)
 
 // generate caller to CINTinit_2e_optimizer for each type of function
-void CINTinit_2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
-                           const int *bas, const int nbas, const double *env)
+void CINTinit_2e_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+                           const FINT *bas, const FINT nbas, const double *env)
 {
         CINTOpt *opt0 = (CINTOpt *)malloc(sizeof(CINTOpt));
         opt0->index_xyz_array = NULL;
@@ -32,8 +32,8 @@ void CINTinit_2e_optimizer(CINTOpt **opt, const int *atm, const int natm,
         opt0->tot_prim = 0;
         *opt = opt0;
 }
-void CINTinit_optimizer(CINTOpt **opt, const int *atm, const int natm,
-                        const int *bas, const int nbas, const double *env)
+void CINTinit_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+                        const FINT *bas, const FINT nbas, const double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
 }
@@ -45,7 +45,7 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 return;
         }
 
-        int i;
+        FINT i;
 
         if (opt0->index_xyz_array) {
                 for (i = 0; i < ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX; i++) {
@@ -91,15 +91,15 @@ void CINTdel_optimizer(CINTOpt **opt)
         CINTdel_2e_optimizer(opt);
 }
 
-void CINTno_optimizer(CINTOpt **opt, const int *atm, const int natm,
-                      const int *bas, const int nbas, const double *env)
+void CINTno_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+                      const FINT *bas, const FINT nbas, const double *env)
 {
         *opt = NULL;
 }
 
-void CINTuse_all_optimizer(CINTOpt **opt, int *ng,
-                           const int *atm, const int natm,
-                           const int *bas, const int nbas, const double *env)
+void CINTuse_all_optimizer(CINTOpt **opt, FINT *ng,
+                           const FINT *atm, const FINT natm,
+                           const FINT *bas, const FINT nbas, const double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
@@ -110,25 +110,25 @@ void CINTuse_all_optimizer(CINTOpt **opt, int *ng,
 /* len(ng) = 9. The first 4 items are the increment adding to envs.li_ceil
  * ... envs.ll_ceil for shell i, j, k, l */
 void
-CINTOpt_set_index_xyz(CINTOpt *opt, int *ng,
-                      const int *atm, const int natm,
-                      const int *bas, const int nbas, const double *env)
+CINTOpt_set_index_xyz(CINTOpt *opt, FINT *ng,
+                      const FINT *atm, const FINT natm,
+                      const FINT *bas, const FINT nbas, const double *env)
 {
-        int i, j, k, l, ptr;
-        int n = ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = (int **)malloc(sizeof(int *) * n);
+        FINT i, j, k, l, ptr;
+        FINT n = ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX;
+        opt->index_xyz_array = (FINT **)malloc(sizeof(FINT *) * n);
         for (i = 0; i < n; i++) {
                 opt->index_xyz_array[i] = NULL;
         }
 
-        int max_l = 0;
+        FINT max_l = 0;
         for (i = 0; i < nbas; i++) {
                 max_l = MAX(max_l, bas(ANG_OF,i));
         }
 
-        int fakenbas = max_l+1;
-        int fakebas[BAS_SLOTS*fakenbas];
-        memset(fakebas, 0, sizeof(int)*BAS_SLOTS*fakenbas);
+        FINT fakenbas = max_l+1;
+        FINT fakebas[BAS_SLOTS*fakenbas];
+        memset(fakebas, 0, sizeof(FINT)*BAS_SLOTS*fakenbas);
         // fakebas only initializes ANG_OF, since the others does not
         // affect index_xyz
         for (i = 0; i <= max_l; i++) {
@@ -136,7 +136,7 @@ CINTOpt_set_index_xyz(CINTOpt *opt, int *ng,
         }
 
         CINTEnvVars envs;
-        int shls[4];
+        FINT shls[4];
         for (i = 0; i <= max_l; i++) {
         for (j = 0; j <= max_l; j++) {
         for (k = 0; k <= max_l; k++) {
@@ -150,17 +150,17 @@ CINTOpt_set_index_xyz(CINTOpt *opt, int *ng,
                     + k*ANG_MAX
                     + l;
                 opt->index_xyz_array[ptr] = 
-                        (int *)malloc(sizeof(int)*envs.nf*3);
+                        (FINT *)malloc(sizeof(FINT)*envs.nf*3);
                 CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
         } } } }
 }
 
 
 // for the coeffs of the pGTO, find the maximum abs(coeff)
-static double max_pgto_coeff(const double *coeff, int nprim, int nctr,
-                             int prim_id)
+static double max_pgto_coeff(const double *coeff, FINT nprim, FINT nctr,
+                             FINT prim_id)
 {
-        int i;
+        FINT i;
         double maxc = 0;
         for (i = 0; i < nctr; i++) {
                 maxc = MAX(maxc, fabs(coeff[i*nprim+prim_id]));
@@ -168,13 +168,13 @@ static double max_pgto_coeff(const double *coeff, int nprim, int nctr,
         return maxc;
 }
 
-void CINTOpt_setij(CINTOpt *opt, int *ng,
-                   const int *atm, const int natm,
-                   const int *bas, const int nbas, const double *env)
+void CINTOpt_setij(CINTOpt *opt, FINT *ng,
+                   const FINT *atm, const FINT natm,
+                   const FINT *bas, const FINT nbas, const double *env)
 {
-        int i, j, ip, jp, io, jo, off;
+        FINT i, j, ip, jp, io, jo, off;
         if (!opt->prim_offset) {
-                opt->prim_offset = (int *)malloc(sizeof(int) * nbas);
+                opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
                 opt->tot_prim = 0;
                 for (i = 0; i < nbas; i++) {
                         opt->prim_offset[i] = opt->tot_prim;
@@ -182,7 +182,7 @@ void CINTOpt_setij(CINTOpt *opt, int *ng,
                 }
         }
 
-        int ik_inc, jl_inc;
+        FINT ik_inc, jl_inc;
         if ((ng[IINC]+ng[JINC]) > (ng[KINC]+ng[LINC])) {
                 ik_inc = ng[IINC];
                 jl_inc = ng[JINC];
@@ -191,14 +191,14 @@ void CINTOpt_setij(CINTOpt *opt, int *ng,
                 jl_inc = ng[LINC];
         }
 
-        int iprim, ictr, jprim, jctr, il, jl;
+        FINT iprim, ictr, jprim, jctr, il, jl;
         double eij, aij, rr, maxci, maxcj, rirj_g4d;
         const double *ai, *aj, *ri, *rj, *ci, *cj;
         double *expij, *rij;
-        int *cceij;
+        FINT *cceij;
         opt->expij = (double **)malloc(sizeof(double *) * opt->tot_prim);
         opt->rij = (double **)malloc(sizeof(double *) * opt->tot_prim);
-        opt->cceij = (int **)malloc(sizeof(int *) * opt->tot_prim);
+        opt->cceij = (FINT **)malloc(sizeof(FINT *) * opt->tot_prim);
         for (i = 0; i < nbas; i++) {
                 ri = env + atm(PTR_COORD,bas(ATOM_OF,i));
                 ai = env + bas(PTR_EXP,i);
@@ -213,7 +213,7 @@ void CINTOpt_setij(CINTOpt *opt, int *ng,
                         maxci = maxci / CINTgto_norm(il, ai[ip]);
                         expij = (double *)malloc(sizeof(double)*opt->tot_prim);
                         rij = (double *)malloc(sizeof(double)*opt->tot_prim*3);
-                        cceij = (int *)malloc(sizeof(int) * opt->tot_prim);
+                        cceij = (FINT *)malloc(sizeof(FINT) * opt->tot_prim);
                         opt->expij[io+ip] = expij;
                         opt->rij[io+ip] = rij;
                         opt->cceij[io+ip] = cceij;
@@ -254,12 +254,12 @@ void CINTOpt_setij(CINTOpt *opt, int *ng,
         }
 }
 
-void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
-                           const int *bas, const int nbas, const double *env)
+void CINTOpt_set_non0coeff(CINTOpt *opt, const FINT *atm, const FINT natm,
+                           const FINT *bas, const FINT nbas, const double *env)
 {
-        int i, j, k, ip, io;
+        FINT i, j, k, ip, io;
         if (!opt->prim_offset) {
-                opt->prim_offset = (int *)malloc(sizeof(int) * nbas);
+                opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
                 opt->tot_prim = 0;
                 for (i = 0; i < nbas; i++) {
                         opt->prim_offset[i] = opt->tot_prim;
@@ -267,12 +267,12 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
                 }
         }
 
-        int iprim, ictr;
+        FINT iprim, ictr;
         const double *ci;
         double *non0coeff;
-        int *non0idx;
-        opt->non0ctr = (int *)malloc(sizeof(int) * opt->tot_prim);
-        opt->non0idx = (int **)malloc(sizeof(int *) * opt->tot_prim);
+        FINT *non0idx;
+        opt->non0ctr = (FINT *)malloc(sizeof(FINT) * opt->tot_prim);
+        opt->non0idx = (FINT **)malloc(sizeof(FINT *) * opt->tot_prim);
         opt->non0coeff = (double **)malloc(sizeof(double *) * opt->tot_prim);
         for (i = 0; i < nbas; i++) {
                 io = opt->prim_offset[i];
@@ -280,7 +280,7 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, const int *atm, const int natm,
                 ictr = bas(NCTR_OF,i);
                 ci = env + bas(PTR_COEFF,i);
                 for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
-                        non0idx = (int *)malloc(sizeof(int) * ictr);
+                        non0idx = (FINT *)malloc(sizeof(FINT) * ictr);
                         non0coeff = (double *)malloc(sizeof(double) * ictr);
                         opt->non0idx[io+ip] = non0idx;
                         opt->non0coeff[io+ip] = non0coeff;

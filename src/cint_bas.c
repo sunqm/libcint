@@ -9,7 +9,7 @@
 /*
  * No. components of a Cartesian GTO, = (l+1)*(l+2)/2
  */
-int CINTlen_cart(const int l)
+FINT CINTlen_cart(const FINT l)
 {
         switch (l) {
                 case 0:
@@ -27,7 +27,7 @@ int CINTlen_cart(const int l)
         }
 }
 
-int CINTlen_spinor(const int bas_id, const int *bas)
+FINT CINTlen_spinor(const FINT bas_id, const FINT *bas)
 {
         if (0 == bas(KAPPA_OF, bas_id)) {
                 return 4 * bas(ANG_OF, bas_id) + 2;
@@ -41,11 +41,11 @@ int CINTlen_spinor(const int bas_id, const int *bas)
 /* 
  * Num. of contracted cartesian GTO = 2j+1 * n_contraction
  */
-int CINTcgtos_cart(const int bas_id, const int *bas)
+FINT CINTcgtos_cart(const FINT bas_id, const FINT *bas)
 {
         return CINTlen_cart(bas(ANG_OF, bas_id)) * bas(NCTR_OF, bas_id);
 }
-int CINTcgto_cart(const int bas_id, const int *bas)
+FINT CINTcgto_cart(const FINT bas_id, const FINT *bas)
 {
         return CINTlen_cart(bas(ANG_OF, bas_id)) * bas(NCTR_OF, bas_id);
 }
@@ -53,11 +53,11 @@ int CINTcgto_cart(const int bas_id, const int *bas)
 /* 
  * Num. of contracted spheric GTO = 2j+1 * n_contraction
  */
-int CINTcgtos_spheric(const int bas_id, const int *bas)
+FINT CINTcgtos_spheric(const FINT bas_id, const FINT *bas)
 {
         return (bas(ANG_OF, bas_id) * 2 + 1) * bas(NCTR_OF, bas_id);
 }
-int CINTcgto_spheric(const int bas_id, const int *bas)
+FINT CINTcgto_spheric(const FINT bas_id, const FINT *bas)
 {
         return (bas(ANG_OF, bas_id) * 2 + 1) * bas(NCTR_OF, bas_id);
 }
@@ -65,11 +65,11 @@ int CINTcgto_spheric(const int bas_id, const int *bas)
 /* 
  * Num. of contracted spinor GTO
  */
-int CINTcgtos_spinor(const int bas_id, const int *bas)
+FINT CINTcgtos_spinor(const FINT bas_id, const FINT *bas)
 {
         return CINTlen_spinor(bas_id, bas) * bas(NCTR_OF, bas_id);
 }
-int CINTcgto_spinor(const int bas_id, const int *bas)
+FINT CINTcgto_spinor(const FINT bas_id, const FINT *bas)
 {
         return CINTlen_spinor(bas_id, bas) * bas(NCTR_OF, bas_id);
 }
@@ -77,10 +77,10 @@ int CINTcgto_spinor(const int bas_id, const int *bas)
 /*
  * tot. primitive atomic spheric GTOs in a shell
  */
-int CINTtot_pgto_spheric(const int *bas, const int nbas)
+FINT CINTtot_pgto_spheric(const FINT *bas, const FINT nbas)
 {
-        int i;
-        int s = 0;
+        FINT i;
+        FINT s = 0;
 
         for (i = 0; i < nbas; i++) {
                 s += (bas(ANG_OF, i) * 2 + 1)
@@ -92,10 +92,10 @@ int CINTtot_pgto_spheric(const int *bas, const int nbas)
 /*
  * tot. primitive atomic spinors in a shell
  */
-int CINTtot_pgto_spinor(const int *bas, const int nbas)
+FINT CINTtot_pgto_spinor(const FINT *bas, const FINT nbas)
 {
-        int i;
-        int s = 0;
+        FINT i;
+        FINT s = 0;
 
         for (i = 0; i < nbas; i++) {
                 s += CINTlen_spinor(i, bas) * bas(NPRIM_OF, i);
@@ -103,10 +103,10 @@ int CINTtot_pgto_spinor(const int *bas, const int nbas)
         return s;
 }
 
-static int tot_cgto_accum(int (*f)(), const int *bas, const int nbas)
+static FINT tot_cgto_accum(FINT (*f)(), const FINT *bas, const FINT nbas)
 {
-        int i;
-        int s = 0;
+        FINT i;
+        FINT s = 0;
 
         for (i = 0; i < nbas; i++) {
                 s += (*f)(i, bas);
@@ -116,7 +116,7 @@ static int tot_cgto_accum(int (*f)(), const int *bas, const int nbas)
 /*
  * tot. contracted atomic spheric GTOs in a shell
  */
-int CINTtot_cgto_spheric(const int *bas, const int nbas)
+FINT CINTtot_cgto_spheric(const FINT *bas, const FINT nbas)
 {
         return tot_cgto_accum(&CINTcgto_spheric, bas, nbas);
 }
@@ -124,7 +124,7 @@ int CINTtot_cgto_spheric(const int *bas, const int nbas)
 /*
  * tot. contracted atomic spinors in a shell
  */
-int CINTtot_cgto_spinor(const int *bas, const int nbas)
+FINT CINTtot_cgto_spinor(const FINT *bas, const FINT nbas)
 {
         return tot_cgto_accum(&CINTcgto_spinor, bas, nbas);
 }
@@ -132,15 +132,15 @@ int CINTtot_cgto_spinor(const int *bas, const int nbas)
 /*
  * tot. contracted atomic spinors in a shell
  */
-int CINTtot_cgto_cart(const int *bas, const int nbas)
+FINT CINTtot_cgto_cart(const FINT *bas, const FINT nbas)
 {
         return tot_cgto_accum(&CINTcgto_cart, bas, nbas);
 }
 
-static void shells_cgto_offset(int (*f)(), int ao_loc[],
-                               const int *bas, const int nbas)
+static void shells_cgto_offset(FINT (*f)(), FINT ao_loc[],
+                               const FINT *bas, const FINT nbas)
 {
-        int i, s;
+        FINT i, s;
         for (i = 0, s = 0; i < nbas; i++) {
                 ao_loc[i] = s;
                 s += (*f)(i, bas);
@@ -149,7 +149,7 @@ static void shells_cgto_offset(int (*f)(), int ao_loc[],
 /*
  * offset of each shell for real spheric GTOs
  */
-void CINTshells_cart_offset(int ao_loc[], const int *bas, const int nbas)
+void CINTshells_cart_offset(FINT ao_loc[], const FINT *bas, const FINT nbas)
 {
         shells_cgto_offset(&CINTcgto_cart, ao_loc, bas, nbas);
 }
@@ -157,7 +157,7 @@ void CINTshells_cart_offset(int ao_loc[], const int *bas, const int nbas)
 /*
  * offset of each shell for real spheric GTOs
  */
-void CINTshells_spheric_offset(int ao_loc[], const int *bas, const int nbas)
+void CINTshells_spheric_offset(FINT ao_loc[], const FINT *bas, const FINT nbas)
 {
         shells_cgto_offset(&CINTcgto_spheric, ao_loc, bas, nbas);
 }
@@ -165,7 +165,7 @@ void CINTshells_spheric_offset(int ao_loc[], const int *bas, const int nbas)
 /*
  * offset of each shell for AO spinors
  */
-void CINTshells_spinor_offset(int ao_loc[], const int *bas, const int nbas)
+void CINTshells_spinor_offset(FINT ao_loc[], const FINT *bas, const FINT nbas)
 {
         shells_cgto_offset(&CINTcgto_spinor, ao_loc, bas, nbas);
 }
@@ -174,10 +174,10 @@ void CINTshells_spinor_offset(int ao_loc[], const int *bas, const int nbas)
 /*
  * GTO = x^{nx}y^{ny}z^{nz}e^{-ar^2}
  */
-void CINTcart_comp(int *nx, int *ny, int *nz, const int lmax)
+void CINTcart_comp(FINT *nx, FINT *ny, FINT *nz, const FINT lmax)
 {
-        int inc = 0;
-        int lx, ly, lz;
+        FINT inc = 0;
+        FINT lx, ly, lz;
 
         for (lx = lmax; lx >= 0; lx--) {
                 for (ly = lmax - lx; ly >= 0; ly--) {

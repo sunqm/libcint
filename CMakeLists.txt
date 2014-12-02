@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.1.3")
+set(cint_VERSION "2.2.0")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -11,7 +11,12 @@ find_package(BLAS REQUIRED)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/src)
+  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_BINARY_DIR}/src)
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/src/config.h.in"
+  "${PROJECT_BINARY_DIR}/src/config.h")
 
 set(cintSrc 
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c

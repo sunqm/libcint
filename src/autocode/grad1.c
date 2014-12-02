@@ -13,14 +13,14 @@
 #include "c2f.h"
 /* <NABLA i|OVLP |j> */
 static void CINTgout1e_cint1e_ipovlp_sph(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs) {
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
-int ix, iy, iz, n;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -38,10 +38,10 @@ gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
 gout += 3;
 }}
-int cint1e_ipovlp_sph(double *opij, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+FINT cint1e_ipovlp_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_ipovlp_sph;
@@ -49,14 +49,14 @@ return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
 C2F_(cint1e_ipovlp_sph)
 /* <NABLA i|OVLP |P DOT P j> */
 static void CINTgout1e_cint1e_ipkin_sph(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs) {
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
-int ix, iy, iz, n;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -110,10 +110,10 @@ gout[1] += + (-1*s[9]) + (-1*s[13]) + (-1*s[17]);
 gout[2] += + (-1*s[18]) + (-1*s[22]) + (-1*s[26]);
 gout += 3;
 }}
-int cint1e_ipkin_sph(double *opij, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 2, 0, 0, 3, 1, 0, 3};
+FINT cint1e_ipkin_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_ipkin_sph;
@@ -121,14 +121,14 @@ return CINT1e_drv(opij, &envs, 0.5, &c2s_sph_1e); }
 C2F_(cint1e_ipkin_sph)
 /* <NABLA i|NUC |j> */
 static void CINTgout1e_cint1e_ipnuc_sph(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs) {
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
-int ix, iy, iz, n;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -146,10 +146,10 @@ gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
 gout += 3;
 }}
-int cint1e_ipnuc_sph(double *opij, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+FINT cint1e_ipnuc_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_ipnuc_sph;
@@ -157,14 +157,14 @@ return CINT1e_nuc_drv(opij, &envs, 1, &c2s_sph_1e); }
 C2F_(cint1e_ipnuc_sph)
 /* <NABLA i|RINV |j> */
 static void CINTgout1e_cint1e_iprinv_sph(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs) {
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
-int ix, iy, iz, n;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -182,10 +182,10 @@ gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
 gout += 3;
 }}
-int cint1e_iprinv_sph(double *opij, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+FINT cint1e_iprinv_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_iprinv_sph;
@@ -193,14 +193,14 @@ return CINT1e_rinv_drv(opij, &envs, 1, &c2s_sph_1e); }
 C2F_(cint1e_iprinv_sph)
 /* <i|RINV |j> */
 static void CINTgout1e_cint1e_rinv_sph(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs) {
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
-int ix, iy, iz, n;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double s[1];
@@ -212,10 +212,10 @@ s[0] = g0[ix] * g0[iy] * g0[iz];
 gout[0] += + (1*s[0]);
 gout += 1;
 }}
-int cint1e_rinv_sph(double *opij, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
+FINT cint1e_rinv_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_rinv_sph;
@@ -224,18 +224,18 @@ C2F_(cint1e_rinv_sph)
 /* <k NABLA i|R12 |j l> : i,jin electron 1; k,lin electron 2
  * = (NABLA i j|R12 |k l) */
 static void CINTgout2e_cint2e_ip1_sph(double *g,
-double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
 const double *env = envs->env;
-const int nf = envs->nf;
-const int i_l = envs->i_l;
-const int j_l = envs->j_l;
-const int k_l = envs->k_l;
-const int l_l = envs->l_l;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
 const double *ri = envs->ri;
 const double *rj = envs->rj;
 const double *rk = envs->rk;
 const double *rl = envs->rl;
-int ix, iy, iz, i, n;
+FINT ix, iy, iz, i, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
@@ -304,15 +304,15 @@ gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
 gout += 3;
 }}}
-void cint2e_ip1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
-const int *bas, const int nbas, const double *env) {
-int ng[] = {1, 0, 0, 0, 0, 0, 0, 0};
+void cint2e_ip1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 0, 0, 0, 0, 0};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int cint2e_ip1_sph(double *opkijl, const int *shls,
-const int *atm, const int natm,
-const int *bas, const int nbas, const double *env, CINTOpt *opt) {
-int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+FINT cint2e_ip1_sph(double *opkijl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_cint2e_ip1_sph;
