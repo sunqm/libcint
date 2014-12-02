@@ -202,7 +202,7 @@
           (format fout fmt-op
                   (g?e-of op) ig ig0 right
                   (g?e-of op) (1+ ig) ig0 right
-                  (1+ ig) ig)
+                  ig (1+ ig))
           (format fout fmt-j (g?e-of op) ig ig0 right))))))
 (defun combo-ket (fout fmt ops-rev ig mask)
   (let* ((right (last-bit1 (ash ig (- mask))))
@@ -283,9 +283,7 @@ double *gout, const int nf, const int *idx,
 const double ai, const double aj,
 const int *shls,
 const int *atm, const int *bas, const double *env) {~%" intname)
-      (format fout "const int INC1 = 1;
-const double D1 = 1;
-const int i_sh = shls[0];
+      (format fout "const int i_sh = shls[0];
 const int j_sh = shls[1];
 const int i_l = bas(ANG_OF, i_sh);
 const int j_l = bas(ANG_OF, j_sh);
@@ -309,7 +307,7 @@ double *g0 = g;~%")
             (fmt-op (mkstr "G1E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a);
 G1E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a);
 n = ng[0] * ng[1] * 3;
-daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
+for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
             (fmt-j (mkstr "G1E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
 ;;; generate gout
@@ -480,9 +478,7 @@ for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
 ;;; generate function gout2e
       (format fout "static void CINTgout2e_~a(double *g,
 double *gout, const int *idx, const CINTEnvVars *envs, int gout_empty) {~%" intname)
-      (format fout "const int INC1 = 1;
-const double D1 = 1;
-const double *env = envs->env;
+      (format fout "const double *env = envs->env;
 const int nf = envs->nf;
 const int i_l = envs->i_l;
 const int j_l = envs->j_l;
@@ -514,7 +510,7 @@ double *g0 = g;~%")
             (fmt-op (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);
 G2E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);
 n = envs->g_size * 3;
-daxpy_(&n, &D1, g~a, &INC1, g~a, &INC1);~%"))
+for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
             (fmt-j (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len)))
 ;;; generate gout
