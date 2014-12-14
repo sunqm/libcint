@@ -5,10 +5,8 @@
 
 #include "config.h"
 
-void CINTprim_to_ctr_0(double *gc, const FINT nf, const double *gp,
-                       const FINT nprim, const FINT nctr, const double *coeff);
-void CINTprim_to_ctr_1(double *gc, const FINT nf, const double *gp,
-                       const FINT nprim, const FINT nctr, const double *coeff);
+void CINT2e_core(double *gout, double *g, double fac1i,
+                 CINTEnvVars *envs, FINT empty);
 
 void CINTgout2e(double *g, double *gout, const FINT *idx,
                 const CINTEnvVars *envs, FINT gout_empty);

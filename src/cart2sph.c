@@ -2705,7 +2705,7 @@ static void c2s_dgemm(const char transa, const char transb,
                       const double beta, double *c, const FINT ldc)
 {
 #if defined I8
-        int i, j, kp;
+        FINT i, j, kp;
         const double *pa, *pb;
         double btmp[k];
         for (j = 0; j < n; j++) {
@@ -2752,7 +2752,7 @@ static void c2s_zgemm(const char transa, const char transb,
                       const double complex beta, double complex *c, const FINT ldc)
 {
 #if defined I8
-        int i, j, kp;
+        FINT i, j, kp;
         const double complex *pa, *pb;
         double complex btmp[k];
         for (j = 0; j < n; j++) {
@@ -5518,39 +5518,23 @@ static void (*f_bra_spinor_si[])() = {
 /*
  * (i,k,l,j) -> (k,i,j,l)
  */
-static void dswap_ik_jl(double *new, const double *old,
-                        const FINT ni, const FINT nj, const FINT nk, const FINT nl)
-{
-        FINT j, l;
-        FINT dlo = ni * nk; // shift of (i,k,l++,j)
-        FINT djo = ni * nk * nl; // shift of (i,k,l,j++)
-        FINT djn = nk * ni; // shift of (k,i,j++,l)
-        FINT dln = nk * ni * nj; // shift of (k,i,j,l++)
-
-        for (l = 0; l < nl; l++)
-                for (j = 0; j < nj; j++) {
-                        CINTdmat_transpose(new + l * dln + j * djn,
-                                           old + l * dlo + j * djo, ni, nk);
-                }
-}
-
-/*
- * (i,k,l,j) -> (k,i,j,l)
- */
 static void zswap_ik_jl(double complex *new, const double complex *old,
                         const FINT ni, const FINT nj, const FINT nk, const FINT nl)
 {
         FINT j, l;
-        FINT dlo = ni * nk; // shift of (i,k,l++,j)
-        FINT djo = ni * nk * nl; // shift of (i,k,l,j++)
-        FINT djn = nk * ni; // shift of (k,i,j++,l)
-        FINT dln = nk * ni * nj; // shift of (k,i,j,l++)
+        FINT dlo = ni * nk; // stride of (i,k,l++,j)
+        FINT djo = ni * nk * nl; // stride of (i,k,l,j++)
+        FINT djn = nk * ni; // stride of (k,i,j++,l)
+        const double complex *pold;
 
-        for (l = 0; l < nl; l++)
+        for (l = 0; l < nl; l++) {
+                pold = old + l * dlo;
                 for (j = 0; j < nj; j++) {
-                        CINTzmat_transpose(new + l * dln + j * djn,
-                                           old + l * dlo + j * djo, ni, nk);
+                        CINTzmat_transpose(new, pold, ni, nk);
+                        new += djn;
+                        pold += djo;
                 }
+        }
 }
 
 
@@ -5561,8 +5545,10 @@ static void dcopy_ij(double *opij, const double *gctr,
 
         for (j = 0; j < mj; j++) {
                 for (i = 0; i < mi; i++) {
-                        opij[j*ni+i] = gctr[j*mi+i];
+                        opij[i] = gctr[i];
                 }
+                opij += ni;
+                gctr += mi;
         }
 }
 static void zcopy_ij(double complex *opij, const double complex *gctr, 
@@ -5578,172 +5564,110 @@ static void zcopy_ij(double complex *opij, const double complex *gctr,
 }
 
 /*
+ * gctr(i,k,l,j) -> fijkl(i,j,k,l)
  * fijkl(ic:ic-1+di,jc:jc-1+dj,kc:kc-1+dk,lc:lc-1+dl)
- * fijkl(ni,nj,nk,nl), gctr(mk,mi,mj,ml)
- * gctr(k,i,j,l) -> fijkl(i,j,k,l)
+ * fijkl(ni,nj,nk,nl), gctr(mi,mk,ml,mj)
  */
-static void dcopy_kijl(double *fijkl, const double *gctr, 
+static void dcopy_iklj(double *fijkl, const double *gctr, 
                        const FINT ni, const FINT nj, const FINT nk, const FINT nl,
                        const FINT mi, const FINT mj, const FINT mk, const FINT ml)
 {
+        const FINT nij = ni * nj;
+        const FINT nijk = nij * nk;
+        const FINT mik = mi * mk;
+        const FINT mikl = mik * ml;
         FINT i, j, k, l;
-        double *pl, *pk, *pk1, *pk2, *pj;
-        const double *pgctr, *pgctr1, *pgctr2;
+        double *pijkl;
+        const double *pgctr;
 
-        for (l = 0; l < ml; l++) {
-                pl = fijkl + l * nk * ni * nj;
-                switch (mk) {
-                case 1:
-                        pgctr = gctr + l * mi * mj;
-                        switch (mi) {
-                        case 1:
-                                for (j = 0; j < mj; j++) {
-                                        pl[j*ni] = pgctr[j];
-                                }
-                                break;
-                        case 3:
-                                for (j = 0; j < mj; j++) {
-                                        pj = pl + j * ni;
-                                        pj[0] = pgctr[0];
-                                        pj[1] = pgctr[1];
-                                        pj[2] = pgctr[2];
-                                        pgctr += 3;
-                                }
-                                break;
-                        case 5:
-                                for (j = 0; j < mj; j++) {
-                                        pj = pl + j * ni;
-                                        pj[0] = pgctr[0];
-                                        pj[1] = pgctr[1];
-                                        pj[2] = pgctr[2];
-                                        pj[3] = pgctr[3];
-                                        pj[4] = pgctr[4];
-                                        pgctr += 5;
-                                }
-                                break;
-                        default:
-                                for (j = 0; j < mj; j++) {
-                                        pj = pl + j * ni;
-                                        for (i = 0; i < mi; i++) {
-                                                pj[i] = pgctr[i];
-                                        }
-                                        pgctr += mi;
-                                }
-                        }
-                        break;
-                case 3:
-                        pk  = pl + 0 * ni * nj;
-                        pk1 = pl + 1 * ni * nj;
-                        pk2 = pl + 2 * ni * nj;
-                        pgctr  = gctr + l * 3 * mi * mj + 0;
-                        pgctr1 = gctr + l * 3 * mi * mj + 1;
-                        pgctr2 = gctr + l * 3 * mi * mj + 2;
-                        switch (mi) {
-                        case 1:
-                                for (j = 0; j < mj; j++) {
-                                        pk [j*ni] = pgctr [j*3];
-                                        pk1[j*ni] = pgctr1[j*3];
-                                        pk2[j*ni] = pgctr2[j*3];
-                                }
-                                break;
-                        case 3:
-                                for (j = 0; j < mj; j++) {
-                                        pk [j*ni+0] = pgctr [0*3];
-                                        pk [j*ni+1] = pgctr [1*3];
-                                        pk [j*ni+2] = pgctr [2*3];
-                                        pk1[j*ni+0] = pgctr1[0*3];
-                                        pk1[j*ni+1] = pgctr1[1*3];
-                                        pk1[j*ni+2] = pgctr1[2*3];
-                                        pk2[j*ni+0] = pgctr2[0*3];
-                                        pk2[j*ni+1] = pgctr2[1*3];
-                                        pk2[j*ni+2] = pgctr2[2*3];
-                                        pgctr  += 3*3;
-                                        pgctr1 += 3*3;
-                                        pgctr2 += 3*3;
-                                }
-                                break;
-                        case 5:
-                                for (j = 0; j < mj; j++) {
-                                        pk [j*ni+0] = pgctr [0*3];
-                                        pk [j*ni+1] = pgctr [1*3];
-                                        pk [j*ni+2] = pgctr [2*3];
-                                        pk [j*ni+3] = pgctr [3*3];
-                                        pk [j*ni+4] = pgctr [4*3];
-                                        pk1[j*ni+0] = pgctr1[0*3];
-                                        pk1[j*ni+1] = pgctr1[1*3];
-                                        pk1[j*ni+2] = pgctr1[2*3];
-                                        pk1[j*ni+3] = pgctr1[3*3];
-                                        pk1[j*ni+4] = pgctr1[4*3];
-                                        pk2[j*ni+0] = pgctr2[0*3];
-                                        pk2[j*ni+1] = pgctr2[1*3];
-                                        pk2[j*ni+2] = pgctr2[2*3];
-                                        pk2[j*ni+3] = pgctr2[3*3];
-                                        pk2[j*ni+4] = pgctr2[4*3];
-                                        pgctr  += 5*3;
-                                        pgctr1 += 5*3;
-                                        pgctr2 += 5*3;
-                                }
-                                break;
-                        default:
-                                for (j = 0; j < mj; j++) {
-                                        for (i = 0; i < mi; i++) {
-                                                pk [j*ni+i] = pgctr [3*i];
-                                                pk1[j*ni+i] = pgctr1[3*i];
-                                                pk2[j*ni+i] = pgctr2[3*i];
-                                        }
-                                        pgctr  += 3 * mi;
-                                        pgctr1 += 3 * mi;
-                                        pgctr2 += 3 * mi;
-                                }
-                        }
-                        break;
-                default:
+        switch (mi) {
+        case 1:
+                for (l = 0; l < ml; l++) {
                         for (k = 0; k < mk; k++) {
-                                pk = pl + k * ni * nj;
-                                pgctr = gctr + l * mk * mi * mj + k;
-                                //for (j = 0; j < mj; j++) {
-                                //        pj = pk + j * ni;
-                                //        for (i = 0; i < mi; i++) {
-                                //                pj[i] = *pgctr;
-                                //                pgctr += mk;
-                                //        }
-                                //}
-                                switch (mi) {
-                                case 1:
-                                        for (j = 0; j < mj; j++) {
-                                                pk[j*ni] = pgctr[j*mk];
-                                        }
-                                        break;
-                                case 3:
-                                        for (j = 0; j < mj; j++) {
-                                                pj = pk + j * ni;
-                                                pj[0] = pgctr[0*mk];
-                                                pj[1] = pgctr[1*mk];
-                                                pj[2] = pgctr[2*mk];
-                                                pgctr += mk*3;
-                                        }
-                                        break;
-                                case 5:
-                                        for (j = 0; j < mj; j++) {
-                                                pj = pk + j * ni;
-                                                pj[0] = pgctr[0*mk];
-                                                pj[1] = pgctr[1*mk];
-                                                pj[2] = pgctr[2*mk];
-                                                pj[3] = pgctr[3*mk];
-                                                pj[4] = pgctr[4*mk];
-                                                pgctr += mk*5;
-                                        }
-                                        break;
-                                default:
-                                        for (j = 0; j < mj; j++) {
-                                                pj = pk + j * ni;
-                                                for (i = 0; i < mi; i++) {
-                                                        pj[i] = pgctr[mk*i];
-                                                }
-                                                pgctr += mk*mi;
-                                        }
+                                pijkl = fijkl + k * nij;
+                                pgctr = gctr + k * mi;
+                                for (j = 0; j < mj; j++) {
+                                        pijkl[0] = pgctr[0];
+                                        pijkl += ni;
+                                        pgctr += mikl;
                                 }
                         }
+                        fijkl += nijk;
+                        gctr += mik;
+                }
+                break;
+        case 3:
+                for (l = 0; l < ml; l++) {
+                        for (k = 0; k < mk; k++) {
+                                pijkl = fijkl + k * nij;
+                                pgctr = gctr + k * mi;
+                                for (j = 0; j < mj; j++) {
+                                        pijkl[0] = pgctr[0];
+                                        pijkl[1] = pgctr[1];
+                                        pijkl[2] = pgctr[2];
+                                        pijkl += ni;
+                                        pgctr += mikl;
+                                }
+                        }
+                        fijkl += nijk;
+                        gctr += mik;
+                }
+                break;
+        case 5:
+                for (l = 0; l < ml; l++) {
+                        for (k = 0; k < mk; k++) {
+                                pijkl = fijkl + k * nij;
+                                pgctr = gctr + k * mi;
+                                for (j = 0; j < mj; j++) {
+                                        pijkl[0] = pgctr[0];
+                                        pijkl[1] = pgctr[1];
+                                        pijkl[2] = pgctr[2];
+                                        pijkl[3] = pgctr[3];
+                                        pijkl[4] = pgctr[4];
+                                        pijkl += ni;
+                                        pgctr += mikl;
+                                }
+                        }
+                        fijkl += nijk;
+                        gctr += mik;
+                }
+                break;
+        case 7:
+                for (l = 0; l < ml; l++) {
+                        for (k = 0; k < mk; k++) {
+                                pijkl = fijkl + k * nij;
+                                pgctr = gctr + k * mi;
+                                for (j = 0; j < mj; j++) {
+                                        pijkl[0] = pgctr[0];
+                                        pijkl[1] = pgctr[1];
+                                        pijkl[2] = pgctr[2];
+                                        pijkl[3] = pgctr[3];
+                                        pijkl[4] = pgctr[4];
+                                        pijkl[5] = pgctr[5];
+                                        pijkl[6] = pgctr[6];
+                                        pijkl += ni;
+                                        pgctr += mikl;
+                                }
+                        }
+                        fijkl += nijk;
+                        gctr += mik;
+                }
+                break;
+        default:
+                for (l = 0; l < ml; l++) {
+                        for (k = 0; k < mk; k++) {
+                                pijkl = fijkl + k * nij;
+                                pgctr = gctr + k * mi;
+                                for (j = 0; j < mj; j++) {
+                                        for (i = 0; i < mi; i++) {
+                                                pijkl[i] = pgctr[i];
+                                        }
+                                        pijkl += ni;
+                                        pgctr += mikl;
+                                }
+                        }
+                        fijkl += nijk;
+                        gctr += mik;
                 }
         }
 }
@@ -5772,64 +5696,37 @@ static void zcopy_kijl(double complex *fijkl, const double complex *gctr,
         }
 }
 
-/*
- * gctr(i,k,l,j) -> fijkl(i,j,k,l)
-static void dcopy_iklj(double *fijkl, const double *gctr, 
-                       const FINT ni, const FINT nj, const FINT nk, const FINT nl,
-                       const FINT mi, const FINT mj, const FINT mk, const FINT ml)
-{
-        FINT i, j, k, l;
-        double *pl, *pk, *pj;
-        const double *pgctr;
-
-        for (l = 0; l < ml; l++) {
-                pl = fijkl + l * nk * ni * nj;
-                for (k = 0; k < mk; k++) {
-                        pk = pl + k * ni * nj;
-                        pgctr = gctr + l * mi * mk + k * mi;
-                        for (j = 0; j < mj; j++) {
-                                pj = pk + j * ni;
-                                for (i = 0; i < mi; i++) {
-                                        pj[i] = pgctr[i];
-                                }
-                                pgctr += mi * mk * ml;
-                        }
-                }
-        }
-} */
-
 
 /*
  * 1e integrals, cartesian to real spheric.
  */
-void c2s_sph_1e(double *opij, const double *gctr,
-                const FINT *shls, const FINT *bas)
+void c2s_sph_1e(double *opij, const double *gctr, CINTEnvVars *envs)
 {
-        const FINT i_sh = shls[0];
-        const FINT j_sh = shls[1];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
         const FINT di = i_l * 2 + 1;
         const FINT dj = j_l * 2 + 1;
         const FINT ni = di * i_ctr;
         const FINT nj = dj * j_ctr;
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nf = nfi * nfj;
+        const FINT nfi = envs->nfi;
+        const FINT nf = envs->nf;
         FINT ic, jc;
-        double *const buf1 = (double *)malloc(sizeof(double) * di*nfj*2);
-        double *const buf2 = buf1 + di * nfj;
+        double *const buf1 = (double *)malloc(sizeof(double) * nfi*dj*2);
+        double *const buf2 = buf1 + nfi*dj;
+        double *pij;
         double *tmp1;
 
-        for (jc = 0; jc < nj; jc += dj)
+        for (jc = 0; jc < nj; jc += dj) {
                 for (ic = 0; ic < ni; ic += di) {
-                        tmp1 = (f_bra_sph[i_l])(buf1, nfj, gctr, i_l);
-                        tmp1 = (f_ket_sph[j_l])(buf2, di, tmp1, j_l);
-                        dcopy_ij(opij+ni*jc+ic, tmp1, ni, nj, di, dj);
-                        gctr += nf;
-                }
+        pij = opij + ni * jc + ic;
+        tmp1 = (f_ket_sph[j_l])(buf1, nfi , gctr, j_l);
+        tmp1 = (f_bra_sph[i_l])(buf2, dj, tmp1, i_l);
+
+        dcopy_ij(pij, tmp1, ni, nj, di, dj);
+        gctr += nf;
+                } }
         free(buf1);
 }
 
@@ -5837,25 +5734,25 @@ void c2s_sph_1e(double *opij, const double *gctr,
 /*
  * 1e integrals, cartesian to spin free spinor.
  */
-void c2s_sf_1e(double complex *opij, const double *gctr,
-               const FINT *shls, const FINT *bas)
+void c2s_sf_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT ni = di * i_ctr;
         const FINT nj = dj * j_ctr;
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
+        const FINT nfj = envs->nfj;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfj;
+        const FINT nf = envs->nf;
         FINT ic, jc;
         double complex *const tmp1 = malloc(sizeof(double complex) * di*nf2j * 2);
         double complex *const tmp2 = tmp1 + di*nf2j;
@@ -5870,25 +5767,25 @@ void c2s_sf_1e(double complex *opij, const double *gctr,
 
         free(tmp1);
 }
-void c2s_sf_1ei(double complex *opij, const double *gctr,
-                const FINT *shls, const FINT *bas)
+void c2s_sf_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT ni = di * i_ctr;
         const FINT nj = dj * j_ctr;
-        const FINT nfi = CINTlen_cart(i_l);
         const FINT nfj = CINTlen_cart(j_l);
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfj;
+        const FINT nf = envs->nf;
         FINT ic, jc;
         double complex *const tmp1 = malloc(sizeof(double complex) * di*nf2j * 2);
         double complex *const tmp2 = tmp1 + di*nf2j;
@@ -5908,26 +5805,27 @@ void c2s_sf_1ei(double complex *opij, const double *gctr,
 /*
  * 1e integrals, cartesian to spinor.
  */
-void c2s_si_1e(double complex *opij, const double *gctr,
-               const FINT *shls, const FINT *bas)
+void c2s_si_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT ni = di * i_ctr;
         const FINT nj = dj * j_ctr;
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
         const FINT nf2i = nfi + nfi;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfj;
+        const FINT nf = envs->nf;
         FINT ic, jc;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
@@ -5958,26 +5856,27 @@ void c2s_si_1e(double complex *opij, const double *gctr,
                 }
         free(tmp1);
 }
-void c2s_si_1ei(double complex *opij, const double *gctr,
-                const FINT *shls, const FINT *bas)
+void c2s_si_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT ni = di * i_ctr;
         const FINT nj = dj * j_ctr;
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
         const FINT nf2i = nfi + nfi;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfj;
+        const FINT nf = envs->nf;
         FINT ic, jc;
         const double *gc_x = gctr;
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
@@ -6015,21 +5914,18 @@ void c2s_si_1ei(double complex *opij, const double *gctr,
  *
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  */
-void c2s_sph_2e1(double *fijkl, const double *gctr,
-                 const FINT *shls, const FINT *bas)
+static double *sph2e_inner(double *gsph, double *gcart,
+                           FINT l, FINT nbra, FINT ncall, FINT sizsph, FINT sizcart);
+void c2s_sph_2e1(double *fijkl, const double *gctr, CINTEnvVars *envs)
 {
-        const FINT i_sh = shls[0];
-        const FINT j_sh = shls[1];
-        const FINT k_sh = shls[2];
-        const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT l_l = envs->l_l;
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = i_l * 2 + 1;
         const FINT dj = j_l * 2 + 1;
         const FINT dk = k_l * 2 + 1;
@@ -6038,45 +5934,59 @@ void c2s_sph_2e1(double *fijkl, const double *gctr,
         const FINT nj = dj * j_ctr;
         const FINT nk = dk * k_ctr;
         const FINT nl = dl * l_ctr;
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
-        const FINT nf = nfi * nfk * nfl * nfj;
-        const FINT d_i = di * nfk * nfl;
-        const FINT d_j = nfk * nfl * nfj;
-        const FINT d_k = dk * di * dj;
-        const FINT d_l = di * dj * nfl;
+        const FINT nfi = envs->nfi;
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
+        const FINT nfik = nfi * nfk;
+        const FINT nfikl = nfik * nfl;
+        const FINT dlj = dl * dj;
+        const FINT nf = envs->nf;
         FINT ofj = ni;
         FINT ofk = ni * nj;
         FINT ofl = nk * ni * nj;
         FINT ic, jc, kc, lc;
-        const FINT buflen = (di*nfk*nfl*nfj + 16) & 0xfffffff0;
-        double *const buf1 = (double *)malloc(sizeof(double)*buflen*3);
+        const FINT buflen = (nfikl*dj + 16) & 0xfffffff0;
+        double *const buf1 = (double *)malloc(sizeof(double)*buflen*4);
         double *const buf2 = buf1 + buflen;
         double *const buf3 = buf2 + buflen;
-        double *pfijkl;
-        double *tmp1;
+        double *const buf4 = buf3 + buflen;
+        double *pfijkl, *tmp1;
 
         for (lc = 0; lc < nl; lc += dl) {
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
-        tmp1 = (f_bra_sph[i_l])(buf1, d_j, gctr, i_l);
-        tmp1 = (f_ket_sph[j_l])(buf2, d_i, tmp1, j_l);
-        gctr += nf;
+        tmp1 = (f_ket_sph[j_l])(buf1, nfikl, gctr, j_l);
+        tmp1 = sph2e_inner(buf2, tmp1, l_l, nfik, dj, nfik*dl, nfikl);
+        tmp1 = sph2e_inner(buf3, tmp1, k_l, nfi, dlj, nfi*dk, nfik);
 
-        dswap_ik_jl(buf3, tmp1, di, dj, nfk, nfl);
-        tmp1 = (f_bra_sph[k_l])(buf1, d_l, buf3, k_l);
-        tmp1 = (f_ket_sph[l_l])(buf2, d_k, tmp1, l_l);
+        tmp1 = (f_bra_sph[i_l])(buf4, dk*dlj, tmp1, i_l);
+
         pfijkl = fijkl + ofl * lc + ofk * kc + ofj * jc + ic;
-
-        dcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        dcopy_iklj(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
+        gctr += nf;
                                 } } } }
 
         free(buf1);
 }
 void c2s_sph_2e2() {};
+/*
+ * use f_ket to transform k,l for gctr(i,j,k,l), where
+ * sizsph = nbra * (2*l+1)
+ * sizcart = nbra * (l*(l+1)/2)
+ * and return the pointer to the buffer which holds the transformed gctr
+ */
+static double *sph2e_inner(double *gsph, double *gcart,
+                           FINT l, FINT nbra, FINT ncall, FINT sizsph, FINT sizcart)
+{
+        double *(*fket)() = f_ket_sph[l];
+        double *ptr0 = (*fket)(gsph, nbra, gcart, l);
+        FINT n;
+        for (n = 1; n < ncall; n++) {
+                (*fket)(gsph+n*sizsph, nbra, gcart+n*sizcart, l);
+        }
+        return ptr0;
+}
 
 
 /*
@@ -6085,31 +5995,27 @@ void c2s_sph_2e2() {};
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-void c2s_sf_2e1(double complex *opij, const double *gctr,
-                const FINT *shls, const FINT *bas)
+void c2s_sf_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT k_sh = shls[2];
-        const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfk * nfl * nfj;
+        const FINT nf = envs->nf;
         const FINT no = di * nfk * nfl * dj;
         const FINT d_i = di * nfk * nfl;
         const FINT d_j = nfk * nfl * nfj;
@@ -6126,31 +6032,27 @@ void c2s_sf_2e1(double complex *opij, const double *gctr,
 
         free(tmp1);
 }
-void c2s_sf_2e1i(double complex *opij, const double *gctr,
-                 const FINT *shls, const FINT *bas)
+void c2s_sf_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT k_sh = shls[2];
-        const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfk * nfl * nfj;
+        const FINT nf = envs->nf;
         const FINT no = di * nfk * nfl * dj;
         const FINT d_i = di * nfk * nfl;
         const FINT d_j = nfk * nfl * nfj;
@@ -6174,25 +6076,26 @@ void c2s_sf_2e1i(double complex *opij, const double *gctr,
  *
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-void c2s_sf_2e2(double complex *fijkl, const double complex *opij,
-                const FINT *shls, const FINT *bas)
+void c2s_sf_2e2(double complex *fijkl, const double complex *opij, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
         const FINT k_sh = shls[2];
         const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT l_l = envs->l_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
         const FINT k_kp = bas(KAPPA_OF, k_sh);
         const FINT l_kp = bas(KAPPA_OF, l_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT dk = _len_spinor(k_l, k_kp);
@@ -6201,8 +6104,8 @@ void c2s_sf_2e2(double complex *fijkl, const double complex *opij,
         const FINT nj = dj * j_ctr;
         const FINT nk = dk * k_ctr;
         const FINT nl = dl * l_ctr;
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2k = nfk + nfk;
         const FINT nf2l = nfl + nfl;
         const FINT d_k = dk * di * dj;
@@ -6234,25 +6137,26 @@ void c2s_sf_2e2(double complex *fijkl, const double complex *opij,
 
         free(tmp1);
 }
-void c2s_sf_2e2i(double complex *fijkl, const double complex *opij,
-                 const FINT *shls, const FINT *bas)
+void c2s_sf_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
         const FINT k_sh = shls[2];
         const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT l_l = envs->l_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
         const FINT k_kp = bas(KAPPA_OF, k_sh);
         const FINT l_kp = bas(KAPPA_OF, l_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT dk = _len_spinor(k_l, k_kp);
@@ -6261,8 +6165,8 @@ void c2s_sf_2e2i(double complex *fijkl, const double complex *opij,
         const FINT nj = dj * j_ctr;
         const FINT nk = dk * k_ctr;
         const FINT nl = dl * l_ctr;
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2k = nfk + nfk;
         const FINT nf2l = nfl + nfl;
         const FINT d_k = dk * di * dj;
@@ -6301,32 +6205,29 @@ void c2s_sf_2e2i(double complex *fijkl, const double complex *opij,
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  * opij: partial transformed GTO integrals, ordered as <ik|lj>
  */
-void c2s_si_2e1(double complex *opij, const double *gctr,
-                const FINT *shls, const FINT *bas)
+void c2s_si_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT k_sh = shls[2];
-        const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2i = nfi + nfi;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfk * nfl * nfj;
+        const FINT nf = envs->nf;
         const FINT no = di * nfk * nfl * dj;
         const FINT d_i = di * nfk * nfl;
         const FINT d_j = nfk * nfl * nf2j;
@@ -6361,32 +6262,29 @@ void c2s_si_2e1(double complex *opij, const double *gctr,
 
         free(tmp1);
 }
-void c2s_si_2e1i(double complex *opij, const double *gctr,
-                 const FINT *shls, const FINT *bas)
+void c2s_si_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
-        const FINT k_sh = shls[2];
-        const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2i = nfi + nfi;
         const FINT nf2j = nfj + nfj;
-        const FINT nf = nfi * nfk * nfl * nfj;
+        const FINT nf = envs->nf;
         const FINT no = di * nfk * nfl * dj;
         const FINT d_i = di * nfk * nfl;
         const FINT d_j = nfk * nfl * nf2j;
@@ -6480,25 +6378,26 @@ static void si2e_swap(double complex *new,
                         }
                 }
 }
-void c2s_si_2e2(double complex *fijkl, const double complex *opij,
-                const FINT *shls, const FINT *bas)
+void c2s_si_2e2(double complex *fijkl, const double complex *opij, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
         const FINT k_sh = shls[2];
         const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT l_l = envs->l_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
         const FINT k_kp = bas(KAPPA_OF, k_sh);
         const FINT l_kp = bas(KAPPA_OF, l_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT dk = _len_spinor(k_l, k_kp);
@@ -6507,8 +6406,8 @@ void c2s_si_2e2(double complex *fijkl, const double complex *opij,
         const FINT nj = dj * j_ctr;
         const FINT nk = dk * k_ctr;
         const FINT nl = dl * l_ctr;
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2k = nfk + nfk;
         const FINT nf2l = nfl + nfl;
         const FINT d_k = dk * di * dj;
@@ -6548,25 +6447,26 @@ void c2s_si_2e2(double complex *fijkl, const double complex *opij,
 
         free(tmp1);
 }
-void c2s_si_2e2i(double complex *fijkl, const double complex *opij,
-                 const FINT *shls, const FINT *bas)
+void c2s_si_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars *envs)
 {
+        const FINT *shls = envs->shls;
+        const FINT *bas = envs->bas;
         const FINT i_sh = shls[0];
         const FINT j_sh = shls[1];
         const FINT k_sh = shls[2];
         const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT l_l = envs->l_l;
         const FINT i_kp = bas(KAPPA_OF, i_sh);
         const FINT j_kp = bas(KAPPA_OF, j_sh);
         const FINT k_kp = bas(KAPPA_OF, k_sh);
         const FINT l_kp = bas(KAPPA_OF, l_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
         const FINT di = _len_spinor(i_l, i_kp);
         const FINT dj = _len_spinor(j_l, j_kp);
         const FINT dk = _len_spinor(k_l, k_kp);
@@ -6575,8 +6475,8 @@ void c2s_si_2e2i(double complex *fijkl, const double complex *opij,
         const FINT nj = dj * j_ctr;
         const FINT nk = dk * k_ctr;
         const FINT nl = dl * l_ctr;
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT nf2k = nfk + nfk;
         const FINT nf2l = nfl + nfl;
         const FINT d_k = dk * di * dj;
@@ -6620,18 +6520,13 @@ void c2s_si_2e2i(double complex *fijkl, const double complex *opij,
 /*
  * 1e integrals, reorder cartesian integrals.
  */
-void c2s_cart_1e(double *opij, const double *gctr,
-                 const FINT *shls, const FINT *bas)
+void c2s_cart_1e(double *opij, const double *gctr, CINTEnvVars *envs)
 {
-        const FINT i_sh = shls[0];
-        const FINT j_sh = shls[1];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nf = nfi * nfj;
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nf = envs->nf;
         const FINT ni = nfi * i_ctr;
         const FINT nj = nfj * j_ctr;
         FINT ic, jc;
@@ -6648,33 +6543,24 @@ void c2s_cart_1e(double *opij, const double *gctr,
 /*
  * 2e integrals, reorder cartesian integrals.
  */
-void c2s_cart_2e1(double *fijkl, const double *gctr,
-                  const FINT *shls, const FINT *bas)
+void c2s_cart_2e1(double *fijkl, const double *gctr, CINTEnvVars *envs)
 {
-        const FINT i_sh = shls[0];
-        const FINT j_sh = shls[1];
-        const FINT k_sh = shls[2];
-        const FINT l_sh = shls[3];
-        const FINT i_l = bas(ANG_OF, i_sh);
-        const FINT j_l = bas(ANG_OF, j_sh);
-        const FINT k_l = bas(ANG_OF, k_sh);
-        const FINT l_l = bas(ANG_OF, l_sh);
-        const FINT i_ctr = bas(NCTR_OF, i_sh);
-        const FINT j_ctr = bas(NCTR_OF, j_sh);
-        const FINT k_ctr = bas(NCTR_OF, k_sh);
-        const FINT l_ctr = bas(NCTR_OF, l_sh);
-        const FINT nfi = CINTlen_cart(i_l);
-        const FINT nfj = CINTlen_cart(j_l);
-        const FINT nfk = CINTlen_cart(k_l);
-        const FINT nfl = CINTlen_cart(l_l);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT l_ctr = envs->l_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT nfl = envs->nfl;
         const FINT ni = nfi * i_ctr;
         const FINT nj = nfj * j_ctr;
         const FINT nk = nfk * k_ctr;
         const FINT nl = nfl * l_ctr;
-        const FINT nf = nfk * nfi * nfj * nfl;
+        const FINT nf = envs->nf;
         FINT ofj = ni;
         FINT ofk = ni * nj;
-        FINT ofl = nk * ni * nj;
+        FINT ofl = ni * nj * nk;
         FINT ic, jc, kc, lc;
         double *pfijkl;
 
@@ -6683,12 +6569,88 @@ void c2s_cart_2e1(double *fijkl, const double *gctr,
                         for (jc = 0; jc < nj; jc += nfj)
                                 for (ic = 0; ic < ni; ic += nfi) {
         pfijkl = fijkl + ofl * lc + ofk * kc + ofj * jc + ic;
-        dcopy_kijl(pfijkl, gctr, ni, nj, nk, nl, nfi, nfj, nfk, nfl);
+        dcopy_iklj(pfijkl, gctr, ni, nj, nk, nl, nfi, nfj, nfk, nfl);
         gctr += nf;
                                 }
 }
 void c2s_cart_2e2() {};
 
+
+/*************************************************
+ *
+ * 3-center 2-electron integral transformation
+ *
+ *************************************************/
+void c2s_sph_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
+{
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT di = i_l * 2 + 1;
+        const FINT dj = j_l * 2 + 1;
+        const FINT dk = k_l * 2 + 1;
+        const FINT ni = di * i_ctr;
+        const FINT nj = dj * j_ctr;
+        const FINT nk = dk * k_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfk = envs->nfk;
+        const FINT nf = envs->nf;
+        const FINT nfik = nfi * nfk;
+        FINT ofj = ni;
+        FINT ofk = ni * nj;
+        FINT ic, jc, kc;
+        const FINT buflen = (nfi*nfk*dj + 16) & 0xfffffff0;
+        double *const buf1 = (double *)malloc(sizeof(double)*buflen*3);
+        double *const buf2 = buf1 + buflen;
+        double *const buf3 = buf2 + buflen;
+        double *pijk;
+        double *tmp1;
+
+        for (kc = 0; kc < nk; kc += dk) {
+                for (jc = 0; jc < nj; jc += dj) {
+                        for (ic = 0; ic < ni; ic += di) {
+        tmp1 = (f_ket_sph[j_l])(buf1, nfik, gctr, j_l);
+        tmp1 = sph2e_inner(buf2, tmp1, k_l, nfi, dj, nfi*dk, nfik);
+        tmp1 = (f_bra_sph[i_l])(buf3, dk*dj, tmp1, i_l);
+        pijk = bufijk + ofk * kc + ofj * jc + ic;
+        dcopy_iklj(pijk, tmp1, ni, nj, nk, 1, di, dj, dk, 1);
+        gctr += nf;
+                        } } }
+        free(buf1);
+
+}
+void c2s_sph_3c2e2() {};
+
+void c2s_cart_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
+{
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT ni = nfi * i_ctr;
+        const FINT nj = nfj * j_ctr;
+        const FINT nk = nfk * k_ctr;
+        const FINT nf = envs->nf;
+        FINT ofj = ni;
+        FINT ofk = ni * nj;
+        FINT ic, jc, kc;
+        double *pijk;
+
+        for (kc = 0; kc < nk; kc += nfk) {
+                for (jc = 0; jc < nj; jc += nfj) {
+                        for (ic = 0; ic < ni; ic += nfi) {
+        pijk = bufijk + ofk * kc + ofj * jc + ic;
+        dcopy_iklj(pijk, gctr, ni, nj, nk, 1, nfi, nfj, nfk, 1);
+        gctr += nf;
+                        } } }
+
+}
+void c2s_cart_3c2e2() {};
 
 
 /*************************************************

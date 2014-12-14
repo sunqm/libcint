@@ -1690,7 +1690,7 @@ _g0_4d_default:
 normal_end:
         return;
 error:
-        printf("Dimension error for CINTg0_2e_lj2d4d: iklj = %d %d %d %d",
+        fprintf(stderr, "Dimension error for CINTg0_2e_lj2d4d: iklj = %d %d %d %d",
                (int)envs->li_ceil, (int)envs->lk_ceil,
                (int)envs->ll_ceil, (int)envs->lj_ceil);
         exit(1);

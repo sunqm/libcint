@@ -106,6 +106,12 @@ void CINTx1j_1e(double *f, const double *g, const double rj[3],
 void CINTprim_to_ctr(double *gc, const FINT nf, const double *gp,
                      const FINT inc, const FINT nprim,
                      const FINT nctr, const double *pcoeff);
+void CINTprim_to_ctr_0(double *gc, const FINT nf, const double *gp,
+                       const FINT nprim, const FINT nctr, const double *coeff);
+void CINTprim_to_ctr_1(double *gc, const FINT nf, const double *gp,
+                       const FINT nprim, const FINT nctr, const double *coeff);
+void CINTprim_to_ctr_opt(double *gc, const FINT nf, const double *gp,
+                         double *non0coeff, FINT *non0idx, FINT non0ctr);
 
 double CINTcommon_fac_sp(FINT l);
 

@@ -34,6 +34,13 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
 void CINTOpt_set_non0coeff(CINTOpt *opt, const FINT *atm, const FINT natm,
                            const FINT *bas, const FINT nbas, const double *env);
 
+void CINTOpt_set_3cindex_xyz(CINTOpt *opt, FINT *ng,
+                             const FINT *atm, const FINT natm,
+                             const FINT *bas, const FINT nbas, const double *env);
+void CINTOpt_set_2cindex_xyz(CINTOpt *opt, FINT *ng,
+                             const FINT *atm, const FINT natm,
+                             const FINT *bas, const FINT nbas, const double *env);
+
 // optimizer examples
 void CINTno_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
                       const FINT *bas, const FINT nbas, const double *env);

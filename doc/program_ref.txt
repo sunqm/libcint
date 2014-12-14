@@ -19,7 +19,7 @@ C routine
     dim = CINTgto_spinor(bas_id, bas);
     f1e(buf, shls, atm, natm, bas, nbas, env);
     f2e(buf, shls, atm, natm, bas, nbas, env, opt);
-    f2e_optimizer(&opt, atm, nbat, bas, nbas, env);
+    f2e_optimizer(&opt, atm, natm, bas, nbas, env);
     CINTdel_optimizer(&opt);
 
 * buf:  column-major double precision array.
@@ -36,7 +36,7 @@ C routine
     - `atm[i*6+1]` env offset to save coordinates
       (`env[atm[i*6+1]]`, `env[atm[i*6+1]+1]`, `env[atm[i*6+1]+2]`) are (x,y,z)
     - `atm[i*6+2]` nuclear model of atom i, = 2 indicates gaussian nuclear model
-    - `atm[i*6+3]` unused
+    - `atm[i*6+3]` env offset to save nuclear mass
     - `atm[i*6+4]` unused
     - `atm[i*6+5]` unused
 * natm: int, number of atoms, natm has no effect __except nuclear
@@ -116,7 +116,7 @@ Fortran routine
     dim = CINTgto_spinor(bas_id, bas)
     call f1e(buf, shls, atm, natm, bas, nbas, env)
     call f2e(buf, shls, atm, natm, bas, nbas, env, opt)
-    call f2e_optimizer(opt, atm, nbat, bas, nbas, env)
+    call f2e_optimizer(opt, atm, natm, bas, nbas, env)
     call CINTdel_optimizer(opt)
 
 * atm and bas are 2D integer array
