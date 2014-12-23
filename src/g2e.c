@@ -293,7 +293,7 @@ void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 /*
  * g(nroots,0:nmax,0:mmax)
  */
-static void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
+void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
         const FINT nroots = envs->nrys_roots;
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
@@ -1694,6 +1694,92 @@ error:
                (int)envs->li_ceil, (int)envs->lk_ceil,
                (int)envs->ll_ceil, (int)envs->lj_ceil);
         exit(1);
+}
+
+void CINTg0_3c2e_kj2d3d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+{
+        FINT nmax = envs->li_ceil + envs->lj_ceil;
+        switch (nmax) {
+                case 0: switch(envs->lk_ceil) {
+                        case 0: goto _g0_4d_default; // ssss
+                        case 1: _g0_lj_4d_1000(g, bc->c0p, envs->rkrl); goto normal_end;
+                        case 2: _g0_lj_4d_2000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                        case 3: _g0_lj_4d_3000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                        default: goto _g0_4d_default; }
+                case 1: switch(envs->lk_ceil) {
+                        case 0: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0001(g, bc->c00, envs->rirj); goto normal_end;
+                                case 1: _g0_lj_4d_1000(g, bc->c00, envs->rirj); goto normal_end;
+                                default: goto error; }
+                        case 1: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0101(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                                case 1: _g0_lj_4d_1100(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                                default: goto error; }
+                        case 2: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0201(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                case 1: _g0_lj_4d_1200(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                case 2: switch(envs->lk_ceil) {
+                        case 0: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0002(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 1: _g0_lj_4d_1001(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 2: _g0_lj_4d_2000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                default: goto error; }
+                        case 1: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0102(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                case 1: _g0_lj_4d_1101(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                case 2: _g0_lj_4d_2100(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                case 3: switch(envs->lk_ceil) {
+                        case 0: switch (envs->li_ceil) {
+                                case 0: _g0_lj_4d_0003(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 1: _g0_lj_4d_1002(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 2: _g0_lj_4d_2001(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                case 3: _g0_lj_4d_3000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                                default: goto error; }
+                        default: goto _g0_4d_default; }
+                default:
+_g0_4d_default:
+                        CINTg0_2e_2d(g, bc, envs);
+                        CINTg0_kj2d_3d(g, envs);
+        }
+normal_end:
+        return;
+error:
+        fprintf(stderr, "Dimension error for CINTg0_3c2e_kj2d3d: ikj = %d %d %d",
+                (int)envs->li_ceil, (int)envs->lk_ceil, (int)envs->lj_ceil);
+        exit(1);
+}
+
+void CINTg0_2c2e_ik2d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+{
+        switch (envs->li_ceil) {
+                case 0: switch(envs->lk_ceil) {
+                        case 0: goto _g0_4d_default; // ssss
+                        case 1: _g0_lj_4d_1000(g, bc->c0p, envs->rkrl); goto normal_end;
+                        case 2: _g0_lj_4d_2000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                        case 3: _g0_lj_4d_3000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
+                        default: goto _g0_4d_default; }
+                case 1: switch(envs->lk_ceil) {
+                        case 0: _g0_lj_4d_1000(g, bc->c00, envs->rirj); goto normal_end;
+                        case 1: _g0_lj_4d_1100(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
+                        case 2: _g0_lj_4d_1200(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
+                        default: goto _g0_4d_default; }
+                case 2: switch(envs->lk_ceil) {
+                        case 0: _g0_lj_4d_2000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                        case 1: _g0_lj_4d_2100(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
+                        default: goto _g0_4d_default; }
+                case 3: switch(envs->lk_ceil) {
+                        case 0: _g0_lj_4d_3000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
+                        default: goto _g0_4d_default; }
+                default:
+_g0_4d_default:
+                        CINTg0_2e_2d(g, bc, envs);
+        }
+normal_end:
+        return;
 }
 
 static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)

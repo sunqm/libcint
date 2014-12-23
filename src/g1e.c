@@ -92,9 +92,9 @@ void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
         n = 0;
         for (j = 0; j < nfj; j++) {
                 for (i = 0; i < nfi; i++) {
-                        idx[n+0] = ofx + dj * j_nx[j] + i_nx[i]; //(ix,jx,1)
-                        idx[n+1] = ofy + dj * j_ny[j] + i_ny[i]; //(iy,jy,2)
-                        idx[n+2] = ofz + dj * j_nz[j] + i_nz[i]; //(iz,jz,3)
+                        idx[n+0] = ofx + dj * j_nx[j] + di * i_nx[i]; //(ix,jx,1)
+                        idx[n+1] = ofy + dj * j_ny[j] + di * i_ny[i]; //(iy,jy,2)
+                        idx[n+2] = ofz + dj * j_nz[j] + di * i_nz[i]; //(iz,jz,3)
                         n += 3;
                 }
         }

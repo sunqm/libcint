@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.3.0")
+set(cint_VERSION "2.4.0")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -22,6 +22,7 @@ set(cintSrc
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
   src/rys_roots.c
+  src/cint2c2e.c src/cint3c2e.c src/g3c2e.c src/optimizer_3c2e.c 
   src/autocode/auto_intor1.c src/autocode/auto_intor2.c
   src/autocode/auto_intor3.c src/autocode/gaunt1.c src/autocode/grad1.c
   src/autocode/grad2.c src/autocode/grad3.c)
