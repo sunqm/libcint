@@ -4,8 +4,8 @@
  * basic cGTO function
  */
 
-#include "cint_const.h"
 #include "config.h"
+#include "cint_const.h"
 
 #define bas(SLOT,I)     bas[BAS_SLOTS * (I) + (SLOT)]
 #define atm(SLOT,I)     atm[ATM_SLOTS * (I) + (SLOT)]

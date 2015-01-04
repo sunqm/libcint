@@ -3,6 +3,8 @@
  *
  */
 
+#include "config.h"
+
 #if !defined HAVE_DEFINED_CINTENVVARS_H
 #define HAVE_DEFINED_CINTENVVARS_H
 // ref to CINTinit_int1e_EnvVars, CINTinit_int2e_EnvVars

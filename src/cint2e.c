@@ -74,10 +74,9 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs)
         const double *cj = env + bas(PTR_COEFF, j_sh);
         const double *ck = env + bas(PTR_COEFF, k_sh);
         const double *cl = env + bas(PTR_COEFF, l_sh);
-        const FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2
-                                  * envs->ncomp_tensor;
+        const FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
         double fac1i, fac1j, fac1k, fac1l;
-        FINT ip, jp, kp, lp, n;
+        FINT ip, jp, kp, lp;
         FINT empty[5] = {1, 1, 1, 1, 1};
         FINT *iempty = empty + 0;
         FINT *jempty = empty + 1;
@@ -243,7 +242,7 @@ k_contracted: ;
         const double *cl = env + bas(PTR_COEFF, l_sh); \
         const FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor; \
         double fac1i, fac1j, fac1k, fac1l; \
-        FINT ip, jp, kp, lp, n; \
+        FINT ip, jp, kp, lp; \
         FINT empty[5] = {1, 1, 1, 1, 1}; \
         FINT *iempty = empty + 0; \
         FINT *jempty = empty + 1; \
@@ -772,9 +771,9 @@ FINT CINT2e_cart_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
         const FINT lp = CINTcgto_cart(envs->shls[3], envs->bas);
         const FINT nop = ip * jp * kp * lp;
         const FINT nc = envs->nf * envs->i_ctr * envs->j_ctr
-                                * envs->k_ctr * envs->l_ctr * envs->ncomp_e1;
-        double *const gctr = malloc(sizeof(double) * nc * envs->ncomp_e1
-                                    * envs->ncomp_tensor);
+                                * envs->k_ctr * envs->l_ctr;
+        const FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
+        double *const gctr = malloc(sizeof(double) * nc * n_comp);
         double *pgctr = gctr;
         FINT n;
         FINT has_value;
@@ -788,13 +787,13 @@ FINT CINT2e_cart_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
         }
 
         if (has_value) {
-                for (n = 0; n < envs->ncomp_tensor; n++) {
+                for (n = 0; n < n_comp; n++) {
                         c2s_cart_2e1(opijkl, pgctr, envs);
                         opijkl += nop;
                         pgctr += nc;
                 }
         } else {
-                CINTdset0(nop * envs->ncomp_tensor, opijkl);
+                CINTdset0(nop * n_comp, opijkl);
         }
         free(gctr);
         return has_value;
@@ -807,9 +806,9 @@ FINT CINT2e_spheric_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
         const FINT lp = CINTcgto_spheric(envs->shls[3], envs->bas);
         const FINT nop = ip * jp * kp * lp;
         const FINT nc = envs->nf * envs->i_ctr * envs->j_ctr
-                                * envs->k_ctr * envs->l_ctr * envs->ncomp_e1;
-        double *const gctr = malloc(sizeof(double) * nc * envs->ncomp_e2
-                                    * envs->ncomp_tensor);
+                                * envs->k_ctr * envs->l_ctr;
+        const FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
+        double *const gctr = malloc(sizeof(double) * nc * n_comp);
         double *pgctr = gctr;
         FINT n;
         FINT has_value;
@@ -823,13 +822,13 @@ FINT CINT2e_spheric_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
         }
 
         if (has_value) {
-                for (n = 0; n < envs->ncomp_tensor; n++) {
+                for (n = 0; n < n_comp; n++) {
                         c2s_sph_2e1(opijkl, pgctr, envs);
                         opijkl += nop;
                         pgctr += nc;
                 }
         } else {
-                CINTdset0(nop * envs->ncomp_tensor, opijkl);
+                CINTdset0(nop * n_comp, opijkl);
         }
         free(gctr);
         return has_value;

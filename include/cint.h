@@ -67,7 +67,7 @@
 #define TSRZZ       8
 
 // some other boundaries
-#define ANG_MAX         7 // l = 0..6
+#define ANG_MAX         8 // l = 0..7
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
 

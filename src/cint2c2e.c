@@ -14,6 +14,7 @@
 #include "optimizer.h"
 #include "cint2e.h"
 #include "misc.h"
+#include "fblas.h"
 #include "cart2sph.h"
 #include "c2f.h"
 
@@ -298,7 +299,6 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
 {
         COMMON_ENVS_AND_DECLARE;
         const FINT nc = i_ctr * k_ctr;
-        // (irys,i,k,k,l,coord,0:1); +1 for nabla-r12
         const FINT leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
         const FINT lenk = envs->nf * nc * n_comp; // gctrk
         const FINT leni = envs->nf * i_ctr * n_comp; // gctri

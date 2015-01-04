@@ -13,6 +13,7 @@
 #include "optimizer.h"
 #include "cint2e.h"
 #include "misc.h"
+#include "fblas.h"
 #include "cart2sph.h"
 #include "c2f.h"
 

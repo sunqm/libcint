@@ -84,24 +84,24 @@ void CINTzmat_transpose(double complex *a_t, const double complex *a,
 {
         FINT i, j;
 
-        switch (m) {
+        switch (n) {
         case 2:
-                for (i = 0; i < n; i++) {
+                for (i = 0; i < m; i++) {
                         a_t[i  ] = a[2*i+0];
-                        a_t[i+n] = a[2*i+1];
+                        a_t[i+m] = a[2*i+1];
                 }
                 break;
         default:
-                switch (n) {
-                case 2: for (i = 0; i < m; i++) {
+                switch (m) {
+                case 2: for (i = 0; i < n; i++) {
                                 a_t[2*i+0] = a[i  ];
-                                a_t[2*i+1] = a[i+m];
+                                a_t[2*i+1] = a[i+n];
                         }
                         break;
                 default:
-                        for (j = 0; j < n; j++) {
-                                for (i = 0; i < m; i++) {
-                                        a_t[i*n+j] = a[j*m+i];
+                        for (i = 0; i < n; i++) {
+                                for (j = 0; j < m; j++) {
+                                        a_t[i*m+j] = a[j*n+i];
                                 }
                         }
                 }
@@ -113,9 +113,9 @@ void CINTzmat_dagger(double complex *a_t, const double complex *a,
 {
         FINT i, j;
 
-        for (j = 0; j < n; j++) {
-                for (i = 0; i < m; i++) {
-                        a_t[i*n+j] = conj(a[j*m+i]);
+        for (i = 0; i < n; i++) {
+                for (j = 0; j < m; j++) {
+                        a_t[i*m+j] = conj(a[j*n+i]);
                 }
         }
 }

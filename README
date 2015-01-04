@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 2.4.0
-2014-12-24
+version 2.5.0
+2015-1-4
 
 
 What is libcint
@@ -79,17 +79,17 @@ In one entry, you need to define the function name and the expression of
 the integral.  The expression is consistent with Mulliken notation.
 For one-electron integral, an entry can be
 
-    '("integral_name" (number op-bra op-bra ... \| op-ket ...))
+    '("integral_name" spinor (number op-bra op-bra ... \| op-ket ...))
 or
-    '("integral_name" (number op-bra op-bra ... \| 1e-operator \| op-ket ...))
+    '("integral_name" spinor (number op-bra op-bra ... \| 1e-operator \| op-ket ...))
 
 the entry of two-electron integral can be
 
-    '("integral_name" (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
-                              op-bra-electron-2 ... \, op-ket-electron-2 ... ))
+    '("integral_name" spinor (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
+                                     op-bra-electron-2 ... \, op-ket-electron-2 ... ))
 or
-    '("integral_name" (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
-                       gaunt \| op-bra-electron-2 ... \, op-ket-electron-2 ... ))
+    '("integral_name" spinor (number op-bra-electron-1 ... \, op-ket-electron-1 ... \|
+                              r12 \| op-bra-electron-2 ... \, op-ket-electron-2 ... ))
 
 * Parentheses must be paired.
 * Line break is allowed.

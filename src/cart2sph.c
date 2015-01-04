@@ -16,6 +16,7 @@
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "cart2sph.h"
+#include "g1e.h"
 #include "misc.h"
 
 
@@ -5530,7 +5531,7 @@ static void zswap_ik_jl(double complex *new, const double complex *old,
         for (l = 0; l < nl; l++) {
                 pold = old + l * dlo;
                 for (j = 0; j < nj; j++) {
-                        CINTzmat_transpose(new, pold, ni, nk);
+                        CINTzmat_transpose(new, pold, nk, ni);
                         new += djn;
                         pold += djo;
                 }
