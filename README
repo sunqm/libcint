@@ -26,6 +26,7 @@ Features
 * Two electron integrals (value < 1e-15 are neglected) include
   - Coulomb repulsion
   - Gaunt interaction
+  - 2-index, 3-index and 4-index integrals
 * Common lisp script to generate C code for new integrals.
 * Thread safe.
 * Uniform API for all kind of integrals.
@@ -160,11 +161,11 @@ Known problems
   flags to replace the default blas link flags.  Be careful with the
   *order* of -lmkl_mc and -lmkl_def.
 
-* For basic ERIs, the code can handle highest angular momentum up to 6
-  (present Rys-roots functions might be numerically unstable for l=5,6).
-  But it has to be reduced to 5 or less for derivative or high order ERI.
-  Depending on the derivative order, reduce 1 highest angular momentum
-  every 4 derivative order.
+* For basic ERIs, the code can handle highest angular momentum up to 7
+  (present Rys-roots functions might be numerically unstable for
+  nroots > 10 or l > 5).  But it has to be reduced to 5 or less for
+  derivative or high order ERI.  Depending on the derivative order,
+  reduce 1 highest angular momentum every 4 derivative order.
 
 * Using SSE3 instructions can increase the performance 5 ~ 50%.
   Please refer to *qcint* library (under GPL v3 license)

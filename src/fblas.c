@@ -30,6 +30,55 @@ void CINTdaxpy2v(const FINT n, const double a,
         }
 }
 
+/*
+ * a[m,n] -> a_t[n,m]
+ */
+void CINTdmat_transpose(double *a_t, const double *a, const FINT m, const FINT n)
+{
+        FINT i, j, k;
+        double *pa1, *pa2, *pa3;
+
+        for (j = 0; j < n-3; j+=4) {
+                pa1 = a_t + m;
+                pa2 = pa1 + m;
+                pa3 = pa2 + m;
+                for (i = 0, k = j; i < m; i++, k+=n) {
+                        a_t[i] = a[k+0];
+                        pa1[i] = a[k+1];
+                        pa2[i] = a[k+2];
+                        pa3[i] = a[k+3];
+                }
+                a_t += m * 4;
+        }
+
+        switch (n-j) {
+        case 1:
+                for (i = 0, k = j; i < m; i++, k+=n) {
+                        a_t[i] = a[k];
+                }
+                break;
+        case 2:
+                pa1 = a_t + m;
+                for (i = 0, k = j; i < m; i++, k+=n) {
+                        a_t[i] = a[k+0];
+                        pa1[i] = a[k+1];
+                }
+                break;
+        case 3:
+                pa1 = a_t + m;
+                pa2 = pa1 + m;
+                for (i = 0, k = j; i < m; i++, k+=n) {
+                        a_t[i] = a[k+0];
+                        pa1[i] = a[k+1];
+                        pa2[i] = a[k+2];
+                }
+                break;
+        }
+}
+
+/*
+ * a[m,n] -> a_t[n,m]
+ */
 void CINTzmat_transpose(double complex *a_t, const double complex *a,
                         const FINT m, const FINT n)
 {

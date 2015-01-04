@@ -18,14 +18,6 @@
         type *GY = G + envs->g_size; \
         type *GZ = G + envs->g_size * 2
 
-struct _BC {
-        double c00[MXRYSROOTS*3];
-        double c0p[MXRYSROOTS*3];
-        double b01[MXRYSROOTS];
-        double b00[MXRYSROOTS];
-        double b10[MXRYSROOTS];
-};
-
 static void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);

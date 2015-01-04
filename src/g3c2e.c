@@ -10,30 +10,19 @@
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "misc.h"
-#include "g2e.h"
+#include "g3c2e.h"
 
 #define DEF_GXYZ(type, G, GX, GY, GZ) \
         type *GX = G; \
         type *GY = G + envs->g_size; \
         type *GZ = G + envs->g_size * 2
 
-struct _BC {
-        double c00[MXRYSROOTS*3];
-        double c0p[MXRYSROOTS*3];
-        double b01[MXRYSROOTS];
-        double b00[MXRYSROOTS];
-        double b10[MXRYSROOTS];
-};
-
-void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 void CINTg0_3c2e_kj2d3d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 void CINTg0_3c2e_ik2d3d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-void CINTg0_2c2e_ik2d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTset_g3c2e_params(CINTEnvVars *envs);
-static void CINTset_g2c2e_params(CINTEnvVars *envs);
 
 /*
- * not the 3c2e functions mostly takes i,j,k parameters. But we initialize
+ * Note the 3c2e functions takes i,j,k parameters. But we initialize
  * ll_ceil, to reuse g2e_g02d function.
  */
 
@@ -318,7 +307,6 @@ void CINTg0_3c2e_ik2d3d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 {
         CINTg0_2e_2d(g, bc, envs);
 
-        //const FINT li = envs->li_ceil;
         const FINT lk = envs->lk_ceil;
         const FINT lj = envs->lj_ceil;
         FINT j, k, ptr, n;
@@ -349,7 +337,7 @@ void CINTg0_3c2e_ik2d3d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 
 
 /*
- * ( \nabla i j | kl )
+ * ( \nabla i j | k )
  */
 void CINTnabla1i_3c2e(double *f, const double *g,
                       const FINT li, const FINT lj, const FINT lk,
@@ -394,7 +382,7 @@ void CINTnabla1i_3c2e(double *f, const double *g,
 
 
 /*
- * ( i \nabla j | kl )
+ * ( i \nabla j | k )
  */
 void CINTnabla1j_3c2e(double *f, const double *g,
                       const FINT li, const FINT lj, const FINT lk,
@@ -445,7 +433,56 @@ void CINTnabla1j_3c2e(double *f, const double *g,
 
 
 /*
- * ( x^1 i j | kl )
+ * ( ij | \nabla k )
+ */
+void CINTnabla1k_3c2e(double *f, const double *g,
+                      const FINT li, const FINT lj, const FINT lk,
+                      const CINTEnvVars *envs)
+{
+        FINT i, j, k, n, ptr;
+        const FINT di = envs->g_stride_i;
+        const FINT dk = envs->g_stride_k;
+        const FINT dj = envs->g_stride_j;
+        const FINT nroots = envs->nrys_roots;
+        const double ak2 = -2 * envs->ak;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
+
+        const double *p1x = gx - dk;
+        const double *p1y = gy - dk;
+        const double *p1z = gz - dk;
+        const double *p2x = gx + dk;
+        const double *p2y = gy + dk;
+        const double *p2z = gz + dk;
+        for (j = 0; j <= lj; j++) {
+                ptr = dj * j;
+                //f(...,0,...) = -2*ak*g(...,1,...)
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = ak2 * p2x[n];
+                                fy[n] = ak2 * p2y[n];
+                                fz[n] = ak2 * p2z[n];
+                        }
+                        ptr += di;
+                }
+                //f(...,k,...) = k*g(...,k-1,...)-2*ak*g(...,k+1,...)
+                for (k = 1; k <= lk; k++) {
+                        ptr = dj * j + dk * k;
+                        for (i = 0; i <= li; i++) {
+                                for (n = ptr; n < ptr+nroots; n++) {
+                                        fx[n] = k*p1x[n] + ak2*p2x[n];
+                                        fy[n] = k*p1y[n] + ak2*p2y[n];
+                                        fz[n] = k*p1z[n] + ak2*p2z[n];
+                                }
+                                ptr += di;
+                        }
+                }
+        }
+}
+
+
+/*
+ * ( x^1 i j | k )
  * ri is the shift from the center R_O to the center of |i>
  * r - R_O = (r-R_i) + ri, ri = R_i - R_O
  */
@@ -481,7 +518,7 @@ void CINTx1i_3c2e(double *f, const double *g, const double *ri,
 
 
 /*
- * ( i x^1 j | kl )
+ * ( i x^1 j | k )
  */
 void CINTx1j_3c2e(double *f, const double *g, const double *rj,
                   const FINT li, const FINT lj, const FINT lk,
@@ -514,147 +551,36 @@ void CINTx1j_3c2e(double *f, const double *g, const double *rj,
 }
 
 
-
-FINT CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
-                             const FINT *atm, const FINT natm,
-                             const FINT *bas, const FINT nbas, const double *env)
+/*
+ * ( ij | x^1 k )
+ */
+void CINTx1k_3c2e(double *f, const double *g, const double *rk,
+                  const FINT li, const FINT lj, const FINT lk,
+                  const CINTEnvVars *envs)
 {
-        envs->natm = natm;
-        envs->nbas = nbas;
-        envs->atm = atm;
-        envs->bas = bas;
-        envs->env = env;
-        envs->shls = shls;
+        FINT i, j, k, n, ptr;
+        const FINT di = envs->g_stride_i;
+        const FINT dk = envs->g_stride_k;
+        const FINT dj = envs->g_stride_j;
+        const FINT nroots = envs->nrys_roots;
+        DEF_GXYZ(const double, g, gx, gy, gz);
+        DEF_GXYZ(double, f, fx, fy, fz);
 
-        const FINT i_sh = shls[0];
-        const FINT j_sh = shls[1];
-        envs->i_l = bas(ANG_OF, i_sh);
-        envs->j_l = bas(ANG_OF, j_sh);
-        envs->i_prim = bas(NPRIM_OF, i_sh);
-        envs->j_prim = bas(NPRIM_OF, j_sh);
-        envs->i_ctr = bas(NCTR_OF, i_sh);
-        envs->j_ctr = bas(NCTR_OF, j_sh);
-        envs->nfi = CINTlen_cart(envs->i_l);
-        envs->nfj = CINTlen_cart(envs->j_l);
-        envs->nf = envs->nfi * envs->nfj;
-
-        envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
-        envs->rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-
-        envs->common_factor = (M_PI*M_PI*M_PI)*2/SQRTPI
-                * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l);
-
-        envs->gbits = ng[GSHIFT];
-        envs->ncomp_tensor = ng[TENSOR];
-
-        envs->li_ceil = envs->i_l + ng[IINC];
-// lj_ceil affect g2e *2d4d function, but g2c2e does not need them
-        envs->lj_ceil = 0;
-// to reuse CINTg0_2e_2d (the value of mmax), apply ng[JINC] on lk_ceil
-        envs->lk_ceil = envs->j_l + ng[JINC];
-        envs->ll_ceil = 0;
-        envs->nrys_roots =(envs->li_ceil + envs->lk_ceil)/2 + 1;
-
-        assert(i_sh < SHLS_MAX);
-        assert(j_sh < SHLS_MAX);
-        assert(envs->i_l < ANG_MAX);
-        assert(envs->j_l < ANG_MAX);
-        assert(envs->i_ctr < NCTR_MAX);
-        assert(envs->j_ctr < NCTR_MAX);
-        assert(envs->i_prim < NPRIM_MAX);
-        assert(envs->j_prim < NPRIM_MAX);
-        assert(envs->i_prim >= envs->i_ctr);
-        assert(envs->j_prim >= envs->j_ctr);
-        assert(bas(ATOM_OF,i_sh) >= 0);
-        assert(bas(ATOM_OF,j_sh) >= 0);
-        assert(bas(ATOM_OF,i_sh) < natm);
-        assert(bas(ATOM_OF,j_sh) < natm);
-        assert(envs->nrys_roots < MXRYSROOTS);
-
-        CINTset_g2c2e_params(envs);
-        return 0;
+        const double *p1x = gx + dk;
+        const double *p1y = gy + dk;
+        const double *p1z = gz + dk;
+        for (j = 0; j <= lj; j++)
+        for (k = 0; k <= lk; k++) {
+                // f(...,0:lk,...) = g(...,1:lk+1,...) + rk(1)*g(...,0:lk,...)
+                ptr = dj * j + dk * k;
+                for (i = 0; i <= li; i++) {
+                        for (n = ptr; n < ptr+nroots; n++) {
+                                fx[n] = p1x[n] + rk[0] * gx[n];
+                                fy[n] = p1y[n] + rk[1] * gy[n];
+                                fz[n] = p1z[n] + rk[2] * gz[n];
+                        }
+                        ptr += di;
+                }
+        }
 }
-
-/* set strides and parameters for g0_2d4d algorithm */
-static void CINTset_g2c2e_params(CINTEnvVars *envs)
-{
-        FINT dli, dlj, dlk, dll;
-        FINT ibase = 1;
-        FINT kbase = 1;
-        if (envs->nrys_roots <= 2) { // use the fully optimized lj_4d algorithm
-                ibase = 0;
-                kbase = 0;
-        }
-
-        if (ibase) {
-                dli = envs->li_ceil + 1;
-                dlj = 1;
-        } else { // to use _g0_lj_4d_xxxx functions, dll can be > 1
-                dli = envs->li_ceil + 1;
-                dlj = dli;
-        }
-
-        if (kbase) {
-                dlk = envs->lk_ceil + 1;
-                dll = 1;
-        } else { // to use _g0_lj_4d_xxxx functions, dll can be > 1
-                dlk = envs->lk_ceil + 1;
-                dll = dlk;
-        }
-
-        envs->g_stride_i = envs->nrys_roots;
-// no g_stride_k because it is needed by *2d4d functions, which are not useful for g2c2e
-//        envs->g_stride_k = envs->nrys_roots * dli;
-// g_stride_j is used only in g1e_index. although called g_stride_j, it
-// corresponds to g_stride_k in CINTset_g2e_params
-        envs->g_stride_j = envs->nrys_roots * dli;
-        envs->g_size     = envs->nrys_roots * dli * dlk * dll * dlj;
-
-        if (kbase) {
-                envs->g2d_klmax = envs->g_stride_j;
-                envs->rkrl[0] = envs->rj[0];
-                envs->rkrl[1] = envs->rj[1];
-                envs->rkrl[2] = envs->rj[2];
-                envs->rklrx[0] = 0; // simplify 'envs->rklrx[0] =' in cint2e.c with rl=0, al=0
-                envs->rklrx[1] = 0;
-                envs->rklrx[2] = 0;
-        } else {
-                // in CINTg0_2c2e_ik2d, g2d_klmax will not be used
-                envs->g2d_klmax = 0;
-                envs->rkrl[0] = -envs->rj[0];
-                envs->rkrl[1] = -envs->rj[1];
-                envs->rkrl[2] = -envs->rj[2];
-                envs->rklrx[0] = envs->rj[0]; // since rl=0, al=0, see cint2e.c
-                envs->rklrx[1] = envs->rj[1];
-                envs->rklrx[2] = envs->rj[2];
-        }
-        envs->rkl[0] = envs->rj[0];
-        envs->rkl[1] = envs->rj[1];
-        envs->rkl[2] = envs->rj[2];
-
-        if (ibase) {
-                envs->g2d_ijmax = envs->g_stride_i;
-                envs->rirj[0] = envs->ri[0];
-                envs->rirj[1] = envs->ri[1];
-                envs->rirj[2] = envs->ri[2];
-                envs->rijrx[0] = 0; // since rj=0, aj=0
-                envs->rijrx[1] = 0;
-                envs->rijrx[2] = 0;
-        } else {
-                // in CINTg0_2c2e_ik2d, g2d_ijmax will not be used
-                envs->g2d_ijmax = 0;
-                envs->rirj[0] = -envs->ri[0];
-                envs->rirj[1] = -envs->ri[1];
-                envs->rirj[2] = -envs->ri[2];
-                envs->rijrx[0] = envs->ri[0];
-                envs->rijrx[1] = envs->ri[1];
-                envs->rijrx[2] = envs->ri[2];
-        }
-        envs->rij[0] = envs->ri[0];
-        envs->rij[1] = envs->ri[1];
-        envs->rij[2] = envs->ri[2];
-
-        envs->f_g0_2d4d = &CINTg0_2c2e_ik2d;
-}
-
 

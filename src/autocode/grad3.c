@@ -5,6 +5,8 @@
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "g2e.h"
+#include "g3c2e.h"
+#include "g2c2e.h"
 #include "optimizer.h"
 #include "cint1e.h"
 #include "cint2e.h"
@@ -221,7 +223,7 @@ CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_rinv_cart;
 return CINT1e_rinv_drv(opij, &envs, 1, &c2s_cart_1e); }
 C2F_(cint1e_rinv_cart)
-/* <k NABLA i|R12 |j l> : i,jin electron 1; k,lin electron 2
+/* <k NABLA i|R12 |j l> : i,j \in electron 1; k,l \in electron 2
  * = (NABLA i j|R12 |k l) */
 static void CINTgout2e_cint2e_ip1_cart(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
@@ -309,7 +311,7 @@ const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 0, 0, 0, 0, 0, 0};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-FINT cint2e_ip1_cart(double *opkijl, const FINT *shls,
+FINT cint2e_ip1_cart(double *opijkl, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
 FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
@@ -317,7 +319,7 @@ CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_cint2e_ip1_cart;
 envs.common_factor *= 1;
-return CINT2e_cart_drv(opkijl, &envs, opt);
+return CINT2e_cart_drv(opijkl, &envs, opt);
 }
 OPTIMIZER2F_(cint2e_ip1_cart_optimizer);
 C2Fo_(cint2e_ip1_cart)

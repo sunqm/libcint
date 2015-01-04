@@ -1466,8 +1466,8 @@ L90:
 }
 
 /* Incomplete gamma function
- * f(2n,x) = \FINT t^{2n} exp(-xt^2) dt
- *         = 1/2 \FINT r^{n-1/2} exp(-xr) dr
+ * f(2n,x) = \int t^{2n} exp(-xt^2) dt
+ *         = 1/2 \int r^{n-1/2} exp(-xr) dr
  *         = 1/2 scipy.special.gammainc(n+1/2, x) * gamma(n+1/2) / x^{n+1/2}
  */
 void gamma_inc_like(double *ff, double x, FINT n)

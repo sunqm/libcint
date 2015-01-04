@@ -5,7 +5,19 @@
  */
 
 #include "config.h"
+#include "cint_const.h"
 #include "g1e.h"
+
+#ifndef HAVE_BC
+#define HAVE_BC
+struct _BC {
+        double c00[MXRYSROOTS*3];
+        double c0p[MXRYSROOTS*3];
+        double b01[MXRYSROOTS];
+        double b00[MXRYSROOTS];
+        double b10[MXRYSROOTS];
+};
+#endif
 
 void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs);
 

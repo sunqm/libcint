@@ -12,6 +12,7 @@
 #include "optimizer.h"
 #include "cint2e.h"
 #include "misc.h"
+#include "fblas.h"
 #include "cart2sph.h"
 #include "c2f.h"
 
@@ -211,44 +212,12 @@ k_contracted: ;
                 }
         } // end loop l_prim
 
-        /* COPY_AND_CLOSING(gctrl, *lempty); */
         if (n_comp > 1 && !*lempty) {
-                const FINT INC1 = 1;
-                double *gctr1, *gctr2, *gctr3;
-                switch (n_comp) {
-                case 3:
-                        gctr1 = gctr  + envs->nf*nc;
-                        gctr2 = gctr1 + envs->nf*nc;
-                        for (n = 0, ip = 0; n < envs->nf*nc; n++, ip+=3) {
-                                gctr [n] = gctrl[ip+0];
-                                gctr1[n] = gctrl[ip+1];
-                                gctr2[n] = gctrl[ip+2];
-                        }
-                        break;
-                default:
-                        for (kp = 0; kp < n_comp-3; kp+=4) {
-                                gctr1 = gctr  + envs->nf*nc;
-                                gctr2 = gctr1 + envs->nf*nc;
-                                gctr3 = gctr2 + envs->nf*nc;
-                                for (n = 0, ip = kp; n < envs->nf*nc; n++,ip+=n_comp) {
-                                        gctr [n] = gctrl[ip+0];
-                                        gctr1[n] = gctrl[ip+1];
-                                        gctr2[n] = gctrl[ip+2];
-                                        gctr3[n] = gctrl[ip+3];
-                                }
-                                gctr += envs->nf*nc * 4;
-                        }
-                        for (; kp < n_comp; kp++) {
-                                n = envs->nf*nc;
-                                dcopy_(&n, gctrl+kp, &n_comp, gctr, &INC1);
-                                gctr += envs->nf*nc;
-                        }
-                }
+                CINTdmat_transpose(gctr, gctrl, envs->nf*nc, n_comp);
         }
         free(g);
         free(envs->idx);
         return !*lempty;
-        /* COPY_AND_CLOSING(gctrl, *lempty); end */
 }
 
 
@@ -326,43 +295,6 @@ k_contracted: ;
         } \
         *ctrsymb##empty = 0
 
-#define COPY_AND_CLOSING(GCTRL, EMPTY) \
-        if (n_comp > 1 && !(EMPTY)) { \
-                const FINT INC1 = 1; \
-                double *gctr1, *gctr2, *gctr3; \
-                switch (n_comp) { \
-                case 3: \
-                        gctr1 = gctr  +envs->nf*nc; \
-                        gctr2 = gctr1 +envs->nf*nc; \
-                        for (n = 0, ip = 0; n < envs->nf*nc; n++, ip+=3) { \
-                                gctr [n] = GCTRL[ip+0]; \
-                                gctr1[n] = GCTRL[ip+1]; \
-                                gctr2[n] = GCTRL[ip+2]; \
-                        } \
-                        break; \
-                default: \
-                        for (kp = 0; kp < n_comp-3; kp+=4) { \
-                                gctr1 = gctr  +envs->nf*nc; \
-                                gctr2 = gctr1 +envs->nf*nc; \
-                                gctr3 = gctr2 +envs->nf*nc; \
-                                for (n = 0, ip = kp; n < envs->nf*nc; n++,ip+=n_comp) { \
-                                        gctr [n] = GCTRL[ip+0]; \
-                                        gctr1[n] = GCTRL[ip+1]; \
-                                        gctr2[n] = GCTRL[ip+2]; \
-                                        gctr3[n] = GCTRL[ip+3]; \
-                                } \
-                                gctr +=envs->nf*nc * 4; \
-                        } \
-                        for (; kp < n_comp; kp++) { \
-                                n =envs->nf*nc; \
-                                dcopy_(&n, GCTRL+kp, &n_comp, gctr, &INC1); \
-                                gctr +=envs->nf*nc; \
-                        } \
-                } \
-        } \
-        free(g); \
-        return !(EMPTY);
-
 // i_ctr = j_ctr = k_ctr = l_ctr = 1;
 FINT CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
 {
@@ -408,7 +340,11 @@ k_contracted: ;
                 } // end loop k_prim
         } // end loop l_prim
 
-        COPY_AND_CLOSING(gout, *empty);
+        if (n_comp > 1 && !*empty) {
+                CINTdmat_transpose(gctr, gout, envs->nf*nc, n_comp);
+        }
+        free(g);
+        return !*empty;
 }
 
 // i_ctr = n; j_ctr = k_ctr = l_ctr = 1;
@@ -461,7 +397,11 @@ k_contracted: ;
                 } // end loop k_prim
         } // end loop l_prim
 
-        COPY_AND_CLOSING(gctri, *iempty);
+        if (n_comp > 1 && !*iempty) {
+                CINTdmat_transpose(gctr, gctri, envs->nf*nc, n_comp);
+        }
+        free(g);
+        return !*iempty;
 }
 
 // j_ctr = n; i_ctr = k_ctr = l_ctr = 1;
@@ -518,7 +458,11 @@ k_contracted: ;
                 } // end loop k_prim
         } // end loop l_prim
 
-        COPY_AND_CLOSING(gctrj, *jempty);
+        if (n_comp > 1 && !*jempty) {
+                CINTdmat_transpose(gctr, gctrj, envs->nf*nc, n_comp);
+        }
+        free(g);
+        return !*jempty;
 }
 
 // k_ctr = n; i_ctr = j_ctr = l_ctr = 1;
@@ -574,7 +518,11 @@ k_contracted: ;
                 } // end loop k_prim
         } // end loop l_prim
 
-        COPY_AND_CLOSING(gctrk, *kempty);
+        if (n_comp > 1 && !*kempty) {
+                CINTdmat_transpose(gctr, gctrk, envs->nf*nc, n_comp);
+        }
+        free(g);
+        return !*kempty;
 }
 
 // l_ctr = n; i_ctr = j_ctr = k_ctr = 1;
@@ -630,7 +578,11 @@ k_contracted: ;
                 }
         } // end loop l_prim
 
-        COPY_AND_CLOSING(gctrl, *lempty);
+        if (n_comp > 1 && !*lempty) {
+                CINTdmat_transpose(gctr, gctrl, envs->nf*nc, n_comp);
+        }
+        free(g);
+        return !*lempty;
 }
 
 
@@ -785,7 +737,11 @@ k_contracted: ;
                 }
         } // end loop l_prim
 
-        COPY_AND_CLOSING(gctrl, *lempty);
+        if (n_comp > 1 && !*lempty) {
+                CINTdmat_transpose(gctr, gctrl, envs->nf*nc, n_comp);
+        }
+        free(g);
+        return !*lempty;
 }
 
 

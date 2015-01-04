@@ -79,7 +79,9 @@ void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
         const FINT di = envs->g_stride_i;
         const FINT dj = envs->g_stride_j;
         FINT i, j, n;
-        FINT ofx, ofy, ofz;
+        FINT ofx, ofjx;
+        FINT ofy, ofjy;
+        FINT ofz, ofjz;
         FINT i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
         FINT j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
 
@@ -91,10 +93,13 @@ void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
         ofz = envs->g_size * 2;
         n = 0;
         for (j = 0; j < nfj; j++) {
+                ofjx = ofx + dj * j_nx[j];
+                ofjy = ofy + dj * j_ny[j];
+                ofjz = ofz + dj * j_nz[j];
                 for (i = 0; i < nfi; i++) {
-                        idx[n+0] = ofx + dj * j_nx[j] + di * i_nx[i]; //(ix,jx,1)
-                        idx[n+1] = ofy + dj * j_ny[j] + di * i_ny[i]; //(iy,jy,2)
-                        idx[n+2] = ofz + dj * j_nz[j] + di * i_nz[i]; //(iz,jz,3)
+                        idx[n+0] = ofjx + di * i_nx[i];
+                        idx[n+1] = ofjy + di * i_ny[i];
+                        idx[n+2] = ofjz + di * i_nz[i];
                         n += 3;
                 }
         }

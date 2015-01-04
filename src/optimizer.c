@@ -107,7 +107,7 @@ void CINTuse_all_optimizer(CINTOpt **opt, FINT *ng,
         CINTOpt_set_index_xyz(*opt, ng, atm, natm, bas, nbas, env);
 }
 
-/* len(ng) = 9. The first 4 items are the increment adding to envs.li_ceil
+/* len(ng) = 8. The first 4 items are the increment adding to envs.li_ceil
  * ... envs.ll_ceil for shell i, j, k, l */
 void
 CINTOpt_set_index_xyz(CINTOpt *opt, FINT *ng,

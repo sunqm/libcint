@@ -24,8 +24,9 @@
 ;;; r12   = 1/r_12
 ;;; translate these keys in function dress-other combo-op
 (defparameter *one-electron-operator-keywords* '(ovlp rinv nuc nabla-rinv))
-(defparameter *one-componet-operator-kewords* '(rinv nuc r12))
+(defparameter *one-componet-operator-keywords* '(rinv nuc r12))
 (defparameter *two-electron-operator-keywords* '(r12 gaunt))
+(defparameter *nabla-not-comutable-keywords* '(rinv nuc nabla-rinv r12 gaunt))
 
 ;;; *operator-keywords*: precedence from high to low
 ;;; translate these keys in function dress-vec and dress-comp ..
@@ -40,13 +41,18 @@
 ;;; rl = r - R_l
 ;;; r = ri/rj/rk/rl; associate with the basis it acts on
 ;;; g = (R_m - R_n) cross r0
-;;; modify dress-other cons-bra-ket g?e-of factor-of if add new keys
-;;; sticker symbol *, which means the operator stick to the next one
-;;;      it affects (p V cross p)
+;;;
+;;; sticker symbol *, which sticks the decorated operator to op or ket-ops
+;;;         (bra-ops ... p* |op| ket-ops)
+;;; the p* in the bra (| will be evaluated with |op| or |ket-ops) (if they
+;;; have cross or dot operators). Using the sticker symbol for p/nabla
+;;; to prevent p/nabla operators comutating with the next p/nabla operators
+
 (defparameter *intvar-keywords* '(p ip nabla px py pz
                                   p* ip* nabla* px* py* pz*
                                   r r0 rc ri rj rk rl g x y z))
 (defparameter *var-sticker-keywords* '(p* ip* nabla* px* py* pz*))
+(defparameter *var-vec-keywords* '(p ip nabla p* ip* nabla* r r0 rc ri rj rk rl g))
 
 ;;;;;; convert to reversed polish notation ;;;;;;;;;;;
 (defun complex? (n)
@@ -90,7 +96,7 @@
   "use () to increase the priority of operator o"
   (cond ((unary-op? o) (pre-unary o seq))
         ((binary-op? o) (pre-binary '() o seq))
-        (t (error "unknown operator ~a" o))))
+        (t (error "unknown operator ~a~%" o))))
 (defun infix-to-rpn (tokens)
   (labels ((rpn-iter (rpn-stack seq)
              ;; return a rpn stack
@@ -185,7 +191,7 @@
                             (make-cell n (make-op (symbol-of const) 'y) op)
                             (make-cell n (make-op (symbol-of const) 'z) op)))
                  (t item))))
-        (t (error "unknown type"))))
+        (t (error "unknown type ~a~%" item))))
 
 (defun reduce-rpn (rpn)
   "reduce the reversed polish notation to a set of vectors"
@@ -208,8 +214,16 @@
                :initial-value '()))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun int4c2e? (expr)
+  (eql (count '\, expr) 2))
+(defun int3c2e? (expr)
+  (eql (count '\, expr) 1))
+(defun int2c2e? (expr)
+  (and (eql (count '\, expr) 0)
+       (intersection *two-electron-operator-keywords* expr)))
 (defun two-electron-int? (expr)
-  (member '\, expr))
+  (or (member '\, expr)
+      (intersection *two-electron-operator-keywords* expr)))
 (defun one-electron-int? (expr)
   (not (two-electron-int? expr)))
 
@@ -250,6 +264,7 @@
           `((r12)
             ,@(multiple-value-list (split-at '\, (car items)))
             ,@(multiple-value-list (split-at '\, (cadr items))))
+; including the 3c2e 2c2e expression, in which, the split-at retuns nil for ket
           `(,(cadr items)
             ,@(multiple-value-list (split-at '\, (car items)))
             ,@(multiple-value-list (split-at '\, (caddr items))))))
@@ -311,7 +326,7 @@
 (defun label-ts (vs)
   (cond ((query-q-in-vs #'ts? vs) 'ts)
         ((query-q-in-vs #'tas? vs) 'tas)
-        (t (error "neither ts nor tas"))))
+        (t (error "neither ts nor tas~%"))))
 
 (defun spin-free? (vs)
   (cond ((null vs) t)
@@ -354,11 +369,18 @@
            (values fac 1))
           ((zerop (realpart fac))
            (values (imagpart fac) #C(0 1)))
-          (t (error "cannot handle complex factor ~a" fac)))))
+          (t (error "cannot handle complex factor ~a~%" fac)))))
+
+(defun count-tensor-rank (ops)
+  (let ((ndot (count 'dot ops)) ; a dot operator reduces two ranks
+        (ncross (count 'cross ops)) ; a cross operator reduces one rank
+        (nvec (count-if #'(lambda (x) (member x *var-vec-keywords*)) ops)))
+    (- nvec ncross (* 2 ndot))))
 
 (defun remove-sticker-next (expr) ; remove the operator behind sticker
   (cond ((last-one? expr) expr)
-        ((member (car expr) *var-sticker-keywords*)
+        ((and (member (car expr) *var-sticker-keywords*)
+              (member (cadr expr) *nabla-not-comutable-keywords*))
          (cons (car expr) (remove-sticker-next (cddr expr))))
         (t (cons (car expr) (remove-sticker-next (cdr expr))))))
 
@@ -378,8 +400,26 @@
       (cons fac (remove-sticker-next
                   (dagger-append bra (append op ket)))))))
 
-(defun format-vs-1e (ops)
-  (let* ((vs (reduce-vs (reduce-rpn (infix-to-rpn ops))))
+(defun reverse-tensor-ordering (ts &optional (depth 0))
+  (labels ((leafpend (xnode ynode znode depth)
+             (if (and (> depth 0) (listp xnode) (vector? xnode))
+                 (make-vec (leafpend (comp-x xnode) (comp-x ynode) (comp-x znode) (1- depth))
+                           (leafpend (comp-y xnode) (comp-y ynode) (comp-y znode) (1- depth))
+                           (leafpend (comp-z xnode) (comp-z ynode) (comp-z znode) (1- depth)))
+                 (make-vec xnode ynode znode))))
+    (if (and (> depth 0) (listp ts) (vector? ts))
+        (leafpend (reverse-tensor-ordering (comp-x ts) (1- depth))
+                  (reverse-tensor-ordering (comp-y ts) (1- depth))
+                  (reverse-tensor-ordering (comp-z ts) (1- depth))
+                  depth)
+        ts)))
+
+(defun format-vs-1e (phase ops-i ops-j &optional op)
+  (let* ((ops (cons phase (cons-bra-ket ops-i ops-j op)))
+         (rankbra (count-tensor-rank ops-i))
+         (vs (reverse-tensor-ordering
+              (reduce-vs (reduce-rpn (infix-to-rpn ops)))
+              (1- rankbra)))
          (ts (label-ts vs))
          (sf (label-sf vs))
          (p-vs (if (eql ts 'ts)
@@ -413,11 +453,11 @@
                vs2))
 
 (defun eval-int-r12 (phasefac op bra-i ket-j bra-k ket-l)
-  (let* ((vs1 (format-vs-1e (cons phasefac (cons-bra-ket bra-i ket-j op))))
+  (let* ((vs1 (format-vs-1e phasefac bra-i ket-j op))
          (ts1 (car vs1))
          (sf1 (cadr vs1))
          (pv1 (caddr vs1))
-         (vs2 (format-vs-1e (cons-bra-ket bra-k ket-l op)))
+         (vs2 (format-vs-1e 1 bra-k ket-l op))
          (ts2 (car vs2))
          (sf2 (cadr vs2))
          (pv2 (caddr vs2)))
@@ -471,16 +511,34 @@
           (ops-j (subst 'rj 'r ket-j))
           (ops-k (subst 'rk 'r bra-k))
           (ops-l (subst 'rl 'r ket-l)))
-      (if (one-electron-int? expr)
-        (cond ((equal op '(ovlp))
-               (format-vs-1e (cons phasefac (cons-bra-ket ops-i ops-j))))
-              (t (format-vs-1e (cons phasefac (cons-bra-ket ops-i ops-j op)))))
-        ; two-electron integrals
-        (cond ((member 'gaunt op)
-               (eval-int-gaunt phasefac op ops-i ops-j ops-k ops-l))
-              ((member 'r12 op)
-               (eval-int-r12 phasefac op ops-i ops-j ops-k ops-l))
-              (t (error "unsupport operator ~s" op)))))))
+      (cond ((one-electron-int? expr)
+             (format-vs-1e phasefac ops-i ops-j op))
+; two-electron integrals
+            ((int4c2e? expr)
+             (cond ((member 'gaunt op)
+                    (eval-int-gaunt phasefac op ops-i ops-j ops-k ops-l))
+                   ((member 'r12 op)
+                    (eval-int-r12 phasefac op ops-i ops-j ops-k ops-l))
+                   (t (error "unsupport operator ~s~%" op))))
+            ((int3c2e? expr)
+             (cond ((member 'gaunt op)
+                    (error "3c2e-gaunt not implemented~%"))
+                   ((member 'r12 op)
+                    (cond ((intersection '(sigma g) ops-k)
+                           (error "sigma, g not allowed in int3c2e electron 2 expression~%"))
+                          (ops-l (error "auxiliary basis should be in electron 2~%"))
+                          (t (eval-int-r12 phasefac op ops-i ops-j ops-k '()))))
+                   (t (error "unsupport operator ~s~%" op))))
+            ((int2c2e? expr)
+             (cond ((member 'gaunt op)
+                    (error "2c2e-gaunt not implemented~%"))
+                   ((member 'r12 op)
+                    (cond ((or (intersection '(sigma g) ops-k)
+                               (intersection '(sigma g) ops-i))
+                           (error "sigma, g not allowed in int2c2e expression~%"))
+                          (t (eval-int-r12 phasefac op ops-i '() ops-k '()))))
+                   (t (error "unsupport operator ~s~%" op))))
+            (t (error "unknown integral expression~%"))))))
 
 
 ;; vim: ft=lisp

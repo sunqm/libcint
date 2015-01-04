@@ -102,7 +102,7 @@
     ((r0 g) "R0") ; R0 ~ the vector origin is (0,0,0)
     ((rc) "RC") ; the vector origin is set in env[PTR_COMMON_ORIG]
     ((nabla-rinv nabla-r12) "D_")
-    (otherwise (error "unknown key ~a" key))))
+    (otherwise (error "unknown key ~a~%" key))))
 
 (defun dump-header (fout)
   (format fout "/*
@@ -112,6 +112,8 @@
 #include \"cint_bas.h\"
 #include \"cart2sph.h\"
 #include \"g2e.h\"
+#include \"g3c2e.h\"
+#include \"g2c2e.h\"
 #include \"optimizer.h\"
 #include \"cint1e.h\"
 #include \"cint2e.h\"
@@ -442,7 +444,7 @@ for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
         (dump-s-loop)
         (format fout "}~%")))))
 
-(defun gen-code-int2e (fout intname raw-infix &optional (sp 'spinor))
+(defun gen-code-int4c2e (fout intname raw-infix &optional (sp 'spinor))
   (destructuring-bind (op bra-i ket-j bra-k ket-l)
     (split-int-expression raw-infix)
     (let* ((i-rev (effect-keys bra-i))
@@ -462,7 +464,7 @@ for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
            (ts2 (caddr raw-script))
            (sf2 (cadddr raw-script))
            (goutinc))
-      (format fout "/* <~{~a ~}k ~{~a ~}i|~{~a ~}|~{~a ~}j ~{~a ~}l> : i,j\in electron 1; k,l\in electron 2~%"
+      (format fout "/* <~{~a ~}k ~{~a ~}i|~{~a ~}|~{~a ~}j ~{~a ~}l> : i,j \\in electron 1; k,l \\in electron 2~%"
               bra-k bra-i op ket-j ket-l)
       (format fout " * = (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k ~{~a ~}l) */~%"
               bra-i ket-j op bra-k ket-l)
@@ -522,7 +524,7 @@ const FINT *bas, const FINT nbas, const double *env) {~%" intname)
       (format fout "CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate function int2e
-      (format fout "FINT ~a(double *opkijl, const FINT *shls,
+      (format fout "FINT ~a(double *opijkl, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
       (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
@@ -541,12 +543,12 @@ const FINT l_sh = shls[3];~%")
 FINT jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
 FINT kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
 FINT lp = (bas(ANG_OF,l_sh) * 2 + 1) * bas(NCTR_OF,l_sh);
-CINTdset0(kp * ip * jp * lp * ng[TENSOR], opkijl);")
+CINTdset0(kp * ip * jp * lp * ng[TENSOR], opijkl);")
               (set0spin "FINT ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
 FINT jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
 FINT kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
 FINT lp = CINTlen_spinor(l_sh, bas) * bas(NCTR_OF,l_sh);
-CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opkijl);"))
+CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opijkl);"))
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
 ~a~%return 0; }~%" (if (eql sp 'spinor) set0spin set0sph)))
@@ -560,31 +562,227 @@ CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
       (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix))
 ;;; determine function caller
       (cond ((eql sp 'spinor)
-             (format fout "return CINT2e_spinor_drv(opkijl, &envs, opt, ~a, ~a);~%}~%"
+             (format fout "return CINT2e_spinor_drv(opijkl, &envs, opt, ~a, ~a);~%}~%"
                      (name-c2sor "2e1" sp sf1 ts1)
                      (name-c2sor "2e2" sp sf2 ts2)))
             ((eql sp 'spheric)
-             (format fout "return CINT2e_spheric_drv(opkijl, &envs, opt);~%}~%"))
+             (format fout "return CINT2e_spheric_drv(opijkl, &envs, opt);~%}~%"))
             ((eql sp 'cart)
-             (format fout "return CINT2e_cart_drv(opkijl, &envs, opt);~%}~%")))
+             (format fout "return CINT2e_cart_drv(opijkl, &envs, opt);~%}~%")))
+      (format fout "OPTIMIZER2F_(~a_optimizer);~%C2Fo_(~a)~%"
+              intname intname))))
+
+(defun gen-code-int3c2e (fout intname raw-infix &optional (sp 'spinor))
+  (destructuring-bind (op bra-i ket-j bra-k ket-l)
+    (split-int-expression raw-infix)
+    (let* ((i-rev (effect-keys bra-i))
+           (j-rev (reverse (effect-keys ket-j)))
+           (k-rev (effect-keys bra-k))
+           (op-rev (reverse (effect-keys op)))
+           (i-len (length i-rev))
+           (j-len (length j-rev))
+           (k-len (length k-rev))
+           (op-len (length op-rev))
+           (tot-bits (+ i-len j-len op-len k-len))
+           (raw-script (eval-int raw-infix))
+           (ts1 (car raw-script))
+           (sf1 (cadr raw-script))
+           (goutinc))
+      (format fout "/* (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k) */~%"
+              bra-i ket-j op bra-k)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate function gout2e
+      (format fout "static void CINTgout3c2e_~a(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {~%" intname)
+      (format fout "const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+FINT ix, iy, iz, i, n;
+double *g0 = g;~%")
+      (loop
+        for i in (range (ash 1 tot-bits)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
+      (format fout "double s[~a];~%" (expt 3 tot-bits))
+      (dump-declare-dri-for-rc fout bra-i "i")
+      (dump-declare-dri-for-rc fout ket-j "j")
+      (dump-declare-dri-for-rc fout bra-k "k")
+      (dump-declare-giao-ijkl fout bra-i ket-j bra-k '())
+;;; generate g_(bin)
+      (let ((fmt-k (mkstr "G3C2E_~aK(g~a, g~a, i_l+" i-len ", j_l+" j-len
+                          ", k_l+~a);~%"))
+            (fmt-op "")
+            (fmt-l ""))
+        (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev op-rev '() 0))
+      (let ((fmt-i (mkstr "G3C2E_~aI(g~a, g~a, i_l+~a, j_l, k_l);~%"))
+            (fmt-op (mkstr "G3C2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);
+G3C2E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);
+n = envs->g_size * 3;
+for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
+            (fmt-j (mkstr "G3C2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);~%")))
+        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len))
+;;; generate gout
+      (dump-s-2e fout tot-bits)
+;;; dump result of eval-int
+      (format fout "if (gout_empty) {~%")
+      (setf goutinc (gen-c-block fout "gout[~a] =" (last1 raw-script)))
+      (format fout "gout += ~a;~%} else {~%" goutinc)
+      (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
+      (format fout "gout += ~a;~%}}}~%" goutinc)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate optimizer for function int2e
+      (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
+              i-len (+ op-len j-len) k-len 0)
+      (format fout "CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+CINTOpt_set_3cindex_xyz(*opt, ng, atm, natm, bas, nbas, env);~%}~%")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate function int3c2e
+      (format fout "FINT ~a(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+              i-len j-len (+ op-len k-len) 0
+              tot-bits
+              (if (eql sf1 'sf) 1 4) 1
+              (if (eql sf1 'sf) goutinc (/ goutinc 4)))
+;;; determine factor
+      (when (member 'g raw-infix)
+        (format fout "const FINT i_sh = shls[0];
+const FINT j_sh = shls[1];
+const FINT k_sh = shls[2];~%")
+        (let ((set0sph "FINT ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
+FINT jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
+FINT kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
+CINTdset0(kp * ip * jp * ng[TENSOR], opijkl);")
+              (set0spin "FINT ip = CINTlen_spinor(i_sh, bas) * bas(NCTR_OF,i_sh);
+FINT jp = CINTlen_spinor(j_sh, bas) * bas(NCTR_OF,j_sh);
+FINT kp = CINTlen_spinor(k_sh, bas) * bas(NCTR_OF,k_sh);
+CINTdset0(kp * ip * jp * OF_CMPLX * ng[TENSOR], opijkl);"))
+        (when (or (member 'g bra-i) (member 'g ket-j))
+          (format fout "if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
+~a~%return 0; }~%" (if (eql sp 'spinor) set0spin set0sph)))))
+;;; initialize CINTEnvVars
+      (format fout "CINTEnvVars envs;
+CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
+      (format fout "envs.f_gout = &CINTgout3c2e_~a;~%" intname)
+      (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix))
+;;; determine function caller
+      (cond ((eql sp 'spinor)
+             (format fout "return CINT3c2e_spinor_drv(opijkl, &envs, opt, ~a);~%}~%"
+                     (name-c2sor "3c2e1" sp sf1 ts1)))
+            ((eql sp 'spheric)
+             (format fout "return CINT3c2e_spheric_drv(opijkl, &envs, opt);~%}~%"))
+            ((eql sp 'cart)
+             (format fout "return CINT3c2e_cart_drv(opijkl, &envs, opt);~%}~%")))
+      (format fout "OPTIMIZER2F_(~a_optimizer);~%C2Fo_(~a)~%"
+              intname intname))))
+
+(defun gen-code-int2c2e (fout intname raw-infix &optional (sp 'spinor))
+  (destructuring-bind (op bra-i ket-j bra-k ket-l)
+    (split-int-expression raw-infix)
+    (let* ((i-rev (effect-keys bra-i))
+           (k-rev (effect-keys bra-k))
+           (op-rev (reverse (effect-keys op)))
+           (i-len (length i-rev))
+           (k-len (length k-rev))
+           (op-len (length op-rev))
+           (tot-bits (+ i-len op-len k-len))
+           (raw-script (eval-int raw-infix))
+           (goutinc))
+      (format fout "/* (~{~a ~}i|~{~a ~}|~{~a ~}k) */~%"
+              bra-i op bra-k)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate function gout2e
+      (format fout "static void CINTgout2c2e_~a(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {~%" intname)
+      (format fout "const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT k_l = envs->k_l;
+const double *ri = envs->ri;
+const double *rk = envs->rk;
+FINT ix, iy, iz, i, n;
+double *g0 = g;~%")
+      (loop
+        for i in (range (ash 1 tot-bits)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
+      (format fout "double s[~a];~%" (expt 3 tot-bits))
+      (dump-declare-dri-for-rc fout bra-i "i")
+      (dump-declare-dri-for-rc fout bra-k "k")
+;;; generate g_(bin)
+      (let ((fmt-k (mkstr "G2C2E_~aK(g~a, g~a, i_l+" i-len ", k_l+~a);~%"))
+            (fmt-op "")
+            (fmt-l ""))
+        (dump-combo-braket fout fmt-k fmt-op fmt-l (append op-rev k-rev) '() '() 0))
+      (let ((fmt-i (mkstr "G2C2E_~aI(g~a, g~a, i_l+~a, k_l);~%"))
+            (fmt-op "")
+            (fmt-j ""))
+        (dump-combo-braket fout fmt-i fmt-op fmt-j (append op-rev i-rev) '() '() k-len))
+;;; generate gout
+      (dump-s-2e fout tot-bits)
+;;; dump result of eval-int
+      (format fout "if (gout_empty) {~%")
+      (setf goutinc (gen-c-block fout "gout[~a] =" (last1 raw-script)))
+      (format fout "gout += ~a;~%} else {~%" goutinc)
+      (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
+      (format fout "gout += ~a;~%}}}~%" goutinc)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate optimizer for function int2e
+      (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
+              (+ op-len i-len) 0 k-len 0)
+      (format fout "CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+CINTOpt_set_2cindex_xyz(*opt, ng, atm, natm, bas, nbas, env);~%}~%")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; generate function int2c2e
+      (format fout "FINT ~a(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
+      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+              (+ op-len i-len) 0 k-len 0 tot-bits 1 1 goutinc)
+;;; initialize CINTEnvVars
+      (format fout "CINTEnvVars envs;
+CINTinit_int2c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
+      (format fout "envs.f_gout = &CINTgout2c2e_~a;~%" intname)
+      (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix))
+;;; determine function caller
+      (cond ((eql sp 'spheric)
+             (format fout "return CINT2c2e_spheric_drv(opijkl, &envs, opt);~%}~%"))
+            ((eql sp 'cart)
+             (format fout "return CINT2c2e_cart_drv(opijkl, &envs, opt);~%}~%")))
       (format fout "OPTIMIZER2F_(~a_optimizer);~%C2Fo_(~a)~%"
               intname intname))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun gen-cint (filename sp &rest items)
+(defun gen-cint (filename &rest items)
   "sp can be one of 'spinor 'spheric 'cart"
-  (if (not (member sp '(spinor spheric cart)))
-    (error "gen-cint: unknown ~a . sp can be one of 'spinor 'spheric 'cart" sp))
   (with-open-file (fout (mkstr filename)
                         :direction :output :if-exists :supersede)
     (dump-header fout)
     (flet ((gen-code (item)
-      (let ((intname (mkstr (car item)))
-            (raw-infix (cadr item)))
-        (if (one-electron-int? raw-infix)
-          (gen-code-int1e fout intname raw-infix sp)
-          (gen-code-int2e fout intname raw-infix sp)))))
+             (let ((intname (mkstr (car item)))
+                   (sp (cadr item))
+                   (raw-infix (caddr item)))
+               (if (member sp '(spinor spheric cart))
+                   (cond ((one-electron-int? raw-infix)
+                          (gen-code-int1e fout intname raw-infix sp))
+                         ((int4c2e? raw-infix)
+                          (gen-code-int4c2e fout intname raw-infix sp))
+                         ((int3c2e? raw-infix)
+                          (gen-code-int3c2e fout intname raw-infix sp))
+                         ((int2c2e? raw-infix)
+                          (gen-code-int2c2e fout intname raw-infix sp)))
+                   (error "gen-cint: unknown ~a in ~a~%" sp item)))))
       (mapcar #'gen-code items))))
 
 ; gcl -load sigma.o -batch -eval "( .. )"

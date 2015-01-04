@@ -79,8 +79,8 @@
 #define TENSOR          7
 
 // some other boundaries
-#define MXRYSROOTS      16 // > ANG_MAX*2+1
-#define ANG_MAX         7 // l = 0..6
+#define MXRYSROOTS      16 // > ANG_MAX*2+1 for 4c2e
+#define ANG_MAX         8 // l = 0..7
 #define CART_MAX        64 // > (ANG_MAX*(ANG_MAX+1)/2)
 #define SHLS_MAX        0x7fffffff
 #define NPRIM_MAX       0x7fffffff

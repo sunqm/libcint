@@ -82,6 +82,10 @@ typedef struct {
 } CINTEnvVars;
 #endif
 
+FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
+                           const FINT *atm, const FINT natm,
+                           const FINT *bas, const FINT nbas, const double *env);
+
 void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs);
 
 void CINTg_ovlp(double *g, const double ai, const double aj,
