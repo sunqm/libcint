@@ -144,3 +144,10 @@
   '("cint3c2e_ipspsp1_spinor" spinor   (nabla sigma dot p \, sigma dot p \| ))
   '("cint3c2e_spsp1ip2_spinor" spinor  (sigma dot p \, sigma dot p \| nabla ))
 )
+ 
+(gen-cint "auto_hess.c"
+  '("cint2e_ipip1_sph"        spheric  ( nabla nabla \, \| \, ))
+  '("cint2e_ipvip1_sph"       spheric  ( nabla \, nabla \| \, ))
+  '("cint2e_ip1ip2_sph"       spheric  ( nabla \, \| nabla \, ))
+)
+

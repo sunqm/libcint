@@ -25,7 +25,8 @@ set(cintSrc
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c src/optimizer_3c2e.c 
   src/autocode/auto_intor1.c src/autocode/auto_intor2.c
   src/autocode/auto_intor3.c src/autocode/gaunt1.c src/autocode/grad1.c
-  src/autocode/grad2.c src/autocode/grad3.c src/autocode/auto_3c2e.c)
+  src/autocode/grad2.c src/autocode/grad3.c src/autocode/auto_hess.c
+  src/autocode/auto_3c2e.c)
 
 
 if (${ENABLE_STATIC})
