@@ -308,6 +308,203 @@ return CINT2c2e_spheric_drv(opijkl, &envs, opt);
 }
 OPTIMIZER2F_(cint2c2e_ip1_sph_optimizer);
 C2Fo_(cint2c2e_ip1_sph)
+/* (i|R12 |NABLA k) */
+static void CINTgout2c2e_cint2c2e_ip2_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT k_l = envs->k_l;
+const double *ri = envs->ri;
+const double *rk = envs->rk;
+FINT ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double s[3];
+G2C2E_D_K(g1, g0, i_l+0, k_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
+CINTdset0(3, s);
+for (i = 0; i < envs->nrys_roots; i++) {
+s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
+} break;}
+if (gout_empty) {
+gout[0] = + (1*s[0]);
+gout[1] = + (1*s[1]);
+gout[2] = + (1*s[2]);
+gout += 3;
+} else {
+gout[0] += + (1*s[0]);
+gout[1] += + (1*s[1]);
+gout[2] += + (1*s[2]);
+gout += 3;
+}}}
+void cint2c2e_ip2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 0, 1, 0, 0, 0, 0, 0};
+CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+CINTOpt_set_2cindex_xyz(*opt, ng, atm, natm, bas, nbas, env);
+}
+FINT cint2c2e_ip2_sph(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {0, 0, 1, 0, 1, 1, 1, 3};
+CINTEnvVars envs;
+CINTinit_int2c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2c2e_cint2c2e_ip2_sph;
+envs.common_factor *= 1;
+return CINT2c2e_spheric_drv(opijkl, &envs, opt);
+}
+OPTIMIZER2F_(cint2c2e_ip2_sph_optimizer);
+C2Fo_(cint2c2e_ip2_sph)
+/* <NABLA k i|R12 |j l> : i,j \in electron 1; k,l \in electron 2
+ * = (i j|R12 |NABLA k l) */
+static void CINTgout2e_cint2e_ip2_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+const double *rl = envs->rl;
+FINT ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double s[3];
+G2E_D_K(g1, g0, i_l+0, j_l+0, k_l+0, l_l);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
+CINTdset0(3, s);
+for (i = 0; i < envs->nrys_roots; i++) {
+s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
+} break;}
+if (gout_empty) {
+gout[0] = + (1*s[0]);
+gout[1] = + (1*s[1]);
+gout[2] = + (1*s[2]);
+gout += 3;
+} else {
+gout[0] += + (1*s[0]);
+gout[1] += + (1*s[1]);
+gout[2] += + (1*s[2]);
+gout += 3;
+}}}
+void cint2e_ip2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 0, 1, 0, 0, 0, 0, 0};
+CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+FINT cint2e_ip2_sph(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {0, 0, 1, 0, 1, 1, 1, 3};
+CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2e_cint2e_ip2_sph;
+envs.common_factor *= 1;
+return CINT2e_spheric_drv(opijkl, &envs, opt);
+}
+OPTIMIZER2F_(cint2e_ip2_sph_optimizer);
+C2Fo_(cint2e_ip2_sph)
 /* (NABLA i j|R12 |k) */
 static void CINTgout3c2e_cint3c2e_ip1_spinor(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
@@ -506,6 +703,75 @@ return CINT3c2e_spinor_drv(opijkl, &envs, opt, &c2s_sf_3c2e1);
 }
 OPTIMIZER2F_(cint3c2e_ip2_spinor_optimizer);
 C2Fo_(cint3c2e_ip2_spinor)
+/* (SIGMA DOT P i SIGMA DOT P j|R12 |k) */
+static void CINTgout3c2e_cint3c2e_spsp1_spinor(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+FINT ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double *g3 = g2 + envs->g_size * 3;
+double *g4 = g3 + envs->g_size * 3;
+double s[9];
+G3C2E_D_J(g1, g0, i_l+1, j_l+0, k_l);
+G3C2E_D_I(g2, g0, i_l+0, j_l, k_l);
+G3C2E_D_I(g3, g1, i_l+0, j_l, k_l);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+if (gout_empty) {
+gout[0] = + (1*s[5]) + (-1*s[7]);
+gout[1] = + (1*s[6]) + (-1*s[2]);
+gout[2] = + (1*s[1]) + (-1*s[3]);
+gout[3] = + (1*s[0]) + (1*s[4]) + (1*s[8]);
+gout += 4;
+} else {
+gout[0] += + (1*s[5]) + (-1*s[7]);
+gout[1] += + (1*s[6]) + (-1*s[2]);
+gout[2] += + (1*s[1]) + (-1*s[3]);
+gout[3] += + (1*s[0]) + (1*s[4]) + (1*s[8]);
+gout += 4;
+}}}
+void cint3c2e_spsp1_spinor_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 1, 0, 0, 0, 0, 0, 0};
+CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+CINTOpt_set_3cindex_xyz(*opt, ng, atm, natm, bas, nbas, env);
+}
+FINT cint3c2e_spsp1_spinor(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 1, 0, 0, 2, 4, 1, 1};
+CINTEnvVars envs;
+CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout3c2e_cint3c2e_spsp1_spinor;
+envs.common_factor *= 1;
+return CINT3c2e_spinor_drv(opijkl, &envs, opt, &c2s_si_3c2e1);
+}
+OPTIMIZER2F_(cint3c2e_spsp1_spinor_optimizer);
+C2Fo_(cint3c2e_spsp1_spinor)
 /* (NABLA SIGMA DOT P i SIGMA DOT P j|R12 |k) */
 static void CINTgout3c2e_cint3c2e_ipspsp1_spinor(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {

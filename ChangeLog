@@ -1,3 +1,6 @@
+Version 2.5.1 (2014-01-26):
+	* Add density fitting integral (sp i sp j | K)
+
 Version 2.5.0 (2014-01-04):
 	* Add general 2-center and 3-center 2e integrals
 	* Extend code generator for 2-center and 3-center 2e integrals 

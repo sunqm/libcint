@@ -136,11 +136,14 @@
 )
 
 (gen-cint "auto_3c2e.c"
-  '("cint3c2e_ip1_sph"        spheric  (nabla \, \| ))
-  '("cint3c2e_ip2_sph"        spheric  ( \, \| nabla))
-  '("cint2c2e_ip1_sph"        spheric  (nabla \| r12 \| ))
+  '("cint3c2e_ip1_sph"  spheric  (nabla \, \| ))
+  '("cint3c2e_ip2_sph"  spheric  ( \, \| nabla))
+  '("cint2c2e_ip1_sph"  spheric  (nabla \| r12 \| ))
+  '("cint2c2e_ip2_sph"  spheric  ( \| r12 \| nabla))
+  '("cint2e_ip2_sph"    spheric  ( \, \| r12 \| nabla \,))
   '("cint3c2e_ip1_spinor"     spinor   (nabla \, \| ))
   '("cint3c2e_ip2_spinor"     spinor   ( \, \| nabla))
+  '("cint3c2e_spsp1_spinor"   spinor   (sigma dot p \, sigma dot p \| ))
   '("cint3c2e_ipspsp1_spinor" spinor   (nabla sigma dot p \, sigma dot p \| ))
   '("cint3c2e_spsp1ip2_spinor" spinor  (sigma dot p \, sigma dot p \| nabla ))
 )
