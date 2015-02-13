@@ -6977,7 +6977,3 @@ void CINTc2s_iket_spinor(double *sph, FINT nket, double *cart, FINT l, FINT kapp
         (f_iket_spinor[l])(sph, nket, cart, l, kappa);
 }
 
-double *CINTc2s_ket_sph(double *sph, FINT nket, double *cart, FINT l)
-{
-        return (f_ket_sph[l])(sph, nket, cart, l);
-}
