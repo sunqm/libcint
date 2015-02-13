@@ -1,3 +1,6 @@
+Version 2.5.2 (2014-02-10):
+	* Expose cartesian to spherical transformation
+
 Version 2.5.1 (2014-01-26):
 	* Add density fitting integral (sp i sp j | K)
 
