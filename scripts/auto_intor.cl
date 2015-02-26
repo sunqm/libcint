@@ -16,6 +16,7 @@
   '("cint1e_igkin_sph"      spheric  (#C(0 .5) g \| p dot p))
   '("cint1e_igovlp_sph"     spheric  (#C(0 1) g \|))
   '("cint1e_ignuc_sph"      spheric  (#C(0 1) g \| nuc \|))
+  '("cint1e_pnucp_sph"      spheric  (p* \| nuc dot p \| ))
   '("cint1e_z_sph"          spheric  ( \| z \| ))
   '("cint1e_zz_sph"         spheric  ( \| z z \| ))
   '("cint1e_r_sph"          spheric  ( \| r \| ))
