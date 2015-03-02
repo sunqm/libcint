@@ -713,8 +713,238 @@ CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_pnucp_sph;
 return CINT1e_nuc_drv(opij, &envs, 1, &c2s_sph_1e); }
 C2F_(cint1e_pnucp_sph)
-/* <i|Z |j> */
+/* <i|ZC |j> */
 static void CINTgout1e_cint1e_z_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+FINT ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double s[3];
+double drj[3];
+drj[0] = rj[0] - env[PTR_COMMON_ORIG+0];
+drj[1] = rj[1] - env[PTR_COMMON_ORIG+1];
+drj[2] = rj[2] - env[PTR_COMMON_ORIG+2];
+G1E_RCJ(g1, g0, i_l+0, j_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g1[ix] * g0[iy] * g0[iz];
+s[1] = g0[ix] * g1[iy] * g0[iz];
+s[2] = g0[ix] * g0[iy] * g1[iz];
+gout[0] += + (1*s[2]);
+gout += 1;
+}}
+FINT cint1e_z_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 0, 1};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_cint1e_z_sph;
+return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
+C2F_(cint1e_z_sph)
+/* <i|ZC ZC |j> */
+static void CINTgout1e_cint1e_zz_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+FINT ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double *g3 = g2  + envs->g_size * 3;
+double *g4 = g3  + envs->g_size * 3;
+double s[9];
+double drj[3];
+drj[0] = rj[0] - env[PTR_COMMON_ORIG+0];
+drj[1] = rj[1] - env[PTR_COMMON_ORIG+1];
+drj[2] = rj[2] - env[PTR_COMMON_ORIG+2];
+G1E_RCJ(g1, g0, i_l+0, j_l+0);
+G1E_RCJ(g2, g0, i_l+0, j_l+1);
+G1E_RCJ(g3, g2, i_l+0, j_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (1*s[8]);
+gout += 1;
+}}
+FINT cint1e_zz_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 1};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_cint1e_zz_sph;
+return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
+C2F_(cint1e_zz_sph)
+/* <i|RC |j> */
+static void CINTgout1e_cint1e_r_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+FINT ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double s[3];
+double drj[3];
+drj[0] = rj[0] - env[PTR_COMMON_ORIG+0];
+drj[1] = rj[1] - env[PTR_COMMON_ORIG+1];
+drj[2] = rj[2] - env[PTR_COMMON_ORIG+2];
+G1E_RCJ(g1, g0, i_l+0, j_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g1[ix] * g0[iy] * g0[iz];
+s[1] = g0[ix] * g1[iy] * g0[iz];
+s[2] = g0[ix] * g0[iy] * g1[iz];
+gout[0] += + (1*s[0]);
+gout[1] += + (1*s[1]);
+gout[2] += + (1*s[2]);
+gout += 3;
+}}
+FINT cint1e_r_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 0, 3};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_cint1e_r_sph;
+return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
+C2F_(cint1e_r_sph)
+/* <i|RC DOT RC |j> */
+static void CINTgout1e_cint1e_r2_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+FINT ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double *g3 = g2  + envs->g_size * 3;
+double *g4 = g3  + envs->g_size * 3;
+double s[9];
+double drj[3];
+drj[0] = rj[0] - env[PTR_COMMON_ORIG+0];
+drj[1] = rj[1] - env[PTR_COMMON_ORIG+1];
+drj[2] = rj[2] - env[PTR_COMMON_ORIG+2];
+G1E_RCJ(g1, g0, i_l+0, j_l+0);
+G1E_RCJ(g2, g0, i_l+0, j_l+1);
+G1E_RCJ(g3, g2, i_l+0, j_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (1*s[0]) + (1*s[4]) + (1*s[8]);
+gout += 1;
+}}
+FINT cint1e_r2_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 1};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_cint1e_r2_sph;
+return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
+C2F_(cint1e_r2_sph)
+/* <i|RC RC |j> */
+static void CINTgout1e_cint1e_rr_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+FINT ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double *g3 = g2  + envs->g_size * 3;
+double *g4 = g3  + envs->g_size * 3;
+double s[9];
+double drj[3];
+drj[0] = rj[0] - env[PTR_COMMON_ORIG+0];
+drj[1] = rj[1] - env[PTR_COMMON_ORIG+1];
+drj[2] = rj[2] - env[PTR_COMMON_ORIG+2];
+G1E_RCJ(g1, g0, i_l+0, j_l+0);
+G1E_RCJ(g2, g0, i_l+0, j_l+1);
+G1E_RCJ(g3, g2, i_l+0, j_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (1*s[0]);
+gout[1] += + (1*s[1]);
+gout[2] += + (1*s[2]);
+gout[3] += + (1*s[3]);
+gout[4] += + (1*s[4]);
+gout[5] += + (1*s[5]);
+gout[6] += + (1*s[6]);
+gout[7] += + (1*s[7]);
+gout[8] += + (1*s[8]);
+gout += 9;
+}}
+FINT cint1e_rr_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_cint1e_rr_sph;
+return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
+C2F_(cint1e_rr_sph)
+/* <i|Z |j> */
+static void CINTgout1e_cint1e_z_origj_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
 const FINT nf = envs->nf;
@@ -738,17 +968,17 @@ s[2] = g0[ix] * g0[iy] * g1[iz];
 gout[0] += + (1*s[2]);
 gout += 1;
 }}
-FINT cint1e_z_sph(double *opij, const FINT *shls,
+FINT cint1e_z_origj_sph(double *opij, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {0, 1, 0, 0, 1, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_cint1e_z_sph;
+envs.f_gout = &CINTgout1e_cint1e_z_origj_sph;
 return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
-C2F_(cint1e_z_sph)
+C2F_(cint1e_z_origj_sph)
 /* <i|Z Z |j> */
-static void CINTgout1e_cint1e_zz_sph(double *g,
+static void CINTgout1e_cint1e_zz_origj_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
 const FINT nf = envs->nf;
@@ -782,17 +1012,17 @@ s[8] = g0[ix] * g0[iy] * g3[iz];
 gout[0] += + (1*s[8]);
 gout += 1;
 }}
-FINT cint1e_zz_sph(double *opij, const FINT *shls,
+FINT cint1e_zz_origj_sph(double *opij, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_cint1e_zz_sph;
+envs.f_gout = &CINTgout1e_cint1e_zz_origj_sph;
 return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
-C2F_(cint1e_zz_sph)
+C2F_(cint1e_zz_origj_sph)
 /* <i|R |j> */
-static void CINTgout1e_cint1e_r_sph(double *g,
+static void CINTgout1e_cint1e_r_origj_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
 const FINT nf = envs->nf;
@@ -818,17 +1048,17 @@ gout[1] += + (1*s[1]);
 gout[2] += + (1*s[2]);
 gout += 3;
 }}
-FINT cint1e_r_sph(double *opij, const FINT *shls,
+FINT cint1e_r_origj_sph(double *opij, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {0, 1, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_cint1e_r_sph;
+envs.f_gout = &CINTgout1e_cint1e_r_origj_sph;
 return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
-C2F_(cint1e_r_sph)
+C2F_(cint1e_r_origj_sph)
 /* <i|R DOT R |j> */
-static void CINTgout1e_cint1e_r2_sph(double *g,
+static void CINTgout1e_cint1e_r2_origj_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
 const FINT nf = envs->nf;
@@ -862,17 +1092,17 @@ s[8] = g0[ix] * g0[iy] * g3[iz];
 gout[0] += + (1*s[0]) + (1*s[4]) + (1*s[8]);
 gout += 1;
 }}
-FINT cint1e_r2_sph(double *opij, const FINT *shls,
+FINT cint1e_r2_origj_sph(double *opij, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_cint1e_r2_sph;
+envs.f_gout = &CINTgout1e_cint1e_r2_origj_sph;
 return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
-C2F_(cint1e_r2_sph)
+C2F_(cint1e_r2_origj_sph)
 /* <i|R R |j> */
-static void CINTgout1e_cint1e_rr_sph(double *g,
+static void CINTgout1e_cint1e_rr_origj_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs) {
 const double *env = envs->env;
 const FINT nf = envs->nf;
@@ -914,15 +1144,15 @@ gout[7] += + (1*s[7]);
 gout[8] += + (1*s[8]);
 gout += 9;
 }}
-FINT cint1e_rr_sph(double *opij, const FINT *shls,
+FINT cint1e_rr_origj_sph(double *opij, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_cint1e_rr_sph;
+envs.f_gout = &CINTgout1e_cint1e_rr_origj_sph;
 return CINT1e_drv(opij, &envs, 1, &c2s_sph_1e); }
-C2F_(cint1e_rr_sph)
+C2F_(cint1e_rr_origj_sph)
 /* <P* i|RINV CROSS P |j> */
 static void CINTgout1e_cint1e_prinvxp_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs) {

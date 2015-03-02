@@ -396,29 +396,29 @@ if __name__ == "__main__":
     test_comp2e_spinor('cint2e_ip1spsp2', 'cint2e_ip1', (0,0,4,4), 3, 12)
     test_comp2e_spinor('cint2e_ipspsp1spsp2', 'cint2e_ip1', (4,4,4,4), 3, 12)
 
-#    fz  = getattr(_cint, 'cint1e_z_sph')
-#    fzz = getattr(_cint, 'cint1e_zz_sph')
-#    fr  = getattr(_cint, 'cint1e_r_sph')
-#    fr2 = getattr(_cint, 'cint1e_r2_sph')
-#    frr = getattr(_cint, 'cint1e_rr_sph')
-#    v1 = 0
-#    for j in range(nbas.value*2):
-#        for i in range(j+1):
-#            di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
-#            dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
-#            opz  = numpy.empty((di,dj)  , order='F')
-#            opzz = numpy.empty((di,dj)  , order='F')
-#            opr  = numpy.empty((di,dj,3), order='F')
-#            opr2 = numpy.empty((di,dj)  , order='F')
-#            oprr = numpy.empty((di,dj,9), order='F')
-#            shls = (ctypes.c_int * 2)(i, j)
-#            fz ( opz.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
-#            fzz(opzz.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
-#            fr ( opr.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
-#            fr2(opr2.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
-#            frr(oprr.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
-#            v1 = abs(opz-opr[:,:,2]).sum()
-#            v1 += abs(opzz-oprr[:,:,8]).sum()
-#            v1 += abs(opr2-oprr[:,:,0]-oprr[:,:,4]-oprr[:,:,8]).sum()
-#            if round(v1, 13):
-#                print "* FAIL: ", i, j, v1
+    fz  = getattr(_cint, 'cint1e_z_sph')
+    fzz = getattr(_cint, 'cint1e_zz_sph')
+    fr  = getattr(_cint, 'cint1e_r_sph')
+    fr2 = getattr(_cint, 'cint1e_r2_sph')
+    frr = getattr(_cint, 'cint1e_rr_sph')
+    v1 = 0
+    for j in range(nbas.value*2):
+        for i in range(j+1):
+            di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
+            dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
+            opz  = numpy.empty((di,dj)  , order='F')
+            opzz = numpy.empty((di,dj)  , order='F')
+            opr  = numpy.empty((di,dj,3), order='F')
+            opr2 = numpy.empty((di,dj)  , order='F')
+            oprr = numpy.empty((di,dj,9), order='F')
+            shls = (ctypes.c_int * 2)(i, j)
+            fz ( opz.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+            fzz(opzz.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+            fr ( opr.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+            fr2(opr2.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+            frr(oprr.ctypes.data_as(ctypes.c_void_p), shls, c_atm, natm, c_bas, nbas, c_env)
+            v1 = abs(opz-opr[:,:,2]).sum()
+            v1 += abs(opzz-oprr[:,:,8]).sum()
+            v1 += abs(opr2-oprr[:,:,0]-oprr[:,:,4]-oprr[:,:,8]).sum()
+            if round(v1, 13):
+                print "* FAIL: ", i, j, v1

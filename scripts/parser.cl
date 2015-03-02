@@ -50,7 +50,10 @@
 
 (defparameter *intvar-keywords* '(p ip nabla px py pz
                                   p* ip* nabla* px* py* pz*
-                                  r r0 rc ri rj rk rl g x y z))
+                                  r r0 rc ri rj rk rl g
+                                  x x0 xc xi xj xk xl
+                                  y y0 yc yi yj yk yl
+                                  z z0 zc zi zj zk zl))
 (defparameter *var-sticker-keywords* '(p* ip* nabla* px* py* pz*))
 (defparameter *var-vec-keywords* '(p ip nabla p* ip* nabla* r r0 rc ri rj rk rl g))
 
@@ -137,6 +140,24 @@
                           (make-cell 1 '() '(r0 y))
                           (make-cell 1 '() '(r0 z)))))
     ((x y z) (make-cell 1 '() (make-op 'r item)))
+    ((x0) (make-cell 1 '() (make-op 'r0 'x)))
+    ((y0) (make-cell 1 '() (make-op 'r0 'y)))
+    ((z0) (make-cell 1 '() (make-op 'r0 'z)))
+    ((xc) (make-cell 1 '() (make-op 'rc 'x)))
+    ((yc) (make-cell 1 '() (make-op 'rc 'y)))
+    ((zc) (make-cell 1 '() (make-op 'rc 'z)))
+    ((xi) (make-cell 1 '() (make-op 'ri 'x)))
+    ((yi) (make-cell 1 '() (make-op 'ri 'y)))
+    ((zi) (make-cell 1 '() (make-op 'ri 'z)))
+    ((xj) (make-cell 1 '() (make-op 'rj 'x)))
+    ((yj) (make-cell 1 '() (make-op 'rj 'y)))
+    ((zj) (make-cell 1 '() (make-op 'rj 'z)))
+    ((xk) (make-cell 1 '() (make-op 'rk 'x)))
+    ((yk) (make-cell 1 '() (make-op 'rk 'y)))
+    ((zk) (make-cell 1 '() (make-op 'rk 'z)))
+    ((xl) (make-cell 1 '() (make-op 'rl 'x)))
+    ((yl) (make-cell 1 '() (make-op 'rl 'y)))
+    ((zl) (make-cell 1 '() (make-op 'rl 'z)))
     ((px) (make-cell #C(0 -1) '() '(nabla z)))
     ((py) (make-cell #C(0 -1) '() '(nabla y)))
     ((pz) (make-cell #C(0 -1) '() '(nabla z)))
