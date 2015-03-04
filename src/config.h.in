@@ -1,7 +1,7 @@
 #cmakedefine I8
 
 #if defined I8
-#define FINT long
+#define FINT long long
 #else
 #define FINT int
 #endif
