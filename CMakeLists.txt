@@ -8,6 +8,11 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(BLAS REQUIRED)
+set(CMAKE_REQUIRED_INCLUDES math.h)
+set(CMAKE_REQUIRED_LIBRARIES m)
+check_function_exists(expl HAVE_EXPL)
+check_function_exists(sqrtl HAVE_SQRTL)
+check_function_exists(fabsl HAVE_FABSL)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include

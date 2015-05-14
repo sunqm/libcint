@@ -1,8 +1,12 @@
 #cmakedefine I8
 
-#if defined I8
+#ifdef I8
 #define FINT long long
 #else
 #define FINT int
 #endif
+
+#cmakedefine HAVE_EXPL
+#cmakedefine HAVE_SQRTL
+#cmakedefine HAVE_FABSL
 
