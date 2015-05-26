@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
  *
  * Parameters and function prototypes for libcint.
  */
 
-#define PTR_LIGHT_SPEED         0
-#define PTR_COMMON_ORIG         1
-#define PTR_RINV_ORIG           4
-#define PTR_ENV_START           20
+#define CINT_VERSION    @cint_VERSION@
+
+#define PTR_LIGHT_SPEED 0
+#define PTR_COMMON_ORIG 1
+#define PTR_RINV_ORIG   4
+#define PTR_ENV_START   20
 
 // slots of atm
 #define CHARGE_OF       0

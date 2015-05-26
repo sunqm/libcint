@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.5.4")
+set(cint_VERSION "2.5.5")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -15,13 +15,17 @@ check_function_exists(sqrtl HAVE_SQRTL)
 check_function_exists(fabsl HAVE_FABSL)
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}/src)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/src/config.h.in"
   "${PROJECT_BINARY_DIR}/src/config.h")
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/include/cint.h.in"
+  "${PROJECT_BINARY_DIR}/include/cint.h")
 
 set(cintSrc 
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
@@ -41,7 +45,7 @@ if (${ENABLE_STATIC})
     OUTPUT_NAME cint)
 
   install(TARGETS cintStatic DESTINATION lib)
-  install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
+  install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION include)
 
 else()
 
@@ -54,7 +58,7 @@ else()
   target_link_libraries(cint ${BLAS_LIBRARIES})
 
   install(TARGETS cint DESTINATION lib)
-  install(FILES ${PROJECT_SOURCE_DIR}/include/cint.h DESTINATION include)
+  install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION include)
 
   if (${ENABLE_EXAMPLE})
     enable_language(Fortran)

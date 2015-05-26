@@ -1,7 +1,8 @@
 #cmakedefine I8
 
 #ifdef I8
-#define FINT long long
+#include <stdint.h>
+#define FINT int64_t
 #else
 #define FINT int
 #endif
