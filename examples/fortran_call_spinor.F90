@@ -7,16 +7,6 @@ do i = 1, n
 end do
 end function factorial
 
-double precision function gto_norm(n, a)
-! normalization factor of function r^n e^{-a r^2}
-integer :: n
-double precision :: a
-integer,external :: factorial
-gto_norm = 2**(2*n+3) * factorial(n+1) * (2*a)**(n+1.5) &
-        / (factorial(2*n+2) * sqrt(3.14159265358979d0))
-gto_norm = sqrt(gto_norm)
-end function gto_norm
-
 program spinor
 implicit none
 integer,parameter :: CHARGE_OF  = 1

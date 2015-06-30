@@ -70,6 +70,8 @@ else()
       enable_testing()
       add_test(NAME cinttest
         COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
+      add_test(NAME cint3c2etest
+        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_3c2e.py)
     endif()
   endif()
 

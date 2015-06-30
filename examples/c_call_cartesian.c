@@ -6,23 +6,6 @@
 int cint1e_ipnuc_cart(double *buf, int *shls,
                       int *atm, int natm, int *bas, int nbas, double *env);
 
-int factorial(int n)
-{
-        int i, fact = 1;
-        for (i = 1; i <= n; i++) {
-                fact *= i;
-        }
-        return fact;
-}
-
-// normalization factor of function r^n e^{-a r^2}
-double gto_norm(int n, double a)
-{
-        double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
-                / (factorial(2*n+2) * sqrt(M_PI));
-        return sqrt(nn);
-}
-
 /* general contracted DZ basis [3s1p/2s1p] for H2
     exponents    contract-coeff
 S   6.0          0.7               0.4

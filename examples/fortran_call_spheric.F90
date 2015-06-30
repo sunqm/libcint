@@ -7,16 +7,6 @@ do i = 1, n
 end do
 end function factorial
 
-double precision function gto_norm(n, a)
-! normalization factor of function r^n e^{-a r^2}
-integer :: n
-double precision :: a
-integer,external :: factorial
-gto_norm = 2**(2*n+3) * factorial(n+1) * (2*a)**(n+1.5) &
-        / (factorial(2*n+2) * sqrt(3.14159265358979d0))
-gto_norm = sqrt(gto_norm)
-end function gto_norm
-
 ! general contracted DZ basis [3s1p/2s1p] for H2
 !     exponents    contract-coeff
 ! S   6.0          0.7               0.4

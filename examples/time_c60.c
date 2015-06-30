@@ -10,8 +10,7 @@
 #define atm(X,Y) atm[(X)+(Y)*ATM_SLOTS]
 
 
-void run_all(const int *atm, const int natm,
-             const int *bas, const int nbas, const double *env);
+void run_all(int *atm, int natm, int *bas, int nbas, double *env);
 
 int main()
 {
@@ -165,8 +164,7 @@ int main()
         free(env);
 }
 
-void run_all(const int *atm, const int natm,
-             const int *bas, const int nbas, const double *env)
+void run_all(int *atm, int natm, int *bas, int nbas, double *env)
 {
         int i, j, k, l, ij, kl;
         int di, dj, dk, dl;

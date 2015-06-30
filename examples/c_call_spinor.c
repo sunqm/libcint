@@ -1,26 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <complex.h>
 #include <math.h>
 #include "cint.h"
 
-#define OF_CMPLX 2
+int cint1e_spnucsp(double complex *buf, int *shls,
+                   int *atm, int natm, int *bas, int nbas, double *env);
 
-int factorial(int n)
-{
-        int i, fact = 1;
-        for (i = 1; i <= n; i++) {
-                fact *= i;
-        }
-        return fact;
-}
+int cint2e_spsp1(double complex *buf, int *shls,
+                 int *atm, int natm, int *bas, int nbas, double *env,
+                 CINTOpt *opt);
 
-// normalization factor of function r^n e^{-a r^2}
-double gto_norm(int n, double a)
-{
-        double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
-                / (factorial(2*n+2) * sqrt(M_PI));
-        return sqrt(nn);
-}
+void cint2e_spsp1_optimizer(CINTOpt **opt, int *atm, int natm,
+                            int *bas, int nbas, double *env);
+
 
 /* general contracted DZ basis [3s1p/2s1p] for H2
     exponents    contract-coeff
@@ -120,11 +113,11 @@ int main()
         int j, k, l;
         int di, dj, dk, dl;
         int shls[4];
-        double *buf;
+        double complex *buf;
 
         i = 0; shls[0] = i; di = CINTcgto_spinor(i, bas);
         j = 1; shls[1] = j; dj = CINTcgto_spinor(j, bas);
-        buf = malloc(sizeof(double) * di * dj * OF_CMPLX);
+        buf = malloc(sizeof(double complex) * di * dj);
         if (0 != cint1e_spnucsp(buf, shls, atm, natm, bas, nbas, env)) {
                 printf("This integral is not 0.\n");
         } else {
@@ -139,7 +132,7 @@ int main()
         j = 1; shls[1] = j; dj = CINTcgto_spinor(j, bas);
         k = 2; shls[2] = k; dk = CINTcgto_spinor(k, bas);
         l = 2; shls[3] = l; dl = CINTcgto_spinor(l, bas);
-        buf = malloc(sizeof(double) * di * dj * dk * dl * OF_CMPLX);
+        buf = malloc(sizeof(double complex) * di * dj * dk * dl);
         if (0 != cint2e_spsp1(buf, shls, atm, natm, bas, nbas, env, NULL)) {
                 printf("This integral is not 0.\n");
         } else {
@@ -153,7 +146,7 @@ int main()
         j = 1; shls[1] = j; dj = CINTcgto_spinor(j, bas);
         k = 2; shls[2] = k; dk = CINTcgto_spinor(k, bas);
         l = 2; shls[3] = l; dl = CINTcgto_spinor(l, bas);
-        buf = malloc(sizeof(double) * di * dj * dk * dl * OF_CMPLX);
+        buf = malloc(sizeof(double complex) * di * dj * dk * dl);
         if (0 != cint2e_spsp1(buf, shls, atm, natm, bas, nbas, env, opt)) {
                 printf("This integral is not 0.\n");
         } else {

@@ -16,6 +16,7 @@
 #include "fblas.h"
 #include "cart2sph.h"
 #include "c2f.h"
+#include "g2c2e.h"
 
 #define SQUARE(r)       (r)[0]*(r)[0] + (r)[1]*(r)[1] + (r)[2]*(r)[2]
 

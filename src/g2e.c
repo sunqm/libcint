@@ -23,6 +23,7 @@ static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 static void CINTset_g2e_params(CINTEnvVars *envs);
+void CINTg0_kj2d_3d(double *g, const CINTEnvVars *envs);
 
 
 FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,

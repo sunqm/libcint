@@ -7,6 +7,7 @@
 #include <math.h>
 #include <complex.h>
 #include "config.h"
+#include "cint_const.h"
 
 void CINTdcmplx_re(const FINT n, double complex *z, const double *re)
 {
@@ -74,4 +75,8 @@ double CINTgto_norm(FINT n, double a)
         double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
                 / (factorial(2*n+2) * sqrt(M_PI));
         return sqrt(nn);
+}
+double CINTgto_norm_(FINT *n, double *a)
+{
+        return CINTgto_norm(*n, *a);
 }
