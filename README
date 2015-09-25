@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 2.5.5
-2015-5-14
+version 2.6.0
+2015-9-25
 
 
 What is libcint
@@ -173,7 +173,7 @@ Known problems
         https://github.com/sunqm/qcint.git
 
 
-* examples are not compiled by default. Compiling examples by
+* Tests and examples are not compiled by default. Compiling them by
 
         cmake -DENABLE_EXAMPLE=1
 

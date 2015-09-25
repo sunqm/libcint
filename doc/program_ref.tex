@@ -1,28 +1,68 @@
-\documentclass{article}
-\usepackage{amsmath}
-\usepackage[mathletters]{ucs}
-\usepackage[utf8x]{inputenc}
-\usepackage[breaklinks=true,unicode=true]{hyperref}
+\documentclass[]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+    \usepackage{xltxtra,xunicode}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use microtype if available
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={},
+            pdftitle={Program Reference},
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+\urlstyle{same}  % don't use monospace font for urls
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
 \setcounter{secnumdepth}{0}
 
 \title{Program Reference}
+\author{}
+\date{}
 
 \begin{document}
 \maketitle
 
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{3}
 \tableofcontents
+}
+\section{Overview of libcint usage}\label{overview-of-libcint-usage}
 
-\section{Overview of libcint usage}
-
-\subsection{Preparing args}
+\subsection{Preparing args}\label{preparing-args}
 
 \ldots{}
 
-\section{Interface}
+\section{Interface}\label{interface}
 
-\subsection{C routine}
+\subsection{C routine}\label{c-routine}
 
 \begin{verbatim}
 dim = CINTgto_cart(bas_id, bas);
@@ -30,81 +70,95 @@ dim = CINTgto_spheric(bas_id, bas);
 dim = CINTgto_spinor(bas_id, bas);
 f1e(buf, shls, atm, natm, bas, nbas, env);
 f2e(buf, shls, atm, natm, bas, nbas, env, opt);
-f2e_optimizer(&opt, atm, nbat, bas, nbas, env);
+f2e_optimizer(&opt, atm, natm, bas, nbas, env);
 CINTdel_optimizer(&opt);
 \end{verbatim}
+
 \begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
   buf: column-major double precision array.
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
     for 1e integrals of shells (i,j), data are stored as
-    \verb![i1j1 i2j1 ... ]!
+    \texttt{{[}i1j1 i2j1 ... {]}}
   \item
     for 2e integrals of shells (i,j\textbar{}k,l), data are stored as\\
-    \verb![i1j1k1l1 i2j1k1l1 ... i1j2k1l1 ... i1j1k2l1 ... ]!
+    \texttt{{[}i1j1k1l1 i2j1k1l1 ... i1j2k1l1 ... i1j1k2l1 ... {]}}
   \item
     complex data are stored as two double elements, first is real,
-    followed by imaginary, e.g.~[Re Im Re Im \ldots{}]
+    followed by imaginary, e.g. {[}Re Im Re Im \ldots{}{]}
   \end{itemize}
 \item
   shls: 0-based basis/shell indices.
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    int[2] for 1e integrals
+    int{[}2{]} for 1e integrals
   \item
-    int[4] for 2e integrals
+    int{[}4{]} for 2e integrals
   \end{itemize}
 \item
-  atm: int[natm*6], list of atoms. For ith atom, the 6 slots of
-  atm[i] are
+  atm: int{[}natm*6{]}, list of atoms. For ith atom, the 6 slots of
+  atm{[}i{]} are
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    \verb!atm[i*6+0]! nuclear charge of atom i
+    \texttt{atm{[}i*6+0{]}} nuclear charge of atom i
   \item
-    \verb!atm[i*6+1]! env offset to save coordinates
-    (\verb!env[atm[i*6+1]]!, \verb!env[atm[i*6+1]+1]!,
-    \verb!env[atm[i*6+1]+2]!) are (x,y,z)
+    \texttt{atm{[}i*6+1{]}} env offset to save coordinates
+    (\texttt{env{[}atm{[}i*6+1{]}{]}},
+    \texttt{env{[}atm{[}i*6+1{]}+1{]}},
+    \texttt{env{[}atm{[}i*6+1{]}+2{]}}) are (x,y,z)
   \item
-    \verb!atm[i*6+2]! nuclear model of atom i, = 2 indicates gaussian
-    nuclear model
+    \texttt{atm{[}i*6+2{]}} nuclear model of atom i, = 2 indicates
+    gaussian nuclear model
+    $\rho(r) = Z (\frac{\zeta}{\pi})^{3/2} \exp(-\zeta r^2)$
   \item
-    \verb!atm[i*6+3]! unused
+    \texttt{atm{[}i*6+3{]}} env offset to save the nuclear charge
+    distribution parameter $\zeta$
   \item
-    \verb!atm[i*6+4]! unused
+    \texttt{atm{[}i*6+4{]}} unused
   \item
-    \verb!atm[i*6+5]! unused
+    \texttt{atm{[}i*6+5{]}} unused
   \end{itemize}
 \item
-  natm: int, number of atoms, natm has no effect
-  \textbf{except nuclear attraction} integrals
+  natm: int, number of atoms, natm has no effect \textbf{except nuclear
+  attraction} integrals
 \item
-  bas: int[nbas*8], list of basis. For ith basis, the 8 slots of
-  bas[i] are
+  bas: int{[}nbas*8{]}, list of basis. For ith basis, the 8 slots of
+  bas{[}i{]} are
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    \verb!bas[i*8+0]! 0-based index of corresponding atom
+    \texttt{bas{[}i*8+0{]}} 0-based index of corresponding atom
   \item
-    \verb!bas[i*8+1]! angular momentum
+    \texttt{bas{[}i*8+1{]}} angular momentum
   \item
-    \verb!bas[i*8+2]! number of primitive GTO in basis i
+    \texttt{bas{[}i*8+2{]}} number of primitive GTO in basis i
   \item
-    \verb!bas[i*8+3]! number of contracted GTO in basis i
+    \texttt{bas{[}i*8+3{]}} number of contracted GTO in basis i
   \item
-    \verb!bas[i*8+4]! kappa for spinor GTO.\\ \textless{} 0 the basis
-    \ensuremath{\sim} j = l + 1/2.\\ \textgreater{} 0 the basis
-    \ensuremath{\sim} j = l - 1/2.\\ = 0 the basis includes both j = l
-    + 1/2 and j = l - 1/2
+    \texttt{bas{[}i*8+4{]}} kappa for spinor GTO.\\ \textless{} 0 the
+    basis \textasciitilde{} j = l + 1/2.\\ \textgreater{} 0 the basis
+    \textasciitilde{} j = l - 1/2.\\ = 0 the basis includes both j = l +
+    1/2 and j = l - 1/2
   \item
-    \verb!bas[i*8+5]! env offset to save exponents of primitive GTOs.
-    e.g.~10 exponents \verb!env[bas[i*8+5]]! \ldots{}
-    \verb!env[bas[i*8+5]+9]!
+    \texttt{bas{[}i*8+5{]}} env offset to save exponents of primitive
+    GTOs. e.g.~10 exponents \texttt{env{[}bas{[}i*8+5{]}{]}} \ldots{}
+    \texttt{env{[}bas{[}i*8+5{]}+9{]}}
   \item
-    \verb!bas[i*8+6]! env offset to save column-major contraction
+    \texttt{bas{[}i*8+6{]}} env offset to save column-major contraction
     coefficients. e.g.~10 primitive -\textgreater{} 5 contraction needs
     a $10\times 5$ array
   \end{itemize}
 \end{itemize}
+
 \begin{verbatim}
 env[bas[i*8+6]  ] | env[bas[i*8+6]+10] |     | env[bas[i*8+6]+40]
 env[bas[i*8+6]+1] | env[bas[i*8+6]+11] |     | env[bas[i*8+6]+41]
@@ -112,44 +166,45 @@ env[bas[i*8+6]+1] | env[bas[i*8+6]+11] |     | env[bas[i*8+6]+41]
  .                |  .                 |     |  .                
 env[bas[i*8+6]+9] | env[bas[i*8+6]+19] |     | env[bas[i*8+6]+49]
 \end{verbatim}
+
 \begin{verbatim}
 - `bas[i*8+7]` unused
 \end{verbatim}
+
 \begin{itemize}
 \item
   nbas: int, number of bases, nbas has no effect, can be set to 0
 \item
-  env: double[], save the value of coordinates, exponents,
+  env: double{[}{]}, save the value of coordinates, exponents,
   contraction coefficients
-
 \item
   struct CINTOpt *opt: so called ``optimizer'', it needs to be
   intialized
 
-  CINTOpt *opt = NULL; intname\_optimizer(\&opt, atm, natm, bas,
-  nbas, env);
-
+  CINTOpt *opt = NULL; intname\_optimizer(\&opt, atm, natm, bas, nbas,
+  env);
 \end{itemize}
+
 every integral type has its own optimizer with the suffix
-\_optimizer in its name, e.g.~the optimizer for cint2e\_sph is
-cint2e\_sph\_opimizer. ``optimizer'' is an optional argument for
-the integrals. It can roughly speed the integration by 10\% without
-affecting the value of integrals. If no optimizer is wanted, set it
-to NULL.
+\emph{optimizer in its name, e.g.~the optimizer for cint2e}sph is
+cint2e\_sph\_opimizer. ``optimizer'' is an optional argument for the
+integrals. It can roughly speed the integration by 10\% without
+affecting the value of integrals. If no optimizer is wanted, set it to
+NULL.
 
 optimizer needs to be released after using.
 
 \begin{verbatim}
 CINTdel_optimizer(&opt);
 \end{verbatim}
+
 \begin{itemize}
 \item
   if the return value equals 0, every element of the integral is 0
-
 \item
   short example
-
 \end{itemize}
+
 \begin{verbatim}
 #include "cint.h"
 ...
@@ -169,7 +224,8 @@ for (i = 0; i < nbas; i++) {
 }
 CINTdel_optimizer(&opt);
 \end{verbatim}
-\subsection{Fortran routine}
+
+\subsection{Fortran routine}\label{fortran-routine}
 
 \begin{verbatim}
 dim = CINTgto_cart(bas_id, bas)
@@ -177,13 +233,16 @@ dim = CINTgto_spheric(bas_id, bas)
 dim = CINTgto_spinor(bas_id, bas)
 call f1e(buf, shls, atm, natm, bas, nbas, env)
 call f2e(buf, shls, atm, natm, bas, nbas, env, opt)
-call f2e_optimizer(opt, atm, nbat, bas, nbas, env)
+call f2e_optimizer(opt, atm, natm, bas, nbas, env)
 call CINTdel_optimizer(opt)
 \end{verbatim}
+
 \begin{itemize}
 \item
   atm and bas are 2D integer array
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
     atm(1:6,i) is the (charge, offset\_coord, nuclear\_model, unused,
     unused, unused) of the ith atom
@@ -198,26 +257,30 @@ call CINTdel_optimizer(opt)
 \item
   buf is 2D/4D double precision/double complex array
 \item
-  opt: an integer(8) to hold the address of so called ``optimizer'',
-  it needs to be intialized by
+  opt: an integer(8) to hold the address of so called ``optimizer'', it
+  needs to be intialized by
 
   integer(8) opt call f2e\_optimizer(opt, atm, natm, bas, nbas, env)
-
 \end{itemize}
+
 The optimizier can be banned by setting the ``optimizier'' to 0\_8
 
 \begin{verbatim}
 call f2e(buf, atm, natm, bas, nbas, env, 0_8)
 \end{verbatim}
+
 To release optimizer, execute
 
 \begin{verbatim}
 call CINTdel_optimizer(opt);
 \end{verbatim}
+
 \begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
   short example
 \end{itemize}
+
 \begin{verbatim}
 ...
 integer,external CINTcgto_spheric
@@ -237,329 +300,348 @@ do i = 1, nbas
 end do
 call CINTdel_optimizer(opt)
 \end{verbatim}
-\subsection{Supported angular momentum}
+
+\subsection{Supported angular
+momentum}\label{supported-angular-momentum}
 
 $l_{max}$ = 6
 
-\subsection{Data ordering}
+\subsection{Data ordering}\label{data-ordering}
 
 \begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
-  for Cartesian GTO, the output data in buf are sorted
-  as\\\begin{tabular}{l|l|l|l}
-\hline
-    s shell & p shell & d shell & ... \\
-\hline
-    ...     & ...     & ...     & \\
-    s       & p $x$   & d $xx$  & \\
-    s       & p $y$   & d $xy$  & \\
-    ...     & p $z$   & d $xz$  & \\
-            & p $x$   & d $yy$  & \\
-            & p $y$   & d $yz$  & \\
-            & p $z$   & d $zz$  & \\
-            & ...     & ...     & \\
-\hline
-\end{tabular}
+  for Cartesian GTO, the output data in buf are sorted as\\
+
+  \begin{tabular}{l|l|l|l}
+  \hline
+      s shell & p shell & d shell & ... \\
+  \hline
+      ...     & ...     & ...     & \\
+      s       & p $x$   & d $xx$  & \\
+      s       & p $y$   & d $xy$  & \\
+      ...     & p $z$   & d $xz$  & \\
+              & p $x$   & d $yy$  & \\
+              & p $y$   & d $yz$  & \\
+              & p $z$   & d $zz$  & \\
+              & ...     & ...     & \\
+  \hline
+  \end{tabular}
 \item
-  for real spheric GTO, the output data in buf are sorted
-  as\\\begin{tabular}{l|l|l|l|l}
-\hline
-    s shell & p shell & d shell     & f shell         & ... \\
-\hline
-    ...     & ...     & ...         & ...             & \\
-    s       & p $x$   & d $xy     $ & f $y(3x^2-y^2)$ & \\
-    s       & p $y$   & d $yz     $ & f $xyz        $ & \\
-    ...     & p $z$   & d $z^2    $ & f $yz^2       $ & \\
-            & p $x$   & d $xz     $ & f $z^3        $ & \\
-            & p $y$   & d $x^2-y^2$ & f $xz^2       $ & \\
-            & p $z$   & ...         & f $z(x^2-y^2) $ & \\
-            & ...     &             & f $x(x^2-3y^2)$ & \\
-            &         &             & ...             & \\
-\hline
-\end{tabular}
+  for real spheric GTO, the output data in buf are sorted as\\
+
+  \begin{tabular}{l|l|l|l|l}
+  \hline
+      s shell & p shell & d shell     & f shell         & ... \\
+  \hline
+      ...     & ...     & ...         & ...             & \\
+      s       & p $x$   & d $xy     $ & f $y(3x^2-y^2)$ & \\
+      s       & p $y$   & d $yz     $ & f $xyz        $ & \\
+      ...     & p $z$   & d $z^2    $ & f $yz^2       $ & \\
+              & p $x$   & d $xz     $ & f $z^3        $ & \\
+              & p $y$   & d $x^2-y^2$ & f $xz^2       $ & \\
+              & p $z$   & ...         & f $z(x^2-y^2) $ & \\
+              & ...     &             & f $x(x^2-3y^2)$ & \\
+              &         &             & ...             & \\
+  \hline
+  \end{tabular}
 \item
-  for spinor GTO, the output data in buf correspond
-  to\\\begin{tabular}{l|l|l|l|l}
-\hline
-    ... & kappa=0,p shell & kappa=1,p shell & kappa=0,d shell & ... \\
-\hline
-        & ...             & ...             & ...             &     \\
-        & $p_{1/2}(-1/2)$ & $p_{1/2}(-1/2)$ & $d_{3/2}(-3/2)$ &     \\
-        & $p_{1/2}( 1/2)$ & $p_{1/2}( 1/2)$ & $d_{3/2}(-1/2)$ &     \\
-        & $p_{3/2}(-3/2)$ & $p_{1/2}(-1/2)$ & $d_{3/2}( 1/2)$ &     \\
-        & $p_{3/2}(-1/2)$ & $p_{1/2}( 1/2)$ & $d_{3/2}( 3/2)$ &     \\
-        & $p_{3/2}( 1/2)$ & $p_{1/2}(-1/2)$ & $d_{5/2}(-5/2)$ &     \\
-        & $p_{3/2}( 3/2)$ & $p_{1/2}( 1/2)$ & $d_{5/2}(-3/2)$ &     \\
-        & $p_{1/2}(-1/2)$ & ...             & $d_{5/2}(-1/2)$ &     \\
-        & $p_{1/2}( 1/2)$ &                 & $d_{3/2}(-3/2)$ &     \\
-        & $p_{3/2}(-3/2)$ &                 & $d_{3/2}(-1/2)$ &     \\
-        & $p_{3/2}(-1/2)$ &                 & ...             &     \\
-        & ...             &                 &                 &     \\
-\hline
-\end{tabular}
+  for spinor GTO, the output data in buf correspond to\\
+
+  \begin{tabular}{l|l|l|l|l}
+  \hline
+      ... & kappa=0,p shell & kappa=1,p shell & kappa=0,d shell & ... \\
+  \hline
+          & ...             & ...             & ...             &     \\
+          & $p_{1/2}(-1/2)$ & $p_{1/2}(-1/2)$ & $d_{3/2}(-3/2)$ &     \\
+          & $p_{1/2}( 1/2)$ & $p_{1/2}( 1/2)$ & $d_{3/2}(-1/2)$ &     \\
+          & $p_{3/2}(-3/2)$ & $p_{1/2}(-1/2)$ & $d_{3/2}( 1/2)$ &     \\
+          & $p_{3/2}(-1/2)$ & $p_{1/2}( 1/2)$ & $d_{3/2}( 3/2)$ &     \\
+          & $p_{3/2}( 1/2)$ & $p_{1/2}(-1/2)$ & $d_{5/2}(-5/2)$ &     \\
+          & $p_{3/2}( 3/2)$ & $p_{1/2}( 1/2)$ & $d_{5/2}(-3/2)$ &     \\
+          & $p_{1/2}(-1/2)$ & ...             & $d_{5/2}(-1/2)$ &     \\
+          & $p_{1/2}( 1/2)$ &                 & $d_{3/2}(-3/2)$ &     \\
+          & $p_{3/2}(-3/2)$ &                 & $d_{3/2}(-1/2)$ &     \\
+          & $p_{3/2}(-1/2)$ &                 & ...             &     \\
+          & ...             &                 &                 &     \\
+  \hline
+  \end{tabular}
 \end{itemize}
-\subsection{Tensor}
 
-Integrals like Gradients have more than one components. The output
-array is ordered in Fortran-contiguous. The tensor component takes
-the biggest strides.
+\subsection{Tensor}\label{tensor}
+
+Integrals like Gradients have more than one components. The output array
+is ordered in Fortran-contiguous. The tensor component takes the biggest
+strides.
 
 \begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
   3-component tensor
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    X \verb!buf(:,0)!
+    X \texttt{buf(:,0)}
   \item
-    Y \verb!buf(:,1)!
+    Y \texttt{buf(:,1)}
   \item
-    Z \verb!buf(:,2)!
+    Z \texttt{buf(:,2)}
   \end{itemize}
 \item
   9-component tensor
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    XX \verb!buf(:,0)!
+    XX \texttt{buf(:,0)}
   \item
-    XY \verb!buf(:,1)!
+    XY \texttt{buf(:,1)}
   \item
-    XZ \verb!buf(:,2)!
+    XZ \texttt{buf(:,2)}
   \item
-    YX \verb!buf(:,3)!
+    YX \texttt{buf(:,3)}
   \item
-    YY \verb!buf(:,4)!
+    YY \texttt{buf(:,4)}
   \item
-    YZ \verb!buf(:,5)!
+    YZ \texttt{buf(:,5)}
   \item
-    ZX \verb!buf(:,6)!
+    ZX \texttt{buf(:,6)}
   \item
-    ZY \verb!buf(:,7)!
+    ZY \texttt{buf(:,7)}
   \item
-    ZZ \verb!buf(:,8)!
+    ZZ \texttt{buf(:,8)}
   \end{itemize}
 \end{itemize}
-\section{Built-in function list}
+
+\section{Built-in function list}\label{built-in-function-list}
 
 \begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
   Cartesian GTO integrals
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    \verb!CINTcgto_cart(int shell_id, int bas[])!: Number of cartesian
-    functions of the given shell
+    \texttt{CINTcgto\_cart(int shell\_id, int bas{[}{]})}: Number of
+    cartesian functions of the given shell
   \item
-    \verb!cint1e_ovlp_cart! \[\langle i| j\rangle \]
+    \texttt{cint1e\_ovlp\_cart} \[\langle i| j\rangle \]
   \item
-    \verb!cint1e_nuc_cart! \[\langle i| V_{nuc} | j\rangle \]
+    \texttt{cint1e\_nuc\_cart} \[\langle i| V_{nuc} | j\rangle \]
   \item
-    \verb!cint1e_kin_cart!
+    \texttt{cint1e\_kin\_cart}
     \[.5\langle i| \vec{p} \cdot \vec{p} j\rangle \]
   \item
-    \verb!cint1e_ia01p_cart!
+    \texttt{cint1e\_ia01p\_cart}
     \[\langle i| \frac{\vec{r}}{r^3}| \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_irixp_cart!
+    \texttt{cint1e\_irixp\_cart}
     \[\langle i| (\vec{r}-\vec{R}_i) \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_ircxp_cart!
+    \texttt{cint1e\_ircxp\_cart}
     \[\langle i| (\vec{r}-\vec{R}_o) \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_iking_cart!
+    \texttt{cint1e\_iking\_cart}
     \[0.5i\langle \vec{p} \cdot \vec{p} i| U_gj\rangle \]
   \item
-    \verb!cint1e_iovlpg_cart! \[i \langle i| U_gj\rangle \]
+    \texttt{cint1e\_iovlpg\_cart} \[i \langle i| U_gj\rangle \]
   \item
-    \verb!cint1e_inucg_cart! \[i \langle i| V_{nuc}| U_gj\rangle \]
+    \texttt{cint1e\_inucg\_cart} \[i \langle i| V_{nuc}| U_gj\rangle \]
   \item
-    \verb!cint1e_ipovlp_cart! \[\langle \vec{\nabla} i|j\rangle \]
+    \texttt{cint1e\_ipovlp\_cart} \[\langle \vec{\nabla} i|j\rangle \]
   \item
-    \verb!cint1e_ipkin_cart!
+    \texttt{cint1e\_ipkin\_cart}
     \[0.5\langle \vec{\nabla} i| \vec{p} \cdot \vec{p} j\rangle \]
   \item
-    \verb!cint1e_ipnuc_cart!
+    \texttt{cint1e\_ipnuc\_cart}
     \[\langle \vec{\nabla} i| V_{nuc}|j\rangle \]
   \item
-    \verb!cint1e_iprinv_cart!
+    \texttt{cint1e\_iprinv\_cart}
     \[\langle \vec{\nabla} i| r^{-1}|j\rangle \]
   \item
-    \verb!cint1e_rinv_cart! \[\langle i| r^{-1} |j\rangle \]
+    \texttt{cint1e\_rinv\_cart} \[\langle i| r^{-1} |j\rangle \]
   \item
-    \verb!cint2e_cart! \[(ij|kl)\]
+    \texttt{cint2e\_cart} \[(ij|kl)\]
   \item
-    \verb!cint2e_ig1_cart! \[i(i U_g j|kl)\]
+    \texttt{cint2e\_ig1\_cart} \[i(i U_g j|kl)\]
   \item
-    \verb!cint2e_ip1_cart! \[(\vec{\nabla} i j|kl)\]
+    \texttt{cint2e\_ip1\_cart} \[(\vec{\nabla} i j|kl)\]
   \end{itemize}
 \item
   Spheric GTO integrals
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    \verb!CINTcgto_spheric(int shell_id, int bas[])!: Number of spheric
-    functions of the given shell
+    \texttt{CINTcgto\_spheric(int shell\_id, int bas{[}{]})}: Number of
+    spheric functions of the given shell
   \item
-    \verb!cint1e_ovlp_sph! \[\langle  i| j\rangle \]
+    \texttt{cint1e\_ovlp\_sph} \[\langle  i| j\rangle \]
   \item
-    \verb!cint1e_nuc_sph! \[\langle  i| V_{nuc}| j\rangle \]
+    \texttt{cint1e\_nuc\_sph} \[\langle  i| V_{nuc}| j\rangle \]
   \item
-    \verb!cint1e_kin_sph! \[0.5\langle i| \vec{p} \cdot pj\rangle \]
+    \texttt{cint1e\_kin\_sph} \[0.5\langle i| \vec{p} \cdot pj\rangle \]
   \item
-    \verb!cint1e_ia01p_sph!
+    \texttt{cint1e\_ia01p\_sph}
     \[\langle i| \frac{\vec{r}}{r^3}| \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_irixp_sph!
+    \texttt{cint1e\_irixp\_sph}
     \[\langle i| (\vec{r}_c-\vec{R}_i) \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_ircxp_sph!
+    \texttt{cint1e\_ircxp\_sph}
     \[\langle i| (\vec{r}_c-\vec{R}_o) \times \vec{\nabla} j\rangle \]
   \item
-    \verb!cint1e_iking_sph!
+    \texttt{cint1e\_iking\_sph}
     \[0.5i\langle \vec{p} \cdot \vec{p} i| U_gj\rangle \]
   \item
-    \verb!cint1e_iovlpg_sph! \[i\langle i| U_gj\rangle \]
+    \texttt{cint1e\_iovlpg\_sph} \[i\langle i| U_gj\rangle \]
   \item
-    \verb!cint1e_inucg_sph! \[i\langle i| V_{nuc}| U_gj\rangle \]
+    \texttt{cint1e\_inucg\_sph} \[i\langle i| V_{nuc}| U_gj\rangle \]
   \item
-    \verb!cint1e_ipovlp_sph! \[\langle \vec{\nabla} i|j\rangle \]
+    \texttt{cint1e\_ipovlp\_sph} \[\langle \vec{\nabla} i|j\rangle \]
   \item
-    \verb!cint1e_ipkin_sph!
+    \texttt{cint1e\_ipkin\_sph}
     \[0.5\langle \vec{\nabla} i| \vec{p} \cdot pj\rangle \]
   \item
-    \verb!cint1e_ipnuc_sph!
+    \texttt{cint1e\_ipnuc\_sph}
     \[\langle \vec{\nabla} i| V_{nuc}|j\rangle \]
   \item
-    \verb!cint1e_iprinv_sph!
+    \texttt{cint1e\_iprinv\_sph}
     \[\langle \vec{\nabla} i| r^{-1}|j\rangle \]
   \item
-    \verb!cint1e_rinv_sph! \[\langle i| r^{-1} |j\rangle \]
+    \texttt{cint1e\_rinv\_sph} \[\langle i| r^{-1} |j\rangle \]
   \item
-    \verb!cint2e_sph! \[(ij|kl)\]
+    \texttt{cint2e\_sph} \[(ij|kl)\]
   \item
-    \verb!cint2e_ig1_sph! \[i(i U_g j|kl)\]
+    \texttt{cint2e\_ig1\_sph} \[i(i U_g j|kl)\]
   \item
-    \verb!cint2e_ip1_sph! \[(\vec{\nabla} i j|kl)\]
+    \texttt{cint2e\_ip1\_sph} \[(\vec{\nabla} i j|kl)\]
   \end{itemize}
 \item
   Spinor GTO integrals
+
   \begin{itemize}
+  \itemsep1pt\parskip0pt\parsep0pt
   \item
-    \verb!CINTcgto_spinor(int shell_id, int bas[])!: Number of spinor
-    functions of the given shell
+    \texttt{CINTcgto\_spinor(int shell\_id, int bas{[}{]})}: Number of
+    spinor functions of the given shell
   \item
-    \verb!cint1e_ovlp! \[\langle  i| j\rangle \]
+    \texttt{cint1e\_ovlp} \[\langle  i| j\rangle \]
   \item
-    \verb!cint1e_nuc! \[\langle  i| V_{nuc} |j\rangle \]
+    \texttt{cint1e\_nuc} \[\langle  i| V_{nuc} |j\rangle \]
   \item
-    \verb!cint1e_nucg! \[\langle  i| V_{nuc} | U_gj\rangle \]
+    \texttt{cint1e\_nucg} \[\langle  i| V_{nuc} | U_gj\rangle \]
   \item
-    \verb!cint1e_srsr!
+    \texttt{cint1e\_srsr}
     \[\langle \vec{\sigma}\cdot\vec{r} i| \vec{\sigma}\cdot\vec{r}j\rangle \]
   \item
-    \verb!cint1e_sr! \[\langle \vec{\sigma}\cdot\vec{r} i|j\rangle \]
+    \texttt{cint1e\_sr} \[\langle \vec{\sigma}\cdot\vec{r} i|j\rangle \]
   \item
-    \verb!cint1e_srsp!
+    \texttt{cint1e\_srsp}
     \[\langle \vec{\sigma}\cdot\vec{r} i| \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_spsp!
+    \texttt{cint1e\_spsp}
     \[\langle \vec{\sigma}\cdot\vec{p} i| \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_sp! \[\langle \vec{\sigma}\cdot\vec{p} i|j\rangle \]
+    \texttt{cint1e\_sp} \[\langle \vec{\sigma}\cdot\vec{p} i|j\rangle \]
   \item
-    \verb!cint1e_spspsp!
+    \texttt{cint1e\_spspsp}
     \[\langle \vec{\sigma}\cdot\vec{p} i| \vec{\sigma}\cdot\vec{p} \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_spnuc!
+    \texttt{cint1e\_spnuc}
     \[\langle \vec{\sigma}\cdot\vec{p} i| V_{nuc} |j\rangle \]
   \item
-    \verb!cint1e_spnucsp!
+    \texttt{cint1e\_spnucsp}
     \[\langle \vec{\sigma}\cdot\vec{p} i| V_{nuc} | \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_srnucsr!
+    \texttt{cint1e\_srnucsr}
     \[\langle \vec{\sigma}\cdot\vec{r} i| V_{nuc} | \vec{\sigma}\cdot\vec{r}j\rangle \]
   \item
-    \verb!cint1e_sa10sa01!
+    \texttt{cint1e\_sa10sa01}
     \[0.5\langle\vec{\sigma} \times \vec{r}_c i|\vec{\sigma} \times \frac{\vec{r}}{r^3} |j\rangle \]
   \item
-    \verb!cint1e_ovlpg! \[\langle i|U_g j\rangle \]
+    \texttt{cint1e\_ovlpg} \[\langle i|U_g j\rangle \]
   \item
-    \verb!cint1e_sa10sp!
+    \texttt{cint1e\_sa10sp}
     \[0.5\langle\vec{r}_c \times\vec{\sigma} i| \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_sa10nucsp!
+    \texttt{cint1e\_sa10nucsp}
     \[0.5\langle\vec{r}_c \times\vec{\sigma} i| V_{nuc} | \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_sa01sp!
+    \texttt{cint1e\_sa01sp}
     \[\langle i| \frac{\vec{r}}{r^3} \times\vec{\sigma} | \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_spgsp!
+    \texttt{cint1e\_spgsp}
     \[\langle U_g \vec{\sigma}\cdot\vec{p} i| \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_spgnucsp!
+    \texttt{cint1e\_spgnucsp}
     \[\langle U_g \vec{\sigma}\cdot\vec{p} i| V_{nuc} | \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_spgsa01!
+    \texttt{cint1e\_spgsa01}
     \[\langle U_g \vec{\sigma}\cdot\vec{p} i| \frac{\vec{r}}{r^3} \times\vec{\sigma} |j\rangle \]
   \item
-    \verb!cint1e_ipovlp! \[\langle \vec{\nabla} i|j\rangle \]
+    \texttt{cint1e\_ipovlp} \[\langle \vec{\nabla} i|j\rangle \]
   \item
-    \verb!cint1e_ipkin!
+    \texttt{cint1e\_ipkin}
     \[0.5\langle \vec{\nabla} i| p \cdot pj\rangle \]
   \item
-    \verb!cint1e_ipnuc! \[\langle \vec{\nabla} i| V_{nuc}|j\rangle \]
+    \texttt{cint1e\_ipnuc} \[\langle \vec{\nabla} i| V_{nuc}|j\rangle \]
   \item
-    \verb!cint1e_iprinv! \[\langle \vec{\nabla} i| r^{-1}|j\rangle \]
+    \texttt{cint1e\_iprinv} \[\langle \vec{\nabla} i| r^{-1}|j\rangle \]
   \item
-    \verb!cint1e_ipspnucsp!
+    \texttt{cint1e\_ipspnucsp}
     \[\langle \vec{\nabla} \vec{\sigma}\cdot\vec{p} i| V_{nuc}| \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint1e_ipsprinvsp!
+    \texttt{cint1e\_ipsprinvsp}
     \[\langle \vec{\nabla} \vec{\sigma}\cdot\vec{p} i| r^{-1}| \vec{\sigma}\cdot\vec{p}j\rangle \]
   \item
-    \verb!cint2e! \[(ij|kl)\]
+    \texttt{cint2e} \[(ij|kl)\]
   \item
-    \verb!cint2e_spsp1!
+    \texttt{cint2e\_spsp1}
     \[(\vec{\sigma}\cdot\vec{p} i \vec{\sigma}\cdot\vec{p} j| k l)\]
   \item
-    \verb!cint2e_spsp1spsp2!
+    \texttt{cint2e\_spsp1spsp2}
     \[(\vec{\sigma}\cdot\vec{p} i \vec{\sigma}\cdot\vec{p} j| \vec{\sigma}\cdot\vec{p} k \vec{\sigma}\cdot\vec{p} l)\]
   \item
-    \verb!cint2e_srsr1!
+    \texttt{cint2e\_srsr1}
     \[(\vec{\sigma}\cdot\vec{r} i \vec{\sigma}\cdot\vec{r} j| kl)\]
   \item
-    \verb!cint2e_srsr1srsr2!
+    \texttt{cint2e\_srsr1srsr2}
     \[(\vec{\sigma}\cdot\vec{r} i \vec{\sigma}\cdot\vec{r} j| \vec{\sigma}\cdot\vec{r} k \vec{\sigma}\cdot\vec{r}l)\]
   \item
-    \verb!cint2e_sa10sp1!
+    \texttt{cint2e\_sa10sp1}
     \[0.5 (\vec{r}_c \times\vec{\sigma} i \vec{\sigma}\cdot\vec{p} j| kl)\]
   \item
-    \verb!cint2e_sa10sp1spsp2!
+    \texttt{cint2e\_sa10sp1spsp2}
     \[0.5 (\vec{r}_c \times\vec{\sigma} i \vec{\sigma}\cdot\vec{p} j| \vec{\sigma}\cdot\vec{p} k \vec{\sigma}\cdot\vec{p} l)\]
   \item
-    \verb!cint2e_g1! \[(i U_g j| kl)\]
+    \texttt{cint2e\_g1} \[(i U_g j| kl)\]
   \item
-    \verb!cint2e_spgsp1!
+    \texttt{cint2e\_spgsp1}
     \[(\vec{\sigma}\cdot\vec{p} i U_g \vec{\sigma}\cdot\vec{p} j| kl)\]
   \item
-    \verb!cint2e_g1spsp2!
+    \texttt{cint2e\_g1spsp2}
     \[(i U_g j| \vec{\sigma}\cdot\vec{p} k \vec{\sigma}\cdot\vec{p}l)\]
   \item
-    \verb!cint2e_spgsp1spsp2!
+    \texttt{cint2e\_spgsp1spsp2}
     \[(\vec{\sigma}\cdot\vec{p} i U_g \vec{\sigma}\cdot\vec{p} j| \vec{\sigma}\cdot\vec{p} k \vec{\sigma}\cdot\vec{p}l)\]
   \item
-    \verb!cint2e_ip1! \[(\vec{\nabla} i j| kl)\]
+    \texttt{cint2e\_ip1} \[(\vec{\nabla} i j| kl)\]
   \item
-    \verb!cint2e_ipspsp1!
+    \texttt{cint2e\_ipspsp1}
     \[(\vec{\nabla} \vec{\sigma}\cdot\vec{p} i \vec{\sigma}\cdot\vec{p} j| kl)\]
   \item
-    \verb!cint2e_ip1spsp2!
+    \texttt{cint2e\_ip1spsp2}
     \[(\vec{\nabla} i j| \vec{\sigma}\cdot\vec{p} k \vec{\sigma}\cdot\vec{p}l)\]
   \item
-    \verb!cint2e_ipspsp1spsp2!
+    \texttt{cint2e\_ipspsp1spsp2}
     \[(\vec{\nabla} \vec{\sigma}\cdot\vec{p} i \vec{\sigma}\cdot\vec{p} j| \vec{\sigma}\cdot\vec{p} k \vec{\sigma}\cdot\vec{p}l)\]
   \item
-    \verb!cint2e_ssp1ssp2!
+    \texttt{cint2e\_ssp1ssp2}
     \[( i \vec{\sigma}\vec{\sigma}\cdot\vec{p} j|k \vec{\sigma}\vec{\sigma}\cdot\vec{p}l)\]
   \end{itemize}
 \end{itemize}
 
 \end{document}
-

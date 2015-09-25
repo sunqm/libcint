@@ -18,9 +18,7 @@ def gto_norm(n, a):
 CHARGE_OF  = 1
 PTR_COORD  = 2
 NUC_MOD_OF = 3
-PTR_MASS   = 4
-RADI_GRIDS = 5
-ANG_GRIDS  = 6
+PTR_ZETA   = 4
 ATM_SLOTS  = 6
 
 ATOM_OF    = 1

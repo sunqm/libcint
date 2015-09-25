@@ -19,9 +19,7 @@ implicit none
 integer,parameter :: CHARGE_OF  = 1
 integer,parameter :: PTR_COORD  = 2
 integer,parameter :: NUC_MOD_OF = 3
-integer,parameter :: PTR_MASS   = 4
-integer,parameter :: RADI_GRIDS = 5
-integer,parameter :: ANG_GRIDS  = 6
+integer,parameter :: PTR_ZETA   = 4
 integer,parameter :: ATM_SLOTS  = 6
 
 integer,parameter :: ATOM_OF    = 1

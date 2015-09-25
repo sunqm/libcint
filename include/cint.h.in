@@ -9,13 +9,14 @@
 #define PTR_LIGHT_SPEED 0
 #define PTR_COMMON_ORIG 1
 #define PTR_RINV_ORIG   4
+#define PTR_RINV_ZETA   7
 #define PTR_ENV_START   20
 
 // slots of atm
 #define CHARGE_OF       0
 #define PTR_COORD       1
 #define NUC_MOD_OF      2
-#define PTR_MASS        3
+#define PTR_ZETA        3
 #define RESERVE_ATMLOT1 4
 #define RESERVE_ATMLOT2 5
 #define ATM_SLOTS       6

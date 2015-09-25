@@ -6968,11 +6968,11 @@ double *CINTc2s_ket_sph(double *sph, FINT nket, double *cart, FINT l)
 {
         return (f_ket_sph[l])(sph, nket, cart, l);
 }
-void CINTc2s_ket_spinor(double *sph, FINT nket, double *cart, FINT l, FINT kappa)
+void CINTc2s_ket_spinor(double complex *sph, FINT nket, double *cart, FINT l, FINT kappa)
 {
         (f_ket_spinor[l])(sph, nket, cart, l, kappa);
 }
-void CINTc2s_iket_spinor(double *sph, FINT nket, double *cart, FINT l, FINT kappa)
+void CINTc2s_iket_spinor(double complex *sph, FINT nket, double *cart, FINT l, FINT kappa)
 {
         (f_iket_spinor[l])(sph, nket, cart, l, kappa);
 }

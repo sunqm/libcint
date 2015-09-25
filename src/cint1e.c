@@ -84,52 +84,27 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double fac)
         return has_value;
 }
 
-
 /*
- * for given nuclear model, calculate temporary parameter tau
- * aij = ai + aj
+ * For given charge distribution, calculate temporary parameter tau.
+ * The charge parameter zeta is defined as    rho(r) = Norm * exp(-zeta*r^2)
  */
 static double CINTnuc_mod(const double aij, const FINT nuc_id,
                           const FINT *atm, const double *env)
 {
-        const FINT mass[109] = { \
-                1  , 4  , 7  , 9  , 11 , 12 , 14 , 16 , 19  , 20 , \
-                23 , 24 , 27 , 28 , 31 , 32 , 35 , 40 , 39  , 40 , \
-                45 , 48 , 51 , 52 , 55 , 56 , 59 , 58 , 63  , 64 , \
-                69 , 74 , 75 , 80 , 79 , 84 , 85 , 88 , 89  , 90 , \
-                93 , 98 , 98 , 102, 103, 106, 107, 114, 115 , 120, \
-                121, 130, 127, 132, 133, 138, 139, 140, 141 , 144, \
-                145, 152, 153, 158, 159, 162, 162, 168, 169 , 174, \
-                175, 180, 181, 184, 187, 192, 193, 195, 197 , 202, \
-                205, 208, 209, 209, 210, 222, 223, 226, 227 , 232, \
-                231, 238, 237, 244, 243, 247, 247, 251, 252 , 257, \
-                258, 259, 262, 261, 262, 263, 262, 265, 266};
-
-        /* screened nuclear potential of Gaussian nuclear model:
-         * M. Filatov and D. Cremer, Theor. Chem. Acc. 108, 168 (2002)
-         * M. Filatov and D. Cremer, Chem. Phys. Lett. 351, 259 (2002)
-        r = (-0.263188 * atm(CHARGE_OF, nuc_id) + 106.016974 \
-             + 138.985999 / atm(CHARGE_OF, nuc_id)) \
-             / (env[PTR_LIGHT_SPEED] * env[PTR_LIGHT_SPEED]);
-        eta = 1 / (r * r); */
-        double a, r, eta;
-
-        switch (atm(NUC_MOD_OF, nuc_id)) {
-                case POINT_NUC:
-                        return 1;
-                case GAUSSIAN_NUC:
-                        a = pow(mass[atm(CHARGE_OF,nuc_id)], (double)1 / 3);
-                        r = (0.836 * a + 0.570) / 52917.7249;
-                        eta = 1.5 / (r * r);
-                        return sqrt(eta / (aij + eta));
-                default:
-                        return 1;
+        double zeta;
+        if (nuc_id < 0) {
+                zeta = env[PTR_RINV_ZETA];
+        } else if (atm(NUC_MOD_OF, nuc_id) == POINT_NUC) {
+                return 1;
+        } else {
+                zeta = env[atm(PTR_ZETA, nuc_id)];
         }
-}
-static double CINTno_nuc_mod(const double aij, const FINT nuc_id,
-                             const FINT *atm, const double *env)
-{
-        return 1;
+
+        if (zeta > 0) {
+                return sqrt(zeta / (aij + zeta));
+        } else {
+                return 1;
+        }
 }
 
 /*
@@ -161,7 +136,6 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id)
         FINT has_value = 0;
         double tau;
         const double *cr;
-        double (*f_nuc_mod)();
         double x, u[MXRYSROOTS], w[MXRYSROOTS];
         FINT *const idx = malloc(sizeof(FINT) * nf * 3);
         double rij[3], aij, dij, eij, rrij, t2;
@@ -172,10 +146,8 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id)
 
         if (nuc_id < 0) {
                 cr = &env[PTR_RINV_ORIG];
-                f_nuc_mod = CINTno_nuc_mod;
         } else {
-                cr = &env[atm(PTR_COORD, nuc_id)],
-                f_nuc_mod = CINTnuc_mod;
+                cr = &env[atm(PTR_COORD, nuc_id)];
         }
 
         CINTg1e_index_xyz(idx, envs);
@@ -198,7 +170,7 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id)
                         rij[0] = (ai[ip] * ri[0] + aj[jp] * rj[0]) / aij;
                         rij[1] = (ai[ip] * ri[1] + aj[jp] * rj[1]) / aij;
                         rij[2] = (ai[ip] * ri[2] + aj[jp] * rj[2]) / aij;
-                        tau = (*f_nuc_mod)(aij, nuc_id, atm, env);
+                        tau = CINTnuc_mod(aij, nuc_id, atm, env);
                         x = aij * CINTsquare_dist(rij, cr) * tau * tau;
                         CINTrys_roots(envs->nrys_roots, x, u, w);
 

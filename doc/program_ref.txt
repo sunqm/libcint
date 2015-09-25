@@ -35,8 +35,10 @@ C routine
     - `atm[i*6+0]` nuclear charge of atom i
     - `atm[i*6+1]` env offset to save coordinates
       (`env[atm[i*6+1]]`, `env[atm[i*6+1]+1]`, `env[atm[i*6+1]+2]`) are (x,y,z)
-    - `atm[i*6+2]` nuclear model of atom i, = 2 indicates gaussian nuclear model
-    - `atm[i*6+3]` env offset to save nuclear mass
+    - `atm[i*6+2]` nuclear model of atom i, = 2 indicates gaussian nuclear
+      model $\rho(r) = Z (\frac{\zeta}{\pi})^{3/2} \exp(-\zeta r^2)$
+    - `atm[i*6+3]` env offset to save the nuclear charge distribution
+      parameter $\zeta$
     - `atm[i*6+4]` unused
     - `atm[i*6+5]` unused
 * natm: int, number of atoms, natm has no effect __except nuclear
