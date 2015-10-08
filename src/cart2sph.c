@@ -3034,7 +3034,7 @@ static double *g_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
  * return the address of gemm results, for s,p function, results ==
  * input, so return the input address optimize
  */
-static double *(*f_bra_sph[])() = {
+double *(*CINTc2s_bra_sph[])() = {
         s_bra_cart2spheric,
         p_bra_cart2spheric,
         d_bra_cart2spheric,
@@ -3045,7 +3045,7 @@ static double *(*f_bra_sph[])() = {
         a_bra_cart2spheric,
 };
 
-static double *(*f_ket_sph[])() = {
+double *(*CINTc2s_ket_sph[])() = {
         s_ket_cart2spheric,
         p_ket_cart2spheric,
         d_ket_cart2spheric,
@@ -5455,7 +5455,7 @@ static void g_iket_cart2spinor(double complex *gsp, FINT nbra,
         }
 }
 
-static void (*f_bra_spinor_e1sf[])() = {
+void (*CINTc2s_bra_spinor_e1sf[])() = {
         s_bra_cart2spinor_e1sf,
         p_bra_cart2spinor_e1sf,
         d_bra_cart2spinor_e1sf,
@@ -5466,7 +5466,7 @@ static void (*f_bra_spinor_e1sf[])() = {
         a_bra_cart2spinor_e1sf,
 };
 
-static void (*f_bra_spinor_sf[])() = {
+void (*CINTc2s_bra_spinor_sf[])() = {
         s_bra_cart2spinor_sf,
         p_bra_cart2spinor_sf,
         d_bra_cart2spinor_sf,
@@ -5477,7 +5477,7 @@ static void (*f_bra_spinor_sf[])() = {
         a_bra_cart2spinor_sf,
 };
 
-static void (*f_ket_spinor[])() = {
+void (*CINTc2s_ket_spinor[])() = {
         s_ket_cart2spinor,
         p_ket_cart2spinor,
         d_ket_cart2spinor,
@@ -5488,7 +5488,7 @@ static void (*f_ket_spinor[])() = {
         a_ket_cart2spinor,
 };
 
-static void (*f_iket_spinor[])() = {
+void (*CINTc2s_iket_spinor[])() = {
         s_iket_cart2spinor,
         p_iket_cart2spinor,
         d_iket_cart2spinor,
@@ -5499,7 +5499,7 @@ static void (*f_iket_spinor[])() = {
         a_iket_cart2spinor,
 };
 
-static void (*f_bra_spinor_si[])() = {
+void (*CINTc2s_bra_spinor_si[])() = {
         s_bra_cart2spinor_si,
         p_bra_cart2spinor_si,
         d_bra_cart2spinor_si,
@@ -5742,16 +5742,16 @@ void c2s_sph_1e(double *opij, const double *gctr, CINTEnvVars *envs)
         const FINT nfi = envs->nfi;
         const FINT nf = envs->nf;
         FINT ic, jc;
-        double *const buf1 = (double *)malloc(sizeof(double) * nfi*dj*2);
-        double *const buf2 = buf1 + nfi*dj;
+        double *buf1 = (double *)malloc(sizeof(double) * nfi*dj*2);
+        double *buf2 = buf1 + nfi*dj;
         double *pij;
         double *tmp1;
 
         for (jc = 0; jc < nj; jc += dj) {
                 for (ic = 0; ic < ni; ic += di) {
         pij = opij + ni * jc + ic;
-        tmp1 = (f_ket_sph[j_l])(buf1, nfi , gctr, j_l);
-        tmp1 = (f_bra_sph[i_l])(buf2, dj, tmp1, i_l);
+        tmp1 = (CINTc2s_ket_sph[j_l])(buf1, nfi , gctr, j_l);
+        tmp1 = (CINTc2s_bra_sph[i_l])(buf2, dj, tmp1, i_l);
 
         dcopy_ij(pij, tmp1, ni, nj, di, dj);
         gctr += nf;
@@ -5783,13 +5783,13 @@ void c2s_sf_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const FINT nf2j = nfj + nfj;
         const FINT nf = envs->nf;
         FINT ic, jc;
-        double complex *const tmp1 = malloc(sizeof(double complex) * di*nf2j * 2);
-        double complex *const tmp2 = tmp1 + di*nf2j;
+        double complex *tmp1 = malloc(sizeof(double complex) * di*nf2j * 2);
+        double complex *tmp2 = tmp1 + di*nf2j;
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
-                        (f_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
-                        (f_ket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
+                        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
+                        (CINTc2s_ket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp2, ni, nj, di, dj);
                         gctr += nf;
                 }
@@ -5816,13 +5816,13 @@ void c2s_sf_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const FINT nf2j = nfj + nfj;
         const FINT nf = envs->nf;
         FINT ic, jc;
-        double complex *const tmp1 = malloc(sizeof(double complex) * di*nf2j * 2);
-        double complex *const tmp2 = tmp1 + di*nf2j;
+        double complex *tmp1 = malloc(sizeof(double complex) * di*nf2j * 2);
+        double complex *tmp2 = tmp1 + di*nf2j;
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
-                        (f_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
-                        (f_iket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
+                        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
+                        (CINTc2s_iket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp2, ni, nj, di, dj);
                         gctr += nf;
                 }
@@ -5860,9 +5860,9 @@ void c2s_si_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr;
         const double *gc_1 = gc_z + nf * i_ctr * j_ctr;
-        double complex *const tmp1 = malloc(sizeof(double complex)*nf2i*nf2j
-                                            +sizeof(double complex)*di*nf2j);
-        double complex *const tmp2 = tmp1 + nf2i*nf2j;
+        double complex *tmp1 = malloc(sizeof(double complex)*nf2i*nf2j
+                                      +sizeof(double complex)*di*nf2j);
+        double complex *tmp2 = tmp1 + nf2i*nf2j;
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
@@ -5874,8 +5874,8 @@ void c2s_si_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
                         //cmplx( gctr.POS_1,-gctr.POS_Z)
                         CINTdcmplx_np(nf, tmp1+nfi*nf2j, gc_y, gc_x);
                         CINTdcmplx_pn(nf, tmp1+nfi*nf2j+nf, gc_1, gc_z);
-                        (f_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
-                        (f_ket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
+                        (CINTc2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
+                        (CINTc2s_ket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp1, ni, nj, di, dj);
 
                         gc_x += nf;
@@ -5911,9 +5911,9 @@ void c2s_si_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const double *gc_y = gc_x + nf * i_ctr * j_ctr;
         const double *gc_z = gc_y + nf * i_ctr * j_ctr;
         const double *gc_1 = gc_z + nf * i_ctr * j_ctr;
-        double complex *const tmp1 = malloc(sizeof(double complex)*nf2i*nf2j
-                                            +sizeof(double complex)*di*nf2j);
-        double complex *const tmp2 = tmp1 + nf2i*nf2j;
+        double complex *tmp1 = malloc(sizeof(double complex)*nf2i*nf2j
+                                      +sizeof(double complex)*di*nf2j);
+        double complex *tmp2 = tmp1 + nf2i*nf2j;
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
@@ -5925,8 +5925,8 @@ void c2s_si_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
                         //cmplx( gctr.POS_1,-gctr.POS_Z)
                         CINTdcmplx_np(nf, tmp1+nfi*nf2j, gc_y, gc_x);
                         CINTdcmplx_pn(nf, tmp1+nfi*nf2j+nf, gc_1, gc_z);
-                        (f_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
-                        (f_iket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
+                        (CINTc2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
+                        (CINTc2s_iket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp1, ni, nj, di, dj);
 
                         gc_x += nf;
@@ -5975,21 +5975,21 @@ void c2s_sph_2e1(double *fijkl, const double *gctr, CINTEnvVars *envs)
         FINT ofl = nk * ni * nj;
         FINT ic, jc, kc, lc;
         const FINT buflen = (nfikl*dj + 16) & 0xfffffff0;
-        double *const buf1 = (double *)malloc(sizeof(double)*buflen*4);
-        double *const buf2 = buf1 + buflen;
-        double *const buf3 = buf2 + buflen;
-        double *const buf4 = buf3 + buflen;
+        double *buf1 = malloc(sizeof(double)*buflen*4);
+        double *buf2 = buf1 + buflen;
+        double *buf3 = buf2 + buflen;
+        double *buf4 = buf3 + buflen;
         double *pfijkl, *tmp1;
 
         for (lc = 0; lc < nl; lc += dl) {
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
-        tmp1 = (f_ket_sph[j_l])(buf1, nfikl, gctr, j_l);
+        tmp1 = (CINTc2s_ket_sph[j_l])(buf1, nfikl, gctr, j_l);
         tmp1 = sph2e_inner(buf2, tmp1, l_l, nfik, dj, nfik*dl, nfikl);
         tmp1 = sph2e_inner(buf3, tmp1, k_l, nfi, dlj, nfi*dk, nfik);
 
-        tmp1 = (f_bra_sph[i_l])(buf4, dk*dlj, tmp1, i_l);
+        tmp1 = (CINTc2s_bra_sph[i_l])(buf4, dk*dlj, tmp1, i_l);
 
         pfijkl = fijkl + ofl * lc + ofk * kc + ofj * jc + ic;
         dcopy_iklj(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6008,7 +6008,7 @@ void c2s_sph_2e2() {};
 static double *sph2e_inner(double *gsph, double *gcart,
                            FINT l, FINT nbra, FINT ncall, FINT sizsph, FINT sizcart)
 {
-        double *(*fket)() = f_ket_sph[l];
+        double *(*fket)() = CINTc2s_ket_sph[l];
         double *ptr0 = (*fket)(gsph, nbra, gcart, l);
         FINT n;
         for (n = 1; n < ncall; n++) {
@@ -6049,12 +6049,11 @@ void c2s_sf_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const FINT d_i = di * nfk * nfl;
         const FINT d_j = nfk * nfl * nfj;
         FINT i;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * di*nfk*nfl*nf2j);
+        double complex *tmp1 = malloc(sizeof(double complex) * di*nfk*nfl*nf2j);
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
-                (f_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
-                (f_ket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
+                (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
+                (CINTc2s_ket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
                 gctr += nf;
                 opij += no;
         }
@@ -6086,12 +6085,11 @@ void c2s_sf_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const FINT d_i = di * nfk * nfl;
         const FINT d_j = nfk * nfl * nfj;
         FINT i;
-        double  complex*const tmp1 = malloc(sizeof(double complex)
-                                            * di*nfk*nfl*nf2j);
+        double complex *tmp1 = malloc(sizeof(double complex) * di*nfk*nfl*nf2j);
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
-                (f_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
-                (f_iket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
+                (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
+                (CINTc2s_iket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
                 gctr += nf;
                 opij += no;
         }
@@ -6147,17 +6145,16 @@ void c2s_sf_2e2(double complex *fijkl, const double complex *opij, CINTEnvVars *
         double complex *pfijkl;
         const FINT len1 = (nf2k*di*dj*nf2l + 16) & 0xfffffff0;
         const FINT len2 = dk*di*dj*nf2l;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * (len1+len2));
-        double complex *const tmp2 = tmp1 + len1;
+        double complex *tmp1 = malloc(sizeof(double complex) * (len1+len2));
+        double complex *tmp2 = tmp1 + len1;
 
         for (lc = 0; lc < nl; lc += dl) {
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
-        (f_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (f_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (CINTc2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (CINTc2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6208,17 +6205,16 @@ void c2s_sf_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars 
         double complex *pfijkl;
         const FINT len1 = (nf2k*di*dj*nf2l + 16) & 0xfffffff0;
         const FINT len2 = dk*di*dj*nf2l;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * (len1+len2));
-        double complex *const tmp2 = tmp1 + len1;
+        double complex *tmp1 = malloc(sizeof(double complex) * (len1+len2));
+        double complex *tmp2 = tmp1 + len1;
 
         for (lc = 0; lc < nl; lc += dl) {
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
-        (f_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (f_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (CINTc2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (CINTc2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6267,9 +6263,8 @@ void c2s_si_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const double *gc_1 = gc_z + nf * i_ctr * j_ctr * k_ctr * l_ctr;
         const FINT len1 = (nf2i*nfk*nfl*nf2j + 16) & 0xfffffff0;
         const FINT len2 = di*nfk*nfl*nf2j;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * (len1+len2));
-        double complex *const tmp2 = tmp1 + len1;
+        double complex *tmp1 = malloc(sizeof(double complex) * (len1+len2));
+        double complex *tmp2 = tmp1 + len1;
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
                 //cmplx( gctr.POS_1, gctr.POS_Z)
@@ -6280,8 +6275,8 @@ void c2s_si_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
                 //cmplx( gctr.POS_1,-gctr.POS_Z)
                 CINTdcmplx_np(nf, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*d_j+nf, gc_1, gc_z);
-                (f_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-                (f_ket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
+                (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+                (CINTc2s_ket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -6324,9 +6319,8 @@ void c2s_si_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
         const double *gc_1 = gc_z + nf * i_ctr * j_ctr * k_ctr * l_ctr;
         const FINT len1 = (nf2i*nfk*nfl*nf2j + 16) & 0xfffffff0;
         const FINT len2 = di*nfk*nfl*nf2j;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * (len1+len2));
-        double complex *const tmp2 = tmp1 + len1;
+        double complex *tmp1 = malloc(sizeof(double complex)*(len1+len2));
+        double complex *tmp2 = tmp1 + len1;
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
                 //cmplx( gctr.POS_1, gctr.POS_Z)
@@ -6337,8 +6331,8 @@ void c2s_si_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
                 //cmplx( gctr.POS_1,-gctr.POS_Z)
                 CINTdcmplx_np(nf, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*d_j+nf, gc_1, gc_z);
-                (f_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-                (f_iket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
+                (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+                (CINTc2s_iket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -6453,17 +6447,16 @@ void c2s_si_2e2(double complex *fijkl, const double complex *opij, CINTEnvVars *
         const double complex *o1 = oz + nop * i_ctr * j_ctr * k_ctr * l_ctr;
         const FINT len1 = (nf2k*di*dj*nf2l + 16) & 0xfffffff0;
         const FINT len2 = dk*di*dj*nf2l;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * (len1+len2));
-        double complex *const tmp2 = tmp1 + len1;
+        double complex *tmp1 = malloc(sizeof(double complex) * (len1+len2));
+        double complex *tmp2 = tmp1 + len1;
 
         for (lc = 0; lc < nl; lc += dl) {
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
-        (f_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (f_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (CINTc2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (CINTc2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6522,17 +6515,16 @@ void c2s_si_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars 
         const double complex *o1 = oz + nop * i_ctr * j_ctr * k_ctr * l_ctr;
         const FINT len1 = (nf2k*di*dj*nf2l + 16) & 0xfffffff0;
         const FINT len2 = dk*di*dj*nf2l;
-        double complex *const tmp1 = malloc(sizeof(double complex)
-                                            * (len1+len2));
-        double complex *const tmp2 = tmp1 + len1;
+        double complex *tmp1 = malloc(sizeof(double complex) * (len1+len2));
+        double complex *tmp2 = tmp1 + len1;
 
         for (lc = 0; lc < nl; lc += dl) {
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
-        (f_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (f_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (CINTc2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (CINTc2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6641,9 +6633,9 @@ void c2s_sph_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
         for (kc = 0; kc < nk; kc += dk) {
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
-        tmp1 = (f_ket_sph[j_l])(buf1, nfik, gctr, j_l);
+        tmp1 = (CINTc2s_ket_sph[j_l])(buf1, nfik, gctr, j_l);
         tmp1 = sph2e_inner(buf2, tmp1, k_l, nfi, dj, nfi*dk, nfik);
-        tmp1 = (f_bra_sph[i_l])(buf3, dk*dj, tmp1, i_l);
+        tmp1 = (CINTc2s_bra_sph[i_l])(buf3, dk*dj, tmp1, i_l);
         pijk = bufijk + ofk * kc + ofj * jc + ic;
         dcopy_iklj(pijk, tmp1, ni, nj, nk, 1, di, dj, dk, 1);
         gctr += nf;
@@ -6651,7 +6643,6 @@ void c2s_sph_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
         free(buf1);
 
 }
-void c2s_sph_3c2e2() {};
 
 void c2s_cart_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
 {
@@ -6679,7 +6670,6 @@ void c2s_cart_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
                         } } }
 
 }
-void c2s_cart_3c2e2() {};
 /*
  * 3c2e spinor integrals, cartesian to spin free spinor for electron 1.
  */
@@ -6727,8 +6717,8 @@ void c2s_sf_3c2e1(double complex *opijk, double *gctr, CINTEnvVars *envs)
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
         pbuf = sph2e_inner(buf, gctr, k_l, nfi, nfj, nfi*dk, nfik);
-        (f_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
-        (f_ket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
+        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
+        (CINTc2s_ket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, dk, 1);
         gctr += nf;
@@ -6781,8 +6771,8 @@ void c2s_sf_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs)
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
         pbuf = sph2e_inner(buf, gctr, k_l, nfi, nfj, nfi*dk, nfik);
-        (f_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
-        (f_iket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
+        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
+        (CINTc2s_iket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, dk, 1);
         gctr += nf;
@@ -6860,8 +6850,8 @@ void c2s_si_3c2e1(double complex *opijk, double *gctr, CINTEnvVars *envs)
         //cmplx( gctr.POS_1,-gctr.POS_Z)
         CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, pbufy, pbufx);
         CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, pbuf1, pbufz);
-        (f_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-        (f_ket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
+        (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+        (CINTc2s_ket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, dk, 1);
         gc_x += nf;
@@ -6939,8 +6929,8 @@ void c2s_si_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs)
         //cmplx( gctr.POS_1,-gctr.POS_Z)
         CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, pbufy, pbufx);
         CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, pbuf1, pbufz);
-        (f_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-        (f_iket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
+        (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+        (CINTc2s_iket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, dk, 1);
         gc_x += nf;
@@ -6954,26 +6944,95 @@ void c2s_si_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs)
 }
 
 
-
 /*************************************************
  *
- * transform vectors
+ * 3-center 1-electron integral transformation
  *
  *************************************************/
-double *CINTc2s_bra_sph(double *sph, FINT nket, double *cart, FINT l)
+static void dcopy_ijk(double *opijk, const double *gctr, 
+                      const FINT ni, const FINT nj, const FINT nk,
+                      const FINT mi, const FINT mj, const FINT mk)
 {
-        return (f_bra_sph[l])(sph, nket, cart, l);
+        FINT i, j, k;
+
+        for (k = 0; k < mk; k++) {
+                for (j = 0; j < mj; j++) {
+                        for (i = 0; i < mi; i++) {
+                                opijk[ni*j+i] = gctr[mi*j+i];
+                        }
+                }
+                opijk += ni * nj;
+                gctr  += mi * mj;
+        }
 }
-double *CINTc2s_ket_sph(double *sph, FINT nket, double *cart, FINT l)
+void c2s_sph_3c1e(double *bufijk, const double *gctr, CINTEnvVars *envs)
 {
-        return (f_ket_sph[l])(sph, nket, cart, l);
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT di = i_l * 2 + 1;
+        const FINT dj = j_l * 2 + 1;
+        const FINT dk = k_l * 2 + 1;
+        const FINT ni = di * i_ctr;
+        const FINT nj = dj * j_ctr;
+        const FINT nk = dk * k_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nf = envs->nf;
+        const FINT nfij = nfi * nfj;
+        FINT ofj = ni;
+        FINT ofk = ni * nj;
+        FINT ic, jc, kc;
+        const FINT buflen = nfij*dk;
+        double *buf1 = malloc(sizeof(double) * buflen*3);
+        double *buf2 = buf1 + buflen;
+        double *buf3 = buf2 + buflen;
+        double *pijk;
+        double *tmp1;
+
+        for (kc = 0; kc < nk; kc += dk) {
+                for (jc = 0; jc < nj; jc += dj) {
+                        for (ic = 0; ic < ni; ic += di) {
+        tmp1 = (CINTc2s_ket_sph[k_l])(buf1, nfij, gctr, k_l);
+        tmp1 = sph2e_inner(buf2, tmp1, j_l, nfi, dk, nfi*dj, nfij);
+        tmp1 = (CINTc2s_bra_sph[i_l])(buf3, dj*dk, tmp1, i_l);
+        pijk = bufijk + ofk * kc + ofj * jc + ic;
+        dcopy_ijk(pijk, tmp1, ni, nj, nk, di, dj, dk);
+        gctr += nf;
+                        } } }
+        free(buf1);
+
 }
-void CINTc2s_ket_spinor(double complex *sph, FINT nket, double *cart, FINT l, FINT kappa)
+
+void c2s_cart_3c1e(double *bufijk, const double *gctr, CINTEnvVars *envs)
 {
-        (f_ket_spinor[l])(sph, nket, cart, l, kappa);
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT ni = nfi * i_ctr;
+        const FINT nj = nfj * j_ctr;
+        const FINT nk = nfk * k_ctr;
+        const FINT nf = envs->nf;
+        FINT ofj = ni;
+        FINT ofk = ni * nj;
+        FINT ic, jc, kc;
+        double *pijk;
+
+        for (kc = 0; kc < nk; kc += nfk) {
+                for (jc = 0; jc < nj; jc += nfj) {
+                        for (ic = 0; ic < ni; ic += nfi) {
+        pijk = bufijk + ofk * kc + ofj * jc + ic;
+        dcopy_ijk(pijk, gctr, ni, nj, nk, nfi, nfj, nfk);
+        gctr += nf;
+                        } } }
+
 }
-void CINTc2s_iket_spinor(double complex *sph, FINT nket, double *cart, FINT l, FINT kappa)
-{
-        (f_iket_spinor[l])(sph, nket, cart, l, kappa);
-}
+
+
 
