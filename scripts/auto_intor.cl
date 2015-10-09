@@ -27,6 +27,7 @@
   '("cint1e_r_origj_sph"    spheric  ( \| r \| ))
   '("cint1e_r2_origj_sph"   spheric  ( \| r dot r \| ))
   '("cint1e_rr_origj_sph"   spheric  ( \| r r \| ))
+  '("cint1e_p4_sph"         spheric  ( p dot p \| p dot p ))
   ; use p* instead of p, to ignore the operator after it, then it can
   ; cross to the next p
   '("cint1e_prinvxp_sph"    spheric  (p* \| rinv cross p \| ))
