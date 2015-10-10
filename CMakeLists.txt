@@ -33,6 +33,7 @@ set(cintSrc
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
   src/rys_roots.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c src/optimizer_3c2e.c 
+  src/cint3c1e.c src/g3c1e.c
   src/autocode/auto_intor1.c src/autocode/auto_intor2.c
   src/autocode/auto_intor3.c src/autocode/gaunt1.c src/autocode/grad1.c
   src/autocode/grad2.c src/autocode/grad3.c src/autocode/auto_hess.c
