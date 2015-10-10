@@ -6684,7 +6684,7 @@ void c2s_ssc_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
         const FINT k_ctr = envs->k_ctr;
         const FINT di = i_l * 2 + 1;
         const FINT dj = j_l * 2 + 1;
-        const FINT dk = _len_cart[k_l];
+        const FINT dk = CINTlen_cart(k_l);
         const FINT ni = di * i_ctr;
         const FINT nj = dj * j_ctr;
         const FINT nk = dk * k_ctr;
