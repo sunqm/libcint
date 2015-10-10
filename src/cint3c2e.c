@@ -741,7 +741,7 @@ FINT cint3c2e_ssc(double *opijk, const FINT *shls,
 
         if (has_value) {
                 for (n = 0; n < n_comp; n++) {
-                        c2s_ssc_3c2e1(opijk, pgctr, envs);
+                        c2s_ssc_3c2e1(opijk, pgctr, &envs);
                         opijk += nop;
                         pgctr += nc;
                 }

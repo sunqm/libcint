@@ -40,6 +40,7 @@ void c2s_si_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars 
 
 void c2s_sph_3c2e1(double *fijkl, const double *gctr, CINTEnvVars *envs);
 void c2s_cart_3c2e1(double *fijkl, const double *gctr, CINTEnvVars *envs);
+void c2s_ssc_3c2e1(double *fijkl, const double *gctr, CINTEnvVars *envs);
 
 void c2s_sph_3c1e(double *fijkl, const double *gctr, CINTEnvVars *envs);
 void c2s_cart_3c1e(double *fijkl, const double *gctr, CINTEnvVars *envs);

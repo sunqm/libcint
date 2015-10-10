@@ -1,4 +1,4 @@
-Version 2.6.1 (2014-10-09):
+Version 2.6.2 (2014-10-09):
 	* 3-center 1-electron integrals
 	* mixed spheric-cartesian 3c2e integrals
 	* Restore cart2sph transformation interface
