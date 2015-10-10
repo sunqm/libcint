@@ -710,6 +710,53 @@ void cint3c2e_spinor_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
         cint3c2e_sph_optimizer(opt, atm, natm, bas, nbas, env);
 }
 
+FINT cint3c2e_ssc(double *opijk, const FINT *shls,
+                 const FINT *atm, const FINT natm,
+                 const FINT *bas, const FINT nbas, const double *env,
+                 const CINTOpt *opt)
+{
+        FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+        CINTEnvVars envs;
+        CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e;
+
+        const FINT ip = CINTcgto_spheric(envs.shls[0], envs.bas);
+        const FINT jp = CINTcgto_spheric(envs.shls[1], envs.bas);
+        const FINT kp = CINTcgto_cart(envs.shls[2], envs.bas);
+        const FINT nop = ip * jp * kp;
+        const FINT nc = envs.nf * envs.i_ctr * envs.j_ctr * envs.k_ctr;
+        const FINT n_comp = envs.ncomp_e1 * envs.ncomp_tensor;
+        double *const gctr = malloc(sizeof(double) * nc * n_comp);
+        double *pgctr = gctr;
+        FINT n;
+        FINT has_value;
+
+        if (opt) {
+                n = ((envs.i_ctr==1) << 2) + ((envs.j_ctr==1) << 1)
+                  + (envs.k_ctr==1);
+                has_value = CINTf_3c2e_loop[n](gctr, &envs, opt);
+        } else {
+                has_value = CINT3c2e_loop_nopt(gctr, &envs);
+        }
+
+        if (has_value) {
+                for (n = 0; n < n_comp; n++) {
+                        c2s_ssc_3c2e1(opijk, pgctr, envs);
+                        opijk += nop;
+                        pgctr += nc;
+                }
+        } else {
+                memset(opijk, 0, sizeof(double)*nop*n_comp);
+        }
+        free(gctr);
+        return has_value;
+}
+void cint3c2e_ssc_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+                            const FINT *bas, const FINT nbas, const double *env)
+{
+        cint3c2e_sph_optimizer(opt, atm, natm, bas, nbas, env);
+}
+
 
 /*
  * * * * * * * * * * * * * * * * * * * * *

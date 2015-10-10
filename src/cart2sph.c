@@ -3034,7 +3034,7 @@ static double *g_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
  * return the address of gemm results, for s,p function, results ==
  * input, so return the input address optimize
  */
-double *(*CINTc2s_bra_sph[])() = {
+double *(*c2s_bra_sph[])() = {
         s_bra_cart2spheric,
         p_bra_cart2spheric,
         d_bra_cart2spheric,
@@ -3045,7 +3045,7 @@ double *(*CINTc2s_bra_sph[])() = {
         a_bra_cart2spheric,
 };
 
-double *(*CINTc2s_ket_sph[])() = {
+double *(*c2s_ket_sph[])() = {
         s_ket_cart2spheric,
         p_ket_cart2spheric,
         d_ket_cart2spheric,
@@ -5455,7 +5455,7 @@ static void g_iket_cart2spinor(double complex *gsp, FINT nbra,
         }
 }
 
-void (*CINTc2s_bra_spinor_e1sf[])() = {
+void (*c2s_bra_spinor_e1sf[])() = {
         s_bra_cart2spinor_e1sf,
         p_bra_cart2spinor_e1sf,
         d_bra_cart2spinor_e1sf,
@@ -5466,7 +5466,7 @@ void (*CINTc2s_bra_spinor_e1sf[])() = {
         a_bra_cart2spinor_e1sf,
 };
 
-void (*CINTc2s_bra_spinor_sf[])() = {
+void (*c2s_bra_spinor_sf[])() = {
         s_bra_cart2spinor_sf,
         p_bra_cart2spinor_sf,
         d_bra_cart2spinor_sf,
@@ -5477,7 +5477,7 @@ void (*CINTc2s_bra_spinor_sf[])() = {
         a_bra_cart2spinor_sf,
 };
 
-void (*CINTc2s_ket_spinor[])() = {
+void (*c2s_ket_spinor[])() = {
         s_ket_cart2spinor,
         p_ket_cart2spinor,
         d_ket_cart2spinor,
@@ -5488,7 +5488,7 @@ void (*CINTc2s_ket_spinor[])() = {
         a_ket_cart2spinor,
 };
 
-void (*CINTc2s_iket_spinor[])() = {
+void (*c2s_iket_spinor[])() = {
         s_iket_cart2spinor,
         p_iket_cart2spinor,
         d_iket_cart2spinor,
@@ -5499,7 +5499,7 @@ void (*CINTc2s_iket_spinor[])() = {
         a_iket_cart2spinor,
 };
 
-void (*CINTc2s_bra_spinor_si[])() = {
+void (*c2s_bra_spinor_si[])() = {
         s_bra_cart2spinor_si,
         p_bra_cart2spinor_si,
         d_bra_cart2spinor_si,
@@ -5750,8 +5750,8 @@ void c2s_sph_1e(double *opij, const double *gctr, CINTEnvVars *envs)
         for (jc = 0; jc < nj; jc += dj) {
                 for (ic = 0; ic < ni; ic += di) {
         pij = opij + ni * jc + ic;
-        tmp1 = (CINTc2s_ket_sph[j_l])(buf1, nfi , gctr, j_l);
-        tmp1 = (CINTc2s_bra_sph[i_l])(buf2, dj, tmp1, i_l);
+        tmp1 = (c2s_ket_sph[j_l])(buf1, nfi , gctr, j_l);
+        tmp1 = (c2s_bra_sph[i_l])(buf2, dj, tmp1, i_l);
 
         dcopy_ij(pij, tmp1, ni, nj, di, dj);
         gctr += nf;
@@ -5788,8 +5788,8 @@ void c2s_sf_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
-                        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
-                        (CINTc2s_ket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
+                        (c2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
+                        (c2s_ket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp2, ni, nj, di, dj);
                         gctr += nf;
                 }
@@ -5821,8 +5821,8 @@ void c2s_sf_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
 
         for (jc = 0; jc < nj; jc += dj)
                 for (ic = 0; ic < ni; ic += di) {
-                        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
-                        (CINTc2s_iket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
+                        (c2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_l, i_kp);
+                        (c2s_iket_spinor[j_l])(tmp2, di, tmp1, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp2, ni, nj, di, dj);
                         gctr += nf;
                 }
@@ -5874,8 +5874,8 @@ void c2s_si_1e(double complex *opij, const double *gctr, CINTEnvVars *envs)
                         //cmplx( gctr.POS_1,-gctr.POS_Z)
                         CINTdcmplx_np(nf, tmp1+nfi*nf2j, gc_y, gc_x);
                         CINTdcmplx_pn(nf, tmp1+nfi*nf2j+nf, gc_1, gc_z);
-                        (CINTc2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
-                        (CINTc2s_ket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
+                        (c2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
+                        (c2s_ket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp1, ni, nj, di, dj);
 
                         gc_x += nf;
@@ -5925,8 +5925,8 @@ void c2s_si_1ei(double complex *opij, const double *gctr, CINTEnvVars *envs)
                         //cmplx( gctr.POS_1,-gctr.POS_Z)
                         CINTdcmplx_np(nf, tmp1+nfi*nf2j, gc_y, gc_x);
                         CINTdcmplx_pn(nf, tmp1+nfi*nf2j+nf, gc_1, gc_z);
-                        (CINTc2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
-                        (CINTc2s_iket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
+                        (c2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_l, i_kp);
+                        (c2s_iket_spinor[j_l])(tmp1, di, tmp2, j_l, j_kp);
                         zcopy_ij(opij+ni*jc+ic, tmp1, ni, nj, di, dj);
 
                         gc_x += nf;
@@ -5985,11 +5985,11 @@ void c2s_sph_2e1(double *fijkl, const double *gctr, CINTEnvVars *envs)
                 for (kc = 0; kc < nk; kc += dk) {
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
-        tmp1 = (CINTc2s_ket_sph[j_l])(buf1, nfikl, gctr, j_l);
+        tmp1 = (c2s_ket_sph[j_l])(buf1, nfikl, gctr, j_l);
         tmp1 = sph2e_inner(buf2, tmp1, l_l, nfik, dj, nfik*dl, nfikl);
         tmp1 = sph2e_inner(buf3, tmp1, k_l, nfi, dlj, nfi*dk, nfik);
 
-        tmp1 = (CINTc2s_bra_sph[i_l])(buf4, dk*dlj, tmp1, i_l);
+        tmp1 = (c2s_bra_sph[i_l])(buf4, dk*dlj, tmp1, i_l);
 
         pfijkl = fijkl + ofl * lc + ofk * kc + ofj * jc + ic;
         dcopy_iklj(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6008,7 +6008,7 @@ void c2s_sph_2e2() {};
 static double *sph2e_inner(double *gsph, double *gcart,
                            FINT l, FINT nbra, FINT ncall, FINT sizsph, FINT sizcart)
 {
-        double *(*fket)() = CINTc2s_ket_sph[l];
+        double *(*fket)() = c2s_ket_sph[l];
         double *ptr0 = (*fket)(gsph, nbra, gcart, l);
         FINT n;
         for (n = 1; n < ncall; n++) {
@@ -6052,8 +6052,8 @@ void c2s_sf_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
         double complex *tmp1 = malloc(sizeof(double complex) * di*nfk*nfl*nf2j);
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
-                (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
-                (CINTc2s_ket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
+                (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
+                (c2s_ket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
                 gctr += nf;
                 opij += no;
         }
@@ -6088,8 +6088,8 @@ void c2s_sf_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
         double complex *tmp1 = malloc(sizeof(double complex) * di*nfk*nfl*nf2j);
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
-                (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
-                (CINTc2s_iket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
+                (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_l, i_kp);
+                (c2s_iket_spinor[j_l])(opij, d_i, tmp1, j_l, j_kp);
                 gctr += nf;
                 opij += no;
         }
@@ -6153,8 +6153,8 @@ void c2s_sf_2e2(double complex *fijkl, const double complex *opij, CINTEnvVars *
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
-        (CINTc2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (CINTc2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (c2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (c2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6213,8 +6213,8 @@ void c2s_sf_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars 
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
-        (CINTc2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (CINTc2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (c2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (c2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6275,8 +6275,8 @@ void c2s_si_2e1(double complex *opij, const double *gctr, CINTEnvVars *envs)
                 //cmplx( gctr.POS_1,-gctr.POS_Z)
                 CINTdcmplx_np(nf, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*d_j+nf, gc_1, gc_z);
-                (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-                (CINTc2s_ket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
+                (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+                (c2s_ket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -6331,8 +6331,8 @@ void c2s_si_2e1i(double complex *opij, const double *gctr, CINTEnvVars *envs)
                 //cmplx( gctr.POS_1,-gctr.POS_Z)
                 CINTdcmplx_np(nf, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*d_j+nf, gc_1, gc_z);
-                (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-                (CINTc2s_iket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
+                (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+                (c2s_iket_spinor[j_l])(opij, d_i, tmp2, j_l, j_kp);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -6455,8 +6455,8 @@ void c2s_si_2e2(double complex *fijkl, const double complex *opij, CINTEnvVars *
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
-        (CINTc2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (CINTc2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (c2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (c2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6523,8 +6523,8 @@ void c2s_si_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars 
                         for (jc = 0; jc < nj; jc += dj) {
                                 for (ic = 0; ic < ni; ic += di) {
         si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
-        (CINTc2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
-        (CINTc2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
+        (c2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_l, k_kp);
+        (c2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_l, l_kp);
         pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + ic);
 
         zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -6633,9 +6633,9 @@ void c2s_sph_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
         for (kc = 0; kc < nk; kc += dk) {
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
-        tmp1 = (CINTc2s_ket_sph[j_l])(buf1, nfik, gctr, j_l);
+        tmp1 = (c2s_ket_sph[j_l])(buf1, nfik, gctr, j_l);
         tmp1 = sph2e_inner(buf2, tmp1, k_l, nfi, dj, nfi*dk, nfik);
-        tmp1 = (CINTc2s_bra_sph[i_l])(buf3, dk*dj, tmp1, i_l);
+        tmp1 = (c2s_bra_sph[i_l])(buf3, dk*dj, tmp1, i_l);
         pijk = bufijk + ofk * kc + ofj * jc + ic;
         dcopy_iklj(pijk, tmp1, ni, nj, nk, 1, di, dj, dk, 1);
         gctr += nf;
@@ -6670,6 +6670,50 @@ void c2s_cart_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
                         } } }
 
 }
+
+/*
+ * ssc ~ (spheric,spheric|cartesian)
+ */
+void c2s_ssc_3c2e1(double *bufijk, const double *gctr, CINTEnvVars *envs)
+{
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT i_ctr = envs->i_ctr;
+        const FINT j_ctr = envs->j_ctr;
+        const FINT k_ctr = envs->k_ctr;
+        const FINT di = i_l * 2 + 1;
+        const FINT dj = j_l * 2 + 1;
+        const FINT dk = _len_cart[k_l];
+        const FINT ni = di * i_ctr;
+        const FINT nj = dj * j_ctr;
+        const FINT nk = dk * k_ctr;
+        const FINT nfi = envs->nfi;
+        const FINT nfk = envs->nfk;
+        const FINT nf = envs->nf;
+        const FINT nfik = nfi * nfk;
+        FINT ofj = ni;
+        FINT ofk = ni * nj;
+        FINT ic, jc, kc;
+        const FINT buflen = nfi*nfk*dj;
+        double *buf1 = malloc(sizeof(double) * buflen*2);
+        double *buf2 = buf1 + buflen;
+        double *pijk;
+        double *tmp1;
+
+        for (kc = 0; kc < nk; kc += dk) {
+                for (jc = 0; jc < nj; jc += dj) {
+                        for (ic = 0; ic < ni; ic += di) {
+        tmp1 = (c2s_ket_sph[j_l])(buf1, nfik, gctr, j_l);
+        tmp1 = (c2s_bra_sph[i_l])(buf2, dk*dj, tmp1, i_l);
+        pijk = bufijk + ofk * kc + ofj * jc + ic;
+        dcopy_iklj(pijk, tmp1, ni, nj, nk, 1, di, dj, dk, 1);
+        gctr += nf;
+                        } } }
+        free(buf1);
+
+}
+
 /*
  * 3c2e spinor integrals, cartesian to spin free spinor for electron 1.
  */
@@ -6717,8 +6761,8 @@ void c2s_sf_3c2e1(double complex *opijk, double *gctr, CINTEnvVars *envs)
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
         pbuf = sph2e_inner(buf, gctr, k_l, nfi, nfj, nfi*dk, nfik);
-        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
-        (CINTc2s_ket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
+        (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
+        (c2s_ket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, dk, 1);
         gctr += nf;
@@ -6771,8 +6815,8 @@ void c2s_sf_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs)
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
         pbuf = sph2e_inner(buf, gctr, k_l, nfi, nfj, nfi*dk, nfik);
-        (CINTc2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
-        (CINTc2s_iket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
+        (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_l, i_kp);
+        (c2s_iket_spinor[j_l])(tmp2, d_i, tmp1, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, dk, 1);
         gctr += nf;
@@ -6850,8 +6894,8 @@ void c2s_si_3c2e1(double complex *opijk, double *gctr, CINTEnvVars *envs)
         //cmplx( gctr.POS_1,-gctr.POS_Z)
         CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, pbufy, pbufx);
         CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, pbuf1, pbufz);
-        (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-        (CINTc2s_ket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
+        (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+        (c2s_ket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, dk, 1);
         gc_x += nf;
@@ -6929,8 +6973,8 @@ void c2s_si_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs)
         //cmplx( gctr.POS_1,-gctr.POS_Z)
         CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, pbufy, pbufx);
         CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, pbuf1, pbufz);
-        (CINTc2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
-        (CINTc2s_iket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
+        (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_l, i_kp);
+        (c2s_iket_spinor[j_l])(tmp3, d_i, tmp2, j_l, j_kp);
         pijk = opijk + ofk * kc + ofj * jc + ic;
         zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, dk, 1);
         gc_x += nf;
@@ -6996,9 +7040,9 @@ void c2s_sph_3c1e(double *bufijk, const double *gctr, CINTEnvVars *envs)
         for (kc = 0; kc < nk; kc += dk) {
                 for (jc = 0; jc < nj; jc += dj) {
                         for (ic = 0; ic < ni; ic += di) {
-        tmp1 = (CINTc2s_ket_sph[k_l])(buf1, nfij, gctr, k_l);
+        tmp1 = (c2s_ket_sph[k_l])(buf1, nfij, gctr, k_l);
         tmp1 = sph2e_inner(buf2, tmp1, j_l, nfi, dk, nfi*dj, nfij);
-        tmp1 = (CINTc2s_bra_sph[i_l])(buf3, dj*dk, tmp1, i_l);
+        tmp1 = (c2s_bra_sph[i_l])(buf3, dj*dk, tmp1, i_l);
         pijk = bufijk + ofk * kc + ofj * jc + ic;
         dcopy_ijk(pijk, tmp1, ni, nj, nk, di, dj, dk);
         gctr += nf;
@@ -7036,3 +7080,36 @@ void c2s_cart_3c1e(double *bufijk, const double *gctr, CINTEnvVars *envs)
 
 
 
+double *CINTc2s_bra_sph(double *gsph, FINT nket, double *gcart, FINT l)
+{
+       return (c2s_bra_sph[l])(gsph, nket, gcart, l);
+}
+double *CINTc2s_ket_sph(double *gsph, FINT nbra, double *gcart, FINT l)
+{
+       return (c2s_ket_sph[l])(gsph, nbra, gcart, l);
+}
+void CINTc2s_bra_spinor_e1sf(double complex *gsp, FINT nket,
+                             double *gcart, FINT l, FINT kappa)
+{
+       (c2s_bra_spinor_e1sf[l])(gsp, nket, gcart, l, kappa);
+}
+void CINTc2s_bra_spinor_sf(double complex *gsp, FINT nket,
+                           double complex *gcart, FINT l, FINT kappa)
+{
+       (c2s_bra_spinor_sf[l])(gsp, nket, gcart, l, kappa);
+}
+void CINTc2s_ket_spinor(double complex *gsp, FINT nbra,
+                        double complex *gcart, FINT l, FINT kappa)
+{
+       (c2s_ket_spinor[l])(gsp, nbra, gcart, l, kappa);
+}
+void CINTc2s_iket_spinor(double complex *gsp, FINT nbra,
+                         double complex *gcart, FINT l, FINT kappa)
+{
+       (c2s_iket_spinor[l])(gsp, nbra, gcart, l, kappa);
+}
+void CINTc2s_bra_spinor_si(double complex *gsp, FINT nket,
+                           double complex *gcart, FINT l, FINT kappa)
+{
+       (c2s_bra_spinor_si[l])(gsp, nket, gcart, l, kappa);
+}
