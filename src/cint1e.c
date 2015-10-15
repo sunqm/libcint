@@ -331,7 +331,7 @@ FINT CINT1e_nuc_drv(double *opij, CINTEnvVars *envs, double fac,
         CINTdset0(nc * envs->ncomp_tensor, gctr);
         for (n = 0; n < envs->natm; n++) {
                 has_value0 = CINT1e_nuc_loop(gctr, envs,
-                                             -fabs(atm(CHARGE_OF,n))*fac, n);
+                                             -abs(atm(CHARGE_OF,n))*fac, n);
                 has_value = has_value || has_value0;
         }
 

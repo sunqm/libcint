@@ -595,7 +595,7 @@ CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
               bra-i ket-j op bra-k)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate function gout2e
-      (format fout "static void CINTgout3c2e_~a(double *g,
+      (format fout "void CINTgout3c2e_~a(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "const double *env = envs->env;
 const FINT nf = envs->nf;
@@ -678,10 +678,10 @@ CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
       (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix))
 ;;; determine function caller
       (cond ((eql sp 'spinor)
-             (format fout "return CINT3c2e_spinor_drv(opijkl, &envs, opt, ~a);~%}~%"
+             (format fout "return CINT3c2e_spinor_drv(opijkl, &envs, opt, ~a, 0);~%}~%"
                      (name-c2sor "3c2e1" sp sf1 ts1)))
             ((eql sp 'spheric)
-             (format fout "return CINT3c2e_spheric_drv(opijkl, &envs, opt);~%}~%"))
+             (format fout "return CINT3c2e_spheric_drv(opijkl, &envs, opt, &c2s_sph_3c2e1, 0);~%}~%"))
             ((eql sp 'cart)
              (format fout "return CINT3c2e_cart_drv(opijkl, &envs, opt);~%}~%")))
       (format fout "OPTIMIZER2F_(~a_optimizer);~%C2Fo_(~a)~%"

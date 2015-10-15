@@ -1,3 +1,6 @@
+Version 2.6.3 (2014-10-15):
+	* mixed spinor-cartesian 3c2e integrals
+
 Version 2.6.2 (2014-10-09):
 	* 3-center 1-electron integrals
 	* mixed spheric-cartesian 3c2e integrals

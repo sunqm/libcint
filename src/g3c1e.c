@@ -12,9 +12,9 @@
 
 #define MAX(X,Y) (X)>(Y)?(X):(Y)
 
-int CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
-                             const int *atm, const int natm,
-                             const int *bas, const int nbas, const double *env)
+FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
+                             const FINT *atm, const FINT natm,
+                             const FINT *bas, const FINT nbas, const double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -23,9 +23,9 @@ int CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         envs->env = env;
         envs->shls = shls;
 
-        const int i_sh = shls[0];
-        const int j_sh = shls[1];
-        const int k_sh = shls[2];
+        const FINT i_sh = shls[0];
+        const FINT j_sh = shls[1];
+        const FINT k_sh = shls[2];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
@@ -56,13 +56,13 @@ int CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
                 * CINTcommon_fac_sp(envs->k_l);
 
-        int dli = envs->li_ceil + 1;
-        int dlj = envs->lj_ceil + envs->lk_ceil + 1;
-        int dlk = envs->lk_ceil + 1;
+        FINT dli = envs->li_ceil + 1;
+        FINT dlj = envs->lj_ceil + envs->lk_ceil + 1;
+        FINT dlk = envs->lk_ceil + 1;
         envs->g_stride_i = 1;
         envs->g_stride_j = dli;
         envs->g_stride_k = dli * dlj;
-        int nmax = envs->li_ceil + dlj;
+        FINT nmax = envs->li_ceil + dlj;
         envs->g_size     = MAX(dli*dlj*dlk, dli*nmax);
 
         envs->rirj[0] = envs->ri[0] - envs->rj[0];
@@ -71,23 +71,23 @@ int CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const int *ng, const int *shls,
         return 0;
 }
 
-void CINTg3c1e_index_xyz(int *idx, const CINTEnvVars *envs)
+void CINTg3c1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 {
-        const int i_l = envs->i_l;
-        const int j_l = envs->j_l;
-        const int k_l = envs->k_l;
-        const int nfi = envs->nfi;
-        const int nfj = envs->nfj;
-        const int nfk = envs->nfk;
-        const int dj = envs->g_stride_j;
-        const int dk = envs->g_stride_k;
-        int i, j, k, n;
-        int ofx, ofjx, ofkx;
-        int ofy, ofjy, ofky;
-        int ofz, ofjz, ofkz;
-        int i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
-        int j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
-        int k_nx[CART_MAX], k_ny[CART_MAX], k_nz[CART_MAX];
+        const FINT i_l = envs->i_l;
+        const FINT j_l = envs->j_l;
+        const FINT k_l = envs->k_l;
+        const FINT nfi = envs->nfi;
+        const FINT nfj = envs->nfj;
+        const FINT nfk = envs->nfk;
+        const FINT dj = envs->g_stride_j;
+        const FINT dk = envs->g_stride_k;
+        FINT i, j, k, n;
+        FINT ofx, ofjx, ofkx;
+        FINT ofy, ofjy, ofky;
+        FINT ofz, ofjz, ofkz;
+        FINT i_nx[CART_MAX], i_ny[CART_MAX], i_nz[CART_MAX];
+        FINT j_nx[CART_MAX], j_ny[CART_MAX], j_nz[CART_MAX];
+        FINT k_nx[CART_MAX], k_ny[CART_MAX], k_nz[CART_MAX];
 
         CINTcart_comp(i_nx, i_ny, i_nz, i_l);
         CINTcart_comp(j_nx, j_ny, j_nz, j_l);
@@ -119,11 +119,11 @@ void CINTg3c1e_index_xyz(int *idx, const CINTEnvVars *envs)
 void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
                     double fac, const CINTEnvVars *envs)
 {
-        const int li = envs->li_ceil;
-        const int lj = envs->lj_ceil;
-        const int lk = envs->lk_ceil;
-        const int nmax = li + lj + lk;
-        const int mmax = lj + lk;
+        const FINT li = envs->li_ceil;
+        const FINT lj = envs->lj_ceil;
+        const FINT lk = envs->lk_ceil;
+        const FINT nmax = li + lj + lk;
+        const FINT mmax = lj + lk;
         double *gx = g;
         double *gy = g + envs->g_size;
         double *gz = g + envs->g_size * 2;
@@ -134,14 +134,14 @@ void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
                 return;
         }
 
-        int dj = li + 1;
-        const int dk = envs->g_stride_k;
+        FINT dj = li + 1;
+        const FINT dk = envs->g_stride_k;
         const double aijk = ai + aj + ak;
         const double aijk1 = .5 / aijk;
         const double *ri = envs->ri;
         const double *rj = envs->rj;
         const double *rk = envs->rk;
-        int i, j, k, off;
+        FINT i, j, k, off;
         const double *rirj = envs->rirj;
         double rjrk[3], rjrijk[3];
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
  *
  * Cartisen GTO to spheric or spinor GTO transformation
  */
@@ -40,12 +40,16 @@ void c2s_si_2e2i(double complex *fijkl, const double complex *opij, CINTEnvVars 
 
 void c2s_sph_3c2e1(double *fijkl, const double *gctr, CINTEnvVars *envs);
 void c2s_cart_3c2e1(double *fijkl, const double *gctr, CINTEnvVars *envs);
-void c2s_ssc_3c2e1(double *fijkl, const double *gctr, CINTEnvVars *envs);
-
-void c2s_sph_3c1e(double *fijkl, const double *gctr, CINTEnvVars *envs);
-void c2s_cart_3c1e(double *fijkl, const double *gctr, CINTEnvVars *envs);
+void c2s_sph_3c2e1_ssc(double *fijkl, const double *gctr, CINTEnvVars *envs);
 
 void c2s_sf_3c2e1(double complex *opijk, double *gctr, CINTEnvVars *envs);
 void c2s_sf_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs);
 void c2s_si_3c2e1(double complex *opijk, double *gctr, CINTEnvVars *envs);
 void c2s_si_3c2e1i(double complex *opijk, double *gctr, CINTEnvVars *envs);
+void c2s_sf_3c2e1_ssc(double complex *opijk, double *gctr, CINTEnvVars *envs);
+void c2s_sf_3c2e1i_ssc(double complex *opijk, double *gctr, CINTEnvVars *envs);
+void c2s_si_3c2e1_ssc(double complex *opijk, double *gctr, CINTEnvVars *envs);
+void c2s_si_3c2e1i_ssc(double complex *opijk, double *gctr, CINTEnvVars *envs);
+
+void c2s_sph_3c1e(double *fijkl, const double *gctr, CINTEnvVars *envs);
+void c2s_cart_3c1e(double *fijkl, const double *gctr, CINTEnvVars *envs);
