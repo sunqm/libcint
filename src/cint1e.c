@@ -94,10 +94,10 @@ static double CINTnuc_mod(const double aij, const FINT nuc_id,
         double zeta;
         if (nuc_id < 0) {
                 zeta = env[PTR_RINV_ZETA];
-        } else if (atm(NUC_MOD_OF, nuc_id) == POINT_NUC) {
-                return 1;
-        } else {
+        } else if (atm(NUC_MOD_OF, nuc_id) == GAUSSIAN_NUC) {
                 zeta = env[atm(PTR_ZETA, nuc_id)];
+        } else {
+                zeta = 0;
         }
 
         if (zeta > 0) {
