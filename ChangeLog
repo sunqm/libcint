@@ -1,3 +1,6 @@
+Version 2.6.4 (2014-10-19):
+	* cart2sph transformation for l=12
+
 Version 2.6.3 (2014-10-15):
 	* mixed spinor-cartesian 3c2e integrals
 
