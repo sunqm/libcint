@@ -161,3 +161,11 @@
   '("cint2e_ip1ip2_sph"       spheric  ( nabla \, \| nabla \, ))
 )
 
+(gen-cint "auto_3c1e.c"
+  '("cint3c1e_r2_origk_sph"  spheric  ( \, \, r dot r))
+  '("cint3c1e_r4_origk_sph"  spheric  ( \, \, r dot r r dot r))
+  '("cint3c1e_r6_origk_sph"  spheric  ( \, \, r dot r r dot r r dot r))
+  '("cint1e_r4_origj_sph"  spheric  ( \| r dot r r dot r))
+)
+
+

@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.6.4")
+set(cint_VERSION "2.6.5")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
@@ -37,7 +37,7 @@ set(cintSrc
   src/autocode/auto_intor1.c src/autocode/auto_intor2.c
   src/autocode/auto_intor3.c src/autocode/gaunt1.c src/autocode/grad1.c
   src/autocode/grad2.c src/autocode/grad3.c src/autocode/auto_hess.c
-  src/autocode/auto_3c2e.c)
+  src/autocode/auto_3c2e.c src/autocode/auto_3c1e.c)
 
 
 if (${ENABLE_STATIC})

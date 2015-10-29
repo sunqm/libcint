@@ -23,9 +23,9 @@
 ;;; rinv  = 1/r
 ;;; r12   = 1/r_12
 ;;; translate these keys in function dress-other combo-op
-(defparameter *one-electron-operator-keywords* '(ovlp rinv nuc nabla-rinv))
+(defparameter *one-electron-operator-keywords* '(ovlp rinv nuc nabla-rinv ccc1e))
+(defparameter *two-electron-operator-keywords* '(r12 gaunt ccc2e))
 (defparameter *one-componet-operator-keywords* '(rinv nuc r12))
-(defparameter *two-electron-operator-keywords* '(r12 gaunt))
 (defparameter *nabla-not-comutable-keywords* '(rinv nuc nabla-rinv r12 gaunt))
 
 ;;; *operator-keywords*: precedence from high to low
@@ -176,8 +176,9 @@
      (make-vec (make-cell 1 '() '(nabla-rinv x))
                (make-cell 1 '() '(nabla-rinv y))
                (make-cell 1 '() '(nabla-rinv z))))
-    ((ovlp) (make-cell 1 '() '()))
-    ((r12 gaunt) ; *two-electron-operator-keywords*
+    ((ovlp ccc1e) ; *one-electron-operator-keywords*
+     (make-cell 1 '() '()))
+    ((r12 gaunt ccc2e) ; *two-electron-operator-keywords*
      (make-cell 1 '() (make-op 'r12 'S)))
     (otherwise (if (numberp item)
                  (make-cell item '() '()) ; factor
@@ -238,12 +239,18 @@
 (defun int4c2e? (expr)
   (eql (count '\, expr) 2))
 (defun int3c2e? (expr)
-  (eql (count '\, expr) 1))
+  (or (member 'ccc2e expr)
+      (and (member '\| expr)
+           (eql (count '\, expr) 1))))
+(defun int3c1e? (expr)
+  (or (member 'ccc1e expr)
+      (and (not (member '\| expr))
+           (eql (count '\, expr) 2))))
 (defun int2c2e? (expr)
   (and (eql (count '\, expr) 0)
        (intersection *two-electron-operator-keywords* expr)))
 (defun two-electron-int? (expr)
-  (or (member '\, expr)
+  (or (and (member '\, expr) (member '\| expr))
       (intersection *two-electron-operator-keywords* expr)))
 (defun one-electron-int? (expr)
   (not (two-electron-int? expr)))
@@ -290,10 +297,13 @@
             ,@(multiple-value-list (split-at '\, (car items)))
             ,@(multiple-value-list (split-at '\, (caddr items))))))
       ; one-electron-int
-      (let ((items (split-at* '\| ops)))
-        (if (eql (length items) 2)
-          (list '(ovlp) (car items) (cadr items) '() '())
-          (list (cadr items) (car items) (caddr items) '() '()))))))
+      (if (int3c1e? ops)
+        (let ((items (split-at* '\, ops)))
+          (list '(ccc1e) (car items) (cadr items) (caddr items) '()))
+        (let ((items (split-at* '\| ops)))
+          (if (eql (length items) 2)
+            (list '(ovlp) (car items) (cadr items) '() '())
+            (list (cadr items) (car items) (caddr items) '() '())))))))
 (defun bra-1-of (expr)
   (caddr (split-int-expression expr)))
 (defun bra-2-of (expr)
@@ -532,7 +542,12 @@
           (ops-j (subst 'rj 'r ket-j))
           (ops-k (subst 'rk 'r bra-k))
           (ops-l (subst 'rl 'r ket-l)))
-      (cond ((one-electron-int? expr)
+      (cond ((int3c1e? expr)
+             (cond ((intersection '(sigma g) ops-k)
+                    (error "sigma, g not allowed in int3c1e expression~%"))
+                   (ops-l (error "auxiliary basis should not have ops-l~%"))
+                   (t (eval-int-r12 phasefac op ops-i ops-j ops-k '()))))
+            ((one-electron-int? expr)
              (format-vs-1e phasefac ops-i ops-j op))
 ; two-electron integrals
             ((int4c2e? expr)

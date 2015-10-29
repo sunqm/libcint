@@ -29,3 +29,9 @@ FINT CINT3c2e_spinor_drv(double *opijk, CINTEnvVars *envs, const CINTOpt *opt,
 FINT CINT2c2e_cart_drv(double *opij, CINTEnvVars *envs, const CINTOpt *opt);
 FINT CINT2c2e_spheric_drv(double *opij, CINTEnvVars *envs, const CINTOpt *opt);
 
+/*
+ * should move following two into cint1e.h
+ */
+FINT CINT3c1e_spheric_drv(double *opijk, CINTEnvVars *envs, const CINTOpt *opt,
+                         void (*const f_e1_c2s)(), FINT is_ssc);
+FINT CINT3c1e_cart_drv(double *opijk, CINTEnvVars *envs, const CINTOpt *opt);

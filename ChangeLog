@@ -1,3 +1,7 @@
+Version 2.6.5 (2014-10-28):
+	* 3c1e integral generator
+	* New 3c1e integrals <ij|r^2|k> <ij|r^4|k> <ij|r^6|k>
+
 Version 2.6.4 (2014-10-19):
 	* cart2sph transformation for l=12
 
