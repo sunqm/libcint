@@ -140,10 +140,10 @@ FINT CINTtot_cgto_cart(const FINT *bas, const FINT nbas)
 static void shells_cgto_offset(FINT (*f)(), FINT ao_loc[],
                                const FINT *bas, const FINT nbas)
 {
-        FINT i, s;
-        for (i = 0, s = 0; i < nbas; i++) {
-                ao_loc[i] = s;
-                s += (*f)(i, bas);
+        FINT i;
+        ao_loc[0] = 0;
+        for (i = 1; i < nbas; i++) {
+                ao_loc[i] = ao_loc[i-1] + (*f)(i-1, bas);
         }
 }
 /*
