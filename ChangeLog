@@ -1,44 +1,47 @@
-Version 2.6.5 (2014-10-28):
+Version 2.6.5 (2015-12-21):
+	* Integrals (i, s, sp j | sp k, s, l) for Gaunt term
+
+Version 2.6.5 (2015-10-28):
 	* 3c1e integral generator
 	* New 3c1e integrals <ij|r^2|k> <ij|r^4|k> <ij|r^6|k>
 
-Version 2.6.4 (2014-10-19):
+Version 2.6.4 (2015-10-19):
 	* cart2sph transformation for l=12
 
-Version 2.6.3 (2014-10-15):
+Version 2.6.3 (2015-10-15):
 	* mixed spinor-cartesian 3c2e integrals
 
-Version 2.6.2 (2014-10-09):
+Version 2.6.2 (2015-10-09):
 	* 3-center 1-electron integrals
 	* mixed spheric-cartesian 3c2e integrals
 	* Restore cart2sph transformation interface
 
-Version 2.6.1 (2014-10-07):
+Version 2.6.1 (2015-10-07):
 	* Expose cart2sph transformation functions
 
-Version 2.6.0 (2014-09-25):
+Version 2.6.0 (2015-09-25):
 	* API Updates!  To support user-specified gaussian nuclear model,
 	the intrinsic nuclear model functions are removed.  Accordingly,
 	the 4th element of "atm" argument are changed.
 
-Version 2.5.5 (2014-05-14):
+Version 2.5.5 (2015-05-14):
 	* Provide sqrtl, expl, fabsl functions when compiler does not
 	fully support c99.
 
-Version 2.5.4 (2014-03-02):
+Version 2.5.4 (2015-03-02):
 	* Change origin of <z>, <zz>, <r> ... integrals.  The existed
 	  <z> <r> ... integrals are renamed.
 
-Version 2.5.3 (2014-02-26):
+Version 2.5.3 (2015-02-26):
 	* Add integral ( p i | nuc | p j )
 
-Version 2.5.2 (2014-02-10):
+Version 2.5.2 (2015-02-10):
 	* Expose cartesian to spherical transformation
 
-Version 2.5.1 (2014-01-26):
+Version 2.5.1 (2015-01-26):
 	* Add density fitting integral (sp i sp j | K)
 
-Version 2.5.0 (2014-01-04):
+Version 2.5.0 (2015-01-04):
 	* Add general 2-center and 3-center 2e integrals
 	* Extend code generator for 2-center and 3-center 2e integrals 
 	* fix a tensor ordering problem of the code generator

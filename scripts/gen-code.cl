@@ -68,16 +68,24 @@
                (let ((fac (realpart (phase-of cell)))
                      (const@3 (ternary-subscript (consts-of cell)))
                      (op@3    (ternary-subscript (ops-of cell))))
-                 (cond ((null const@3)
-                        (if (null op@3)
-                          (format fout " + (~a*s\[0\])" fac)
-                          (format fout " + (~a*s\[~a\])"
-                                  fac op@3)))
-                       ((null op@3)
-                        (format fout " + (~a*c\[~a\]*s\[0\])"
-                                fac const@3))
-                       (t (format fout " + (~a*c\[~a\]*s\[~a\])"
-                                  fac const@3 op@3)))))
+                 (if (equal fac 1)
+                   (cond ((null const@3)
+                          (if (null op@3)
+                            (format fout " + s\[0\]" )
+                            (format fout " + s\[~a\]" op@3)))
+                         ((null op@3)
+                          (format fout " + c\[~a\]*s\[0\]" const@3))
+                         (t (format fout " + c\[~a\]*s\[~a\]" const@3 op@3)))
+                   (cond ((null const@3)
+                          (if (null op@3)
+                            (format fout " + (~a*s\[0\])" fac)
+                            (format fout " + (~a*s\[~a\])"
+                                    fac op@3)))
+                         ((null op@3)
+                          (format fout " + (~a*c\[~a\]*s\[0\])"
+                                  fac const@3))
+                         (t (format fout " + (~a*c\[~a\]*s\[~a\])"
+                                    fac const@3 op@3))))))
              (c-streamer (cs)
                (format fout fmt-gout (incf ginc))
                (cond ((null cs) (format fout " 0"))
@@ -165,8 +173,8 @@
         (format fout "c[~a] = 1" i)
         (loop
           for j from (1- n-giao) downto 0
-          and res = i then (multiple-value-bind (FINT res) (floor res (expt 3 j))
-                             (format fout " * rirj[~a]" FINT)
+          and res = i then (multiple-value-bind (int res) (floor res (expt 3 j))
+                             (format fout " * rirj[~a]" int)
                              res))
         (format fout ";~%")))))
 
@@ -374,14 +382,14 @@ CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
         (format fout "c[~a] = 1" i)
         (loop
           for j from (+ n-ij n-kl -1) downto n-kl
-          and res = i then (multiple-value-bind (FINT res) (floor res (expt 3 j))
-                             (format fout " * rirj[~a]" FINT)
+          and res = i then (multiple-value-bind (int res) (floor res (expt 3 j))
+                             (format fout " * rirj[~a]" int)
                              res))
         (loop
           for j from (1- n-kl) downto 0
           and res = (nth-value 1 (floor i (expt 3 n-kl)))
-                    then (multiple-value-bind (FINT res) (floor res (expt 3 j))
-                           (format fout " * rkrl[~a]" FINT)
+                    then (multiple-value-bind (int res) (floor res (expt 3 j))
+                           (format fout " * rkrl[~a]" int)
                            res))
         (format fout ";~%")))))
 

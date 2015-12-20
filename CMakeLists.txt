@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.6.5")
+set(cint_VERSION "2.6.6")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
