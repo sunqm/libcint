@@ -138,6 +138,8 @@
 (gen-cint "gaunt1.c"
   '("cint2e_ssp1ssp2"         spinor  ( \, sigma dot p \| gaunt \| \, sigma dot p))
   '("cint2e_ssp1sps2"         spinor  ( \, sigma dot p \| gaunt \| sigma dot p \,))
+  '("cint2e_sps1ssp2"         spinor  ( sigma dot p \, \| gaunt \| \, sigma dot p))
+  '("cint2e_sps1sps2"         spinor  ( sigma dot p \, \| gaunt \| sigma dot p \,))
   '("cint2e_cg_ssa10ssp2"     spinor  (rc cross sigma \, \| gaunt \| \, sigma dot p))
   '("cint2e_giao_ssa10ssp2"   spinor  (r cross sigma  \, \| gaunt \| \, sigma dot p))
   '("cint2e_gssp1ssp2"        spinor  (g \, sigma dot p  \| gaunt \| \, sigma dot p))

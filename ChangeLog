@@ -1,4 +1,8 @@
-Version 2.6.5 (2015-12-21):
+Version 2.6.7 (2015-12-26):
+	* Integrals (sp i, s, j | k, s, sp l) for Gaunt term
+	* Integrals (sp i, s, j | sp k, s, l) for Gaunt term
+
+Version 2.6.6 (2015-12-21):
 	* Integrals (i, s, sp j | sp k, s, l) for Gaunt term
 
 Version 2.6.5 (2015-10-28):
