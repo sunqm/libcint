@@ -1,5 +1,5 @@
 ;;;;
-;;;; Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
+;;;; Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
 ;;;; Description:
 ;;;;    translate the short expression to the expression which is
 ;;;;    suitable for derivator
@@ -23,14 +23,15 @@
 ;;; rinv  = 1/r
 ;;; r12   = 1/r_12
 ;;; translate these keys in function dress-other combo-op
-(defparameter *one-electron-operator-keywords* '(ovlp rinv nuc nabla-rinv ccc1e))
-(defparameter *two-electron-operator-keywords* '(r12 gaunt ccc2e))
-(defparameter *one-componet-operator-keywords* '(rinv nuc r12))
-(defparameter *nabla-not-comutable-keywords* '(rinv nuc nabla-rinv r12 gaunt))
+(defparameter *one-electron-operator* '(ovlp rinv nuc nabla-rinv ccc1e))
+(defparameter *two-electron-operator* '(r12 ccc2e nabla-r12 gaunt breit-r1 breit-r2))
+(defparameter *one-componet-operator* '(rinv nuc r12))
+(defparameter *nabla-not-comutable* '(rinv nuc nabla-rinv r12 nabla-r12 gaunt2 breit-r1 breit-r2))
+(defparameter *act-left-right* '(nabla-rinv nabla-r12 breit-r1 breit-r2))
 
-;;; *operator-keywords*: precedence from high to low
+;;; *operator*: precedence from high to low
 ;;; translate these keys in function dress-vec and dress-comp ..
-(defparameter *operator-keywords* '(vec comp-x comp-y comp-z cross dot))
+(defparameter *operator* '(vec comp-x comp-y comp-z cross dot))
 ;;; p = -i \nabla
 ;;; ip = \nabla
 ;;; r0 = r - (0,0,0)
@@ -48,15 +49,18 @@
 ;;; have cross or dot operators). Using the sticker symbol for p/nabla
 ;;; to prevent p/nabla operators comutating with the next p/nabla operators
 
-(defparameter *intvar-keywords* '(p ip nabla px py pz
-                                  p* ip* nabla* px* py* pz*
-                                  r r0 rc ri rj rk rl g
-                                  x x0 xc xi xj xk xl
-                                  y y0 yc yi yj yk yl
-                                  z z0 zc zi zj zk zl))
-(defparameter *var-sticker-keywords* '(p* ip* nabla* px* py* pz*))
-(defparameter *var-vec-keywords* '(p ip nabla p* ip* nabla* r r0 rc ri rj rk rl g))
+;;; rscalar?
+(defparameter *intvar* '(p ip nabla px py pz
+                         p* ip* nabla* px* py* pz*
+                         r r0 rc ri rj rk rl g
+                         x x0 xc xi xj xk xl
+                         y y0 yc yi yj yk yl
+                         z z0 zc zi zj zk zl))
+(defparameter *var-sticker* '(p* ip* nabla* px* py* pz*))
+(defparameter *var-vec* '(p ip nabla p* ip* nabla* r r0 rc ri rj rk rl g))
 
+(defun breit-int? (expr)
+  (or (member 'breit-r1 expr) (member 'breit-r2 expr)))
 ;;;;;; convert to reversed polish notation ;;;;;;;;;;;
 (defun complex? (n)
   (not (zerop (imagpart n))))
@@ -105,12 +109,12 @@
              ;; return a rpn stack
              (cond ((null seq) rpn-stack)
                    ((atom seq) (cons seq rpn-stack))
-                   ((member (car seq) *operator-keywords*)
+                   ((member (car seq) *operator*)
                     (rpn-iter (cons (car seq)
                                     (rpn-iter rpn-stack (cadr seq)))
                               (cddr seq)))
                    (t (rpn-iter (rpn-iter rpn-stack (car seq)) (cdr seq))))))
-    (reverse (rpn-iter '() (reduce #'precede *operator-keywords*
+    (reverse (rpn-iter '() (reduce #'precede *operator*
                                    :initial-value tokens)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -129,7 +133,7 @@
     ((p) (make-vec (make-cell #C(0 -1) '() '(nabla x))
                    (make-cell #C(0 -1) '() '(nabla y))
                    (make-cell #C(0 -1) '() '(nabla z))))
-    ((p*) (make-vec (make-cell #C(0 -1) '() '(nabla* x))
+    ((p*) (make-vec (make-cell #C(0 -1) '() '(nabla* x)) ; prevent commutating to p
                     (make-cell #C(0 -1) '() '(nabla* y))
                     (make-cell #C(0 -1) '() '(nabla* z))))
     ((g) ; Rmn cross r0
@@ -170,15 +174,15 @@
     ;((ipx nablax*) (make-cell 1 '() '(nabla* x)))
     ;((ipy nablay*) (make-cell 1 '() '(nabla* y)))
     ;((ipz nablaz*) (make-cell 1 '() '(nabla* z)))
-    ((nuc rinv) ; *one-electron-operator-keywords*
+    ((nuc rinv) ; *one-electron-operator*
      (make-cell 1 '() (make-op item 'S)))
-    ((nabla-rinv)
-     (make-vec (make-cell 1 '() '(nabla-rinv x))
-               (make-cell 1 '() '(nabla-rinv y))
-               (make-cell 1 '() '(nabla-rinv z))))
-    ((ovlp ccc1e) ; *one-electron-operator-keywords*
+    ((nabla-rinv nabla-r12)
+     (make-vec (make-cell 1 '() `(,item x))
+               (make-cell 1 '() `(,item y))
+               (make-cell 1 '() `(,item z))))
+    ((ovlp ccc1e) ; *one-electron-operator*
      (make-cell 1 '() '()))
-    ((r12 gaunt ccc2e) ; *two-electron-operator-keywords*
+    ((r12 gaunt ccc2e) ; *two-electron-operator*
      (make-cell 1 '() (make-op 'r12 'S)))
     (otherwise (if (numberp item)
                  (make-cell item '() '()) ; factor
@@ -248,10 +252,10 @@
            (eql (count '\, expr) 2))))
 (defun int2c2e? (expr)
   (and (eql (count '\, expr) 0)
-       (intersection *two-electron-operator-keywords* expr)))
+       (intersection *two-electron-operator* expr)))
 (defun two-electron-int? (expr)
   (or (and (member '\, expr) (member '\| expr))
-      (intersection *two-electron-operator-keywords* expr)))
+      (intersection *two-electron-operator* expr)))
 (defun one-electron-int? (expr)
   (not (two-electron-int? expr)))
 
@@ -289,13 +293,20 @@
     (if (two-electron-int? ops)
       (let ((items (split-at* '\| ops)))
         (if (eql (length items) 2)
-          `((r12)
-            ,@(multiple-value-list (split-at '\, (car items)))
-            ,@(multiple-value-list (split-at '\, (cadr items))))
-; including the 3c2e 2c2e expression, in which, the split-at retuns nil for ket
-          `(,(cadr items)
-            ,@(multiple-value-list (split-at '\, (car items)))
-            ,@(multiple-value-list (split-at '\, (caddr items))))))
+            `((r12)
+              ,@(multiple-value-list (split-at '\, (car items)))
+              ,@(multiple-value-list (split-at '\, (cadr items))))
+            (let ((ops (cadr items))
+                  (ij (multiple-value-list (split-at '\, (car items))))
+                  (kl (multiple-value-list (split-at '\, (caddr items)))))
+              (cond ((member 'breit-r1 ops)
+; Insert r between ij and between kl to make breit term have correct operator
+; sequence (and correct tot-bits).  The operator sequence (tot-bits) are used by
+; file gen-code.cl (see i-len, j-len, k-len, l-len) to generate intermediates g0,g1,g2...
+                     (list ops (car ij) (cons 'r (cadr ij)) (car kl) (cadr kl)))
+                    ((member 'breit-r2 ops)
+                     (list ops (car ij) (cadr ij) (car kl) (cons 'r (cadr kl))))
+                    (t `(,ops ,@ij ,@kl))))))
       ; one-electron-int
       (if (int3c1e? ops)
         (let ((items (split-at* '\, ops)))
@@ -405,13 +416,13 @@
 (defun count-tensor-rank (ops)
   (let ((ndot (count 'dot ops)) ; a dot operator reduces two ranks
         (ncross (count 'cross ops)) ; a cross operator reduces one rank
-        (nvec (count-if #'(lambda (x) (member x *var-vec-keywords*)) ops)))
+        (nvec (count-if #'(lambda (x) (member x *var-vec*)) ops)))
     (- nvec ncross (* 2 ndot))))
 
 (defun remove-sticker-next (expr) ; remove the operator behind sticker
   (cond ((last-one? expr) expr)
-        ((and (member (car expr) *var-sticker-keywords*)
-              (member (cadr expr) *nabla-not-comutable-keywords*))
+        ((and (member (car expr) *var-sticker*)
+              (member (cadr expr) *nabla-not-comutable*))
          (cons (car expr) (remove-sticker-next (cddr expr))))
         (t (cons (car expr) (remove-sticker-next (cdr expr))))))
 
@@ -495,6 +506,41 @@
     (list ts1 sf1 ts2 sf2
           (vs-by-vs pv1 pv2))))
 
+;;; [\sigma_1 \dot (-\nabla 1/r12)] (\sigma_2 \dot r1)
+(defun eval-breit-gauge-r1 (phasefac bra-i ket-j bra-k ket-l)
+  (flet ((breit-iter (comp)
+; (cdr ket-j) to remove first operator because it was added in
+; split-int-expression function to get the right tot-btis
+           (let* ((vs1 (format-vs-1e phasefac bra-i (cons `(,comp r) (cdr ket-j))
+                                     '(sigma dot nabla-r12)))
+                  (ts1 (car vs1))
+                  (sf1 (cadr vs1))
+                  (pv1 (caddr vs1))
+                  (vs2 (format-vs-1e 1 bra-k ket-l `(,comp sigma r12)))
+                  (ts2 (car vs2))
+                  (sf2 (cadr vs2))
+                  (pv2 (caddr vs2)))
+             (list ts1 sf1 ts2 sf2 (vs-by-vs pv1 pv2)))))
+    (let ((sx (breit-iter 'comp-x))
+          (sy (breit-iter 'comp-y))
+          (sz (breit-iter 'comp-z)))
+      `(,@(subseq sx 0 4)
+         ,(reduce #'vs-align-merge (mapcar #'last1 (list sx sy sz)))))))
+
+;;; [\sigma_1 \dot (-\nabla 1/r12)] (\sigma_2 \dot r2)
+(defun eval-breit-gauge-r2 (phasefac bra-i ket-j bra-k ket-l)
+  (let* ((vs1 (format-vs-1e phasefac bra-i ket-j '(sigma dot nabla-r12)))
+         (ts1 (car vs1))
+         (sf1 (cadr vs1))
+         (pv1 (caddr vs1))
+; (cdr ket-l) to remove first operator because it was added in
+; split-int-expression function to get the right tot-btis
+         (vs2 (format-vs-1e 1 bra-k (append '(sigma dot r) (cdr ket-l)) '(r12)))
+         (ts2 (car vs2))
+         (sf2 (cadr vs2))
+         (pv2 (caddr vs2)))
+    (list ts1 sf1 ts2 sf2 (vs-by-vs pv1 pv2))))
+
 (defun vs-align-merge (vs1 vs2)
   "add two tensors/vectors, vs1 and vs2 should be aligned"
   (cond ((null vs1) '())
@@ -521,19 +567,19 @@
     (let ((unknow (remove-if (lambda (x)
                                (or (numberp x)
                                    (member x '(sigma))
-                                   (member x *intvar-keywords*) ; ??
-                                   (member x *operator-keywords*)
-                                   (member x *intvar-keywords*)
-                                   (member x *one-electron-operator-keywords*)
-                                   (member x *two-electron-operator-keywords*)))
+                                   (member x *intvar*) ; ??
+                                   (member x *operator*)
+                                   (member x *intvar*)
+                                   (member x *one-electron-operator*)
+                                   (member x *two-electron-operator*)))
                              op)))
       (if (> (length unknow) 0)
         (format t "//Warning: unknown operators: ~a" unknow)))
     (let ((unknow (remove-if (lambda (x)
                                (or (numberp x)
                                    (member x '(sigma))
-                                   (member x *intvar-keywords*)
-                                   (member x *operator-keywords*)))
+                                   (member x *intvar*)
+                                   (member x *operator*)))
                              `(,@bra-i ,@ket-j ,@bra-k ,@ket-l))))
       (if (> (length unknow) 0)
         (format t "//Warning: unknown keys ~a" unknow)))
@@ -553,6 +599,10 @@
             ((int4c2e? expr)
              (cond ((member 'gaunt op)
                     (eval-int-gaunt phasefac op ops-i ops-j ops-k ops-l))
+                   ((member 'breit-r1 op)
+                    (eval-breit-gauge-r1 phasefac ops-i ops-j ops-k ops-l))
+                   ((member 'breit-r2 op)
+                    (eval-breit-gauge-r2 phasefac ops-i ops-j ops-k ops-l))
                    ((member 'r12 op)
                     (eval-int-r12 phasefac op ops-i ops-j ops-k ops-l))
                    (t (error "unsupport operator ~s~%" op))))

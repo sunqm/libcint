@@ -48,7 +48,7 @@ s[5] = g0[ix] * g2[iy] * g1[iz];
 s[6] = g1[ix] * g0[iy] * g2[iz];
 s[7] = g0[ix] * g1[iy] * g2[iz];
 s[8] = g0[ix] * g0[iy] * g3[iz];
-gout[0] += + (1*s[0]) + (1*s[4]) + (1*s[8]);
+gout[0] += + s[0] + s[4] + s[8];
 gout += 1;
 }}
 void cint3c1e_r2_origk_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
@@ -197,7 +197,7 @@ s[77] = g0[ix] * g2[iy] * g13[iz];
 s[78] = g1[ix] * g0[iy] * g14[iz];
 s[79] = g0[ix] * g1[iy] * g14[iz];
 s[80] = g0[ix] * g0[iy] * g15[iz];
-gout[0] += + (1*s[0]) + (2*s[4]) + (2*s[8]) + (1*s[40]) + (2*s[44]) + (1*s[80]);
+gout[0] += + s[0] + (2*s[4]) + (2*s[8]) + s[40] + (2*s[44]) + s[80];
 gout += 1;
 }}
 void cint3c1e_r4_origk_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
@@ -1090,7 +1090,7 @@ s[725] = g0[ix] * g2[iy] * g61[iz];
 s[726] = g1[ix] * g0[iy] * g62[iz];
 s[727] = g0[ix] * g1[iy] * g62[iz];
 s[728] = g0[ix] * g0[iy] * g63[iz];
-gout[0] += + (1*s[0]) + (3*s[4]) + (3*s[8]) + (3*s[40]) + (6*s[44]) + (3*s[80]) + (1*s[364]) + (3*s[368]) + (3*s[404]) + (1*s[728]);
+gout[0] += + s[0] + (3*s[4]) + (3*s[8]) + (3*s[40]) + (6*s[44]) + (3*s[80]) + s[364] + (3*s[368]) + (3*s[404]) + s[728];
 gout += 1;
 }}
 void cint3c1e_r6_origk_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
@@ -1237,7 +1237,7 @@ s[77] = g0[ix] * g2[iy] * g13[iz];
 s[78] = g1[ix] * g0[iy] * g14[iz];
 s[79] = g0[ix] * g1[iy] * g14[iz];
 s[80] = g0[ix] * g0[iy] * g15[iz];
-gout[0] += + (1*s[0]) + (2*s[4]) + (2*s[8]) + (1*s[40]) + (2*s[44]) + (1*s[80]);
+gout[0] += + s[0] + (2*s[4]) + (2*s[8]) + s[40] + (2*s[44]) + s[80];
 gout += 1;
 }}
 FINT cint1e_r4_origj_sph(double *opij, const FINT *shls,

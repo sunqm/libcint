@@ -99,8 +99,8 @@
 ;;; effective keys are p,r,ri,...
 (defun effect-keys (ops)
   (remove-if-not (lambda (x)
-                   (member x (append '(nabla-rinv nabla-r12)
-                                     *intvar-keywords*)))
+                   (or (member x *act-left-right*)
+                       (member x *intvar*)))
                  ops))
 (defun g?e-of (key)
   (case key
@@ -112,7 +112,7 @@
     ((zi zj zk zl) "RC")
     ((r0 x0 y0 z0 g) "R0") ; R0 ~ the vector origin is (0,0,0)
     ((rc xc yc zc) "RC") ; the vector origin is set in env[PTR_COMMON_ORIG]
-    ((nabla-rinv nabla-r12) "D_")
+    ((nabla-rinv nabla-r12 breit-r1 breit-r2) "D_")
     (otherwise (error "unknown key ~a~%" key))))
 
 (defun dump-header (fout)
@@ -180,16 +180,40 @@
 
 ; l-combo searches op_bit from left to right
 ;  o100 o010 o001|g...>  =>  |g...> = o100 |g0..>
+; a operator can only be applied to the left of the existed ones
 ;  |g100,l> = o100 |g000,l+1>
 ;  |g101,l> = o100 |g001,l+1>
 ;  |g110,l> = o100 |g010,l+1>
 ;  |g111,l> = o100 |g011,l+1>
+; as a result, g* intermediates are generated from the previous one whose
+; id (in binary) can be obtained by removing the first bit 1 from current
+; id (in binary), see combo-bra function, eg
+;  000  g0
+;  001  g1 from g0 (000)
+;  010  g2 from g0 (000)
+;  011  g3 from g1 (001)
+;  100  g4 from g0 (000)
+;  101  g5 from g1 (001)
+;  110  g6 from g2 (010)
+;  111  g7 from g3 (011)
 ; r-combo searches op_bit from right to left
 ;  o100 o010 o001|g...>  =>  |g...> = o001 |g..0>
+; a operator can only be applied to the right of the exsited ones
 ;  |g100,l+2> = o100 |g000,l+3>
 ;  |g101,l  > = o001 |g100,l+1>
 ;  |g110,l+1> = o010 |g100,l+2>
 ;  |g111,l  > = o001 |g110,l+1>
+; as a result, g* intermediates are generated from the previous one whose
+; id (in binary) can be obtained by removing the last bit 1 from current
+; id (in binary), see combo-ket function, eg
+;  000  g0
+;  001  g1 from g0 (000)
+;  010  g2 from g0 (000)
+;  011  g3 from g2 (010)
+;  100  g4 from g0 (000)
+;  101  g5 from g4 (100)
+;  110  g6 from g4 (100)
+;  111  g7 from g6 (110)
 ; [lr]-combo have no connection with <bra| or |ket>
 ;    def l_combinator(self, ops, ig, mask, template):
 (defun first-bit1 (n)
@@ -206,23 +230,26 @@
          (ig0 (- ig (ash 1 (+ mask right))))
          (op (nth right ops-rev)))
     (format fout fmt (g?e-of op) ig ig0 left)))
-(defun combo-opj (fout fmt-op fmt-j opj-rev j-len ig mask)
-  (let ((right (last-bit1 (ash ig (- mask)))))
-    (if (< right j-len) ; does not reach op yet
-      (combo-ket fout fmt-j opj-rev ig mask)
-      (let ((ig0 (- ig (ash 1 (+ mask right))))
-            (op (nth right opj-rev)))
-        (if (member op '(nabla-rinv nabla-r12))
-          (format fout fmt-op
-                  (g?e-of op) ig ig0 right
-                  (g?e-of op) (1+ ig) ig0 right
-                  ig (1+ ig))
-          (format fout fmt-j (g?e-of op) ig ig0 right))))))
-(defun combo-ket (fout fmt ops-rev ig mask)
+(defun combo-ket (fout fmt ops-rev i-len ig mask)
   (let* ((right (last-bit1 (ash ig (- mask))))
          (ig0 (- ig (ash 1 (+ mask right))))
          (op (nth right ops-rev)))
-    (format fout fmt (g?e-of op) ig ig0 right)))
+    (format fout fmt (g?e-of op) ig ig0 i-len right)))
+(defun combo-opj (fout fmt-op fmt-j opj-rev i-len j-len ig mask)
+  (let ((right (last-bit1 (ash ig (- mask)))))
+    (if (< right j-len) ; does not reach op yet
+      (combo-ket fout fmt-j opj-rev i-len ig mask)
+      (let ((ig0 (- ig (ash 1 (+ mask right))))
+            (op (nth right opj-rev)))
+        (if (member op *act-left-right*)
+          (format fout fmt-op
+                  (g?e-of op) ig ig0 i-len right
+                  (g?e-of op) (1+ ig) ig0 i-len right
+                  ig (1+ ig))
+          (if (and (breit-int? opj-rev)
+                   (< (1+ right) (length opj-rev))) ; more ops on the left of breit-op
+              (format fout fmt-j (g?e-of op) ig ig0 (1+ i-len) right)
+              (format fout fmt-j (g?e-of op) ig ig0 i-len right)))))))
 
 (defun power2-range (n &optional (shift 0))
   (range (+ shift (ash 1 n)) (+ shift (ash 1 (1+ n)))))
@@ -235,7 +262,7 @@
       for right from mask to (+ mask j-len op-len -1) do
       (loop
         for ig in (power2-range right) do
-        (combo-opj fout fmt-op fmt-j opj-rev j-len ig mask)))
+        (combo-opj fout fmt-op fmt-j opj-rev i-len j-len ig mask)))
     (let ((shft (+ op-len j-len mask)))
       (loop
         for right from shft to (+ shft i-len -1) do
@@ -277,6 +304,10 @@ iz = idx[2];~%")
           (format nil "&c2s_sph_~a" sfx))
          (t (format nil "&c2s_cart_~a" sfx))))
 
+;!!! Be very cautious of the reverse on i-operators and k operators!
+;!!! When multiple tensor components (>= rank 2) provided by the operators
+;!!! on bra functions, the ordering of the multiple tensor components are
+;!!! also reversed in the generated integral code
 (defun gen-code-int1e (fout intname raw-infix &optional (sp 'spinor))
   (destructuring-bind (op bra-i ket-j bra-k ket-l)
     (split-int-expression raw-infix)
@@ -312,12 +343,11 @@ double *g0 = g;~%")
 ;;; generate g_(bin)
 ;;; for the operators act on the |ket>, the reversed scan order and r_combinator
 ;;; is required; for the operators acto on the <bra|, the normal scan order and
-      (let ((fmt-i (mkstr "G1E_~aI(g~a, g~a, i_l+~a, j_l);~%"))
-            (fmt-op (mkstr "G1E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a);
-G1E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a);
-n = envs->g_size * 3;
-for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G1E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a);~%")))
+      (let ((fmt-i "G1E_~aI(g~a, g~a, i_l+~a, j_l);~%")
+            (fmt-op (mkstr "G1E_~aJ(g~a, g~a, i_l+~d, j_l+~a);
+G1E_~aI(g~a, g~a, i_l+~d, j_l+~a);
+for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
+            (fmt-j (mkstr "G1E_~aJ(g~a, g~a, i_l+~d, j_l+~a);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
 ;;; generate gout
       (dump-s-1e fout tot-bits)
@@ -464,11 +494,11 @@ for (i = 0; i < envs->nrys_roots; i++) {~%" (expt 3 n))
            (k-rev (effect-keys bra-k))
            (l-rev (reverse (effect-keys ket-l)))
            (op-rev (reverse (effect-keys op)))
+           (op-len (length op-rev))
            (i-len (length i-rev))
            (j-len (length j-rev))
            (k-len (length k-rev))
            (l-len (length l-rev))
-           (op-len (length op-rev))
            (tot-bits (+ i-len j-len op-len k-len l-len))
            (raw-script (eval-int raw-infix))
            (ts1 (car raw-script))
@@ -506,18 +536,31 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout ket-l "l")
       (dump-declare-giao-ijkl fout bra-i ket-j bra-k ket-l)
 ;;; generate g_(bin)
-      (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, i_l+" i-len ", j_l+" j-len
-                          ", k_l+~a, l_l);~%"))
-            (fmt-op "")
-            (fmt-l (mkstr "G2E_~aL(g~a, g~a, i_l+" i-len ", j_l+" j-len
-                          ", k_l+" k-len ", l_l+~a);~%")))
-        (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev op-rev l-rev 0))
-      (let ((fmt-i (mkstr "G2E_~aI(g~a, g~a, i_l+~a, j_l, k_l, l_l);~%"))
-            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);
-G2E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);
-n = envs->g_size * 3;
-for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l, l_l);~%")))
+      (if (breit-int? op)
+        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, i_l+" (1+ i-len) ", j_l+" (1+ j-len)
+                            ", k_l+~a, l_l);~%"))
+              (fmt-op "")
+              (fmt-l (mkstr "G2E_~aL(g~a, g~a, i_l+" (1+ i-len) ", j_l+" (1+ j-len)
+                            ", k_l+~a, l_l+~a);~%")))
+          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() l-rev 0))
+;!! FIXME, if there are operators of electron 2 in op
+        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, i_l+" i-len ", j_l+" (+ op-len j-len)
+                            ", k_l+~a, l_l);~%"))
+              (fmt-op "")
+              (fmt-l (mkstr "G2E_~aL(g~a, g~a, i_l+" i-len ", j_l+" (+ op-len j-len)
+                            ", k_l+~a, l_l+~a);~%")))
+          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() l-rev 0)))
+;;; The derivative part of Breit term (nabla-r12) acts on both bra and ket.
+;;; In current treatments nabla-r12 are combined to j-operators.
+;;; j-operators are handled before i-operators, the nabla (of nabla-r12) on
+;;; i-operators is applied the earliest, (than all other operators on <i|
+;;; Because nabla (of nabla-r12) on <i| is always on the left-most of i-operators,
+;;; applying it first on <i| is exactly what we want.
+      (let ((fmt-i "G2E_~aI(g~a, g~a, i_l+~a, j_l, k_l, l_l);~%")
+            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l, l_l);
+G2E_~aI(g~a, g~a, i_l+~a, j_l+~a, k_l, l_l);
+for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
+            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l, l_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len)))
 ;;; generate gout
       (dump-s-2e fout tot-bits)
@@ -531,20 +574,27 @@ for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
 ;;; generate optimizer for function int2e
       (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {~%" intname)
-      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
-              i-len j-len k-len (+ op-len l-len))
+      (if (breit-int? op)
+        (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
+                (1+ i-len) (1+ j-len) k-len l-len)
+        (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
+                i-len (+ op-len j-len) k-len l-len))
       (format fout "CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate function int2e
       (format fout "FINT ~a(double *opijkl, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
-      (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
-              i-len j-len k-len (+ op-len l-len) tot-bits
-              (if (eql sf1 'sf) 1 4) (if (eql sf2 'sf) 1 4)
-              (cond ((and (eql sf1 'sf) (eql sf2 'sf)) goutinc)
-                    ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
-                    (t (/ goutinc 4))))
+      (let ((e1comps (if (eql sf1 'sf) 1 4))
+            (e2comps (if (eql sf2 'sf) 1 4))
+            (tensors (cond ((and (eql sf1 'sf) (eql sf2 'sf)) goutinc)
+                           ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
+                           (t (/ goutinc 4)))))
+        (if (breit-int? op)
+            (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+                    (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
+            (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+                    i-len (+ op-len j-len) k-len l-len tot-bits e1comps e2comps tensors)))
 ;;; determine factor
       (when (member 'g raw-infix)
         (format fout "const FINT i_sh = shls[0];
@@ -631,11 +681,11 @@ double *g0 = g;~%")
             (fmt-l ""))
         (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev op-rev '() 0))
       (let ((fmt-i (mkstr "G3C2E_~aI(g~a, g~a, i_l+~a, j_l, k_l);~%"))
-            (fmt-op (mkstr "G3C2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);
-G3C2E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);
+            (fmt-op (mkstr "G3C2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);
+G3C2E_~aI(g~a, g~a, i_l+~d, j_l+~a, k_l);
 n = envs->g_size * 3;
 for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G3C2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);~%")))
+            (fmt-j (mkstr "G3C2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len))
 ;;; generate gout
       (dump-s-2e fout tot-bits)
@@ -823,11 +873,11 @@ double *g0 = g;~%")
             (fmt-l ""))
         (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev op-rev '() 0))
       (let ((fmt-i (mkstr "G3C2E_~aI(g~a, g~a, i_l+~a, j_l, k_l);~%"))
-            (fmt-op (mkstr "G3C2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);
-G3C2E_~aI(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);
+            (fmt-op (mkstr "G3C2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);
+G3C2E_~aI(g~a, g~a, i_l+~d, j_l+~a, k_l);
 n = envs->g_size * 3;
 for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G3C2E_~aJ(g~a, g~a, i_l+" i-len ", j_l+~a, k_l);~%")))
+            (fmt-j (mkstr "G3C2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len))
 ;;; generate gout
       (dump-s-1e fout tot-bits)

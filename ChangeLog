@@ -1,3 +1,6 @@
+Version 2.6.8 (2016-01-07):
+	* Integrals for Breit interaction
+
 Version 2.6.7 (2015-12-26):
 	* Integrals (sp i, s, j | k, s, sp l) for Gaunt term
 	* Integrals (sp i, s, j | sp k, s, l) for Gaunt term
