@@ -303,9 +303,9 @@
 ; Insert r between ij and between kl to make breit term have correct operator
 ; sequence (and correct tot-bits).  The operator sequence (tot-bits) are used by
 ; file gen-code.cl (see i-len, j-len, k-len, l-len) to generate intermediates g0,g1,g2...
-                     (list ops (car ij) (cons 'r (cadr ij)) (car kl) (cadr kl)))
+                     (list ops (car ij) (cons 'r0 (cadr ij)) (car kl) (cadr kl)))
                     ((member 'breit-r2 ops)
-                     (list ops (car ij) (cadr ij) (car kl) (cons 'r (cadr kl))))
+                     (list ops (car ij) (cadr ij) (car kl) (cons 'r0 (cadr kl))))
                     (t `(,ops ,@ij ,@kl))))))
       ; one-electron-int
       (if (int3c1e? ops)
@@ -511,7 +511,7 @@
   (flet ((breit-iter (comp)
 ; (cdr ket-j) to remove first operator because it was added in
 ; split-int-expression function to get the right tot-btis
-           (let* ((vs1 (format-vs-1e phasefac bra-i (cons `(,comp r) (cdr ket-j))
+           (let* ((vs1 (format-vs-1e phasefac bra-i (cons `(,comp r0) (cdr ket-j))
                                      '(sigma dot nabla-r12)))
                   (ts1 (car vs1))
                   (sf1 (cadr vs1))
@@ -535,7 +535,7 @@
          (pv1 (caddr vs1))
 ; (cdr ket-l) to remove first operator because it was added in
 ; split-int-expression function to get the right tot-btis
-         (vs2 (format-vs-1e 1 bra-k (append '(sigma dot r) (cdr ket-l)) '(r12)))
+         (vs2 (format-vs-1e 1 bra-k (append '(sigma dot r0) (cdr ket-l)) '(r12)))
          (ts2 (car vs2))
          (sf2 (cadr vs2))
          (pv2 (caddr vs2)))

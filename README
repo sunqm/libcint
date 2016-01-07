@@ -26,7 +26,8 @@ Features
 * Two electron integrals (value < 1e-15 are neglected) include
   - Coulomb repulsion
   - Gaunt interaction
-  - 2-index, 3-index and 4-index integrals
+  - Breit interaction
+  - 2-center, 3-center and 4-center integrals
 * Common lisp script to generate C code for new integrals.
 * Thread safe.
 * Uniform API for all kind of integrals.

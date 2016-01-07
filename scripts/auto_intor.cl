@@ -155,6 +155,7 @@
   '("cint2e_gauge_r2_sps1ssp2"  spinor  ( sigma dot p \, \| breit-r2 \| \, sigma dot p))
   '("cint2e_gauge_r2_sps1sps2"  spinor  ( sigma dot p \, \| breit-r2 \| sigma dot p \,))
 )
+
 (gen-cint "auto_3c2e.c"
   '("cint3c2e_ip1_sph"  spheric  (nabla \, \| ))
   '("cint3c2e_ip2_sph"  spheric  ( \, \| nabla))
