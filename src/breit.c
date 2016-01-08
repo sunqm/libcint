@@ -9,7 +9,8 @@
 
 #include <stdlib.h>
 #include <complex.h>
-#include "cint.h"
+#include "cint_bas.h"
+#include "optimizer.h"
 
 #define DECLARE(X)      int X(double complex *opijkl, int *shls, \
                               int *atm, int natm, \
