@@ -2813,6 +2813,21 @@ static struct cart2sp_t g_c2s[] = {
         {g_trans_cart2sph+6370,NULL,NULL},
 };
 
+double *CINTaddress_cart2sph(FINT l)
+{
+        return g_c2s[l].cart2sph;
+}
+
+double *CINTaddress_cart2j_lt_l(FINT l)
+{
+        return g_c2s[l].cart2j_lt_l;
+}
+
+double *CINTaddress_cart2j_gt_l(FINT l)
+{
+        return g_c2s[l].cart2j_gt_l;
+}
+
 
 static void c2s_dgemm(const char transa, const char transb,
                       const FINT m, const FINT n, const FINT k,
