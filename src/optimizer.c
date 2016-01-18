@@ -41,22 +41,22 @@ void CINTinit_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 void CINTdel_2e_optimizer(CINTOpt **opt)
 {
         CINTOpt *opt0 = *opt;
-        if (!opt0) { // when opt is created by CINTno_optimizer
+        if (opt0 == NULL) { // when opt is created by CINTno_optimizer
                 return;
         }
 
         FINT i;
 
-        if (opt0->index_xyz_array) {
+        if (opt0->index_xyz_array != NULL) {
                 for (i = 0; i < ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX; i++) {
-                        if (opt0->index_xyz_array[i]) {
+                        if (opt0->index_xyz_array[i] != NULL) {
                                 free(opt0->index_xyz_array[i]);
                         };
                 }
                 free(opt0->index_xyz_array);
         }
 
-        if (opt0->expij) {
+        if (opt0->expij != NULL) {
                 for (i = 0; i < opt0->tot_prim; i++) {
                         free(opt0->expij[i]);
                         free(opt0->rij[i]);
@@ -67,7 +67,7 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 free(opt0->cceij);
         }
 
-        if (opt0->non0ctr) {
+        if (opt0->non0ctr != NULL) {
                 free(opt0->non0ctr);
                 for (i = 0; i < opt0->tot_prim; i++) {
                         free(opt0->non0idx[i]);
@@ -77,7 +77,7 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 free(opt0->non0coeff);
         }
 
-        if (opt0->prim_offset) {
+        if (opt0->prim_offset != NULL) {
                 free(opt0->prim_offset);
         }
 
@@ -173,7 +173,7 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                    const FINT *bas, const FINT nbas, const double *env)
 {
         FINT i, j, ip, jp, io, jo, off;
-        if (!opt->prim_offset) {
+        if (opt->prim_offset == NULL) {
                 opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
                 opt->tot_prim = 0;
                 for (i = 0; i < nbas; i++) {
@@ -258,7 +258,7 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, const FINT *atm, const FINT natm,
                            const FINT *bas, const FINT nbas, const double *env)
 {
         FINT i, j, k, ip, io;
-        if (!opt->prim_offset) {
+        if (opt->prim_offset == NULL) {
                 opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
                 opt->tot_prim = 0;
                 for (i = 0; i < nbas; i++) {

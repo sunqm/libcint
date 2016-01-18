@@ -189,7 +189,7 @@ FINT CINT3c1e_cart_drv(double *opijk, CINTEnvVars *envs, const CINTOpt *opt)
         FINT has_value;
         double *pgctr = gctr;
 
-        //if (opt) {
+        //if (opt != NULL) {
         //        n = ((envs->i_ctr==1) << 2) + ((envs->j_ctr==1) << 1)
         //          + (envs->k_ctr==1);
         //        //has_value = CINTf_3c1e_loop[n](gctr, envs, opt);
@@ -223,7 +223,7 @@ FINT CINT3c1e_spheric_drv(double *opijk, CINTEnvVars *envs, const CINTOpt *opt,
         FINT n;
         FINT has_value;
 
-        //if (opt) {
+        //if (opt != NULL) {
         //        n = ((envs->i_ctr==1) << 2) + ((envs->j_ctr==1) << 1)
         //          + (envs->k_ctr==1);
         //        //has_value = CINTf_3c1e_loop[n](gctr, envs, opt);
