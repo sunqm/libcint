@@ -2818,12 +2818,12 @@ const double *CINTaddress_cart2sph(FINT l)
         return g_c2s[l].cart2sph;
 }
 
-const double *CINTaddress_cart2j_lt_l(FINT l)
+const double complex *CINTaddress_cart2j_lt_l(FINT l)
 {
         return g_c2s[l].cart2j_lt_l;
 }
 
-const double *CINTaddress_cart2j_gt_l(FINT l)
+const double complex *CINTaddress_cart2j_gt_l(FINT l)
 {
         return g_c2s[l].cart2j_gt_l;
 }
