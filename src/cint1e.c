@@ -322,17 +322,20 @@ FINT CINT1e_nuc_drv(double *opij, CINTEnvVars *envs, double fac,
         const FINT nfi = envs->nfi;
         const FINT nfj = envs->nfj;
         const FINT nc = nfi * nfj * i_ctr * j_ctr * envs->ncomp_e1;
-        FINT has_value = 0, has_value0;
+        FINT has_value = 0;
         FINT ip, jp, nop;
         FINT n;
+        double charge_fac;
         double *gctr = malloc(sizeof(double) * nc * envs->ncomp_tensor);
         double *pgctr = gctr;
 
         CINTdset0(nc * envs->ncomp_tensor, gctr);
         for (n = 0; n < envs->natm; n++) {
-                has_value0 = CINT1e_nuc_loop(gctr, envs,
-                                             -abs(atm(CHARGE_OF,n))*fac, n);
-                has_value = has_value || has_value0;
+                charge_fac = -abs(atm(CHARGE_OF,n)) * fac;
+                if (fabs(charge_fac) > 1e-20) {
+                        has_value = CINT1e_nuc_loop(gctr, envs, charge_fac, n)
+                                || has_value;
+                }
         }
 
         if (f_c2s == c2s_sph_1e) {
