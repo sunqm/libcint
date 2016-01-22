@@ -1515,3 +1515,119 @@ return CINT2e_spheric_drv(opijkl, &envs, opt);
 }
 OPTIMIZER2F_(cint2e_ig1_sph_optimizer);
 C2Fo_(cint2e_ig1_sph)
+/* <G k G i|R12 |j l> : i,j \in electron 1; k,l \in electron 2
+ * = (G i j|R12 |G k l) */
+static void CINTgout2e_cint2e_ig1ig2_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const FINT l_l = envs->l_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+const double *rl = envs->rl;
+FINT ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double *g3 = g2 + envs->g_size * 3;
+double *g4 = g3 + envs->g_size * 3;
+double s[9];
+double rirj[3];
+rirj[0] = ri[0] - rj[0];
+rirj[1] = ri[1] - rj[1];
+rirj[2] = ri[2] - rj[2];
+double rkrl[3];
+rkrl[0] = rk[0] - rl[0];
+rkrl[1] = rk[1] - rl[1];
+rkrl[2] = rk[2] - rl[2];
+double c[9];
+c[0] = 1 * rirj[0] * rkrl[0];
+c[1] = 1 * rirj[0] * rkrl[1];
+c[2] = 1 * rirj[0] * rkrl[2];
+c[3] = 1 * rirj[1] * rkrl[0];
+c[4] = 1 * rirj[1] * rkrl[1];
+c[5] = 1 * rirj[1] * rkrl[2];
+c[6] = 1 * rirj[2] * rkrl[0];
+c[7] = 1 * rirj[2] * rkrl[1];
+c[8] = 1 * rirj[2] * rkrl[2];
+G2E_R0K(g1, g0, i_l+1, j_l+0, k_l+0, l_l);
+G2E_R0I(g2, g0, i_l+0, j_l, k_l, l_l);
+G2E_R0I(g3, g1, i_l+0, j_l, k_l, l_l);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+CINTdset0(9, s);
+for (i = 0; i < envs->nrys_roots; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+if (gout_empty) {
+gout[0] = + c[4]*s[8] + (-1*c[7]*s[5]) + (-1*c[5]*s[7]) + c[8]*s[4];
+gout[1] = + c[7]*s[2] + (-1*c[1]*s[8]) + (-1*c[8]*s[1]) + c[2]*s[7];
+gout[2] = + c[1]*s[5] + (-1*c[4]*s[2]) + (-1*c[2]*s[4]) + c[5]*s[1];
+gout[3] = + c[5]*s[6] + (-1*c[8]*s[3]) + (-1*c[3]*s[8]) + c[6]*s[5];
+gout[4] = + c[8]*s[0] + (-1*c[2]*s[6]) + (-1*c[6]*s[2]) + c[0]*s[8];
+gout[5] = + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
+gout[6] = + c[3]*s[7] + (-1*c[6]*s[4]) + (-1*c[4]*s[6]) + c[7]*s[3];
+gout[7] = + c[6]*s[1] + (-1*c[0]*s[7]) + (-1*c[7]*s[0]) + c[1]*s[6];
+gout[8] = + c[0]*s[4] + (-1*c[3]*s[1]) + (-1*c[1]*s[3]) + c[4]*s[0];
+gout += 9;
+} else {
+gout[0] += + c[4]*s[8] + (-1*c[7]*s[5]) + (-1*c[5]*s[7]) + c[8]*s[4];
+gout[1] += + c[7]*s[2] + (-1*c[1]*s[8]) + (-1*c[8]*s[1]) + c[2]*s[7];
+gout[2] += + c[1]*s[5] + (-1*c[4]*s[2]) + (-1*c[2]*s[4]) + c[5]*s[1];
+gout[3] += + c[5]*s[6] + (-1*c[8]*s[3]) + (-1*c[3]*s[8]) + c[6]*s[5];
+gout[4] += + c[8]*s[0] + (-1*c[2]*s[6]) + (-1*c[6]*s[2]) + c[0]*s[8];
+gout[5] += + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
+gout[6] += + c[3]*s[7] + (-1*c[6]*s[4]) + (-1*c[4]*s[6]) + c[7]*s[3];
+gout[7] += + c[6]*s[1] + (-1*c[0]*s[7]) + (-1*c[7]*s[0]) + c[1]*s[6];
+gout[8] += + c[0]*s[4] + (-1*c[3]*s[1]) + (-1*c[1]*s[3]) + c[4]*s[0];
+gout += 9;
+}}}
+void cint2e_ig1ig2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 1, 0, 0, 0, 0, 0};
+CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+FINT cint2e_ig1ig2_sph(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
+const FINT i_sh = shls[0];
+const FINT j_sh = shls[1];
+const FINT k_sh = shls[2];
+const FINT l_sh = shls[3];
+if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
+FINT ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
+FINT jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
+FINT kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
+FINT lp = (bas(ANG_OF,l_sh) * 2 + 1) * bas(NCTR_OF,l_sh);
+CINTdset0(kp * ip * jp * lp * ng[TENSOR], opijkl);
+return 0; }
+if (bas(ATOM_OF, k_sh) == bas(ATOM_OF, l_sh)) {
+FINT ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
+FINT jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
+FINT kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
+FINT lp = (bas(ANG_OF,l_sh) * 2 + 1) * bas(NCTR_OF,l_sh);
+CINTdset0(kp * ip * jp * lp * ng[TENSOR], opijkl);
+return 0; }
+CINTEnvVars envs;
+CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout2e_cint2e_ig1ig2_sph;
+envs.common_factor *= -0.25;
+return CINT2e_spheric_drv(opijkl, &envs, opt);
+}
+OPTIMIZER2F_(cint2e_ig1ig2_sph_optimizer);
+C2Fo_(cint2e_ig1ig2_sph)

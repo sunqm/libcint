@@ -34,6 +34,7 @@
   '("cint2e_p1vxp1_sph"     spheric  ( p* \, cross p \| \, )) ; SSO
   ;'("cint2e_sph"            spheric  ( \, \| \, ))
   '("cint2e_ig1_sph"        spheric  (#C(0 1) g \, \| \, ))
+  '("cint2e_ig1ig2_sph"     spheric  (-1 g \, \| g \, ))
 )
 
 (gen-cint "auto_intor2.c"
