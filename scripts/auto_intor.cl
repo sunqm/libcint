@@ -162,6 +162,7 @@
   '("cint2c2e_ip1_sph"  spheric  (nabla \| r12 \| ))
   '("cint2c2e_ip2_sph"  spheric  ( \| r12 \| nabla))
   '("cint2e_ip2_sph"    spheric  ( \, \| r12 \| nabla \,))
+  '("cint3c2e_ig1_sph"  spheric  (#C(0 1) g \, \| ))
   '("cint3c2e_ip1_spinor"     spinor   (nabla \, \| ))
   '("cint3c2e_ip2_spinor"     spinor   ( \, \| nabla))
   '("cint3c2e_spsp1_spinor"   spinor   (sigma dot p \, sigma dot p \| ))
@@ -181,5 +182,4 @@
   '("cint3c1e_r6_origk_sph"  spheric  ( \, \, r dot r r dot r r dot r))
   '("cint1e_r4_origj_sph"  spheric  ( \| r dot r r dot r))
 )
-
 

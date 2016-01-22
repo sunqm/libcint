@@ -506,6 +506,122 @@ return CINT2e_spheric_drv(opijkl, &envs, opt);
 }
 OPTIMIZER2F_(cint2e_ip2_sph_optimizer);
 C2Fo_(cint2e_ip2_sph)
+/* (G i j|R12 |k) */
+void CINTgout3c2e_cint3c2e_ig1_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+FINT ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double s[3];
+double rirj[3];
+rirj[0] = ri[0] - rj[0];
+rirj[1] = ri[1] - rj[1];
+rirj[2] = ri[2] - rj[2];
+double c[3];
+c[0] = 1 * rirj[0];
+c[1] = 1 * rirj[1];
+c[2] = 1 * rirj[2];
+G3C2E_R0I(g1, g0, i_l+0, j_l, k_l);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+switch (envs->nrys_roots) {
+case 1:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
+break;
+case 2:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1];
+break;
+case 3:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2];
+break;
+case 4:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3];
+break;
+case 5:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4];
+break;
+case 6:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5];
+break;
+case 7:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6];
+break;
+case 8:
+s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0]+ g1[ix+1]*g0[iy+1]*g0[iz+1]+ g1[ix+2]*g0[iy+2]*g0[iz+2]+ g1[ix+3]*g0[iy+3]*g0[iz+3]+ g1[ix+4]*g0[iy+4]*g0[iz+4]+ g1[ix+5]*g0[iy+5]*g0[iz+5]+ g1[ix+6]*g0[iy+6]*g0[iz+6]+ g1[ix+7]*g0[iy+7]*g0[iz+7];
+s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0]+ g0[ix+1]*g1[iy+1]*g0[iz+1]+ g0[ix+2]*g1[iy+2]*g0[iz+2]+ g0[ix+3]*g1[iy+3]*g0[iz+3]+ g0[ix+4]*g1[iy+4]*g0[iz+4]+ g0[ix+5]*g1[iy+5]*g0[iz+5]+ g0[ix+6]*g1[iy+6]*g0[iz+6]+ g0[ix+7]*g1[iy+7]*g0[iz+7];
+s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0]+ g0[ix+1]*g0[iy+1]*g1[iz+1]+ g0[ix+2]*g0[iy+2]*g1[iz+2]+ g0[ix+3]*g0[iy+3]*g1[iz+3]+ g0[ix+4]*g0[iy+4]*g1[iz+4]+ g0[ix+5]*g0[iy+5]*g1[iz+5]+ g0[ix+6]*g0[iy+6]*g1[iz+6]+ g0[ix+7]*g0[iy+7]*g1[iz+7];
+break;
+default:
+CINTdset0(3, s);
+for (i = 0; i < envs->nrys_roots; i++) {
+s[0] += g1[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g0[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g0[ix+i] * g0[iy+i] * g1[iz+i];
+} break;}
+if (gout_empty) {
+gout[0] = + (-1*c[1]*s[2]) + c[2]*s[1];
+gout[1] = + (-1*c[2]*s[0]) + c[0]*s[2];
+gout[2] = + (-1*c[0]*s[1]) + c[1]*s[0];
+gout += 3;
+} else {
+gout[0] += + (-1*c[1]*s[2]) + c[2]*s[1];
+gout[1] += + (-1*c[2]*s[0]) + c[0]*s[2];
+gout[2] += + (-1*c[0]*s[1]) + c[1]*s[0];
+gout += 3;
+}}}
+void cint3c2e_ig1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 0, 0, 0, 0, 0, 0, 0};
+CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+CINTOpt_set_3cindex_xyz(*opt, ng, atm, natm, bas, nbas, env);
+}
+FINT cint3c2e_ig1_sph(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+const FINT i_sh = shls[0];
+const FINT j_sh = shls[1];
+const FINT k_sh = shls[2];
+if (bas(ATOM_OF, i_sh) == bas(ATOM_OF, j_sh)) {
+FINT ip = (bas(ANG_OF,i_sh) * 2 + 1) * bas(NCTR_OF,i_sh);
+FINT jp = (bas(ANG_OF,j_sh) * 2 + 1) * bas(NCTR_OF,j_sh);
+FINT kp = (bas(ANG_OF,k_sh) * 2 + 1) * bas(NCTR_OF,k_sh);
+CINTdset0(kp * ip * jp * ng[TENSOR], opijkl);
+return 0; }
+CINTEnvVars envs;
+CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout3c2e_cint3c2e_ig1_sph;
+envs.common_factor *= 0.5;
+return CINT3c2e_spheric_drv(opijkl, &envs, opt, &c2s_sph_3c2e1, 0);
+}
+OPTIMIZER2F_(cint3c2e_ig1_sph_optimizer);
+C2Fo_(cint3c2e_ig1_sph)
 /* (NABLA i j|R12 |k) */
 void CINTgout3c2e_cint3c2e_ip1_spinor(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
