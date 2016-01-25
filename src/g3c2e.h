@@ -1,5 +1,9 @@
 #include "g2e.h"
 
+FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
+                             const FINT *atm, const FINT natm,
+                             const FINT *bas, const FINT nbas, const double *env);
+
 FINT CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
                              const FINT *atm, const FINT natm,
                              const FINT *bas, const FINT nbas, const double *env);
