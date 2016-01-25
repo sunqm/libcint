@@ -1465,15 +1465,15 @@ L90:
     return;
 }
 
-#ifdef __clang__
-double __attibute__((noinline))
-__prevent_clang_optimizing_add_d(double x, double y) {
-        return x + y;
-}
-#define DADD(x, y)      __prevent_clang_optimizing_add_d(x, y)
-#else
+//#ifdef __clang__
+//double __attibute__((noinline))
+//__prevent_clang_optimizing_add_d(double x, double y) {
+//        return x + y;
+//}
+//#define DADD(x, y)      __prevent_clang_optimizing_add_d(x, y)
+//#else
 #define DADD(x, y)      (x + y)
-#endif
+//#endif
 /* Incomplete gamma function
  * f(2n,x) = \int t^{2n} exp(-xt^2) dt
  *         = 1/2 \int r^{n-1/2} exp(-xr) dr
@@ -1834,15 +1834,15 @@ L90:
     return;
 }
 
-#ifdef __clang__
-long double __attibute__((noinline))
-__prevent_clang_optimizing_add_q(long double x, long double y) {
-        return x + y;
-}
-#define QADD(x, y)      __prevent_clang_optimizing_add_q(x, y)
-#else
+//#ifdef __clang__
+//long double __attibute__((noinline))
+//__prevent_clang_optimizing_add_q(long double x, long double y) {
+//        return x + y;
+//}
+//#define QADD(x, y)      __prevent_clang_optimizing_add_q(x, y)
+//#else
 #define QADD(x, y)      (x + y)
-#endif
+//#endif
 static void qgamma_inc_like(long double *ff, long double x, FINT n)
 {
         const long double pie4 = .7853981633974483096156608458l; // PI/4
