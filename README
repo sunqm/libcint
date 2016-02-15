@@ -141,7 +141,7 @@ Installation
 
 * Build static library (optional)
     mkdir build; cd build
-    cmake -DENABLE_STATIC=1 ..
+    cmake -DBUILD_SHARED_LIBS=0 ..
     make install
 
 * Compile with integer-8

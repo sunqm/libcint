@@ -40,42 +40,34 @@ set(cintSrc
   src/autocode/auto_3c2e.c src/autocode/auto_3c1e.c
   src/autocode/gaunt1.c src/autocode/breit1.c)
 
+set(BUILD_SHARED_LIBS 1)
+option(ENABLE_EXAMPLE 0)
 
-if (${ENABLE_STATIC})
-  add_library(cintStatic STATIC ${cintSrc})
-  set_target_properties(cintStatic PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
-    OUTPUT_NAME cint)
+if(ENABLE_STATIC)
+  option(BUILD_SHARED_LIBS 0)
+endif()
 
-  install(TARGETS cintStatic DESTINATION lib)
-  install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION include)
+add_library(cint ${cintSrc})
+set_target_properties(cint PROPERTIES
+  VERSION ${cint_VERSION}
+  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+target_link_libraries(cint ${BLAS_LIBRARIES})
 
-else()
+install(TARGETS cint DESTINATION lib)
+install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION include)
 
-  add_library(cint SHARED ${cintSrc})
 
-  set_target_properties(cint PROPERTIES
-    VERSION ${cint_VERSION}
-    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+if(BUILD_SHARED_LIBS AND ENABLE_EXAMPLE)
+  enable_language(Fortran)
+  add_subdirectory(examples)
 
-  target_link_libraries(cint ${BLAS_LIBRARIES})
-
-  install(TARGETS cint DESTINATION lib)
-  install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION include)
-
-  if (${ENABLE_EXAMPLE})
-    enable_language(Fortran)
-    add_subdirectory(examples)
-
-    find_package(PythonInterp)
-    message(STATUS "Found python  ${PYTHON_EXECUTABLE}")
-    if (PYTHONINTERP_FOUND)
-      enable_testing()
-      add_test(NAME cinttest
-        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
-      add_test(NAME cint3c2etest
-        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_3c2e.py)
-    endif()
+  find_package(PythonInterp)
+  message(STATUS "Found python  ${PYTHON_EXECUTABLE}")
+  if(PYTHONINTERP_FOUND)
+    enable_testing()
+    add_test(NAME cinttest
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
+    add_test(NAME cint3c2etest
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_3c2e.py)
   endif()
-
 endif()
