@@ -307,9 +307,9 @@ gout[1] += + s[1];
 gout[2] += + s[2];
 gout += 3;
 }}}
-void cint2e_ip1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_ip1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {1, 0, 0, 0, 0, 0, 0, 0};
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_ip1_sph(double *opijkl, const FINT *shls,

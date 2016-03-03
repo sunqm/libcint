@@ -1379,9 +1379,9 @@ gout[1] += + s[6] + (-1*s[2]);
 gout[2] += + s[1] + (-1*s[3]);
 gout += 3;
 }}}
-void cint2e_p1vxp1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_p1vxp1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {1, 1, 0, 0, 0, 0, 0, 0};
+FINT ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_p1vxp1_sph(double *opijkl, const FINT *shls,
@@ -1487,9 +1487,9 @@ gout[1] += + (-1*c[2]*s[0]) + c[0]*s[2];
 gout[2] += + (-1*c[0]*s[1]) + c[1]*s[0];
 gout += 3;
 }}}
-void cint2e_ig1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_ig1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {1, 0, 0, 0, 0, 0, 0, 0};
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_ig1_sph(double *opijkl, const FINT *shls,
@@ -1575,30 +1575,30 @@ s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
 if (gout_empty) {
 gout[0] = + c[4]*s[8] + (-1*c[7]*s[5]) + (-1*c[5]*s[7]) + c[8]*s[4];
-gout[1] = + c[7]*s[2] + (-1*c[1]*s[8]) + (-1*c[8]*s[1]) + c[2]*s[7];
-gout[2] = + c[1]*s[5] + (-1*c[4]*s[2]) + (-1*c[2]*s[4]) + c[5]*s[1];
-gout[3] = + c[5]*s[6] + (-1*c[8]*s[3]) + (-1*c[3]*s[8]) + c[6]*s[5];
+gout[1] = + c[5]*s[6] + (-1*c[8]*s[3]) + (-1*c[3]*s[8]) + c[6]*s[5];
+gout[2] = + c[3]*s[7] + (-1*c[6]*s[4]) + (-1*c[4]*s[6]) + c[7]*s[3];
+gout[3] = + c[7]*s[2] + (-1*c[1]*s[8]) + (-1*c[8]*s[1]) + c[2]*s[7];
 gout[4] = + c[8]*s[0] + (-1*c[2]*s[6]) + (-1*c[6]*s[2]) + c[0]*s[8];
-gout[5] = + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
-gout[6] = + c[3]*s[7] + (-1*c[6]*s[4]) + (-1*c[4]*s[6]) + c[7]*s[3];
-gout[7] = + c[6]*s[1] + (-1*c[0]*s[7]) + (-1*c[7]*s[0]) + c[1]*s[6];
+gout[5] = + c[6]*s[1] + (-1*c[0]*s[7]) + (-1*c[7]*s[0]) + c[1]*s[6];
+gout[6] = + c[1]*s[5] + (-1*c[4]*s[2]) + (-1*c[2]*s[4]) + c[5]*s[1];
+gout[7] = + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
 gout[8] = + c[0]*s[4] + (-1*c[3]*s[1]) + (-1*c[1]*s[3]) + c[4]*s[0];
 gout += 9;
 } else {
 gout[0] += + c[4]*s[8] + (-1*c[7]*s[5]) + (-1*c[5]*s[7]) + c[8]*s[4];
-gout[1] += + c[7]*s[2] + (-1*c[1]*s[8]) + (-1*c[8]*s[1]) + c[2]*s[7];
-gout[2] += + c[1]*s[5] + (-1*c[4]*s[2]) + (-1*c[2]*s[4]) + c[5]*s[1];
-gout[3] += + c[5]*s[6] + (-1*c[8]*s[3]) + (-1*c[3]*s[8]) + c[6]*s[5];
+gout[1] += + c[5]*s[6] + (-1*c[8]*s[3]) + (-1*c[3]*s[8]) + c[6]*s[5];
+gout[2] += + c[3]*s[7] + (-1*c[6]*s[4]) + (-1*c[4]*s[6]) + c[7]*s[3];
+gout[3] += + c[7]*s[2] + (-1*c[1]*s[8]) + (-1*c[8]*s[1]) + c[2]*s[7];
 gout[4] += + c[8]*s[0] + (-1*c[2]*s[6]) + (-1*c[6]*s[2]) + c[0]*s[8];
-gout[5] += + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
-gout[6] += + c[3]*s[7] + (-1*c[6]*s[4]) + (-1*c[4]*s[6]) + c[7]*s[3];
-gout[7] += + c[6]*s[1] + (-1*c[0]*s[7]) + (-1*c[7]*s[0]) + c[1]*s[6];
+gout[5] += + c[6]*s[1] + (-1*c[0]*s[7]) + (-1*c[7]*s[0]) + c[1]*s[6];
+gout[6] += + c[1]*s[5] + (-1*c[4]*s[2]) + (-1*c[2]*s[4]) + c[5]*s[1];
+gout[7] += + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
 gout[8] += + c[0]*s[4] + (-1*c[3]*s[1]) + (-1*c[1]*s[3]) + c[4]*s[0];
 gout += 9;
 }}}
-void cint2e_ig1ig2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_ig1ig2_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {1, 0, 1, 0, 0, 0, 0, 0};
+FINT ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_ig1ig2_sph(double *opijkl, const FINT *shls,

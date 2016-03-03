@@ -320,12 +320,12 @@ if __name__ == "__main__":
               ('cint1e_ipkin_sph' , 1307.395170673386, 3, 10),
               ('cint1e_ipnuc_sph' , 8358.422626593954, 3, 10),
               ('cint1e_iprinv_sph', 385.1108471512923, 3, 11),
-              ('cint1e_prinvxp_sph',210.475021425001 , 3, 11),
+              ('cint1e_prinvxp_sph',210.475021425001, 3, 11),
               ('cint1e_z_sph'     , 651.8811101988866, 1, 11),
-              ('cint1e_zz_sph'    , 1881.075059037941, 1, 11),
-              ('cint1e_r_sph'     , 1803.13043674652 , 3, 11),
-              ('cint1e_rr_sph'    , 13379.47937680471, 9, 11),
-              ('cint1e_r2_sph'    , 5237.899221349136, 1, 11),
+              ('cint1e_zz_sph'    , 1881.075059037941, 1, 10),
+              ('cint1e_r_sph'     , 1803.13043674652 , 3, 10),
+              ('cint1e_rr_sph'    , 13379.47937680471, 9,  9),
+              ('cint1e_r2_sph'    , 5237.899221349136, 1, 10),
              ):
         test_int1e_sph(*f)
 
@@ -356,46 +356,46 @@ if __name__ == "__main__":
               ('cint1e_ipkin'    , 497.249399637873, 3, 11),
               ('cint1e_ipnuc'    , 4506.61348255897, 3, 10),
               ('cint1e_iprinv'   , 240.036283917245, 3, 11),
-              ('cint1e_ipspnucsp', 35059.4071347107, 3, 10),
-              ('cint1e_ipsprinvsp',1166.20850563398, 3, 11),
+              ('cint1e_ipspnucsp', 35059.4071347107, 3,  9),
+              ('cint1e_ipsprinvsp',1166.20850563398, 3, 10),
              ):
         test_int1e_spinor(*f)
 
-    for f in (('cint2e_sph'    , 56243.88328820554 , 1, 10),
-              ('cint2e_ig1_sph', 8101.087330632489 , 3, 10),
-              ('cint2e_ip1_sph', 115489.8643757788 , 3, 9 ),
-              ('cint2e_p1vxp1_sph', 89014.88176711103, 3, 10),
+    for f in (('cint2e_sph'    , 56243.88328768107 , 1, 9 ),
+              ('cint2e_ig1_sph', 8101.087334398195 , 3, 10),
+              ('cint2e_ip1_sph', 115489.8643866550 , 3, 8 ),
+              ('cint2e_p1vxp1_sph', 89014.88169743448, 3, 9),
              ):
         test_int2e_sph(*f)
 
-    for f in (('cint2e'             , 37737.11365741726, 1, 10),
-              ('cint2e_spsp1'       , 221528.4765760534 , 1, 10),
-              ('cint2e_spsp1spsp2'  , 1391716.869878709 , 1, 10),
-              ('cint2e_srsr1'       , 178572.7398767213 , 1, 10),
-              ('cint2e_srsr1srsr2'  , 860883.6268786178 , 1, 10),
-              ('cint2e_cg_sa10sp1'  , 241519.2144398676 , 3, 10),
-              ('cint2e_cg_sa10sp1spsp2'  , 1419443.465694745, 3, 9 ),
-              ('cint2e_giao_sa10sp1'     , 153861.9208614748, 3, 10),
-              ('cint2e_giao_sa10sp1spsp2', 918284.9422733105, 3, 10),
-              ('cint2e_g1'          , 3755.251590409050, 3, 10),
-              ('cint2e_spgsp1'      , 16626.99099293698, 3, 10),
-              ('cint2e_g1spsp2'     , 22186.56613633214, 3, 10),
-              ('cint2e_spgsp1spsp2' , 107110.2309101739, 3, 10),
-              ('cint2e_ip1'         , 34912.85433409394, 3, 10),
-              ('cint2e_ipspsp1'     , 221092.5547042545, 3, 10),
-              ('cint2e_ip1spsp2'    , 212447.1019907781, 3, 10),
-              ('cint2e_ipspsp1spsp2', 1443972.919823476, 3, 9 ),
+    for f in (('cint2e'             , 37737.11365710611, 1, 9),
+              ('cint2e_spsp1'       , 221528.4764668166, 1, 8),
+              ('cint2e_spsp1spsp2'  , 1391716.876869147, 1, 7),
+              ('cint2e_srsr1'       , 178572.7398308939, 1, 8),
+              ('cint2e_srsr1srsr2'  , 860883.6288270953, 1, 8),
+              ('cint2e_cg_sa10sp1'  , 241519.2143647713, 3, 8),
+              ('cint2e_cg_sa10sp1spsp2'  , 1419443.469767018, 3, 7),
+              ('cint2e_giao_sa10sp1'     , 153861.920807804 , 3, 8),
+              ('cint2e_giao_sa10sp1spsp2', 918284.9464686266, 3, 8),
+              ('cint2e_g1'          , 3755.251591892025, 3, 10),
+              ('cint2e_spgsp1'      , 16626.99103794526, 3, 9 ),
+              ('cint2e_g1spsp2'     , 22186.56654833549, 3, 9 ),
+              ('cint2e_spgsp1spsp2' , 107110.2340526177, 3, 8 ),
+              ('cint2e_ip1'         , 34912.85433806438, 3, 9 ),
+              ('cint2e_ipspsp1'     , 221092.5556043494, 3, 8 ),
+              ('cint2e_ip1spsp2'    , 212447.1029358293, 3, 8 ),
+              ('cint2e_ipspsp1spsp2', 1443972.936563201, 3, 7 ),
              ):
         test_int2e_spinor(*f)
-    test_comp2e_spinor('cint2e_spsp1', 'cint2e', (4,4,0,0), 1, 12)
-    test_comp2e_spinor('cint2e_spsp1spsp2', 'cint2e', (4,4,4,4), 1, 12)
-    test_comp2e_spinor('cint2e_spsp1spsp2', 'cint2e_spsp1', (0,0,4,4), 1, 12)
-    test_comp2e_spinor('cint2e_spgsp1', 'cint2e_g1', (4,4,0,0), 3, 12)
-    test_comp2e_spinor('cint2e_g1spsp2', 'cint2e_g1', (0,0,4,4), 3, 12)
-    test_comp2e_spinor('cint2e_spgsp1spsp2', 'cint2e_g1', (4,4,4,4), 3, 12)
-    test_comp2e_spinor('cint2e_ipspsp1', 'cint2e_ip1', (4,4,0,0), 3, 12)
-    test_comp2e_spinor('cint2e_ip1spsp2', 'cint2e_ip1', (0,0,4,4), 3, 12)
-    test_comp2e_spinor('cint2e_ipspsp1spsp2', 'cint2e_ip1', (4,4,4,4), 3, 12)
+    test_comp2e_spinor('cint2e_spsp1', 'cint2e', (4,4,0,0), 1, 11)
+    test_comp2e_spinor('cint2e_spsp1spsp2', 'cint2e', (4,4,4,4), 1, 11)
+    test_comp2e_spinor('cint2e_spsp1spsp2', 'cint2e_spsp1', (0,0,4,4), 1, 11)
+    test_comp2e_spinor('cint2e_spgsp1', 'cint2e_g1', (4,4,0,0), 3, 11)
+    test_comp2e_spinor('cint2e_g1spsp2', 'cint2e_g1', (0,0,4,4), 3, 11)
+    test_comp2e_spinor('cint2e_spgsp1spsp2', 'cint2e_g1', (4,4,4,4), 3, 11)
+    test_comp2e_spinor('cint2e_ipspsp1', 'cint2e_ip1', (4,4,0,0), 3, 11)
+    test_comp2e_spinor('cint2e_ip1spsp2', 'cint2e_ip1', (0,0,4,4), 3, 11)
+    test_comp2e_spinor('cint2e_ipspsp1spsp2', 'cint2e_ip1', (4,4,4,4), 3, 11)
 
     fz  = getattr(_cint, 'cint1e_z_sph')
     fzz = getattr(_cint, 'cint1e_zz_sph')

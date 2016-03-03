@@ -40,7 +40,7 @@ FINT cint2e_breit_##X(double complex *opijkl, FINT *shls, \
         FINT i; \
         has_value = (cint2e_gauge_r1_##X(buf, shls, atm, natm, bas, nbas, env, NULL) || \
                      has_value); \
-        /* [-1/2 gaunt] - [1/2 xxx*\sigma\dot r1] */ \
+        /* [1/2 gaunt] - [1/2 xxx*\sigma\dot r1] */ \
         if (has_value) { \
                 for (i = 0; i < nop; i++) { \
                         opijkl[i] = -opijkl[i] - buf[i]; \

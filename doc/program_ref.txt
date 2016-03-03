@@ -228,8 +228,7 @@ Tensor
 ------
 
   Integrals like Gradients have more than one components.  The output
-  array is ordered in Fortran-contiguous.  The tensor component takes
-  the biggest strides.
+  array is ordered in Fortran-contiguous.  The tensors are ordered as
 
 * 3-component tensor  
     - X `buf(:,0)`

@@ -487,12 +487,12 @@
                    (plainq-by-plainq q1 (cdr q2))))))
 (defun vs-by-vs (vs1 vs2)
   "product of two tensors/vectors, do not squeeze. ordered like
-  ((1_x 2_x) (1_y 2_x) (1_z 2_x) ...)"
-  (map-q-in-vs (lambda (q2)
-                 (map-q-in-vs (lambda (q1)
+  ((1_x 2_x) (1_x 2_y) (1_x 2_z) (1_y 2_x) (1_y 2_y) ...)"
+  (map-q-in-vs (lambda (q1)
+                 (map-q-in-vs (lambda (q2)
                                 (plainq-by-plainq q1 q2))
-                              vs1))
-               vs2))
+                              vs2))
+               vs1))
 
 (defun eval-int-r12 (phasefac op bra-i ket-j bra-k ket-l)
   (let* ((vs1 (format-vs-1e phasefac bra-i ket-j op))

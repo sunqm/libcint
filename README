@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 2.6.10
-2016-03-02
+version 2.7.0
+2016-03-03
 
 
 What is libcint
@@ -118,7 +118,9 @@ or
     nuc         means   \sum_N Z_N / |\vec{r} - \vec{R}_N|
     nabla-rinv  means   \nabla (1 / |\vec{r} - \vec{R}_(env[PTR_RINV_ORIG])|)
     gaunt       means   \alpha_i \dot \alpha_j / |\vec{r}_i - \vec{r}_j|
+    breit       means   -1/2\alpha_i \dot \alpha_j / |\vec{r}_i - \vec{r}_j| - 1/2 \alpha_i \dot r_{ij} \alpha_j \dot r_{ij} / |\vec{r}_i - \vec{r}_j|^3
 
+  Note sign - is not included in the gaunt integrals
 
 Installation
 ------------

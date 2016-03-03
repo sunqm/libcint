@@ -685,9 +685,9 @@ gout[7] += + s[5];
 gout[8] += + s[8];
 gout += 9;
 }}}
-void cint2e_ipip1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_ipip1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {2, 0, 0, 0, 0, 0, 0, 0};
+FINT ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_ipip1_sph(double *opijkl, const FINT *shls,
@@ -765,9 +765,9 @@ gout[7] += + s[7];
 gout[8] += + s[8];
 gout += 9;
 }}}
-void cint2e_ipvip1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_ipvip1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {1, 1, 0, 0, 0, 0, 0, 0};
+FINT ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_ipvip1_sph(double *opijkl, const FINT *shls,
@@ -824,30 +824,30 @@ s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
 if (gout_empty) {
 gout[0] = + s[0];
-gout[1] = + s[3];
-gout[2] = + s[6];
-gout[3] = + s[1];
+gout[1] = + s[1];
+gout[2] = + s[2];
+gout[3] = + s[3];
 gout[4] = + s[4];
-gout[5] = + s[7];
-gout[6] = + s[2];
-gout[7] = + s[5];
+gout[5] = + s[5];
+gout[6] = + s[6];
+gout[7] = + s[7];
 gout[8] = + s[8];
 gout += 9;
 } else {
 gout[0] += + s[0];
-gout[1] += + s[3];
-gout[2] += + s[6];
-gout[3] += + s[1];
+gout[1] += + s[1];
+gout[2] += + s[2];
+gout[3] += + s[3];
 gout[4] += + s[4];
-gout[5] += + s[7];
-gout[6] += + s[2];
-gout[7] += + s[5];
+gout[5] += + s[5];
+gout[6] += + s[6];
+gout[7] += + s[7];
 gout[8] += + s[8];
 gout += 9;
 }}}
-void cint2e_ip1ip2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+void cint2e_ip1ip2_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
 const FINT *bas, const FINT nbas, const double *env) {
-FINT ng[] = {1, 0, 1, 0, 0, 0, 0, 0};
+FINT ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_ip1ip2_sph(double *opijkl, const FINT *shls,

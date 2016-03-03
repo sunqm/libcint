@@ -580,24 +580,22 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout "gout += ~a;~%}}}~%" goutinc)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate optimizer for function int2e
-      (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-const FINT *bas, const FINT nbas, const double *env) {~%" intname)
-      (if (breit-int? op)
-        (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
-                (1+ i-len) (1+ j-len) k-len l-len)
-        (format fout "FINT ng[] = {~d, ~d, ~d, ~d, 0, 0, 0, 0};~%"
-                i-len (+ op-len j-len) k-len l-len))
-      (format fout "CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; generate function int2e
-      (format fout "FINT ~a(double *opijkl, const FINT *shls,
-const FINT *atm, const FINT natm,
-const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
       (let ((e1comps (if (eql sf1 'sf) 1 4))
             (e2comps (if (eql sf2 'sf) 1 4))
             (tensors (cond ((and (eql sf1 'sf) (eql sf2 'sf)) goutinc)
                            ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
                            (t (/ goutinc 4)))))
+        (format fout "void ~a_optimizer(CINTOpt **opt, const int *atm, const int natm,
+const FINT *bas, const FINT nbas, const double *env) {~%" intname)
+        (if (breit-int? op)
+            (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+                    (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
+            (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+                    i-len (+ op-len j-len) k-len l-len tot-bits e1comps e2comps tensors))
+        (format fout "CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
+        (format fout "FINT ~a(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
         (if (breit-int? op)
             (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
                     (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
