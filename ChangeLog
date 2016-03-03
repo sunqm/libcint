@@ -1,3 +1,7 @@
+Version 2.6.10 (2016-03-02):
+	* Hessian integrals
+	* Fix value estimation bug for high order derivatives
+
 Version 2.6.9 (2016-01-22):
 	* NMR GIAO 3-cetner 2e integrals
 

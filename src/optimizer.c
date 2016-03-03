@@ -210,7 +210,7 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                 il = bas(ANG_OF,i) + ik_inc;
                 for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
                         maxci = max_pgto_coeff(ci, iprim, ictr, ip);
-                        maxci = maxci / CINTgto_norm(il, ai[ip]);
+                        maxci = maxci / CINTgto_norm(bas(ANG_OF,i), ai[ip]);
                         expij = (double *)malloc(sizeof(double)*opt->tot_prim);
                         rij = (double *)malloc(sizeof(double)*opt->tot_prim*3);
                         cceij = (FINT *)malloc(sizeof(FINT) * opt->tot_prim);
@@ -231,7 +231,7 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                                    + (ri[2]-rj[2])*(ri[2]-rj[2]);
                                 for (jp = 0; jp < bas(NPRIM_OF,j); jp++) {
                                         maxcj = max_pgto_coeff(cj, jprim, jctr, jp);
-                                        maxcj = maxcj/CINTgto_norm(jl, aj[jp]);
+                                        maxcj = maxcj / CINTgto_norm(bas(ANG_OF,j), aj[jp]);
                                         aij = ai[ip] + aj[jp];
                                         off = jo + jp;
                                         eij = rr * ai[ip] * aj[jp] / aij;
@@ -239,15 +239,19 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                                         rij[off*3+0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / aij;
                                         rij[off*3+1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / aij;
                                         rij[off*3+2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / aij;
-/* estimation of the value, based on g0_2e_2d and g0_xx2d_4d,
- * value ~< exp(-eij)*(il+jl+2)!*(aij/2)^(il+jl)*(ri_or_rj-rij)^(ij+jl)*rirj^max(il,jl)
- *       ~< *       exp(-eij)*(il+jl+2)!*(aij/2)^(il+jl)*rirj^((il+jl)+max(il,jl))
- * But in practice, rirj^((il+jl)/2) is usually large enough to cover all other factors */
-/* rr+1 to prevent log() diverge when i,j on same center */
-                                        rirj_g4d = pow((rr+1), (il+jl+1)/2);
-/*cceij[off] =-log(expij[off]*maxci*maxcj*rirj_g4d);
-  when eij is big, expij == 0, singular value in cceij */
-                                        cceij[off] = eij - log(maxci*maxcj*rirj_g4d);
+
+        if (rr > 1e-12) {
+/* value estimation based on g0_2e_2d and g0_xx2d_4d,
+ * value/exp(-eij) ~< (il+jl+2)!*(aij/2)^(il+jl)*(ri_or_rj-rij)^(ij+jl)*rirj^max(il,jl)
+ *                 ~< (il+jl+2)!*(aij/2)^(il+jl)*|rirj|^((il+jl)+max(il,jl))
+ * But in practice, |rirj|^((il+jl)/2) is large enough to cover all other factors */
+                rirj_g4d = pow(rr, (il+jl+1)/2);
+                cceij[off] = eij - log(maxci*maxcj*rirj_g4d);
+        } else {
+/* If basis on the same center, include the (ss|ss)^{1/2} contribution
+ * (ss|ss) = 2\sqrt{aij/pi} */
+                cceij[off] = -log(maxci*maxcj) - log(aij)/4;
+        }
                                 }
                         }
                 }

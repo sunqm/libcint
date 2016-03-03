@@ -41,7 +41,7 @@ set(cintSrc
   src/autocode/gaunt1.c src/autocode/breit1.c)
 
 set(BUILD_SHARED_LIBS 1)
-option(ENABLE_EXAMPLE 0)
+option(ENABLE_EXAMPLE "build examples and tests" 0)
 
 if(ENABLE_STATIC)
   option(BUILD_SHARED_LIBS 0)

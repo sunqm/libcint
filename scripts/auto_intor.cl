@@ -172,6 +172,14 @@
 )
  
 (gen-cint "auto_hess.c"
+  '("cint1e_ipipovlp_sph"     spheric  ( nabla nabla \| ))
+  '("cint1e_ipovlpip_sph"     spheric  ( nabla \| nabla ))
+  '("cint1e_ipipkin_sph"      spheric  ( .5 nabla nabla \| p dot p \| ))
+  '("cint1e_ipkinip_sph"      spheric  ( .5 nabla \| p dot p \| nabla ))
+  '("cint1e_ipipnuc_sph"      spheric  ( nabla nabla \| nuc \| ))
+  '("cint1e_ipnucip_sph"      spheric  ( nabla \| nuc \| nabla ))
+  '("cint1e_ipiprinv_sph"     spheric  ( nabla nabla \| rinv \| ))
+  '("cint1e_iprinvip_sph"     spheric  ( nabla \| rinv \| nabla ))
   '("cint2e_ipip1_sph"        spheric  ( nabla nabla \, \| \, ))
   '("cint2e_ipvip1_sph"       spheric  ( nabla \, nabla \| \, ))
   '("cint2e_ip1ip2_sph"       spheric  ( nabla \, \| nabla \, ))
