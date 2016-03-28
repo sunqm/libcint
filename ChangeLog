@@ -1,3 +1,6 @@
+Version 2.8.0 (2016-03-28):
+	* Resolve the optimization bug of LLVM for expression (x+epsilon == x)
+
 Version 2.7.0 (2016-03-03):
 	* Adjust for tensor ordering,  from  XX, YX, ZX, XY ...  to  XX, XY, XZ, YX ...
 	* Update all tests due to the change of cutoff value estimation

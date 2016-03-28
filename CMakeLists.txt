@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint)
-set(cint_VERSION "2.7")
+set(cint_VERSION "2.8")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
@@ -13,7 +13,6 @@ set(CMAKE_REQUIRED_INCLUDES math.h)
 set(CMAKE_REQUIRED_LIBRARIES m)
 check_function_exists(expl HAVE_EXPL)
 check_function_exists(sqrtl HAVE_SQRTL)
-check_function_exists(fabsl HAVE_FABSL)
 
 include_directories(
   ${PROJECT_BINARY_DIR}/include
