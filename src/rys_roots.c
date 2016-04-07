@@ -1776,7 +1776,7 @@ L45:
         }
         ++icoun2;
         if (icoun2 > 50) {
-                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %12.4lf\n", prod);
+                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %12.4Lf\n", prod);
                 exit(1);
         }
         prod = p3 * p5;

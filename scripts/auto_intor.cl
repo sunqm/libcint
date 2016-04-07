@@ -186,6 +186,7 @@
 )
 
 (gen-cint "auto_3c1e.c"
+  '("cint3c1e_p2_sph"        spheric  ( \, \, p dot p))
   '("cint3c1e_r2_origk_sph"  spheric  ( \, \, r dot r))
   '("cint3c1e_r4_origk_sph"  spheric  ( \, \, r dot r r dot r))
   '("cint3c1e_r6_origk_sph"  spheric  ( \, \, r dot r r dot r r dot r))

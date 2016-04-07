@@ -1,3 +1,6 @@
+Version 2.8.1 (2016-04-07):
+	* New 3c1e integral <ij|p^2|k>
+
 Version 2.8.0 (2016-03-28):
 	* Resolve the optimization bug of LLVM for expression (x+epsilon == x)
 

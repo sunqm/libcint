@@ -14,6 +14,59 @@
 #include "misc.h"
 #include "fblas.h"
 #include "c2f.h"
+/* (i j|CCC1E |P DOT P k) */
+void CINTgout3c1e_cint3c1e_p2_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const FINT k_l = envs->k_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+const double *rk = envs->rk;
+FINT ix, iy, iz, i, n;
+double *g0 = g;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double *g3 = g2 + envs->g_size * 3;
+double *g4 = g3 + envs->g_size * 3;
+double s[9];
+G3C2E_D_K(g1, g0, i_l+0, j_l+0, k_l+1);
+G3C2E_D_K(g2, g0, i_l+0, j_l+0, k_l+0);
+G3C2E_D_K(g3, g1, i_l+0, j_l+0, k_l+0);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + (-1*s[0]) + (-1*s[4]) + (-1*s[8]);
+gout += 1;
+}}
+void cint3c1e_p2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+*opt = NULL;
+}
+FINT cint3c1e_p2_sph(double *opijkl, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
+FINT ng[] = {0, 0, 2, 0, 2, 1, 1, 1};
+CINTEnvVars envs;
+CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout3c1e_cint3c1e_p2_sph;
+envs.common_factor *= 1;
+return CINT3c1e_spheric_drv(opijkl, &envs, opt, &c2s_sph_3c1e, 0);
+}
+OPTIMIZER2F_(cint3c1e_p2_sph_optimizer);
+C2Fo_(cint3c1e_p2_sph)
 /* (i j|CCC1E |R DOT R k) */
 void CINTgout3c1e_cint3c1e_r2_origk_sph(double *g,
 double *gout, const FINT *idx, const CINTEnvVars *envs, FINT gout_empty) {
