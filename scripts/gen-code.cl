@@ -124,6 +124,7 @@
 #include \"cint_bas.h\"
 #include \"cart2sph.h\"
 #include \"g2e.h\"
+#include \"g3c1e.h\"
 #include \"g3c2e.h\"
 #include \"g2c2e.h\"
 #include \"optimizer.h\"
@@ -873,23 +874,26 @@ double *g0 = g;~%")
       (dump-declare-giao-ijkl fout bra-i ket-j bra-k '())
       ;XX(print (list fmt-k fmt-op fmt-l k-rev op-rev))
 ;;; generate g_(bin)
-      (let ((fmt-k (mkstr "G3C2E_~aK(g~a, g~a, i_l+" i-len ", j_l+" j-len
+      (let ((fmt-k (mkstr "G3C1E_~aK(g~a, g~a, i_l+" i-len ", j_l+" j-len
                           ", k_l+~a);~%"))
             (fmt-op "")
             (fmt-l ""))
         (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev op-rev '() 0))
-      (let ((fmt-i (mkstr "G3C2E_~aI(g~a, g~a, i_l+~a, j_l, k_l);~%"))
-            (fmt-op (mkstr "G3C2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);
-G3C2E_~aI(g~a, g~a, i_l+~d, j_l+~a, k_l);
+      (let ((fmt-i (mkstr "G3C1E_~aI(g~a, g~a, i_l+~a, j_l, k_l);~%"))
+            (fmt-op (mkstr "G3C1E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);
+G3C1E_~aI(g~a, g~a, i_l+~d, j_l+~a, k_l);
 n = envs->g_size * 3;
 for (ix = 0; ix < n; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G3C2E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);~%")))
+            (fmt-j (mkstr "G3C1E_~aJ(g~a, g~a, i_l+~d, j_l+~a, k_l);~%")))
         (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len))
 ;;; generate gout
       (dump-s-1e fout tot-bits)
 ;;; dump result of eval-int
+      (format fout "if (gout_empty) {~%")
+      (setf goutinc (gen-c-block fout "gout[~a] =" (last1 raw-script)))
+      (format fout "gout += ~a;~%} else {~%" goutinc)
       (setf goutinc (gen-c-block fout "gout[~a] +=" (last1 raw-script)))
-      (format fout "gout += ~a;~%}}~%" goutinc)
+      (format fout "gout += ~a;~%}}}~%" goutinc)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generate optimizer for function int2e
       (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,

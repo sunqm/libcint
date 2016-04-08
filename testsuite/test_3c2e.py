@@ -257,7 +257,7 @@ def test_int3c2e_spinor(name, fnref, vref, dim, place):
         print "pass: ", name
 
 
-def test_int2c2e_sph(name, fnref, vref, dim, place):
+def test_int2c_sph(name, fnref, vref, dim, place):
     intor = getattr(_cint, name)
     intoref = getattr(_cint, fnref)
     intor.restype = ctypes.c_void_p
@@ -267,17 +267,15 @@ def test_int2c2e_sph(name, fnref, vref, dim, place):
     pref = opref.ctypes.data_as(ctypes.c_void_p)
     v1 = 0
     for k in range(nbas.value):
-        l = nfitid
-        bas[l,ATOM_OF] = bas[k,ATOM_OF]
         for i in range(nbas.value):
             j = nfitid1
             bas[j,ATOM_OF] = bas[i,ATOM_OF]
             di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
             dk = (bas[k,ANG_OF] * 2 + 1) * bas[k,NCTR_OF]
             nd = di*dk*dim
-            shls = (ctypes.c_int * 4)(i, j, k, l)
+            shls = (ctypes.c_int * 3)(i, j, k)
             intoref(pref, shls, c_atm, natm, c_bas, nbas, c_env, opt)
-            shls = (ctypes.c_int * 4)(i, k, 0, 0)
+            shls = (ctypes.c_int * 2)(i, k)
             intor(pop, shls, c_atm, natm, c_bas, nbas, c_env, opt)
             if not numpy.allclose(opref[:nd], op[:nd]):
                 print 'Fail:', name, i,k
@@ -300,8 +298,16 @@ if __name__ == "__main__":
              ):
         test_int3c2e_spinor(*f)
 
-    for f in (('cint2c2e_sph', 'cint2e_sph', 782.3104849606677, 1, 10),
-              ('cint2c2e_ip1_sph', 'cint2e_ip1_sph', 394.6515972715189, 3, 10),
-              ('cint2c2e_ip2_sph', 'cint2e_ip2_sph', 394.6515972715189, 3, 10),
+#    for f in (('cint2c2e_sph', 'cint2e_sph', 782.3104849606677, 1, 10),
+#              ('cint2c2e_ip1_sph', 'cint2e_ip1_sph', 394.6515972715189, 3, 10),
+#              ('cint2c2e_ip2_sph', 'cint2e_ip2_sph', 394.6515972715189, 3, 10),
+#             ):
+#        test_int2c2e_sph(*f)
+    for f in (('cint2c2e_sph', 'cint3c2e_sph', 782.3104849606677, 1, 10),
+              ('cint2c2e_ip1_sph', 'cint3c2e_ip1_sph', 394.6515972715189, 3, 10),
+              ('cint2c2e_ip2_sph', 'cint3c2e_ip2_sph', 394.6515972715189, 3, 10),
+              ('cint1e_ovlp_sph', 'cint3c1e_sph', 288.739411257669, 1, 10),
+              #('cint1e_kin_sph'*2.0, 'cint3c1e_p2_sph', 1662.148571297274, 1, 10),
+              ('cint1e_r2_origj_sph', 'cint3c1e_r2_origk_sph', 1467.040217557744, 1, 10),
              ):
-        test_int2c2e_sph(*f)
+        test_int2c_sph(*f)

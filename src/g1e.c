@@ -250,10 +250,10 @@ void CINTnabla1j_1e(double *f, const double *g,
         //f(...,j,...) = j*g(...,j-1,...)-2*aj*g(...,j+1,...)
         for (j = 1; j <= lj; j++) {
                 ptr = dj * j;
-                for (i = 0; i <= li; i++) {
-                        fx[ptr+i] = j * gx[ptr+i-dj] + aj2 * gx[ptr+i+dj];
-                        fy[ptr+i] = j * gy[ptr+i-dj] + aj2 * gy[ptr+i+dj];
-                        fz[ptr+i] = j * gz[ptr+i-dj] + aj2 * gz[ptr+i+dj];
+                for (i = ptr; i <= ptr+li; i++) {
+                        fx[i] = j * gx[i-dj] + aj2 * gx[i+dj];
+                        fy[i] = j * gy[i-dj] + aj2 * gy[i+dj];
+                        fz[i] = j * gz[i-dj] + aj2 * gz[i+dj];
                 }
         }
 }
