@@ -1798,6 +1798,11 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
         const double aij = envs->aij;
         const double akl = envs->akl;
+#ifdef WITH_RANGE_COULOMB
+        const double omega = envs->env[PTR_RANGE_OMEGA];
+#else
+        const double omega = 0;
+#endif
         double a0, a1, fac1, x;
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
@@ -1808,6 +1813,14 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
+
+        double theta = 0;
+        if (omega > 0) {
+// For long-range part of range-separated Coulomb operator
+                theta = omega * omega / (omega * omega + a0);
+                a0 *= theta;
+        }
+
         fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
@@ -1815,6 +1828,17 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         CINTrys_roots(envs->nrys_roots, x, u, w);
 
         FINT irys;
+        if (omega > 0) {
+                /* u[:] = tau^2 / (1 - tau^2)
+                 * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
+                 * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
+                 * so the rest code can be reused.
+                 */
+                for (irys = 0; irys < envs->nrys_roots; irys++) {
+                        u[irys] /= u[irys] + 1 - u[irys] * theta;
+                }
+        }
+
         double u2, div, tmp1, tmp2, tmp3, tmp4;
         const double *rijrx = envs->rijrx;
         const double *rklrx = envs->rklrx;
@@ -1906,222 +1930,35 @@ double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs)
 {
         const double aij = envs->aij;
         const double akl = envs->akl;
+#ifdef WITH_RANGE_COULOMB
+        const double omega = envs->env[PTR_RANGE_OMEGA];
+#else
+        const double omega = 0;
+#endif
         double a0, a1, x;
         double rijrkl[3];
+        double rr;
         rijrkl[0] = envs->rij[0] - envs->rkl[0];
         rijrkl[1] = envs->rij[1] - envs->rkl[1];
         rijrkl[2] = envs->rij[2] - envs->rkl[2];
+        rr = rijrkl[0]*rijrkl[0] + rijrkl[1]*rijrkl[1] + rijrkl[2]*rijrkl[2];
 
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
-        x = a0 *(rijrkl[0] * rijrkl[0]
-               + rijrkl[1] * rijrkl[1]
-               + rijrkl[2] * rijrkl[2]);
 
-        return sqrt(a0 / (a1 * a1 * a1)) * fac * rys_root1(x);
-}
-
-/*
- * ( \nabla i j | kl )
- */
-void CINTnabla1i_2e(double *f, const double *g,
-                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
-                    const CINTEnvVars *envs)
-{
-        FINT i, j, k, l, n, ptr;
-        const FINT di = envs->g_stride_i;
-        const FINT dk = envs->g_stride_k;
-        const FINT dl = envs->g_stride_l;
-        const FINT dj = envs->g_stride_j;
-        const FINT nroots = envs->nrys_roots;
-        const double ai2 = -2 * envs->ai;
-        DEF_GXYZ(const double, g, gx, gy, gz);
-        DEF_GXYZ(double, f, fx, fy, fz);
-
-        const double *p1x = gx - di;
-        const double *p1y = gy - di;
-        const double *p1z = gz - di;
-        const double *p2x = gx + di;
-        const double *p2y = gy + di;
-        const double *p2z = gz + di;
-        for (j = 0; j <= lj; j++)
-        for (l = 0; l <= ll; l++)
-        for (k = 0; k <= lk; k++) {
-                ptr = dj * j + dl * l + dk * k;
-                //f(...,0,...) = -2*ai*g(...,1,...)
-                for (n = ptr; n < ptr+nroots; n++) {
-                        fx[n] = ai2 * p2x[n];
-                        fy[n] = ai2 * p2y[n];
-                        fz[n] = ai2 * p2z[n];
-                }
-                ptr += di;
-                //f(...,i,...) = i*g(...,i-1,...)-2*ai*g(...,i+1,...)
-                for (i = 1; i <= li; i++) {
-                        for (n = ptr; n < ptr+nroots; n++) {
-                                fx[n] = i*p1x[n] + ai2*p2x[n];
-                                fy[n] = i*p1y[n] + ai2*p2y[n];
-                                fz[n] = i*p1z[n] + ai2*p2z[n];
-                        }
-                        ptr += di;
-                }
+        double theta, u;
+        if (omega > 0) {
+// For long-range part of range-separated Coulomb operator
+                theta = omega * omega / (omega * omega + a0);
+                a0 *= theta;
+                x = a0 * rr;
+                u = rys_root1(x);
+                u /= u + 1 - u * theta;
+        } else {
+                x = a0 * rr;
+                u = rys_root1(x);
         }
-}
-
-
-/*
- * ( i \nabla j | kl )
- */
-void CINTnabla1j_2e(double *f, const double *g,
-                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
-                    const CINTEnvVars *envs)
-{
-        FINT i, j, k, l, n, ptr;
-        const FINT di = envs->g_stride_i;
-        const FINT dk = envs->g_stride_k;
-        const FINT dl = envs->g_stride_l;
-        const FINT dj = envs->g_stride_j;
-        const FINT nroots = envs->nrys_roots;
-        const double aj2 = -2 * envs->aj;
-        DEF_GXYZ(const double, g, gx, gy, gz);
-        DEF_GXYZ(double, f, fx, fy, fz);
-
-        const double *p1x = gx - dj;
-        const double *p1y = gy - dj;
-        const double *p1z = gz - dj;
-        const double *p2x = gx + dj;
-        const double *p2y = gy + dj;
-        const double *p2z = gz + dj;
-        //f(...,0,...) = -2*aj*g(...,1,...)
-        for (l = 0; l <= ll; l++) {
-        for (k = 0; k <= lk; k++) {
-                ptr = dl * l + dk * k;
-                for (i = 0; i <= li; i++) {
-                        for (n = ptr; n < ptr+nroots; n++) {
-                                fx[n] = aj2 * p2x[n];
-                                fy[n] = aj2 * p2y[n];
-                                fz[n] = aj2 * p2z[n];
-                        }
-                        ptr += di;
-                }
-        } }
-        //f(...,j,...) = j*g(...,j-1,...)-2*aj*g(...,j+1,...)
-        for (j = 1; j <= lj; j++) {
-                for (l = 0; l <= ll; l++) {
-                for (k = 0; k <= lk; k++) {
-                        ptr = dj * j + dl * l + dk * k;
-                        for (i = 0; i <= li; i++) {
-                                for (n = ptr; n < ptr+nroots; n++) {
-                                        fx[n] = j*p1x[n] + aj2*p2x[n];
-                                        fy[n] = j*p1y[n] + aj2*p2y[n];
-                                        fz[n] = j*p1z[n] + aj2*p2z[n];
-                                }
-                                ptr += di;
-                        }
-                } }
-        }
-}
-
-
-/*
- * ( ij | \nabla k l )
- */
-void CINTnabla1k_2e(double *f, const double *g,
-                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
-                    const CINTEnvVars *envs)
-{
-        FINT i, j, k, l, n, ptr;
-        const FINT di = envs->g_stride_i;
-        const FINT dk = envs->g_stride_k;
-        const FINT dl = envs->g_stride_l;
-        const FINT dj = envs->g_stride_j;
-        const FINT nroots = envs->nrys_roots;
-        const double ak2 = -2 * envs->ak;
-        DEF_GXYZ(const double, g, gx, gy, gz);
-        DEF_GXYZ(double, f, fx, fy, fz);
-
-        const double *p1x = gx - dk;
-        const double *p1y = gy - dk;
-        const double *p1z = gz - dk;
-        const double *p2x = gx + dk;
-        const double *p2y = gy + dk;
-        const double *p2z = gz + dk;
-        for (j = 0; j <= lj; j++)
-        for (l = 0; l <= ll; l++) {
-                ptr = dj * j + dl * l;
-                //f(...,0,...) = -2*ak*g(...,1,...)
-                for (i = 0; i <= li; i++) {
-                        for (n = ptr; n < ptr+nroots; n++) {
-                                fx[n] = ak2 * p2x[n];
-                                fy[n] = ak2 * p2y[n];
-                                fz[n] = ak2 * p2z[n];
-                        }
-                        ptr += di;
-                }
-                //f(...,k,...) = k*g(...,k-1,...)-2*ak*g(...,k+1,...)
-                for (k = 1; k <= lk; k++) {
-                        ptr = dj * j + dl * l + dk * k;
-                        for (i = 0; i <= li; i++) {
-                                for (n = ptr; n < ptr+nroots; n++) {
-                                        fx[n] = k*p1x[n] + ak2*p2x[n];
-                                        fy[n] = k*p1y[n] + ak2*p2y[n];
-                                        fz[n] = k*p1z[n] + ak2*p2z[n];
-                                }
-                                ptr += di;
-                        }
-                }
-        }
-}
-
-
-/*
- * ( ij | k \nabla l )
- */
-void CINTnabla1l_2e(double *f, const double *g,
-                    const FINT li, const FINT lj, const FINT lk, const FINT ll,
-                    const CINTEnvVars *envs)
-{
-        FINT i, j, k, l, n, ptr;
-        const FINT di = envs->g_stride_i;
-        const FINT dk = envs->g_stride_k;
-        const FINT dl = envs->g_stride_l;
-        const FINT dj = envs->g_stride_j;
-        const FINT nroots = envs->nrys_roots;
-        const double al2 = -2 * envs->al;
-        DEF_GXYZ(const double, g, gx, gy, gz);
-        DEF_GXYZ(double, f, fx, fy, fz);
-
-        const double *p1x = gx - dl;
-        const double *p1y = gy - dl;
-        const double *p1z = gz - dl;
-        const double *p2x = gx + dl;
-        const double *p2y = gy + dl;
-        const double *p2z = gz + dl;
-        for (j = 0; j <= lj; j++) {
-                //f(...,0,...) = -2*al*g(...,1,...)
-                for (k = 0; k <= lk; k++) {
-                        ptr = dj * j + dk * k;
-                        for (i = 0; i <= li; i++) {
-                                for (n = ptr; n < ptr+nroots; n++) {
-                                        fx[n] = al2 * p2x[n];
-                                        fy[n] = al2 * p2y[n];
-                                        fz[n] = al2 * p2z[n];
-                                }
-                                ptr += di;
-                        }
-                }
-                //f(...,l,...) = l*g(...,l-1,...)-2*al*g(...,l+1,...)
-                for (l = 1; l <= ll; l++) {
-                        for (k = 0; k <= lk; k++) {
-                                ptr = dj * j + dl * l + dk * k;
-                                for (i = 0; i <= li; i++, ptr += di) {
-                                for (n = ptr; n < ptr+nroots; n++) {
-                                        fx[n] = l*p1x[n] + al2*p2x[n];
-                                        fy[n] = l*p1y[n] + al2*p2y[n];
-                                        fz[n] = l*p1z[n] + al2*p2z[n];
-                                } }
-                        }
-                }
-        }
+        return sqrt(a0 / (a1 * a1 * a1)) * fac * u;
 }
 
 /*

@@ -121,7 +121,7 @@ FINT CINT3c1e_loop_nopt(double *gctr, CINTEnvVars *envs)
         const double rr_jk = SQUARE(      rjrk);
         envs->idx = (FINT *)malloc(sizeof(FINT) * envs->nf * 3);
         CINTg3c1e_index_xyz(envs->idx, envs);
-int n;
+
         *kempty = 1;
         for (kp = 0; kp < envs->k_prim; kp++) {
                 envs->ak = ak[kp];

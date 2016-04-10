@@ -10,6 +10,8 @@
 #define PTR_COMMON_ORIG         1
 #define PTR_RINV_ORIG           4
 #define PTR_RINV_ZETA           7
+// omega parameter in range-separated coulomb operator
+#define PTR_RANGE_OMEGA         8
 #define PTR_ENV_START           20
 
 // slots of atm
@@ -81,8 +83,8 @@
 
 // some other boundaries
 #define MXRYSROOTS      16 // > ANG_MAX*2+1 for 4c2e
-#define ANG_MAX         15 // l = 0..7 ..14
-#define CART_MAX        64 // > (ANG_MAX*(ANG_MAX+1)/2)
+#define ANG_MAX         12 // l = 0..7 ..14
+#define CART_MAX        128 // > (ANG_MAX*(ANG_MAX+1)/2)
 #define SHLS_MAX        0x7fffffff
 #define NPRIM_MAX       0x7fffffff
 #define NCTR_MAX        0x7fffffff

@@ -21,6 +21,7 @@ PTR_COMMON_ORIG    = 1
 PTR_SHIELDING_ORIG = 4
 PTR_RINV_ORIG      = 4
 PTR_RINV_ZETA      = 7
+PTR_ENV_START      = 20
 
 CHARGE_OF  = 0
 PTR_COORD  = 1
@@ -44,7 +45,7 @@ nbas = 0
 atm = numpy.zeros((natm,ATM_SLOTS), dtype=numpy.int32)
 bas = numpy.zeros((1000,BAS_SLOTS), dtype=numpy.int32)
 env = numpy.zeros(10000)
-off = 10
+off = PTR_ENV_START
 for i in range(natm):
     atm[i, CHARGE_OF] = (i+1)*2
     atm[i, PTR_COORD] = off
