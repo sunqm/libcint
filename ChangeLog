@@ -1,4 +1,7 @@
-Version 2.8.2 (2016-04-07):
+Version 2.8.3 (2016-04-20):
+	* New 1e integral p Vnuc cross p
+
+Version 2.8.2 (2016-04-09):
 	* Long range part of range-separated Coulomb operator
 
 Version 2.8.1 (2016-04-07):

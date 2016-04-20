@@ -6,6 +6,7 @@
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "g2e.h"
+#include "g3c1e.h"
 #include "g3c2e.h"
 #include "g2c2e.h"
 #include "optimizer.h"
@@ -1328,6 +1329,52 @@ CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_cint1e_prinvxp_sph;
 return CINT1e_rinv_drv(opij, &envs, 1, &c2s_sph_1e); }
 C2F_(cint1e_prinvxp_sph)
+/* <P* i|NUC CROSS P |j> */
+static void CINTgout1e_cint1e_pnucxp_sph(double *g,
+double *gout, const FINT *idx, const CINTEnvVars *envs) {
+const double *env = envs->env;
+const FINT nf = envs->nf;
+const FINT i_l = envs->i_l;
+const FINT j_l = envs->j_l;
+const double *ri = envs->ri;
+const double *rj = envs->rj;
+FINT ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double *g3 = g2  + envs->g_size * 3;
+double *g4 = g3  + envs->g_size * 3;
+double s[9];
+G1E_D_J(g1, g0, i_l+1, j_l+0);
+G1E_D_I(g2, g0, i_l+0, j_l);
+G1E_D_I(g3, g1, i_l+0, j_l);
+for (n = 0; n < nf; n++, idx+=3) {
+ix = idx[0];
+iy = idx[1];
+iz = idx[2];
+s[0] = g3[ix] * g0[iy] * g0[iz];
+s[1] = g2[ix] * g1[iy] * g0[iz];
+s[2] = g2[ix] * g0[iy] * g1[iz];
+s[3] = g1[ix] * g2[iy] * g0[iz];
+s[4] = g0[ix] * g3[iy] * g0[iz];
+s[5] = g0[ix] * g2[iy] * g1[iz];
+s[6] = g1[ix] * g0[iy] * g2[iz];
+s[7] = g0[ix] * g1[iy] * g2[iz];
+s[8] = g0[ix] * g0[iy] * g3[iz];
+gout[0] += + s[5] + (-1*s[7]);
+gout[1] += + s[6] + (-1*s[2]);
+gout[2] += + s[1] + (-1*s[3]);
+gout += 3;
+}}
+FINT cint1e_pnucxp_sph(double *opij, const FINT *shls,
+const FINT *atm, const FINT natm,
+const FINT *bas, const FINT nbas, const double *env) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_cint1e_pnucxp_sph;
+return CINT1e_nuc_drv(opij, &envs, 1, &c2s_sph_1e); }
+C2F_(cint1e_pnucxp_sph)
 /* <k P* i|R12 |CROSS P j l> : i,j \in electron 1; k,l \in electron 2
  * = (P* i CROSS P j|R12 |k l) */
 static void CINTgout2e_cint2e_p1vxp1_sph(double *g,

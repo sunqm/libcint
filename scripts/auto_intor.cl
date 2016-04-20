@@ -31,6 +31,7 @@
   ; use p* instead of p, to ignore the operator after it, then it can
   ; cross to the next p
   '("cint1e_prinvxp_sph"    spheric  (p* \| rinv cross p \| ))
+  '("cint1e_pnucxp_sph"     spheric  (p* \| nuc cross p \| ))
   '("cint2e_p1vxp1_sph"     spheric  ( p* \, cross p \| \, )) ; SSO
   ;'("cint2e_sph"            spheric  ( \, \| \, ))
   '("cint2e_ig1_sph"        spheric  (#C(0 1) g \, \| \, ))
