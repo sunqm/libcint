@@ -1426,7 +1426,7 @@ gout[1] += + s[6] + (-1*s[2]);
 gout[2] += + s[1] + (-1*s[3]);
 gout += 3;
 }}}
-void cint2e_p1vxp1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_p1vxp1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1534,7 +1534,7 @@ gout[1] += + (-1*c[2]*s[0]) + c[0]*s[2];
 gout[2] += + (-1*c[0]*s[1]) + c[1]*s[0];
 gout += 3;
 }}}
-void cint2e_ig1_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ig1_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1643,7 +1643,7 @@ gout[7] += + c[2]*s[3] + (-1*c[5]*s[0]) + (-1*c[0]*s[5]) + c[3]*s[2];
 gout[8] += + c[0]*s[4] + (-1*c[3]*s[1]) + (-1*c[1]*s[3]) + c[4]*s[0];
 gout += 9;
 }}}
-void cint2e_ig1ig2_sph_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ig1ig2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);

@@ -439,7 +439,7 @@ gout[1] += + s[1];
 gout[2] += + s[2];
 gout += 3;
 }}}
-void cint2e_ip1_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ip1_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -551,7 +551,7 @@ gout[10] += + s[7] + (-1*s[15]);
 gout[11] += + s[6] + s[16] + s[26];
 gout += 12;
 }}}
-void cint2e_ipspsp1_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ipspsp1_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {2, 1, 0, 0, 3, 4, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -663,7 +663,7 @@ gout[10] += + s[19] + (-1*s[21]);
 gout[11] += + s[18] + s[22] + s[26];
 gout += 12;
 }}}
-void cint2e_ip1spsp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ip1spsp2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 1, 1, 3, 1, 4, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1111,7 +1111,7 @@ gout[46] += + s[63] + (-1*s[135]) + s[67] + (-1*s[139]) + s[71] + (-1*s[143]);
 gout[47] += + s[54] + s[144] + s[234] + s[58] + s[148] + s[238] + s[62] + s[152] + s[242];
 gout += 48;
 }}}
-void cint2e_ipspsp1spsp2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ipspsp1spsp2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {2, 1, 1, 1, 5, 4, 4, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1223,7 +1223,7 @@ gout[10] += + s[7] + (-1*s[15]);
 gout[11] += + s[6] + s[16] + s[26];
 gout += 12;
 }}}
-void cint2e_ipsrsr1_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ipsrsr1_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {2, 1, 0, 0, 3, 4, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1335,7 +1335,7 @@ gout[10] += + s[19] + (-1*s[21]);
 gout[11] += + s[18] + s[22] + s[26];
 gout += 12;
 }}}
-void cint2e_ip1srsr2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ip1srsr2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 1, 1, 3, 1, 4, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1783,7 +1783,7 @@ gout[46] += + s[63] + (-1*s[135]) + s[67] + (-1*s[139]) + s[71] + (-1*s[143]);
 gout[47] += + s[54] + s[144] + s[234] + s[58] + s[148] + s[238] + s[62] + s[152] + s[242];
 gout += 48;
 }}}
-void cint2e_ipsrsr1srsr2_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ipsrsr1srsr2_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {2, 1, 1, 1, 5, 4, 4, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);

@@ -586,7 +586,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
             (tensors (cond ((and (eql sf1 'sf) (eql sf2 'sf)) goutinc)
                            ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
                            (t (/ goutinc 4)))))
-        (format fout "void ~a_optimizer(CINTOpt **opt, const int *atm, const int natm,
+        (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {~%" intname)
         (if (breit-int? op)
             (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"

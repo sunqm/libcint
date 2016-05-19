@@ -749,7 +749,7 @@ gout[1] += + (-1*c[2]*s[0]) + c[0]*s[2];
 gout[2] += + (-1*c[0]*s[1]) + c[1]*s[0];
 gout += 3;
 }}}
-void cint2e_ig1_cart_optimizer(CINTOpt **opt, const int *atm, const int natm,
+void cint2e_ig1_cart_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {
 FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
