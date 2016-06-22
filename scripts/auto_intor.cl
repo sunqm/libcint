@@ -25,8 +25,11 @@
   '("cint1e_z_origj_sph"    spheric  ( \| z \| ))
   '("cint1e_zz_origj_sph"   spheric  ( \| z z \| ))
   '("cint1e_r_origj_sph"    spheric  ( \| r \| ))
-  '("cint1e_r2_origj_sph"   spheric  ( \| r dot r \| ))
   '("cint1e_rr_origj_sph"   spheric  ( \| r r \| ))
+  '("cint1e_r2_origj_sph"   spheric  ( \| r dot r \| ))
+  '("cint1e_r4_origj_sph"   spheric  ( \| r dot r r dot r))
+  '("cint1e_r2_origi_sph"   spheric  (r dot r \| ))
+  '("cint1e_r4_origi_sph"   spheric  (r dot r r dot r \| ))
   '("cint1e_p4_sph"         spheric  ( p dot p \| p dot p ))
   ; use p* instead of p, to ignore the operator after it, then it can
   ; cross to the next p
@@ -191,6 +194,5 @@
   '("cint3c1e_r2_origk_sph"  spheric  ( \, \, r dot r))
   '("cint3c1e_r4_origk_sph"  spheric  ( \, \, r dot r r dot r))
   '("cint3c1e_r6_origk_sph"  spheric  ( \, \, r dot r r dot r r dot r))
-  '("cint1e_r4_origj_sph"  spheric  ( \| r dot r r dot r))
 )
 

@@ -1,3 +1,9 @@
+Version 2.8.5 (2016-06-22):
+	* New integrals <r^2 i|j> and <r^4 i|j>
+
+Version 2.8.4 (2016-05-19):
+	* Fix precompile problem for range separation Coulomb integrals
+
 Version 2.8.3 (2016-04-20):
 	* New 1e integral p Vnuc cross p
 

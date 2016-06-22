@@ -153,6 +153,7 @@ if (0 /= cint2e_ip1_cart(buf2e, shls, atm, natm, bas, nbas, env, 0_8)) then
 else
   print*, "This integral is 0.\n"
 endif
+deallocate (buf2e)
 
 call cint2e_ip1_cart_optimizer(opt, atm, natm, bas, nbas, env)
 i = 0; shls(1) = i; di = CINTcgto_cart(i, bas)
