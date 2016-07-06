@@ -18,8 +18,7 @@
 //#define MXROOTS1  (MXROOTS+1)
 #define MXROOTS1  MXROOTS
 
-//#define LESSLESS(x, y)         ((y-x) == y)
-#define LESSLESS(x, y)          (fabs(x) < fabs(y)*1e-19)
+#include "fmt.c"
 
 // FIXME: R_dsmit causes big errors for nroots > 13
 void CINTrys_roots(FINT nroots, double x, double *u, double *w)
@@ -1466,86 +1465,6 @@ L90:
     return;
 }
 
-/* Incomplete gamma function
- * f(2n,x) = \int t^{2n} exp(-xt^2) dt
- *         = 1/2 \int r^{n-1/2} exp(-xr) dr
- *         = 1/2 scipy.special.gammainc(n+1/2, x) * gamma(n+1/2) / x^{n+1/2}
- */
-void gamma_inc_like(double *ff, double x, FINT n)
-{
-        const double pie4 = .7853981633974483096156608; // PI/4
-        const double xsw = 33.;
-        const double e = .5 * exp(-x);
-        const double fac0 = n + .5;
-        double term[200];
-        double sum, fac, sum1, suma, term0;
-        FINT k;
-        FINT nterm = 0;
-
-        if (x > xsw) {
-                sum = sqrt(pie4 / x);
-                fac = -.5;
-                for (k = 0; k < n; ++k) {
-                        fac += 1;
-                        sum *= fac / x;
-                }
-
-                term[0] = -e / x;
-                suma = sum + term[0];
-                fac = fac0;
-                for (nterm = 1; nterm < (FINT)(x+fac0-1); ++nterm) {
-                        fac -= 1;
-                        term[nterm] = term[nterm-1] * fac / x;
-                        suma += term[nterm];
-                        if (LESSLESS(term[nterm], suma)) {
-                                goto _CONV;
-                        }
-                }
-        }
-
-        // if xsw too small, 1/x series not converge; or x < xsw
-
-        fac = fac0;
-        term0 = e / fac;
-        sum = term0;
-        for (k = 0; k < (FINT)(x-fac0); ++k) {
-                fac += 1;
-                term0 *= x / fac;
-                sum += term0;
-        }
-
-        fac += 1;
-        term[0] = term0 * x / fac;
-        suma = sum + term[0];
-        for (nterm = 1; nterm < 200; nterm++) {
-                fac += 1;
-                term[nterm] = term[nterm-1] * x / fac;
-                suma += term[nterm];
-                if (LESSLESS(term[nterm], suma)) {
-                        goto _CONV;
-                }
-        }
-        if (nterm > 199) {
-                fprintf(stderr, "libcint::rys_roots power series of gamma_inc_like not converge"
-                        "val=%.16g last term=%.16g x=%.16g n=%d\n",
-                        suma, term[199], x, (int)n);
-                exit(1);
-        }
-
-_CONV:
-        // summation in the reversed order, to minimize the round-off error
-        sum1 = 0;
-        for (k = nterm; k >= 0; k--) {
-                sum1 += term[k];
-        }
-        ff[n] = sum + sum1; // ff[n] == suma +/- epsilon
-        fac = fac0;
-        for (k = n; k > 0; k--) {
-                fac -= 1;
-                ff[k-1] = (e + x * ff[k]) / fac;
-        }
-}
-
 /* bdf_cvwint_dsmit_ */
 static void R_dsmit(double *cs, double *s, FINT n)
 {
@@ -1800,79 +1719,6 @@ L90:
         rt[m] = r;
     }
     return;
-}
-
-static void qgamma_inc_like(long double *ff, long double x, FINT n)
-{
-        const long double pie4 = .7853981633974483096156608458l; // PI/4
-        const long double xsw = 33.;
-        const long double e = .5l * EXPL(-x);
-        const long double fac0 = n + .5l;
-        long double term[200];
-        long double sum, fac, sum1, suma, term0;
-        FINT k;
-        FINT nterm = 0;
-
-        if (x > xsw) {
-                sum = SQRTL(pie4 / x);
-                fac = -.5l;
-                for (k = 0; k < n; ++k) {
-                        fac += 1;
-                        sum *= fac / x;
-                }
-
-                term[0] = -e / x;
-                suma = sum + term[0];
-                fac = fac0;
-                for (nterm = 1; nterm < (FINT)(x+fac0-1); ++nterm) {
-                        fac -= 1;
-                        term[nterm] = term[nterm-1] * fac / x;
-                        suma += term[nterm];
-                        if (LESSLESS(term[nterm], suma)) {
-                                goto _CONV;
-                        }
-                }
-        }
-        // if xsw too low, 1/x series not converge; or x < xsw
-
-        fac = fac0;
-        term0 = e / fac;
-        sum = term0;
-        for (k = 0; k < (FINT)(x-fac0); ++k) {
-                fac += 1;
-                term0 *= x / fac;
-                sum += term0;
-        }
-
-        fac += 1;
-        term[0] = term0 * x / fac;
-        suma = sum + term[0];
-        for (nterm = 1; nterm < 200; nterm++) {
-                fac += 1;
-                term[nterm] = term[nterm-1] * x / fac;
-                suma += term[nterm];
-                if (LESSLESS(term[nterm], suma)) {
-                        goto _CONV;
-                }
-        }
-        if (nterm > 199) {
-                fprintf(stderr, "libcint::rys_roots power series of gamma_inc_like not converge"
-                        "val=%.16Lg last term=%.16Lg x=%.16Lg n=%d\n",
-                        suma, term[199], x, (int)n);
-                exit(1);
-        }
-
-_CONV:
-        sum1 = 0;
-        for (k = nterm; k >= 0; k--) {
-                sum1 += term[k];
-        }
-        ff[n] = sum + sum1; // ff[n] == suma +/- epsilon
-        fac = fac0;
-        for (k = n; k > 0; k--) {
-                fac -= 1;
-                ff[k-1] = (e + x * ff[k]) / fac;
-        }
 }
 
 static void R_qsmit(long double *cs, long double *s, FINT n)
