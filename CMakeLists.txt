@@ -42,6 +42,10 @@ set(cintSrc
 set(BUILD_SHARED_LIBS 1)
 option(ENABLE_EXAMPLE "build examples and tests" 0)
 
+if(QUICK_TEST)
+  set(RUN_QUICK_TEST --quick)
+endif()
+
 if(ENABLE_STATIC)
   option(BUILD_SHARED_LIBS 0)
 endif()
@@ -65,8 +69,8 @@ if(BUILD_SHARED_LIBS AND ENABLE_EXAMPLE)
   if(PYTHONINTERP_FOUND)
     enable_testing()
     add_test(NAME cinttest
-      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py)
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py ${RUN_QUICK_TEST})
     add_test(NAME cint3c2etest
-      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_3c2e.py)
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_3c2e.py ${RUN_QUICK_TEST})
   endif()
 endif()
