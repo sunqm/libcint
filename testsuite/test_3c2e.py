@@ -294,10 +294,10 @@ if __name__ == "__main__":
               ('cint3c2e_ip2_sph', 'cint2e_ip2_sph', 1970.982483860059, 3, 10),
              ):
         test_int3c2e_sph(*f)
-
-    for f in (('cint3c2e_spinor', 'cint3c2e_sph', 4412.363002831547, 1, 10),
-             ):
-        test_int3c2e_spinor(*f)
+    if "--quick" not in sys.argv:
+        for f in (('cint3c2e_spinor', 'cint3c2e_sph', 4412.363002831547, 1, 10),
+                 ):
+            test_int3c2e_spinor(*f)
 
 #    for f in (('cint2c2e_sph', 'cint2e_sph', 782.3104849606677, 1, 10),
 #              ('cint2c2e_ip1_sph', 'cint2e_ip1_sph', 394.6515972715189, 3, 10),

@@ -135,9 +135,9 @@ Installation
     cmake ..
     make install
 
-* Build libcint with examples and tests (optional)
+* Build libcint with examples and full or abridged tests (optional)
     mkdir build; cd build
-    cmake -DENABLE_EXAMPLE=1 ..
+    cmake -DENABLE_EXAMPLE=1 [-DQUICK_TEST=1] ..
     make
     make test ARGS=-V
 
