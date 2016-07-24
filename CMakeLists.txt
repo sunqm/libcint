@@ -6,7 +6,9 @@ set(cint_VERSION "2.8")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-include(GNUInstallDirs)
+if (${CMAKE_VERSION} GREATER 2.8.5)
+  include(GNUInstallDirs)
+endif (${CMAKE_VERSION} GREATER 2.8.5)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(BLAS REQUIRED)
