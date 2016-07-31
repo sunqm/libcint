@@ -187,6 +187,23 @@ Known problems
         cmake -DENABLE_EXAMPLE=1
 
 
+How to cite
+-----------
+
+```
+@article{10.1002/jcc.23981,
+  title = {Libcint: An efficient general integral library for Gaussian basis functions},
+  author = {Sun, Qiming},
+  journal = {Journal of Computational Chemistry},
+  year = {2015},
+  pages = {1664-1671},
+  volume = {36},
+  doi = {10.1002/jcc.23981},
+  url = {http://dx.doi.org/10.1002/jcc.23981}
+}
+```
+
+
 Bug report
 ----------
 Qiming Sun <osirpt.sun@gmail.com>
