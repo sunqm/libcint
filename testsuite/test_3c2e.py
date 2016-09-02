@@ -168,6 +168,8 @@ opt = ctypes.POINTER(ctypes.c_void_p)()
 _cint.CINTlen_spinor.restype = ctypes.c_int
 
 
+def close(v1, vref, count, place):
+    return round(abs(v1-vref)/count, place) == 0
 
 def test_int3c2e_sph(name, fnref, vref, dim, place):
     intor = getattr(_cint, name)
@@ -178,6 +180,7 @@ def test_int3c2e_sph(name, fnref, vref, dim, place):
     opref = numpy.empty(1000000*dim)
     pref = opref.ctypes.data_as(ctypes.c_void_p)
     v1 = 0
+    cnt = 0
     for k in range(nbas.value):
         l = nfitid
         bas[l,ATOM_OF] = bas[k,ATOM_OF]
@@ -193,10 +196,11 @@ def test_int3c2e_sph(name, fnref, vref, dim, place):
                 if not numpy.allclose(opref[:nd], op[:nd]):
                     print 'Fail:', name, i,j,k
                 v1 += abs(numpy.array(op[:nd])).sum()
-    if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
-    else:
+                cnt += nd
+    if close(v1, vref, cnt, place):
         print "pass: ", name
+    else:
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
 
 
 def sf2spinor(mat, i, j, bas):
@@ -230,6 +234,7 @@ def test_int3c2e_spinor(name, fnref, vref, dim, place):
     intoref = getattr(_cint, fnref)
     intor.restype = ctypes.c_void_p
     v1 = 0
+    cnt = 0
     for k in range(nbas.value):
         l = nfitid
         for j in range(nbas.value):
@@ -252,10 +257,11 @@ def test_int3c2e_spinor(name, fnref, vref, dim, place):
                 if not numpy.allclose(zmat, op[:,:,:,0]):
                     print 'Fail:', name, i,j,k
                 v1 += abs(numpy.array(op)).sum()
-    if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
-    else:
+                cnt += op.size
+    if close(v1, vref, cnt, place):
         print "pass: ", name
+    else:
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
 
 
 def test_int2c_sph(name, fnref, vref, dim, place):
@@ -267,6 +273,7 @@ def test_int2c_sph(name, fnref, vref, dim, place):
     opref = numpy.empty(1000000*dim)
     pref = opref.ctypes.data_as(ctypes.c_void_p)
     v1 = 0
+    cnt = 0
     for k in range(nbas.value):
         for i in range(nbas.value):
             j = nfitid1
@@ -281,14 +288,19 @@ def test_int2c_sph(name, fnref, vref, dim, place):
             if not numpy.allclose(opref[:nd], op[:nd]):
                 print 'Fail:', name, i,k
             v1 += abs(numpy.array(op[:nd])).sum()
-    if round(abs(v1-vref), place):
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
-    else:
+            cnt += nd
+    if close(v1, vref, cnt, place):
         print "pass: ", name
+    else:
+        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
 
 
 
 if __name__ == "__main__":
+    if "--high-prec" in sys.argv:
+        def close(v1, vref, count, place):
+            return round(abs(v1-vref), place) == 0
+
     for f in (('cint3c2e_sph', 'cint2e_sph', 1586.350797432699, 1, 10),
               ('cint3c2e_ip1_sph', 'cint2e_ip1_sph', 2242.052249267909, 3, 10),
               ('cint3c2e_ip2_sph', 'cint2e_ip2_sph', 1970.982483860059, 3, 10),
