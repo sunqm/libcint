@@ -1667,7 +1667,7 @@ L30:
         dr = .0625l * dr;
         r5 = r - dr;
         r6 = r + dr;
-        if (fabs(delta) < accrt || r5 == r || r6 == r) {
+        if (fabsl(delta) < accrt || r5 == r || r6 == r) {
             goto L90;
         }
         ++icount;
