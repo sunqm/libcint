@@ -17,6 +17,8 @@
 #define SML_FLOAT64   1.0e-16
 #define SML_FLOAT80   1.0e-21
 
+#define HAVE_QUADMATH_H
+
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #define PI_SQRD_128 M_PIq * M_PIq
@@ -226,7 +228,7 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
                         }
                 }
         } else {
-                __float128 pi2q = PI_SQRD_128;
+                __float128 pi2 = PI_SQRD_128;
                 __float128 tt = sqrtl(t);
                 f[0] = pi2 / tt * erfl(tt);
                 if (m > 0) {
