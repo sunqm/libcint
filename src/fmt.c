@@ -156,7 +156,7 @@ void gamma_inc_like(double *f, double t, FINT m)
         }
 }
 
-static void qgamma_inc_like(long double *f, long double t, FINT m)
+void qgamma_inc_like(long double *f, long double t, FINT m)
 {
         FINT i;
         if (t < m + 1.5) {
