@@ -11,6 +11,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#define HAVE_QUADMATH_H
+
+#ifdef HAVE_QUADMATH_H
+#include <quadmath.h>
+#endif
+
 #include "cint_const.h"
 #include "rys_roots.h"
 
@@ -37,7 +44,7 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
                         R_droot(nroots, x, u, w);
                         break;
                 default:
-                        R_qroot(nroots, x, u, w);
+                        R_lroot(nroots, x, u, w);
         }
 }
 
@@ -1626,7 +1633,7 @@ static long double c99_expl(long double x)
 #define EXPL    c99_expl
 #endif
 
-static void R_qnode(long double *a, long double *rt, FINT k)
+static void R_lnode(long double *a, long double *rt, FINT k)
 {
     const long double accrt = 1e-11l;
 
@@ -1695,7 +1702,7 @@ L45:
         }
         ++icoun2;
         if (icoun2 > 50) {
-                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %12.4Lf\n", prod);
+                fprintf(stderr, "libcint::rys_roots no convergence in R_lnode, prod= %12.4Lf\n", prod);
                 exit(1);
         }
         prod = p3 * p5;
@@ -1721,7 +1728,7 @@ L90:
     return;
 }
 
-static void R_qsmit(long double *cs, long double *s, FINT n)
+static void R_lsmit(long double *cs, long double *s, FINT n)
 {
     FINT i, j, k;
     long double fac, dot;
@@ -1764,7 +1771,7 @@ static void R_qsmit(long double *cs, long double *s, FINT n)
     }
 }
 
-static void R_qroot(FINT nroots, double x,
+static void R_lroot(FINT nroots, double x,
                     double roots[], double weights[])
 {
     FINT i, k, j, m;
@@ -1776,6 +1783,237 @@ static void R_qroot(FINT nroots, double x,
     long double a[MXROOTS1];
     long double ff[MXROOTS*2+1];
     long double root, poly, wsum, dum;
+
+    if (nroots < 2) {
+        nroots = 2;
+    }
+
+    lgamma_inc_like(ff, x, nroots*2);
+
+    for (j = 0; j < nroots+1; ++j) {
+        for (i = 0; i < nroots+1; ++i) {
+            s[i + j * MXROOTS1] = ff[i + j];
+        }
+    }
+
+    R_lsmit(cs, s, nroots+1);
+
+    wsum = ff[0];
+    w[0] = wsum;
+    r[0] = ff[1] / wsum;
+
+    dum = SQRTL(cs[2*MXROOTS1+1] * cs[2*MXROOTS1+1]
+               - 4 * cs[2*MXROOTS1+0] * cs[2*MXROOTS1+2]);
+    r[MXROOTS  ] = .5 * (-cs[2*MXROOTS1+1] - dum) / cs[2*MXROOTS1+2];
+    r[MXROOTS+1] = .5 * (-cs[2*MXROOTS1+1] + dum) / cs[2*MXROOTS1+2];
+
+    if (nroots == 2) {
+        goto L70;
+    }
+
+    for (i = 2; i < nroots+1; ++i) {
+        rt[i] = 1;
+    }
+    rt[0] = r[MXROOTS  ];
+    rt[1] = r[MXROOTS+1];
+    for (k = 2; k < nroots; ++k) {
+        for (i = 0; i < k+2; ++i) {
+            a[i] = cs[i + (k+1) * MXROOTS1];
+        }
+        R_lnode(a, rt, k+1);
+
+        for (i = 0; i < k+2; ++i) {
+            r[i + k * MXROOTS] = rt[i];
+        }
+    }
+L70:
+    for (k = 1; k < nroots; ++k) {
+        for (i = 0; i < k+1; ++i) {
+            root = r[i + k * MXROOTS];
+            dum = 1 / ff[0];
+            for (j = 1; j <= k; ++j) {
+                poly = cs[j + j * MXROOTS1];
+                for (m = 1; m <= j; ++m) {
+                    poly = poly * root + cs[j - m + j * MXROOTS1];
+                }
+                dum += poly * poly;
+            }
+            w[i + k * MXROOTS] = 1 / dum;
+        }
+    }
+
+    for (k = 0; k < nroots; ++k) {
+        dum = r[k + (nroots-1) * MXROOTS];
+        roots[k] = dum / (1 - dum);
+        weights[k] = w[k + (nroots-1) * MXROOTS];
+    }
+    return;
+}
+
+#ifdef HAVE_QUADMATH_H
+
+static void R_qnode(__float128 *a, __float128 *rt, FINT k)
+{
+    const __float128 accrt = 1e-11q;
+
+    FINT i, m;
+    FINT icoun2, icount;
+    __float128 r;
+    __float128 p1, p2, r1, r2, p5, p6, r5, r6, r3, p3, r4, p4, dr, prod, delta;
+
+    r2 = 0;
+    p2 = a[0];
+    for (m = 0; m < k; ++m) {
+        r1 = r2;
+        p1 = p2;
+        r2 = rt[m];
+        p2 = a[k];
+        for (i = 1; i <= k; ++i) {
+            p2 = p2 * r2 + a[k - i];
+        }
+        prod = p1 * p2;
+        if (prod < 0) {
+            goto L20;
+        }
+        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n", (int)m, (int)k);
+L20:
+        r5 = r1;
+        p5 = p1;
+        r6 = r2;
+        p6 = p2;
+        icount = 0;
+L30:
+        r3 = r5;
+        p3 = p5;
+        r4 = r6;
+        p4 = p6;
+        r = (r3 * p4 - r4 * p3) / (p4 - p3);
+        dr = r4 - r3;
+        delta = dr;
+        dr = .0625q * dr;
+        r5 = r - dr;
+        r6 = r + dr;
+        if (fabsl(delta) < accrt || r5 == r || r6 == r) {
+            goto L90;
+        }
+        ++icount;
+        if (icount == 50) {
+            char string[128];
+            int rc = quadmath_snprintf(string, sizeof(string), "%Qe", 46 /* width */, delta);
+            if (rc<128) {
+                fprintf(stderr, "libcint::rys_roots NO CONV. IN DNODE: DELTA= %s\n", string);
+            } else {
+                fprintf(stderr, "libcint::rys_roots NO CONV. IN DNODE: DELTA= %lf\n", (double)delta );
+            }
+            exit(1);
+        }
+        if (r5 < r3) {
+            r5 = r3;
+        }
+        if (r6 > r4) {
+            r6 = r4;
+        }
+        p5 = a[k];
+        p6 = p5;
+        for (i = 1; i <= k; ++i) {
+            p5 = p5 * r5 + a[k - i];
+            p6 = p6 * r6 + a[k - i];
+        }
+        icoun2 = 0;
+L45:
+        prod = p5 * p6;
+        if (prod < 0) {
+            goto L30;
+        }
+        ++icoun2;
+        if (icoun2 > 50) {
+            char string[128];
+            int rc = quadmath_snprintf(string, sizeof(string), "%Qe", 46 /* width */, prod);
+            if (rc<128) {
+                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %s\n", string);
+            } else {
+                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %12.4lf\n", (double)prod);
+            }
+            exit(1);
+        }
+        prod = p3 * p5;
+        if (prod > 0.) {
+            goto L60;
+        }
+        r5 = .25q * r3 + .75q * r5;
+        p5 = a[k];
+        for (i = 1; i <= k; ++i) {
+            p5 = p5 * r5 + a[k - i];
+        }
+        goto L45;
+L60:
+        r6 = .25q * r4 + .75q * r6;
+        p6 = a[k];
+        for (i = 1; i <= k; ++i) {
+            p6 = p6 * r6 + a[k - i];
+        }
+        goto L45;
+L90:
+        rt[m] = r;
+    }
+    return;
+}
+
+static void R_qsmit(__float128 *cs, __float128 *s, FINT n)
+{
+    FINT i, j, k;
+    __float128 fac, dot;
+    __float128 v[MXROOTS1];
+
+    for (i = 0; i < n; ++i) {
+        for (j = 0; j < i; ++j) {
+            cs[i + j * MXROOTS1] = 0;
+        }
+    }
+
+    for (j = 0; j < n; ++j) {
+
+        fac = s[j + j * MXROOTS1];
+
+        for (k = 0; k < j; ++k) {
+            v[k] = 0;
+        }
+
+        for (k = 0; k < j; ++k) {
+            dot = 0;
+            for (i = 0; i <= k; ++i) {
+                dot += cs[i + k * MXROOTS1] * s[i+j*MXROOTS1];
+            }
+            for (i = 0; i <= k; ++i) {
+                v[i] -= dot * cs[i + k * MXROOTS1];
+            }
+            fac -= dot * dot;
+        }
+
+        if (fac < 0) {
+                fprintf(stderr, "libcint::rys_roots negative value in sqrt\n");
+                exit(1);
+        }
+        fac = 1 / SQRTL(fac);
+        cs[j + j * MXROOTS1] = fac;
+        for (k = 0; k < j; ++k) {
+            cs[k + j * MXROOTS1] = fac * v[k];
+        }
+    }
+}
+
+static void R_qroot(FINT nroots, double x,
+                    double roots[], double weights[])
+{
+    FINT i, k, j, m;
+    __float128 r[MXROOTS*MXROOTS] = {0};
+    __float128 w[MXROOTS*MXROOTS] = {0};
+    __float128 cs[MXROOTS1*MXROOTS1];
+    __float128 s[MXROOTS1*MXROOTS1];
+    __float128 rt[MXROOTS1];
+    __float128 a[MXROOTS1];
+    __float128 ff[MXROOTS*2+1];
+    __float128 root, poly, wsum, dum;
 
     if (nroots < 2) {
         nroots = 2;
@@ -1843,3 +2081,4 @@ L70:
     return;
 }
 
+#endif

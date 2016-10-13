@@ -17,6 +17,13 @@
 #define SML_FLOAT64   1.0e-16
 #define SML_FLOAT80   1.0e-21
 
+#define HAVE_QUADMATH_H
+
+#ifdef HAVE_QUADMATH_H
+#include <quadmath.h>
+#define PI_SQRD_128 M_PIq * M_PIq
+#endif
+
 /*
  * Name
  *
@@ -156,7 +163,7 @@ void gamma_inc_like(double *f, double t, FINT m)
         }
 }
 
-static void qgamma_inc_like(long double *f, long double t, FINT m)
+void lgamma_inc_like(long double *f, long double t, FINT m)
 {
         FINT i;
         if (t < m + 1.5) {
@@ -194,3 +201,42 @@ static void qgamma_inc_like(long double *f, long double t, FINT m)
         }
 }
 
+#ifdef HAVE_QUADMATH_H
+void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
+{
+        FINT i;
+        if (t < m + 1.5) {
+                __float128 b = m + 0.5l;
+                __float128 x = 1;
+                __float128 s = 1;
+                __float128 e = .5l * expl(-t);
+                if (t < SML_FLOAT80) {
+                        f[m] = .5l / b;
+                } else {
+                        //f[m] = fmtpse(m, t);
+                        for (i = 1; x > SML_FLOAT80; i++)
+                        {
+                                x *= t / (b + i);
+                                s += x;
+                        }
+                        f[m] = e * s / b;
+                }
+                if (m > 0) {
+                        for (i = m; i > 0; i--) {
+                                b -= 1;
+                                f[i-1] = (e + t * f[i]) / b;
+                        }
+                }
+        } else {
+                __float128 pi2 = PI_SQRD_128;
+                __float128 tt = sqrtl(t);
+                f[0] = pi2 / tt * erfl(tt);
+                if (m > 0) {
+                        __float128 e = expl(-t);
+                        __float128 b = .5l / t;
+                        for (i = 1; i <= m; i++)
+                                f[i] = b * ((2*i-1) * f[i-1] - e);
+                }
+        }
+}
+#endif
