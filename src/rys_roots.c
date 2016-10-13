@@ -44,7 +44,11 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
                         R_droot(nroots, x, u, w);
                         break;
                 default:
+#ifdef HAVE_QUADMATH_H
+                        R_qroot(nroots, x, u, w);
+#else
                         R_lroot(nroots, x, u, w);
+#endif
         }
 }
 
