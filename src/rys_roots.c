@@ -1667,7 +1667,7 @@ L30:
         dr = .0625l * dr;
         r5 = r - dr;
         r6 = r + dr;
-        if (fabs(delta) < accrt || r5 == r || r6 == r) {
+        if (fabsl(delta) < accrt || r5 == r || r6 == r) {
             goto L90;
         }
         ++icount;
@@ -1781,7 +1781,7 @@ static void R_qroot(FINT nroots, double x,
         nroots = 2;
     }
 
-    qgamma_inc_like(ff, x, nroots*2);
+    lgamma_inc_like(ff, x, nroots*2);
 
     for (j = 0; j < nroots+1; ++j) {
         for (i = 0; i < nroots+1; ++i) {
