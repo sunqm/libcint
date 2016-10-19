@@ -11,5 +11,7 @@
 #cmakedefine HAVE_SQRTL
 #cmakedefine HAVE_FABSL
 
+#cmakedefine HAVE_QUADMATH_H
+
 #cmakedefine WITH_RANGE_COULOMB
 

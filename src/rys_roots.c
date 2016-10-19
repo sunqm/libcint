@@ -12,8 +12,7 @@
 #include <string.h>
 #include <math.h>
 
-#define HAVE_QUADMATH_H
-
+#include "config.h"
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #endif
@@ -1897,7 +1896,7 @@ L30:
         dr = .0625q * dr;
         r5 = r - dr;
         r6 = r + dr;
-        if (fabsl(delta) < accrt || r5 == r || r6 == r) {
+        if (fabsq(delta) < accrt || r5 == r || r6 == r) {
             goto L90;
         }
         ++icount;

@@ -17,11 +17,18 @@ else ()
 endif (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.8)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+find_package(QUADMATH)
+if(QUADMATH_FOUND)
+  set(HAVE_QUADMATH_H 1 CACHE INTERNAL "Have QUADMATH")
+endif()
+
 find_package(BLAS REQUIRED)
 set(CMAKE_REQUIRED_INCLUDES math.h)
 set(CMAKE_REQUIRED_LIBRARIES m)
 check_function_exists(expl HAVE_EXPL)
 check_function_exists(sqrtl HAVE_SQRTL)
+#check_function_exists(fabsq HAVE_QUADMATH_H)
 
 include_directories(
   ${PROJECT_BINARY_DIR}/include
