@@ -17,8 +17,6 @@
 #define SML_FLOAT64   1.0e-16
 #define SML_FLOAT80   1.0e-21
 
-#define HAVE_QUADMATH_H
-
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #define PI_SQRD_128 M_PIq * M_PIq
