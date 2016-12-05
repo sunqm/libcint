@@ -17,4 +17,6 @@ static void Root4(double x, double roots[], double weights[]);
 static void Root5(double x, double roots[], double weights[]);
 static void R_droot(FINT nroots, double x, double roots[], double weights[]);
 static void R_lroot(FINT nroots, double x, double roots[], double weights[]);
+#ifdef HAVE_QUADMATH_H
 static void R_qroot(FINT nroots, double x, double roots[], double weights[]);
+#endif
