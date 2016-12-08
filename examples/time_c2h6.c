@@ -718,7 +718,7 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
         printf("\tcint2e_sph without optimizer: total num ERI = %.2e\n", tot);
         pct = 0; count = 0;
 #pragma omp parallel default(none) \
-        shared(atm, bas, env, ishls, jshls, non_opt, time0, pct, count, stdout) \
+        shared(atm, natm, bas, nbas, env, ishls, jshls, non_opt, time0, pct, count, stdout) \
         private(di, dj, dk, dl, i, j, k, l, ij, kl, kl_max, shls, buf, time1)
 #pragma omp for nowait schedule(dynamic, 2)
         for (ij = 0; ij < nbas*(nbas+1)/2; ij++) {
@@ -760,7 +760,7 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
         pct = 0; count = 0;
 
 #pragma omp parallel default(none) \
-        shared(atm, bas, env, ishls, jshls, opt_for_cint2e, time0, pct, count, stdout) \
+        shared(atm, natm, bas, nbas, env, ishls, jshls, opt_for_cint2e, time0, pct, count, stdout) \
         private(di, dj, dk, dl, i, j, k, l, ij, kl, kl_max, shls, buf, time1)
 #pragma omp for nowait schedule(dynamic, 2)
         for (ij = 0; ij < nbas*(nbas+1)/2; ij++) {
@@ -803,7 +803,7 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
         printf("\tGradients with optimizer: total num ERI = %.2e\n", tot);
         pct = 0; count = 0;
 #pragma omp parallel default(none) \
-        shared(atm, bas, env, ishls, jshls, opt_for_ip1, time0, pct, count, stdout) \
+        shared(atm, natm, bas, nbas, env, ishls, jshls, opt_for_ip1, time0, pct, count, stdout) \
         private(di, dj, dk, dl, i, j, k, l, ij, kl, shls, buf, time1)
 #pragma omp for nowait schedule(dynamic, 2)
         for (ij = 0; ij < nbas*nbas; ij++) {
