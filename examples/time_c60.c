@@ -7,9 +7,6 @@
 #include <omp.h>
 #include "cint.h"
 
-#define atm(X,Y) atm[(X)+(Y)*ATM_SLOTS]
-
-
 void run_all(int *atm, int natm, int *bas, int nbas, double *env);
 
 int main()
