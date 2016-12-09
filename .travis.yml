@@ -32,7 +32,6 @@ script:
 - env
 - mkdir build
 - cd build
-- find /usr/ -name gfortran\*
 - if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${CC}" = "gcc" ]; then brew install gcc6 && export CC=gcc-6 CXX=g++-6 ; fi
 - if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${CC}" = "clang" ]; then brew install llvm38 && export CC=clang-3.8 CXX=clang-3.8 ; fi
 - export CMAKE_C_COMPILER=$CC
