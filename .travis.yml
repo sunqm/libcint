@@ -11,6 +11,9 @@ compiler:
 - gcc
 - clang
 matrix:
+  allow_failures:
+  - os: osx
+    compiler: clang
 addons:
   apt:
     sources:
