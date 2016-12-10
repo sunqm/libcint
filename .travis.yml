@@ -1,0 +1,48 @@
+sudo: false
+language: c
+env:
+# this is for Python, per http://danielnouri.org/notes/2012/11/23/use-apt-get-to-install-python-dependencies-for-travis-ci/
+virtualenv:
+  system_site_packages: true
+os:
+- linux
+- osx
+compiler:
+- gcc
+- clang
+matrix:
+  allow_failures:
+  - os: osx
+    compiler: clang
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    # clang-3.8 comes from this
+    - llvm-toolchain-precise
+    packages:
+    - cmake
+    - python-numpy
+    - gcc-5
+    - g++-5
+    - gfortran-5
+    # This should provide OpenMP
+    - clang-3.8
+script:
+- env
+- mkdir build
+- cd build
+- if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${CC}" = "gcc" ]; then brew install gcc6 && export CC=gcc-6 CXX=g++-6 ; fi
+- if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${CC}" = "clang" ]; then brew install llvm38 && export CC=clang-3.8 CXX=clang-3.8 ; fi
+- export CMAKE_C_COMPILER=$CC
+- export CMAKE_CXX_COMPILER=$CXX
+- export CMAKE_C_FLAGS="-O3 -fopenmp"
+- export CMAKE_CXX_FLAGS="-O3 -fopenmp"
+- echo 'if the following fails, use `cmake --debug-output ..` instead'
+- cmake .. -DQUICK_TEST=1
+- make
+- echo 'cannot do `make test` right now'
+after_failure:
+- echo "FAILURE"
+- find . -name CMakeOutput.log -exec cat {} ";"
+- find . -name CMakeError.log -exec cat {} ";"
