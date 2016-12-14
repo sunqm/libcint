@@ -56,8 +56,9 @@ set(cintSrc
   src/autocode/gaunt1.c src/autocode/breit1.c)
 
 set(BUILD_SHARED_LIBS 1)
-option(ENABLE_EXAMPLE "build examples and tests" 0)
+option(ENABLE_EXAMPLE "build tests" 0)
 
+option(ENABLE_TEST "build tests" 0)
 if(QUICK_TEST)
   set(RUN_QUICK_TEST --quick)
 endif()
@@ -75,10 +76,12 @@ target_link_libraries(cint ${BLAS_LIBRARIES})
 install(TARGETS cint DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
 
-if(BUILD_SHARED_LIBS AND ENABLE_EXAMPLE)
+if(ENABLE_EXAMPLE)
   enable_language(Fortran)
   add_subdirectory(examples)
+endif()
 
+if(BUILD_SHARED_LIBS AND ENABLE_TEST)
   find_package(PythonInterp)
   message(STATUS "Found python  ${PYTHON_EXECUTABLE}")
   if(PYTHONINTERP_FOUND)
