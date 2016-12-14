@@ -3,9 +3,10 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 #include <omp.h>
 #include "cint.h"
+
+
 
 void run_all(int *atm, int natm, int *bas, int nbas, double *env);
 
@@ -702,10 +703,10 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
                CINTtot_pgto_spheric(bas, nbas));
 
         int pct, count;
-        clock_t time0, time1 = 0;
+        double time0, time1 = 0;
         double tt, tot;
         tot = (double)ncgto*ncgto*ncgto*ncgto/8;
-        time0 = clock();
+        time0 = omp_get_wtime();
 
         CINTOpt *non_opt = NULL;
         CINTOpt *opt_for_cint2e = NULL;
@@ -742,14 +743,13 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
                 count += kl_max;
                 if (100*count/((long)nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
                         pct++;
-                        time1 = clock();
-                        printf("\t%d%%, CPU time = %8.2f\r", pct,
-                               (double)(time1-time0)/CLOCKS_PER_SEC);
+                        time1 = omp_get_wtime();
+                        printf("\t%d%%, CPU time = %8.2f\r", pct, time1-time0);
                         fflush(stdout);
                 }
         }
-        time1 = clock();
-        tt = (double)(time1-time0)/CLOCKS_PER_SEC;
+        time1 = omp_get_wtime();
+        tt = time1-time0;
         printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n",
                tt, tot/1e6/tt);
         /* */
@@ -784,14 +784,13 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
                 count += kl_max;
                 if (100*count/((long)nbas*nbas*(nbas+1)*(nbas+2)/8) > pct) {
                         pct++;
-                        time1 = clock();
-                        printf("\t%d%%, CPU time = %8.2f\r", pct,
-                               (double)(time1-time0)/CLOCKS_PER_SEC);
+                        time1 = omp_get_wtime();
+                        printf("\t%d%%, CPU time = %8.2f\r", pct, time1-time0);
                         fflush(stdout);
                 }
         }
-        time1 = clock();
-        tt = (double)(time1-time0)/CLOCKS_PER_SEC;
+        time1 = omp_get_wtime();
+        tt = time1-time0;
         printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n",
                tt, tot/1e6/tt);
 
@@ -825,16 +824,15 @@ void run_all(int *atm, int natm, int *bas, int nbas, double *env)
                 count += nbas*(nbas+1)/2;
                 if (100*count/((long)nbas*nbas*nbas*(nbas+1)/2) > pct) {
                         pct++;
-                        time1 = clock();
+                        time1 = omp_get_wtime();
                         printf("\t%d%%, CPU time = %8.2f\r", pct,
-                               (double)(time1-time0)/CLOCKS_PER_SEC);
+                               time1-time0);
                         fflush(stdout);
                 }
         }
-        time1 = clock();
-        tt = (double)(time1-time0)/CLOCKS_PER_SEC;
-        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n",
-               tt, tot/1e6/tt);
+        time1 = omp_get_wtime();
+        tt = time1-time0;
+        printf("\t100%%, CPU time = %8.2f, %8.4f Mflops\n", tt, tot/1e6/tt);
 
         CINTdel_optimizer(&opt_for_cint2e);
         CINTdel_optimizer(&opt_for_ip1);
