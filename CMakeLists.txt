@@ -55,16 +55,15 @@ set(cintSrc
   src/autocode/auto_3c2e.c src/autocode/auto_3c1e.c
   src/autocode/gaunt1.c src/autocode/breit1.c)
 
-set(BUILD_SHARED_LIBS 1)
-option(ENABLE_EXAMPLE "build tests" 0)
-
+option(BUILD_SHARED_LIBS "build shared libraries" 1)
+option(ENABLE_EXAMPLE "build examples" 0)
 option(ENABLE_TEST "build tests" 0)
 if(QUICK_TEST)
   set(RUN_QUICK_TEST --quick)
 endif()
 
 if(ENABLE_STATIC)
-  option(BUILD_SHARED_LIBS 0)
+  set(BUILD_SHARED_LIBS 0)
 endif()
 
 add_library(cint ${cintSrc})
