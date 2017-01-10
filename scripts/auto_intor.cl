@@ -164,6 +164,7 @@
 (gen-cint "auto_3c2e.c"
   '("cint3c2e_ip1_sph"  spheric  (nabla \, \| ))
   '("cint3c2e_ip2_sph"  spheric  ( \, \| nabla))
+  '("cint3c2e_pvp1_sph"  spheric  (p* \, dot p \|))
   '("cint2c2e_ip1_sph"  spheric  (nabla \| r12 \| ))
   '("cint2c2e_ip2_sph"  spheric  ( \| r12 \| nabla))
   '("cint2e_ip2_sph"    spheric  ( \, \| r12 \| nabla \,))

@@ -1,3 +1,6 @@
+Version 2.8.9 (2017-01-09):
+	* New 3c2e integral (pi dot pj|k)
+
 Version 2.8.8 (2016-10-13):
 	* Use float128 for high order rys_roots
 
