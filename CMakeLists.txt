@@ -34,6 +34,9 @@ include_directories(
   ${PROJECT_BINARY_DIR}/include
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}/src)
+if(QUADMATH_FOUND)
+  include_directories(${QUADMATH_INCLUDE_DIR})
+endif()
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/src/config.h.in"
@@ -71,6 +74,9 @@ set_target_properties(cint PROPERTIES
   VERSION ${cint_VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 target_link_libraries(cint ${BLAS_LIBRARIES})
+if(QUADMATH_FOUND)
+  target_link_libraries(cint ${QUADMATH_LIBRARY})
+endif()
 
 install(TARGETS cint DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
