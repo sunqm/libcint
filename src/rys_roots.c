@@ -1515,7 +1515,7 @@ static void R_dsmit(double *cs, double *s, FINT n)
         }
 L60:
         if (fac < 0) {
-                fprintf(stderr, "libcint::rys_roots negative value in sqrt\n");
+                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d\n", n);
                 exit(1);
         }
         fac = 1 / sqrt(fac);
@@ -1763,7 +1763,7 @@ static void R_lsmit(long double *cs, long double *s, FINT n)
         }
 
         if (fac < 0) {
-                fprintf(stderr, "libcint::rys_roots negative value in sqrt\n");
+                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d\n", n);
                 exit(1);
         }
         fac = 1 / SQRTL(fac);
