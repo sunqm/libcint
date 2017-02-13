@@ -16,3 +16,10 @@ target_link_libraries(spinor_f    cint m)
 target_link_libraries(time_c2h6   cint m)
 target_link_libraries(time_c60    cint m)
 
+set_target_properties(time_c2h6 PROPERTIES
+  COMPILE_FLAGS ${OpenMP_C_FLAGS}
+  LINK_FLAGS ${OpenMP_C_FLAGS})
+set_target_properties(time_c60 PROPERTIES
+  COMPILE_FLAGS ${OpenMP_C_FLAGS}
+  LINK_FLAGS ${OpenMP_C_FLAGS})
+
