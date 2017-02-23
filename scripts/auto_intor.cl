@@ -76,6 +76,8 @@
   '("cint2e_spgsp1"         spinor  (g sigma dot p \, sigma dot p \| \,))
   '("cint2e_g1spsp2"        spinor  (g \, \| sigma dot p \, sigma dot p))
   '("cint2e_spgsp1spsp2"    spinor  (g sigma dot p \, sigma dot p \| sigma dot p \, sigma dot p))
+  '("cint2e_pp1"            spinor  (p* \, dot p \| \,))
+  '("cint2e_pp1pp2"         spinor  (p* \, dot p \| p* \, dot p))
   ; for DKB
   '("cint1e_spspsp"         spinor  (sigma dot p \| sigma dot p sigma dot p))
   '("cint1e_spnuc"          spinor  (sigma dot p \| nuc \|))
