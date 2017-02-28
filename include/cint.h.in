@@ -125,6 +125,7 @@ void CINTshells_spinor_offset(FINT ao_loc[], const FINT *bas, const FINT nbas);
 
 double *CINTc2s_bra_sph(double *sph, FINT nket, double *cart, FINT l);
 double *CINTc2s_ket_sph(double *sph, FINT nket, double *cart, FINT l);
+double *CINTc2s_ket_sph1(double *sph, FINT lds, double *cart, FINT ldc, FINT l);
 
 
 double CINTgto_norm(FINT n, double a);

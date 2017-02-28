@@ -2942,6 +2942,16 @@ static double *a_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
         return gsph;
 }
 
+static double *a_ket_cart2spheric1(double *gsph, FINT ldg, double *gcart,
+                                   FINT nbra, FINT l)
+{
+        const FINT nf = CINTlen_cart(l);
+        const FINT nd = l * 2 + 1;
+        c2s_dgemm('N', 'N', nbra, nd, nf,
+                  1, gcart, nbra, g_c2s[l].cart2sph, nf, 0, gsph, ldg);
+        return gsph;
+}
+
 // transform s function from cartesian to spheric
 static double *s_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
 {
@@ -2960,6 +2970,15 @@ static double *s_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
                 gsph[i] = gcart[i];
         }*/
         return gcart;
+}
+static double *s_ket_cart2spheric1(double *gsph, FINT ldg, double *gcart,
+                                   FINT nbra, FINT l)
+{
+        FINT i;
+        for (i = 0; i < nbra; i++) {
+                gsph[i] = gcart[i];
+        }
+        return gsph;
 }
 
 // transform p function from cartesian to spheric
@@ -2988,6 +3007,17 @@ static double *p_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
                 gsph[2*nbra+i] = gcart[2*nbra+i];
         }*/
         return gcart;
+}
+static double *p_ket_cart2spheric1(double *gsph, FINT ldg, double *gcart,
+                                   FINT nbra, FINT l)
+{
+        FINT i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*ldg+i] = gcart[0*nbra+i];
+                gsph[1*ldg+i] = gcart[1*nbra+i];
+                gsph[2*ldg+i] = gcart[2*nbra+i];
+        }
+        return gsph;
 }
 
 // transform d function from cartesian to spheric
@@ -3024,6 +3054,24 @@ static double *d_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
                 gsph[3*nbra+i] = coeff_c2s[20] * gcart[2*nbra+i];
                 gsph[4*nbra+i] = coeff_c2s[24] * gcart[0*nbra+i]
                                + coeff_c2s[27] * gcart[3*nbra+i];
+        }
+        return pgsph;
+}
+static double *d_ket_cart2spheric1(double *gsph, FINT ldg, double *gcart,
+                                   FINT nbra, FINT l)
+{
+        const double *coeff_c2s = g_c2s[2].cart2sph;
+        double *const pgsph = gsph;
+        FINT i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*ldg+i] = coeff_c2s[ 1] * gcart[1*nbra+i];
+                gsph[1*ldg+i] = coeff_c2s[10] * gcart[4*nbra+i];
+                gsph[2*ldg+i] = coeff_c2s[12] * gcart[0*nbra+i]
+                              + coeff_c2s[15] * gcart[3*nbra+i]
+                              + coeff_c2s[17] * gcart[5*nbra+i];
+                gsph[3*ldg+i] = coeff_c2s[20] * gcart[2*nbra+i];
+                gsph[4*ldg+i] = coeff_c2s[24] * gcart[0*nbra+i]
+                              + coeff_c2s[27] * gcart[3*nbra+i];
         }
         return pgsph;
 }
@@ -3078,6 +3126,32 @@ static double *f_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
                                + coeff_c2s[57] * gcart[7*nbra+i];
                 gsph[6*nbra+i] = coeff_c2s[60] * gcart[0*nbra+i]
                                + coeff_c2s[63] * gcart[3*nbra+i];
+        }
+        return pgsph;
+}
+static double *f_ket_cart2spheric1(double *gsph, FINT ldg, double *gcart,
+                                   FINT nbra, FINT l)
+{
+        const double *coeff_c2s = g_c2s[3].cart2sph;
+        double *const pgsph = gsph;
+        FINT i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*ldg+i] = coeff_c2s[ 1] * gcart[1*nbra+i]
+                              + coeff_c2s[ 6] * gcart[6*nbra+i];
+                gsph[1*ldg+i] = coeff_c2s[14] * gcart[4*nbra+i];
+                gsph[2*ldg+i] = coeff_c2s[21] * gcart[1*nbra+i]
+                              + coeff_c2s[26] * gcart[6*nbra+i]
+                              + coeff_c2s[28] * gcart[8*nbra+i];
+                gsph[3*ldg+i] = coeff_c2s[32] * gcart[2*nbra+i]
+                              + coeff_c2s[37] * gcart[7*nbra+i]
+                              + coeff_c2s[39] * gcart[9*nbra+i];
+                gsph[4*ldg+i] = coeff_c2s[40] * gcart[0*nbra+i]
+                              + coeff_c2s[43] * gcart[3*nbra+i]
+                              + coeff_c2s[45] * gcart[5*nbra+i];
+                gsph[5*ldg+i] = coeff_c2s[52] * gcart[2*nbra+i]
+                              + coeff_c2s[57] * gcart[7*nbra+i];
+                gsph[6*ldg+i] = coeff_c2s[60] * gcart[0*nbra+i]
+                              + coeff_c2s[63] * gcart[3*nbra+i];
         }
         return pgsph;
 }
@@ -3159,6 +3233,44 @@ static double *g_ket_cart2spheric(double *gsph, FINT nbra, double *gcart, FINT l
         }
         return pgsph;
 }
+static double *g_ket_cart2spheric1(double *gsph, FINT ldg, double *gcart,
+                                   FINT nbra, FINT l)
+{
+        const double *coeff_c2s = g_c2s[4].cart2sph;
+        double *const pgsph = gsph;
+        FINT i;
+        for (i = 0; i < nbra; i++) {
+                gsph[0*ldg+i] = coeff_c2s[  1] * gcart[ 1*nbra+i]
+                              + coeff_c2s[  6] * gcart[ 6*nbra+i];
+                gsph[1*ldg+i] = coeff_c2s[ 19] * gcart[ 4*nbra+i]
+                              + coeff_c2s[ 26] * gcart[11*nbra+i];
+                gsph[2*ldg+i] = coeff_c2s[ 31] * gcart[ 1*nbra+i]
+                              + coeff_c2s[ 36] * gcart[ 6*nbra+i]
+                              + coeff_c2s[ 38] * gcart[ 8*nbra+i];
+                gsph[3*ldg+i] = coeff_c2s[ 49] * gcart[ 4*nbra+i]
+                              + coeff_c2s[ 56] * gcart[11*nbra+i]
+                              + coeff_c2s[ 58] * gcart[13*nbra+i];
+                gsph[4*ldg+i] = coeff_c2s[ 60] * gcart[ 0*nbra+i]
+                              + coeff_c2s[ 63] * gcart[ 3*nbra+i]
+                              + coeff_c2s[ 65] * gcart[ 5*nbra+i]
+                              + coeff_c2s[ 70] * gcart[10*nbra+i]
+                              + coeff_c2s[ 72] * gcart[12*nbra+i]
+                              + coeff_c2s[ 74] * gcart[14*nbra+i];
+                gsph[5*ldg+i] = coeff_c2s[ 77] * gcart[ 2*nbra+i]
+                              + coeff_c2s[ 82] * gcart[ 7*nbra+i]
+                              + coeff_c2s[ 84] * gcart[ 9*nbra+i];
+                gsph[6*ldg+i] = coeff_c2s[ 90] * gcart[ 0*nbra+i]
+                              + coeff_c2s[ 95] * gcart[ 5*nbra+i]
+                              + coeff_c2s[100] * gcart[10*nbra+i]
+                              + coeff_c2s[102] * gcart[12*nbra+i];
+                gsph[7*ldg+i] = coeff_c2s[107] * gcart[ 2*nbra+i]
+                              + coeff_c2s[112] * gcart[ 7*nbra+i];
+                gsph[8*ldg+i] = coeff_c2s[120] * gcart[ 0*nbra+i]
+                              + coeff_c2s[123] * gcart[ 3*nbra+i]
+                              + coeff_c2s[130] * gcart[10*nbra+i];
+        }
+        return pgsph;
+}
 
 /*
  * return the address of gemm results, for s,p function, results ==
@@ -3194,6 +3306,22 @@ double *(*c2s_ket_sph[])() = {
         a_ket_cart2spheric,
         a_ket_cart2spheric,
         a_ket_cart2spheric,
+};
+
+double *(*c2s_ket_sph1[])() = {
+        s_ket_cart2spheric1,
+        p_ket_cart2spheric1,
+        d_ket_cart2spheric1,
+        f_ket_cart2spheric1,
+        g_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
+        a_ket_cart2spheric1,
 };
 
 
@@ -7447,6 +7575,10 @@ double *CINTc2s_bra_sph(double *gsph, FINT nket, double *gcart, FINT l)
 double *CINTc2s_ket_sph(double *gsph, FINT nbra, double *gcart, FINT l)
 {
         return (c2s_ket_sph[l])(gsph, nbra, gcart, l);
+}
+double *CINTc2s_ket_sph1(double *sph, FINT lds, double *cart, FINT ldc, FINT l)
+{
+        return (c2s_ket_sph1[l])(sph, lds, cart, ldc, l);
 }
 void CINTc2s_bra_spinor_e1sf(double complex *gsp, FINT nket,
                              double *gcart, FINT l, FINT kappa)
