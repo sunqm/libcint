@@ -17,11 +17,11 @@ else ()
 endif (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.8)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-#find_package(QUADMATH)
-#if(QUADMATH_FOUND)
-#  set(HAVE_QUADMATH_H 1 CACHE INTERNAL "Have QUADMATH")
-#endif()
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+find_package(QUADMATH)
+if(QUADMATH_FOUND)
+  set(HAVE_QUADMATH_H 1 CACHE INTERNAL "Have QUADMATH")
+endif()
 
 find_package(BLAS REQUIRED)
 
@@ -30,9 +30,9 @@ set(CMAKE_REQUIRED_INCLUDES math.h)
 set(CMAKE_REQUIRED_LIBRARIES m)
 check_function_exists(expl HAVE_EXPL)
 check_function_exists(sqrtl HAVE_SQRTL)
-set(CMAKE_REQUIRED_INCLUDES quadmath.h)
-set(CMAKE_REQUIRED_LIBRARIES quadmath)
-check_function_exists(fabsq HAVE_QUADMATH_H)
+#set(CMAKE_REQUIRED_INCLUDES quadmath.h)
+#set(CMAKE_REQUIRED_LIBRARIES quadmath)
+#check_function_exists(fabsq HAVE_QUADMATH_H)
 
 include_directories(
   ${PROJECT_BINARY_DIR}/include
@@ -75,7 +75,7 @@ set_target_properties(cint PROPERTIES
   VERSION ${cint_VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 target_link_libraries(cint ${BLAS_LIBRARIES})
-if(HAVE_QUADMATH_H)
+if(QUADMATH_FOUND)
   target_link_libraries(cint quadmath)
 endif()
 
