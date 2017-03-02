@@ -11,20 +11,7 @@
  */
 FINT CINTlen_cart(const FINT l)
 {
-        switch (l) {
-                case 0:
-                        return 1;
-                case 1:
-                        return 3;
-                case 2:
-                        return 6;
-                case 3:
-                        return 10;
-                case 4:
-                        return 15;
-                default:
-                        return (l + 1) * (l + 2) / 2;
-        }
+        return (l + 1) * (l + 2) / 2;
 }
 
 FINT CINTlen_spinor(const FINT bas_id, const FINT *bas)
@@ -43,11 +30,13 @@ FINT CINTlen_spinor(const FINT bas_id, const FINT *bas)
  */
 FINT CINTcgtos_cart(const FINT bas_id, const FINT *bas)
 {
-        return CINTlen_cart(bas(ANG_OF, bas_id)) * bas(NCTR_OF, bas_id);
+        int l = bas(ANG_OF, bas_id);
+        return (l+1)*(l+2)/2 * bas(NCTR_OF, bas_id);
 }
 FINT CINTcgto_cart(const FINT bas_id, const FINT *bas)
 {
-        return CINTlen_cart(bas(ANG_OF, bas_id)) * bas(NCTR_OF, bas_id);
+        int l = bas(ANG_OF, bas_id);
+        return (l+1)*(l+2)/2 * bas(NCTR_OF, bas_id);
 }
 
 /* 

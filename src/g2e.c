@@ -53,10 +53,10 @@ FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         envs->j_ctr = bas(NCTR_OF, j_sh);
         envs->k_ctr = bas(NCTR_OF, k_sh);
         envs->l_ctr = bas(NCTR_OF, l_sh);
-        envs->nfi = CINTlen_cart(envs->i_l);
-        envs->nfj = CINTlen_cart(envs->j_l);
-        envs->nfk = CINTlen_cart(envs->k_l);
-        envs->nfl = CINTlen_cart(envs->l_l);
+        envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
+        envs->nfj = (envs->j_l+1)*(envs->j_l+2)/2;
+        envs->nfk = (envs->k_l+1)*(envs->k_l+2)/2;
+        envs->nfl = (envs->l_l+1)*(envs->l_l+2)/2;
         envs->nf = envs->nfi * envs->nfk * envs->nfl * envs->nfj;
 
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));

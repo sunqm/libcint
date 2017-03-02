@@ -30,8 +30,8 @@ FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         envs->j_prim = bas(NPRIM_OF, j_sh);
         envs->i_ctr = bas(NCTR_OF, i_sh);
         envs->j_ctr = bas(NCTR_OF, j_sh);
-        envs->nfi = CINTlen_cart(envs->i_l);
-        envs->nfj = CINTlen_cart(envs->j_l);
+        envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
+        envs->nfj = (envs->j_l+1)*(envs->j_l+2)/2;
         envs->nf = envs->nfi * envs->nfj;
 
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));

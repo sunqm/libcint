@@ -39,8 +39,8 @@ FINT CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shl
         envs->k_prim = bas(NPRIM_OF, k_sh);
         envs->i_ctr = bas(NCTR_OF, i_sh);
         envs->k_ctr = bas(NCTR_OF, k_sh);
-        envs->nfi = CINTlen_cart(envs->i_l);
-        envs->nfk = CINTlen_cart(envs->k_l);
+        envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
+        envs->nfk = (envs->k_l+1)*(envs->k_l+2)/2;
         envs->nf = envs->nfi * envs->nfk;
 
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
