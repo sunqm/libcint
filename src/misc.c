@@ -49,6 +49,14 @@ void CINTdcmplx_np(const FINT n, double complex *z,
                 z[i] = -re[i] + im[i] * _Complex_I;
         }
 }
+void CINTdcmplx_nn(const FINT n, double complex *z,
+                   const double *re, const double *im)
+{
+        FINT i;
+        for (i = 0; i < n; i++) {
+                z[i] = -re[i] - im[i] * _Complex_I;
+        }
+}
 
 
 double CINTsquare_dist(const double *r1, const double *r2)
