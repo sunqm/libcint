@@ -102,6 +102,8 @@ typedef struct {
 } CINTOpt;
 #endif
 
+#include <complex.h>
+
 FINT CINTlen_cart(const FINT l);
 FINT CINTlen_spinor(const FINT bas_id, const FINT *bas);
 

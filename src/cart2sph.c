@@ -7700,7 +7700,7 @@ static void s_ket_cart2spinor_si1(double complex *gspa, double complex *gspb,
                                   double complex *gcart,
                                   FINT lds, FINT nbra, FINT l, FINT kappa)
 {
-        double complex *gcart11 = gcart   + nbra;
+        double complex *gcart11 = gcart;
         double complex *gcart12 = gcart11 + nbra;
         double complex *gcart21 = gcart12 + nbra;
         double complex *gcart22 = gcart21 + nbra;
@@ -7716,7 +7716,7 @@ static void s_iket_cart2spinor_si1(double complex *gspa, double complex *gspb,
                                    double complex *gcart,
                                    FINT lds, FINT nbra, FINT l, FINT kappa)
 {
-        double complex *gcart11 = gcart   + nbra;
+        double complex *gcart11 = gcart;
         double complex *gcart12 = gcart11 + nbra;
         double complex *gcart21 = gcart12 + nbra;
         double complex *gcart22 = gcart21 + nbra;
@@ -9721,7 +9721,7 @@ static void g_ket_cart2spinor_si1(double complex *gspa, double complex *gspb,
                                       + cimag(coeff_c2s[229]) * gcart [nbra*19+i]*_Complex_I
                                       + creal(coeff_c2s[232]) * gcart [nbra*22+i]
                                       + cimag(coeff_c2s[236]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[8*nbra+i]= creal(coeff_c2s[242]) * gcart [nbra* 2+i]
+                        gspa[8*lds+i] = creal(coeff_c2s[242]) * gcart [nbra* 2+i]
                                       + cimag(coeff_c2s[244]) * gcart [nbra* 4+i]*_Complex_I
                                       + creal(coeff_c2s[247]) * gcart [nbra* 7+i]
                                       + cimag(coeff_c2s[251]) * gcart [nbra*11+i]*_Complex_I
@@ -9821,7 +9821,7 @@ static void g_ket_cart2spinor_si1(double complex *gspa, double complex *gspb,
                                       + cimag(coeff_c2s[229]) * gcart1[nbra*19+i]*_Complex_I
                                       + creal(coeff_c2s[232]) * gcart1[nbra*22+i]
                                       + cimag(coeff_c2s[236]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[8*nbra+i]= creal(coeff_c2s[242]) * gcart1[nbra* 2+i]
+                        gspb[8*lds+i] = creal(coeff_c2s[242]) * gcart1[nbra* 2+i]
                                       + cimag(coeff_c2s[244]) * gcart1[nbra* 4+i]*_Complex_I
                                       + creal(coeff_c2s[247]) * gcart1[nbra* 7+i]
                                       + cimag(coeff_c2s[251]) * gcart1[nbra*11+i]*_Complex_I
@@ -10300,18 +10300,18 @@ void CINTc2s_ket_spinor_si1(double complex *gspa, double complex *gspb, double *
         const FINT nf = (l+1)*(l+2)/2;
         const FINT ngc = nf * ldc;
         const double *gc_x = gcart;
-        const double *gc_y = gc_x + nf * ldc;
-        const double *gc_z = gc_y + nf * ldc;
-        const double *gc_1 = gc_z + nf * ldc;
+        const double *gc_y = gc_x + ngc;
+        const double *gc_z = gc_y + ngc;
+        const double *gc_1 = gc_z + ngc;
         double complex *tmp = malloc(sizeof(double complex)*ngc*4);
         //cmplx( gctr.POS_1, gctr.POS_Z)
         //cmplx( gctr.POS_Y, gctr.POS_X)
-        CINTdcmplx_pp(nf, tmp      , gc_1, gc_z);
-        CINTdcmplx_pp(nf, tmp+ngc  , gc_y, gc_x);
+        CINTdcmplx_pp(ngc, tmp      , gc_1, gc_z);
+        CINTdcmplx_pp(ngc, tmp+ngc  , gc_y, gc_x);
         //cmplx(-gctr.POS_Y, gctr.POS_X)
         //cmplx( gctr.POS_1,-gctr.POS_Z)
-        CINTdcmplx_np(nf, tmp+ngc*2, gc_y, gc_x);
-        CINTdcmplx_pn(nf, tmp+ngc*3, gc_1, gc_z);
+        CINTdcmplx_np(ngc, tmp+ngc*2, gc_y, gc_x);
+        CINTdcmplx_pn(ngc, tmp+ngc*3, gc_1, gc_z);
         (c2s_ket_spinor_si1[l])(gspa, gspb, tmp, lds, ldc, l, kappa);
         free(tmp);
 }
@@ -10321,18 +10321,18 @@ void CINTc2s_iket_spinor_si1(double complex *gspa, double complex *gspb, double 
         const FINT nf = (l+1)*(l+2)/2;
         const FINT ngc = nf * ldc;
         const double *gc_x = gcart;
-        const double *gc_y = gc_x + nf * ldc;
-        const double *gc_z = gc_y + nf * ldc;
-        const double *gc_1 = gc_z + nf * ldc;
+        const double *gc_y = gc_x + ngc;
+        const double *gc_z = gc_y + ngc;
+        const double *gc_1 = gc_z + ngc;
         double complex *tmp = malloc(sizeof(double complex)*ngc*4);
         //cmplx( gctr.POS_1, gctr.POS_Z)
         //cmplx( gctr.POS_Y, gctr.POS_X)
-        CINTdcmplx_pp(nf, tmp      , gc_1, gc_z);
-        CINTdcmplx_pp(nf, tmp+ngc  , gc_y, gc_x);
+        CINTdcmplx_pp(ngc, tmp      , gc_1, gc_z);
+        CINTdcmplx_pp(ngc, tmp+ngc  , gc_y, gc_x);
         //cmplx(-gctr.POS_Y, gctr.POS_X)
         //cmplx( gctr.POS_1,-gctr.POS_Z)
-        CINTdcmplx_np(nf, tmp+ngc*2, gc_y, gc_x);
-        CINTdcmplx_pn(nf, tmp+ngc*3, gc_1, gc_z);
+        CINTdcmplx_np(ngc, tmp+ngc*2, gc_y, gc_x);
+        CINTdcmplx_pn(ngc, tmp+ngc*3, gc_1, gc_z);
         (c2s_iket_spinor_si1[l])(gspa, gspb, tmp, lds, ldc, l, kappa);
         free(tmp);
 }
