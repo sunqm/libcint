@@ -1,3 +1,6 @@
+Version 2.8.11 (2017-03-06):
+	* New 1e integral <pi |Vnuc| dot pj>
+
 Version 2.8.10 (2017-02-22):
 	* New 2e integrals (pi dot pj|kl),  (pi dot pj|pk dot pl)
 

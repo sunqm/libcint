@@ -63,6 +63,7 @@
   '("cint1e_spgsp"          spinor  (g sigma dot p \| sigma dot p))
   '("cint1e_spgnucsp"       spinor  (g sigma dot p \| nuc \| sigma dot p))
   '("cint1e_spgsa01"        spinor  (g sigma dot p \| nabla-rinv cross sigma \|))
+  '("cint1e_pnucp"          spinor  (p* \| nuc dot p \| ))
   ;'("cint2e"                spinor  (, \| \, ))
   '("cint2e_spsp1"          spinor  (sigma dot p \, sigma dot p \| \, ))
   '("cint2e_spsp1spsp2"     spinor  (sigma dot p \, sigma dot p \| sigma dot p \, sigma dot p ))
