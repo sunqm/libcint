@@ -29,6 +29,7 @@ FINT cint2e_breit_##X(double complex *opijkl, FINT *shls, \
                           FINT *atm, FINT natm, \
                           FINT *bas, FINT nbas, double *env, CINTOpt *opt) \
 { \
+        /* Gaunt */ \
         FINT has_value = cint2e_##X(opijkl, shls, atm, natm, bas, nbas, env, NULL); \
  \
         const FINT ip = CINTcgto_spinor(shls[0], bas); \
@@ -40,13 +41,13 @@ FINT cint2e_breit_##X(double complex *opijkl, FINT *shls, \
         FINT i; \
         has_value = (cint2e_gauge_r1_##X(buf, shls, atm, natm, bas, nbas, env, NULL) || \
                      has_value); \
-        /* [1/2 gaunt] - [1/2 xxx*\sigma\dot r1] */ \
+        /* [1/2 gaunt] - [1/2 xxx*\sigma1\dot r1] */ \
         if (has_value) { \
                 for (i = 0; i < nop; i++) { \
                         opijkl[i] = -opijkl[i] - buf[i]; \
                 } \
         } \
-        /* ... [- 1/2 xxx*\sigma\dot(-r2)] */ \
+        /* ... [- 1/2 xxx*\sigma1\dot(-r2)] */ \
         has_value = (cint2e_gauge_r2_##X(buf, shls, atm, natm, bas, nbas, env, NULL) || \
                      has_value); \
         if (has_value) { \

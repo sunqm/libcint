@@ -204,12 +204,12 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
 {
         FINT i;
         if (t < m + 1.5) {
-                __float128 b = m + 0.5l;
+                __float128 b = m + .5q;
                 __float128 x = 1;
                 __float128 s = 1;
-                __float128 e = .5l * expl(-t);
+                __float128 e = .5q * expq(-t);
                 if (t < SML_FLOAT80) {
-                        f[m] = .5l / b;
+                        f[m] = .5q / b;
                 } else {
                         //f[m] = fmtpse(m, t);
                         for (i = 1; x > SML_FLOAT80; i++)
@@ -227,11 +227,11 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
                 }
         } else {
                 __float128 pi2 = PI_SQRD_128;
-                __float128 tt = sqrtl(t);
-                f[0] = pi2 / tt * erfl(tt);
+                __float128 tt = sqrtq(t);
+                f[0] = pi2 / tt * erfq(tt);
                 if (m > 0) {
-                        __float128 e = expl(-t);
-                        __float128 b = .5l / t;
+                        __float128 e = expq(-t);
+                        __float128 b = .5q / t;
                         for (i = 1; i <= m; i++)
                                 f[i] = b * ((2*i-1) * f[i-1] - e);
                 }
