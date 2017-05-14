@@ -1946,19 +1946,15 @@ double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs)
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
 
-        double theta, u;
+        double theta, w;
         if (omega > 0) {
 // For long-range part of range-separated Coulomb operator
                 theta = omega * omega / (omega * omega + a0);
                 a0 *= theta;
-                x = a0 * rr;
-                u = rys_root1(x);
-                u /= u + 1 - u * theta;
-        } else {
-                x = a0 * rr;
-                u = rys_root1(x);
         }
-        return sqrt(a0 / (a1 * a1 * a1)) * fac * u;
+        x = a0 * rr;
+        w = rys_root1(x);
+        return sqrt(a0 / (a1 * a1 * a1)) * fac * w;
 }
 
 /*
