@@ -181,8 +181,8 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
                 //:w *= t;
                 //:uu = t/(1-t);
                 for (i = 0; i < nroots; i++) {
-                        w[0] *= u[0];
-                        u[0] = u[0] / (1 - u[0]);
+                        w[i] *= u[i];
+                        u[i] = u[i] / (1 - u[i]);
                 }
         }
         if (envs->g_size == 1) {

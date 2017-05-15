@@ -1571,7 +1571,7 @@ static inline void _g0_lj_4d_2100(double *g, double *c0, double *cp,
 
 
 
-void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -1665,17 +1665,17 @@ error:
         exit(1);
 }
 
-void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_kj2d_4d(g, envs);
 }
-void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_ik2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_ik2d_4d(g, envs);
 }
-void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_il2d_4d(g, envs);
@@ -1731,6 +1731,7 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         if (envs->g_size == 1) {
                 g[0] = 1;
                 g[1] = 1;
+                g[2] *= fac1;
                 return;
         }
 
@@ -1765,7 +1766,7 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                 w[irys] *= fac1;
         }
 
-        (*envs->f_g0_2d4d)(g, envs, &bc);
+        (*envs->f_g0_2d4d)(g, &bc, envs);
 }
 
 /*

@@ -197,6 +197,7 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
         if (envs->g_size == 1) {
                 g[0] = 1;
                 g[1] = 1;
+                g[2] *= fac1;
                 return;
         }
 

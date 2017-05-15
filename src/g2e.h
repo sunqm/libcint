@@ -30,10 +30,10 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 
 void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
 void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+void CINTg0_2e_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
+void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
+void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
+void CINTg0_2e_ik2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
 void CINTnabla1i_2e(double *f, const double *g,
                     const FINT li, const FINT lj, const FINT lk, const FINT ll,

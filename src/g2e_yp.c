@@ -183,8 +183,8 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
                 //:uu = t/(1-t);
                 double ua2 = 2. * ua[0] / yp_zeta;
                 for (i = 0; i < nroots; i++) {
-                        w[0] *= (1-u[0]) * ua2;
-                        u[0] = u[0] / (1 - u[0]);
+                        w[i] *= (1-u[i]) * ua2;
+                        u[i] = u[i] / (1 - u[i]);
                 }
         }
         if (envs->g_size == 1) {

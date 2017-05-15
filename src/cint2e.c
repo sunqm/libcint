@@ -176,7 +176,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                                 fac1i = fac1j*expijkl;
                                         }
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, *gempty);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
                                         PRIM2CTR0(i, gout, envs->nf*n_comp);
 i_contracted: ;
                                 } // end loop i_prim
@@ -314,7 +314,7 @@ FINT CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cac
                                         SET_RIJ(i, j);
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, *empty);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, *empty);
                                         *empty = 0;
 i_contracted: ;
                                 } // end loop i_prim
@@ -372,7 +372,7 @@ FINT CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cac
                                         SET_RIJ(i, j);
                                         fac1i = fac1j*expij*expkl;
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, 1);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, 1);
                                         PRIM2CTR(i, gout,envs->nf*n_comp);
 i_contracted: ;
                                 } // end loop i_prim
@@ -431,7 +431,7 @@ FINT CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cac
                                         SET_RIJ(i, j);
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, *iempty);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, *iempty);
                                         *iempty = 0;
 i_contracted: ;
                                 } // end loop i_prim
@@ -492,7 +492,7 @@ FINT CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cac
                                         SET_RIJ(i, j);
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, *jempty);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, *jempty);
                                         *jempty = 0;
 i_contracted: ;
                                 } // end loop i_prim
@@ -553,7 +553,7 @@ FINT CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cac
                                         SET_RIJ(i, j);
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, *kempty);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, *kempty);
                                         *kempty = 0;
 i_contracted: ;
                                 } // end loop i_prim
@@ -706,7 +706,7 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cache)
                                                 fac1i = fac1j*expijkl;
                                         }
                                         (*envs->f_g0_2e)(g, fac1i, envs);
-                                        (*envs->f_gout)(g, gout, envs->idx, envs, *gempty);
+                                        (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
                                         PRIM2CTR(i, gout, envs->nf*n_comp);
 i_contracted: ;
                                 } // end loop i_prim
@@ -936,7 +936,7 @@ FINT CINT2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTO
 /*
  * <ki|jl> = (ij|kl); i,j\in electron 1; k,l\in electron 2
  */
-void CINTgout2e(double *g, double *gout, FINT *idx,
+void CINTgout2e(double *gout, double *g, FINT *idx,
                 CINTEnvVars *envs, FINT gout_empty)
 {
         FINT nf = envs->nf;

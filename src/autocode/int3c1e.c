@@ -15,9 +15,7 @@
 #include "c2f.h"
 static void CINTgout1e_int3c1e_p2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg3c1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * 1;
 int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
@@ -74,9 +72,7 @@ ALL_CINT(int3c1e_p2)
 ALL_CINT_FORTRAN_(int3c1e_p2)
 static void CINTgout1e_int3c1e_r2_origk(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg3c1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * 1;
 int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
@@ -133,9 +129,7 @@ ALL_CINT(int3c1e_r2_origk)
 ALL_CINT_FORTRAN_(int3c1e_r2_origk)
 static void CINTgout1e_int3c1e_r4_origk(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg3c1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * 1;
 int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
@@ -288,9 +282,7 @@ ALL_CINT(int3c1e_r4_origk)
 ALL_CINT_FORTRAN_(int3c1e_r4_origk)
 static void CINTgout1e_int3c1e_r6_origk(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg3c1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * 1;
 int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;

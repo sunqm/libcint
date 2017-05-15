@@ -15,9 +15,7 @@
 #include "c2f.h"
 /* <SIGMA DOT P i|OVLP |SIGMA DOT P SIGMA DOT P j> */
 static void CINTgout1e_int1e_spspsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * 4;
 int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
@@ -66,10 +64,10 @@ s[23] = + g0[ix+0]*g2[iy+0]*g5[iz+0];
 s[24] = + g1[ix+0]*g0[iy+0]*g6[iz+0];
 s[25] = + g0[ix+0]*g1[iy+0]*g6[iz+0];
 s[26] = + g0[ix+0]*g0[iy+0]*g7[iz+0];
-gout[n*4+0] = - s[0] - s[12] - s[24];
-gout[n*4+1] = - s[1] - s[13] - s[25];
-gout[n*4+2] = - s[2] - s[14] - s[26];
-gout[n*4+3] = 0;
+gout[n*4+0] += - s[0] - s[12] - s[24];
+gout[n*4+1] += - s[1] - s[13] - s[25];
+gout[n*4+2] += - s[2] - s[14] - s[26];
+gout[n*4+3] += 0;
 }}
 void int1e_spspsp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 2, 0, 0, 3, 4, 1, 1};
@@ -103,9 +101,7 @@ ALL_CINT1E(int1e_spspsp)
 ALL_CINT1E_FORTRAN_(int1e_spspsp)
 /* <SIGMA DOT P i|NUC |j> */
 static void CINTgout1e_int1e_spnuc(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * 4;
 int ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
@@ -118,10 +114,10 @@ iz = idx[2+n*3];
 s[0] = + g1[ix+0]*g0[iy+0]*g0[iz+0];
 s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
 s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
-gout[n*4+0] = + s[0];
-gout[n*4+1] = + s[1];
-gout[n*4+2] = + s[2];
-gout[n*4+3] = 0;
+gout[n*4+0] += + s[0];
+gout[n*4+1] += + s[1];
+gout[n*4+2] += + s[2];
+gout[n*4+3] += 0;
 }}
 void int1e_spnuc_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 0, 0, 0, 1, 4, 0, 1};

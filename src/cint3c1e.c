@@ -155,7 +155,7 @@ FINT CINT3c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                 }
                                 dijk = fac1i / (aijk * sqrt(aijk));
                                 CINTg3c1e_ovlp(g, ai[ip], aj[jp], ak[kp], dijk, envs);
-                                (*envs->f_gout)(g, gout, envs->idx, envs, *gempty);
+                                (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
 
                                 PRIM2CTR0(i, gout, envs->nf*n_comp);
                         } // end loop i_prim
@@ -291,7 +291,7 @@ FINT CINT3c1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
         exit(1);
 }
 
-void CINTgout3c1e(double *g, double *gout, FINT *idx, CINTEnvVars *envs, FINT gout_empty)
+void CINTgout3c1e(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty)
 {
         FINT ix, iy, iz, n;
 
@@ -336,6 +336,17 @@ FINT int3c1e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
         envs.f_gout = &CINTgout3c1e;
         return CINT3c1e_cart_drv(out, dims, &envs, opt, cache);
 }
+
+FINT int3c1e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+                   FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
+{
+        FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+        CINTEnvVars envs;
+        CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout3c1e;
+        return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1);
+}
+
 
 ALL_CINT(int3c1e)
 ALL_CINT_FORTRAN_(int3c1e)

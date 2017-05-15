@@ -14,7 +14,7 @@
 #include "fblas.h"
 #include "c2f.h"
 /* (NABLA i j|R12 |k) */
-static void CINTgout2e_int3c2e_ip1(double *gout,
+void CINTgout2e_int3c2e_ip1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -97,7 +97,7 @@ return CINT3c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 0);
 ALL_CINT(int3c2e_ip1)
 ALL_CINT_FORTRAN_(int3c2e_ip1)
 /* (i j|R12 |NABLA k) */
-static void CINTgout2e_int3c2e_ip2(double *gout,
+void CINTgout2e_int3c2e_ip2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -180,7 +180,7 @@ return CINT3c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 0);
 ALL_CINT(int3c2e_ip2)
 ALL_CINT_FORTRAN_(int3c2e_ip2)
 /* (P* i DOT P j|R12 |k) */
-static void CINTgout2e_int3c2e_pvp1(double *gout,
+void CINTgout2e_int3c2e_pvp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -413,7 +413,7 @@ return CINT2c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_1e);
 ALL_CINT(int2c2e_ip2)
 ALL_CINT_FORTRAN_(int2c2e_ip2)
 /* (G i j|R12 |k) */
-static void CINTgout2e_int3c2e_ig1(double *gout,
+void CINTgout2e_int3c2e_ig1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -542,7 +542,7 @@ return CINT3c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 0);
 ALL_CINT(int3c2e_ig1)
 ALL_CINT_FORTRAN_(int3c2e_ig1)
 /* (SIGMA DOT P i SIGMA DOT P j|R12 |k) */
-static void CINTgout2e_int3c2e_spsp1(double *gout,
+void CINTgout2e_int3c2e_spsp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -615,7 +615,7 @@ return CINT3c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_si_3c2e1, 0);
 ALL_CINT(int3c2e_spsp1)
 ALL_CINT_FORTRAN_(int3c2e_spsp1)
 /* (NABLA SIGMA DOT P i SIGMA DOT P j|R12 |k) */
-static void CINTgout2e_int3c2e_ipspsp1(double *gout,
+void CINTgout2e_int3c2e_ipspsp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -730,7 +730,7 @@ return CINT3c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_si_3c2e1, 0);
 ALL_CINT(int3c2e_ipspsp1)
 ALL_CINT_FORTRAN_(int3c2e_ipspsp1)
 /* (SIGMA DOT P i SIGMA DOT P j|R12 |NABLA k) */
-static void CINTgout2e_int3c2e_spsp1ip2(double *gout,
+void CINTgout2e_int3c2e_spsp1ip2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;

@@ -64,8 +64,7 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lj_ceil = envs->j_l + ng[JINC];
         envs->lk_ceil = 0; // to reuse CINTg0_2e_lj2d4d
         envs->ll_ceil = envs->k_l + ng[KINC];
-        envs->nrys_roots =(envs->li_ceil + envs->lj_ceil
-                         + envs->lk_ceil)/2 + 1;
+        envs->nrys_roots =(envs->li_ceil + envs->lj_ceil + envs->ll_ceil)/2 + 1;
 
         FINT dli, dlj, dlk;
         FINT ibase = envs->li_ceil > envs->lj_ceil;

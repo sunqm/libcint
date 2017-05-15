@@ -91,15 +91,17 @@
     (loop for s in assemb
           for gid from 0 do
           (format fout "gout[n*~a+~a] =~a;~%" comp gid s))))
-(defun gen-c-block-with-empty (fout flat-script)
-  (format fout "if (gout_empty) {~%")
-  (gen-c-block fout flat-script)
-  (format fout "~%} else {~%")
+(defun gen-c-block+ (fout flat-script)
   (let ((assemb (to-c-code-string fout #'cell-converter flat-script))
         (comp (length flat-script)))
     (loop for s in assemb
           for gid from 0 do
-          (format fout "gout[n*~a+~a] +=~a;~%" comp gid s)))
+          (format fout "gout[n*~a+~a] +=~a;~%" comp gid s))))
+(defun gen-c-block-with-empty (fout flat-script)
+  (format fout "if (gout_empty) {~%")
+  (gen-c-block fout flat-script)
+  (format fout "~%} else {~%")
+  (gen-c-block+ fout flat-script)
   (format fout "~%}"))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -336,10 +338,8 @@ iz = idx[2];~%")
            (goutinc (length flat-script)))
       (format fout "static void CINTgout1e_~a" intname)
       (format fout "(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
-CINTg1e_ovlp(g, envs, count);
 int nf = envs->nf;
-int nfc = nf * ~a;~%" goutinc)
-      (format fout "int ix, iy, iz, n;
+int ix, iy, iz, n;
 double *g0 = g;~%")
       (loop
         for i in (range (1- (ash 1 tot-bits))) do
@@ -362,7 +362,7 @@ ix = idx[0+n*3];
 iy = idx[1+n*3];
 iz = idx[2+n*3];~%")
       (dump-s-for-nroots fout tot-bits 1)
-      (gen-c-block fout flat-script)
+      (gen-c-block+ fout flat-script)
       (format fout "}}~%")
       goutinc)))
 
@@ -759,7 +759,7 @@ return 0; }~%")))
            (k-len (length k-rev))
            (tot-bits (+ i-len j-len op-len k-len))
            (goutinc (length flat-script)))
-      (format fout "static void CINTgout2e_~a(double *gout,
+      (format fout "void CINTgout2e_~a(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
       (format fout "int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1024,10 +1024,8 @@ int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache
            (goutinc (length flat-script)))
       (format fout "static void CINTgout1e_~a(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int count) {~%" intname)
-      (format fout "CINTg3c1e_ovlp(g, envs, count);
-int nf = envs->nf;
-int nfc = nf * ~a;~%" goutinc)
-      (format fout "int ix, iy, iz, n;
+      (format fout "int nf = envs->nf;
+int ix, iy, iz, n;
 double *g0 = g;~%")
       (if (breit-int? op)
         (loop for i in (range (ash 1 tot-bits)) do

@@ -53,6 +53,7 @@ void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lj_ceil = envs->j_l + ng[JINC];
         envs->lk_ceil = envs->k_l + ng[KINC];
         envs->ll_ceil = 0;
+        envs->nrys_roots = 1;
 
         envs->common_factor = SQRTPI * M_PI
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
