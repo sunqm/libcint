@@ -10,11 +10,8 @@
 #include "misc.h"
 #include "g1e.h"
 
-#define MAX(X,Y) (X)>(Y)?(X):(Y)
-
-FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
-                             const FINT *atm, const FINT natm,
-                             const FINT *bas, const FINT nbas, const double *env)
+void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -29,15 +26,18 @@ FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shl
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
+        envs->l_l = 0;
         envs->i_prim = bas(NPRIM_OF, i_sh);
         envs->j_prim = bas(NPRIM_OF, j_sh);
         envs->k_prim = bas(NPRIM_OF, k_sh);
-        envs->i_ctr = bas(NCTR_OF, i_sh);
-        envs->j_ctr = bas(NCTR_OF, j_sh);
-        envs->k_ctr = bas(NCTR_OF, k_sh);
+        envs->x_ctr[0] = bas(NCTR_OF, i_sh);
+        envs->x_ctr[1] = bas(NCTR_OF, j_sh);
+        envs->x_ctr[2] = bas(NCTR_OF, k_sh);
+        envs->x_ctr[3] = 1;
         envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
         envs->nfj = (envs->j_l+1)*(envs->j_l+2)/2;
         envs->nfk = (envs->k_l+1)*(envs->k_l+2)/2;
+        envs->nfl = 1;
         envs->nf = envs->nfi * envs->nfj * envs->nfk;
 
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
@@ -46,11 +46,13 @@ FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shl
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
+        envs->ncomp_e2 = 0;
         envs->ncomp_tensor = ng[TENSOR];
 
         envs->li_ceil = envs->i_l + ng[IINC];
         envs->lj_ceil = envs->j_l + ng[JINC];
         envs->lk_ceil = envs->k_l + ng[KINC];
+        envs->ll_ceil = 0;
 
         envs->common_factor = SQRTPI * M_PI
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
@@ -62,13 +64,13 @@ FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shl
         envs->g_stride_i = 1;
         envs->g_stride_j = dli;
         envs->g_stride_k = dli * dlj;
+        envs->g_stride_l = envs->g_stride_k;
         FINT nmax = envs->li_ceil + dlj;
         envs->g_size     = MAX(dli*dlj*dlk, dli*nmax);
 
         envs->rirj[0] = envs->ri[0] - envs->rj[0];
         envs->rirj[1] = envs->ri[1] - envs->rj[1];
         envs->rirj[2] = envs->ri[2] - envs->rj[2];
-        return 0;
 }
 
 void CINTg3c1e_index_xyz(FINT *idx, const CINTEnvVars *envs)

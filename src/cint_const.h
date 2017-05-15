@@ -10,8 +10,12 @@
 #define PTR_COMMON_ORIG         1
 #define PTR_RINV_ORIG           4
 #define PTR_RINV_ZETA           7
-// omega parameter in range-separated coulomb operator
+// omega parameter in range-separated coulomb operator erf(omega*r12)/r12
 #define PTR_RANGE_OMEGA         8
+// Yukawa potential
+#define PTR_F12_YP_ZETA         9
+// slater-type geminal e^{-zeta r}
+#define PTR_F12_STG_ZETA        10
 #define PTR_ENV_START           20
 
 // slots of atm
@@ -83,15 +87,14 @@
 
 // some other boundaries
 #define MXRYSROOTS      16 // > ANG_MAX*2+1 for 4c2e
-#define ANG_MAX         12 // l = 0..7 ..14
+#define ANG_MAX         12 // l = 0..12
 #define CART_MAX        128 // > (ANG_MAX*(ANG_MAX+1)/2)
 #define SHLS_MAX        0x7fffffff
-#define NPRIM_MAX       0x7fffffff
-#define NCTR_MAX        0x7fffffff
+#define NPRIM_MAX       64
+#define NCTR_MAX        64
 
 #define EXPCUTOFF       100
-// ~ 1e-15
-#define CUTOFF15        36
+#define CUTOFF15        40
 
 #define OF_CMPLX        2
 

@@ -30,12 +30,12 @@ FINT CINTlen_spinor(const FINT bas_id, const FINT *bas)
  */
 FINT CINTcgtos_cart(const FINT bas_id, const FINT *bas)
 {
-        int l = bas(ANG_OF, bas_id);
+        FINT l = bas(ANG_OF, bas_id);
         return (l+1)*(l+2)/2 * bas(NCTR_OF, bas_id);
 }
 FINT CINTcgto_cart(const FINT bas_id, const FINT *bas)
 {
-        int l = bas(ANG_OF, bas_id);
+        FINT l = bas(ANG_OF, bas_id);
         return (l+1)*(l+2)/2 * bas(NCTR_OF, bas_id);
 }
 

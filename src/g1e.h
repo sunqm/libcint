@@ -9,10 +9,10 @@
 #define HAVE_DEFINED_CINTENVVARS_H
 // ref to CINTinit_int1e_EnvVars, CINTinit_int2e_EnvVars
 typedef struct {
-        const FINT *atm;
-        const FINT *bas;
-        const double *env;
-        const FINT *shls;
+        FINT *atm;
+        FINT *bas;
+        double *env;
+        FINT *shls;
         FINT natm;
         FINT nbas;
 
@@ -24,20 +24,17 @@ typedef struct {
         FINT j_prim;
         FINT k_prim;
         FINT l_prim;
-        FINT i_ctr;
-        FINT j_ctr;
-        FINT k_ctr;
-        FINT l_ctr;
+        FINT x_ctr[4];
         FINT nfi;  // number of cartesion components
         FINT nfj;
         FINT nfk;
         FINT nfl;
         FINT nf;  // = nfi*nfj*nfk*nfl;
         FINT _padding1;
-        const double *ri;
-        const double *rj;
-        const double *rk;
-        const double *rl;
+        double *ri;
+        double *rj;
+        double *rk;
+        double *rl;
         double common_factor;
 
         FINT gbits;
@@ -59,14 +56,13 @@ typedef struct {
 
         FINT g2d_ijmax;
         FINT g2d_klmax;
-        const double *rx_in_rijrx;
-        const double *rx_in_rklrx;
+        double *rx_in_rijrx;
+        double *rx_in_rklrx;
         double rirj[3]; // diff by an sign in different g0_2d4d algorithm
         double rkrl[3];
 
         void (*f_g0_2d4d)();
-
-        /* */
+        void (*f_g0_2e)();
         void (*f_gout)();
 
         /* values are assigned during calculation */
@@ -84,52 +80,61 @@ typedef struct {
 } CINTEnvVars;
 #endif
 
-FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
-                           const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
+void CINTinit_int1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
-void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs);
+void CINTg1e_index_xyz(FINT *idx, CINTEnvVars *envs);
 
-void CINTg_ovlp(double *g, const double ai, const double aj,
-                const double fac, const CINTEnvVars *envs);
+void CINTg_ovlp(double *g, double ai, double aj, double fac, CINTEnvVars *envs);
 
-void CINTg_nuc(double *g, const double aij, const double *rij,
-               const double *cr, const double t2, const double fac,
-               const CINTEnvVars *envs);
+void CINTg_nuc(double *g, double aij, double *rij,
+               double *cr, double t2, double fac, CINTEnvVars *envs);
 
-void CINTnabla1i_1e(double *f, const double *g,
-                    const FINT li, const FINT lj, const CINTEnvVars *envs);
+void CINTnabla1i_1e(double *f, double *g,
+                    FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
 
-void CINTnabla1j_1e(double *f, const double *g,
-                    const FINT li, const FINT lj, const CINTEnvVars *envs);
+void CINTnabla1j_1e(double *f, double *g,
+                    FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
 
-void CINTx1i_1e(double *f, const double *g, const double ri[3],
-                const FINT li, const FINT lj, const CINTEnvVars *envs);
+void CINTnabla1k_1e(double *f, double *g,
+                    FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
 
-void CINTx1j_1e(double *f, const double *g, const double rj[3],
-                const FINT li, const FINT lj, const CINTEnvVars *envs);
+void CINTx1i_1e(double *f, double *g, double ri[3],
+                FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
 
-void CINTprim_to_ctr(double *gc, const FINT nf, const double *gp,
-                     const FINT inc, const FINT nprim,
-                     const FINT nctr, const double *pcoeff);
-void CINTprim_to_ctr_0(double *gc, const FINT nf, const double *gp,
-                       const FINT nprim, const FINT nctr, const double *coeff);
-void CINTprim_to_ctr_1(double *gc, const FINT nf, const double *gp,
-                       const FINT nprim, const FINT nctr, const double *coeff);
-void CINTprim_to_ctr_opt(double *gc, const FINT nf, const double *gp,
+void CINTx1j_1e(double *f, double *g, double rj[3],
+                FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
+
+void CINTx1k_1e(double *f, double *g, double rk[3],
+                FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
+
+void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
+                     FINT inc, FINT nprim,
+                     FINT nctr, double *pcoeff);
+void CINTprim_to_ctr_0(double *gc, FINT nf, double *gp,
+                       FINT nprim, FINT nctr, double *coeff);
+void CINTprim_to_ctr_1(double *gc, FINT nf, double *gp,
+                       FINT nprim, FINT nctr, double *coeff);
+void CINTprim_to_ctr_opt(double *gc, FINT nf, double *gp,
                          double *non0coeff, FINT *non0idx, FINT non0ctr);
 
 double CINTcommon_fac_sp(FINT l);
 
-#define G1E_D_I(f, g, li, lj)   CINTnabla1i_1e(f, g, li, lj, envs)
-#define G1E_D_J(f, g, li, lj)   CINTnabla1j_1e(f, g, li, lj, envs)
+#define G1E_D_I(f, g, li, lj, lk)   CINTnabla1i_1e(f, g, li, lj, lk, envs)
+#define G1E_D_J(f, g, li, lj, lk)   CINTnabla1j_1e(f, g, li, lj, lk, envs)
+#define G1E_D_K(f, g, li, lj, lk)   CINTnabla1k_1e(f, g, li, lj, lk, envs)
 /* r-R_0, R_0 is (0,0,0) */
-#define G1E_R0I(f, g, li, lj)   CINTx1i_1e(f, g, ri, li, lj, envs)
-#define G1E_R0J(f, g, li, lj)   CINTx1j_1e(f, g, rj, li, lj, envs)
+#define G1E_R0I(f, g, li, lj, lk)   CINTx1i_1e(f, g, envs->ri, li, lj, lk, envs)
+#define G1E_R0J(f, g, li, lj, lk)   CINTx1j_1e(f, g, envs->rj, li, lj, lk, envs)
+#define G1E_R0K(f, g, li, lj, lk)   CINTx1k_1e(f, g, envs->rk, li, lj, lk, envs)
 /* r-R_C, R_C is common origin */
-#define G1E_RCI(f, g, li, lj)   CINTx1i_1e(f, g, dri, li, lj, envs)
-#define G1E_RCJ(f, g, li, lj)   CINTx1j_1e(f, g, drj, li, lj, envs)
+#define G1E_RCI(f, g, li, lj, lk)   CINTx1i_1e(f, g, dri, li, lj, lk, envs)
+#define G1E_RCJ(f, g, li, lj, lk)   CINTx1j_1e(f, g, drj, li, lj, lk, envs)
+#define G1E_RCK(f, g, li, lj, lk)   CINTx1k_1e(f, g, drk, li, lj, lk, envs)
 /* origin from center of each basis
  * x1[ij]_1e(f, g, ng, li, lj, 0d0) */
-#define G1E_R_I(f, g, li, lj)   f = g + 1
-#define G1E_R_J(f, g, li, lj)   f = g + envs->g_stride_j
+#define G1E_R_I(f, g, li, lj, lk)   f = g + envs->g_stride_i
+#define G1E_R_J(f, g, li, lj, lk)   f = g + envs->g_stride_j
+#define G1E_R_K(f, g, li, lj, lk)   f = g + envs->g_stride_k

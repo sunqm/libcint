@@ -19,32 +19,33 @@ typedef struct {
 } CINTOpt;
 #endif
 
-void CINTinit_2e_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
-void CINTinit_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                        const FINT *bas, const FINT nbas, const double *env);
+void CINTinit_2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env);
+void CINTinit_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                        FINT *bas, FINT nbas, double *env);
 void CINTdel_2e_optimizer(CINTOpt **opt);
 void CINTdel_optimizer(CINTOpt **opt);
 void CINTOpt_set_index_xyz(CINTOpt *opt, FINT *ng,
-                           const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
+                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTOpt_setij(CINTOpt *opt, FINT *ng,
-                   const FINT *atm, const FINT natm,
-                   const FINT *bas, const FINT nbas, const double *env);
-void CINTOpt_set_non0coeff(CINTOpt *opt, const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
+                   FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env);
 
-void CINTOpt_set_3cindex_xyz(CINTOpt *opt, FINT *ng,
-                             const FINT *atm, const FINT natm,
-                             const FINT *bas, const FINT nbas, const double *env);
-void CINTOpt_set_2cindex_xyz(CINTOpt *opt, FINT *ng,
-                             const FINT *atm, const FINT natm,
-                             const FINT *bas, const FINT nbas, const double *env);
+void CINTOpt_4cindex_xyz(CINTOpt *opt, FINT *ng,
+                         FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTOpt_3cindex_xyz(CINTOpt *opt, FINT *ng,
+                         FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTOpt_2cindex_xyz(CINTOpt *opt, FINT *ng,
+                         FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTOpt_3c1eindex_xyz(CINTOpt *opt, FINT *ng,
+                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 // optimizer examples
-void CINTno_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                      const FINT *bas, const FINT nbas, const double *env);
-void CINTuse_all_optimizer(CINTOpt **opt, FINT *ng,
-                           const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
+void CINTno_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                      FINT *bas, FINT nbas, double *env);
+void CINTall_2e_optimizer(CINTOpt **opt, FINT *ng,
+                          FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTall_3c2e_optimizer(CINTOpt **opt, FINT *ng,
+                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 

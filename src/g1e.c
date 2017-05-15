@@ -11,9 +11,9 @@
 #include "g1e.h"
 
 
-FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
-                           const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env)
+void CINTinit_int1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                           FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -28,14 +28,15 @@ FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         envs->j_l = bas(ANG_OF, j_sh);
         envs->i_prim = bas(NPRIM_OF, i_sh);
         envs->j_prim = bas(NPRIM_OF, j_sh);
-        envs->i_ctr = bas(NCTR_OF, i_sh);
-        envs->j_ctr = bas(NCTR_OF, j_sh);
+        envs->x_ctr[0] = bas(NCTR_OF, i_sh);
+        envs->x_ctr[1] = bas(NCTR_OF, j_sh);
         envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
         envs->nfj = (envs->j_l+1)*(envs->j_l+2)/2;
         envs->nf = envs->nfi * envs->nfj;
 
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
         envs->rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+        envs->common_factor = 1;
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
@@ -49,12 +50,8 @@ FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         assert(j_sh < SHLS_MAX);
         assert(envs->i_l < ANG_MAX);
         assert(envs->j_l < ANG_MAX);
-        assert(envs->i_ctr < NCTR_MAX);
-        assert(envs->j_ctr < NCTR_MAX);
         assert(envs->i_prim < NPRIM_MAX);
         assert(envs->j_prim < NPRIM_MAX);
-        assert(envs->i_prim >= envs->i_ctr);
-        assert(envs->j_prim >= envs->j_ctr);
         assert(bas(ATOM_OF,i_sh) >= 0);
         assert(bas(ATOM_OF,j_sh) >= 0);
         assert(bas(ATOM_OF,i_sh) < natm);
@@ -65,12 +62,11 @@ FINT CINTinit_int1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         FINT dlj = envs->lj_ceil + 1;
         envs->g_stride_i = 1;
         envs->g_stride_j = dli;
+        envs->g_stride_k = dli * dlj;
         envs->g_size     = dli * dlj;
-
-        return 0;
 }
 
-void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
+void CINTg1e_index_xyz(FINT *idx, CINTEnvVars *envs)
 {
         const FINT i_l = envs->i_l;
         const FINT j_l = envs->j_l;
@@ -106,8 +102,7 @@ void CINTg1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 }
 
 
-void CINTg_ovlp(double *g, const double ai, const double aj,
-                const double fac, const CINTEnvVars *envs)
+void CINTg_ovlp(double *g, double ai, double aj, double fac, CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT lj = envs->lj_ceil;
@@ -130,7 +125,7 @@ void CINTg_ovlp(double *g, const double ai, const double aj,
 
         gx[0] = 1;
         gy[0] = 1;
-        gz[0] = fac;
+        gz[0] = SQRTPI * M_PI * fac;
         if (nmax > 0) {
                 gx[1] = -ririj[0] * gx[0];
                 gy[1] = -ririj[1] * gy[0];
@@ -153,9 +148,8 @@ void CINTg_ovlp(double *g, const double ai, const double aj,
         }
 }
 
-void CINTg_nuc(double *g, const double aij, const double *rij,
-               const double *cr, const double t2, const double fac,
-               const CINTEnvVars *envs)
+void CINTg_nuc(double *g, double aij, double *rij,
+               double *cr, double t2, double fac, CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT lj = envs->lj_ceil;
@@ -177,7 +171,7 @@ void CINTg_nuc(double *g, const double aij, const double *rij,
 
         gx[0] = 1;
         gy[0] = 1;
-        gz[0] = fac;
+        gz[0] = 2 * M_PI * fac;
         if (nmax > 0) {
                 gx[1] = -rir0[0] * gx[0];
                 gy[1] = -rir0[1] * gy[0];
@@ -200,12 +194,13 @@ void CINTg_nuc(double *g, const double aij, const double *rij,
         }
 }
 
-void CINTnabla1i_1e(double *f, const double *g,
-                    const FINT li, const FINT lj, const CINTEnvVars *envs)
+void CINTnabla1i_1e(double *f, double *g,
+                    FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
 {
         const FINT dj = envs->g_stride_j;
+        const FINT dk = envs->g_stride_k;
         const double ai2 = -2 * envs->ai;
-        FINT i, j, ptr;
+        FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -213,8 +208,9 @@ void CINTnabla1i_1e(double *f, const double *g,
         double *fy = f + envs->g_size;
         double *fz = f + envs->g_size * 2;
 
+        for (k = 0; k <= lk; k++) {
         for (j = 0; j <= lj; j++) {
-                ptr = dj * j;
+                ptr = dj * j + dk * k;
                 //f(...,0,...) = -2*ai*g(...,1,...)
                 fx[ptr] = ai2 * gx[ptr+1];
                 fy[ptr] = ai2 * gy[ptr+1];
@@ -225,15 +221,16 @@ void CINTnabla1i_1e(double *f, const double *g,
                         fy[ptr+i] = i * gy[ptr+i-1] + ai2 * gy[ptr+i+1];
                         fz[ptr+i] = i * gz[ptr+i-1] + ai2 * gz[ptr+i+1];
                 }
-        }
+        } }
 }
 
-void CINTnabla1j_1e(double *f, const double *g,
-                    const FINT li, const FINT lj, const CINTEnvVars *envs)
+void CINTnabla1j_1e(double *f, double *g,
+                    FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
 {
         const FINT dj = envs->g_stride_j;
+        const FINT dk = envs->g_stride_k;
         const double aj2 = -2 * envs->aj;
-        FINT i, j, ptr;
+        FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -241,33 +238,36 @@ void CINTnabla1j_1e(double *f, const double *g,
         double *fy = f + envs->g_size;
         double *fz = f + envs->g_size * 2;
 
-        //f(...,0,...) = -2*aj*g(...,1,...)
-        for (i = 0; i <= li; i++) {
-                fx[i] = aj2 * gx[i+dj];
-                fy[i] = aj2 * gy[i+dj];
-                fz[i] = aj2 * gz[i+dj];
-        }
-        //f(...,j,...) = j*g(...,j-1,...)-2*aj*g(...,j+1,...)
-        for (j = 1; j <= lj; j++) {
-                ptr = dj * j;
+        for (k = 0; k <= lk; k++) {
+                ptr = dk * k;
+                //f(...,0,...) = -2*aj*g(...,1,...)
                 for (i = ptr; i <= ptr+li; i++) {
-                        fx[i] = j * gx[i-dj] + aj2 * gx[i+dj];
-                        fy[i] = j * gy[i-dj] + aj2 * gy[i+dj];
-                        fz[i] = j * gz[i-dj] + aj2 * gz[i+dj];
+                        fx[i] = aj2 * gx[i+dj];
+                        fy[i] = aj2 * gy[i+dj];
+                        fz[i] = aj2 * gz[i+dj];
+                }
+                //f(...,j,...) = j*g(...,j-1,...)-2*aj*g(...,j+1,...)
+                for (j = 1; j <= lj; j++) {
+                        ptr = dj * j + dk * k;
+                        for (i = ptr; i <= ptr+li; i++) {
+                                fx[i] = j * gx[i-dj] + aj2 * gx[i+dj];
+                                fy[i] = j * gy[i-dj] + aj2 * gy[i+dj];
+                                fz[i] = j * gz[i-dj] + aj2 * gz[i+dj];
+                        }
                 }
         }
 }
 
 /*
- * < x^1 i | j >
- * ri is the shift from the center R_O to the center of |i>
- * r - R_O = (r-R_i) + ri, ri = R_i - R_O
+ * ( ij | \nabla k )
  */
-void CINTx1i_1e(double *f, const double *g, const double ri[3],
-                const FINT li, const FINT lj, const CINTEnvVars *envs)
+void CINTnabla1k_1e(double *f, double *g,
+                    FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
 {
         const FINT dj = envs->g_stride_j;
-        FINT i, j, ptr;
+        const FINT dk = envs->g_stride_k;
+        const double ak2 = -2 * envs->ak;
+        FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -277,20 +277,60 @@ void CINTx1i_1e(double *f, const double *g, const double ri[3],
 
         for (j = 0; j <= lj; j++) {
                 ptr = dj * j;
-                //f(...,0:li,...) = g(...,1:li+1,...) + ri(1)*g(...,0:li,...)
-                for (i = ptr; i <= ptr + li; i++) {
+                for (i = ptr; i <= ptr+li; i++) {
+                        fx[i] = ak2 * gx[i+dk];
+                        fy[i] = ak2 * gy[i+dk];
+                        fz[i] = ak2 * gz[i+dk];
+                }
+        }
+        for (k = 1; k <= lk; k++) {
+                for (j = 0; j <= lj; j++) {
+                        ptr = dj * j + dk * k;
+                        for (i = ptr; i <= ptr+li; i++) {
+                                fx[i] = k * gx[i-dk] + ak2 * gx[i+dk];
+                                fy[i] = k * gy[i-dk] + ak2 * gy[i+dk];
+                                fz[i] = k * gz[i-dk] + ak2 * gz[i+dk];
+                        }
+                }
+        }
+}
+
+
+/*
+ * ( x^1 i j | k )
+ * ri is the shift from the center R_O to the center of |i>
+ * r - R_O = (r-R_i) + ri, ri = R_i - R_O
+ */
+void CINTx1i_1e(double *f, double *g, double ri[3],
+                FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
+{
+        FINT i, j, k, ptr;
+        const FINT dj = envs->g_stride_j;
+        const FINT dk = envs->g_stride_k;
+        const double *gx = g;
+        const double *gy = g + envs->g_size;
+        const double *gz = g + envs->g_size * 2;
+        double *fx = f;
+        double *fy = f + envs->g_size;
+        double *fz = f + envs->g_size * 2;
+
+        for (k = 0; k <= lk; k++) {
+        for (j = 0; j <= lj; j++) {
+                ptr = dj * j + dk * k;
+                for (i = ptr; i <= ptr+li; i++) {
                         fx[i] = gx[i+1] + ri[0] * gx[i];
                         fy[i] = gy[i+1] + ri[1] * gy[i];
                         fz[i] = gz[i+1] + ri[2] * gz[i];
                 }
-        }
+        } }
 }
 
-void CINTx1j_1e(double *f, const double *g, const double rj[3],
-                const FINT li, const FINT lj, const CINTEnvVars *envs)
+void CINTx1j_1e(double *f, double *g, double rj[3],
+                FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
 {
+        FINT i, j, k, ptr;
         const FINT dj = envs->g_stride_j;
-        FINT i, j, ptr;
+        const FINT dk = envs->g_stride_k;
         const double *gx = g;
         const double *gy = g + envs->g_size;
         const double *gz = g + envs->g_size * 2;
@@ -298,17 +338,40 @@ void CINTx1j_1e(double *f, const double *g, const double rj[3],
         double *fy = f + envs->g_size;
         double *fz = f + envs->g_size * 2;
 
+        for (k = 0; k <= lk; k++) {
         for (j = 0; j <= lj; j++) {
-                ptr = dj * j;
-                //f(...,0:lj,...) = g(...,1:lj+1,...) + rj(1)*g(...,0:lj,...)
-                for (i = ptr; i <= ptr + li; i++) {
+                ptr = dj * j + dk * k;
+                for (i = ptr; i <= ptr+li; i++) {
                         fx[i] = gx[i+dj] + rj[0] * gx[i];
                         fy[i] = gy[i+dj] + rj[1] * gy[i];
                         fz[i] = gz[i+dj] + rj[2] * gz[i];
                 }
-        }
+        } }
 }
 
+void CINTx1k_1e(double *f, double *g, double *rk,
+                FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
+{
+        FINT i, j, k, ptr;
+        const FINT dj = envs->g_stride_j;
+        const FINT dk = envs->g_stride_k;
+        const double *gx = g;
+        const double *gy = g + envs->g_size;
+        const double *gz = g + envs->g_size * 2;
+        double *fx = f;
+        double *fy = f + envs->g_size;
+        double *fz = f + envs->g_size * 2;
+
+        for (k = 0; k <= lk; k++) {
+        for (j = 0; j <= lj; j++) {
+                ptr = dj * j + dk * k;
+                for (i = ptr; i <= ptr+li; i++) {
+                        fx[i] = gx[i+dk] + rk[0] * gx[i];
+                        fy[i] = gy[i+dk] + rk[1] * gy[i];
+                        fz[i] = gz[i+dk] + rk[2] * gz[i];
+                }
+        } }
+}
 
 /*
  * gc    contracted GTO integral
@@ -318,11 +381,10 @@ void CINTx1j_1e(double *f, const double *g, const double rj[3],
  * shl   nth shell
  * ip    ith-1 primitive GTO
  */
-void CINTprim_to_ctr(double *gc, const FINT nf, const double *gp,
-                     const FINT inc, const FINT nprim,
-                     const FINT nctr, const double *coeff)
+void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
+                     FINT inc, FINT nprim, FINT nctr, double *coeff)
 {
-        const FINT INC1 = 1;
+        FINT INC1 = 1;
         FINT n, i, k;
         double *pgc = gc;
         double c;
@@ -345,8 +407,8 @@ void CINTprim_to_ctr(double *gc, const FINT nf, const double *gp,
 /* optimized
  * memset(gc, 0, sizeof(double)*nf*nctr);
  * CINTprim_to_ctr(gc, nf, gp, 1, nprim, nprim, nctr, coeff); */
-void CINTprim_to_ctr_0(double *gc, const FINT nf, const double *gp,
-                       const FINT nprim, const FINT nctr, const double *coeff)
+void CINTprim_to_ctr_0(double *gc, FINT nf, double *gp,
+                       FINT nprim, FINT nctr, double *coeff)
 {
         FINT n, i;
         double c0, c1;
@@ -387,7 +449,7 @@ void CINTprim_to_ctr_0(double *gc, const FINT nf, const double *gp,
 /* optimized
  * CINTprim_to_ctr(gc, nf, gp, 1, nprim, nprim, nctr, coeff);
  * with opt->non0coeff, opt->non0idx, opt->non0ctr */
-void CINTprim_to_ctr_opt(double *gc, const FINT nf, const double *gp,
+void CINTprim_to_ctr_opt(double *gc, FINT nf, double *gp,
                          double *non0coeff, FINT *non0idx, FINT non0ctr)
 {
         FINT n, i;
@@ -415,8 +477,8 @@ void CINTprim_to_ctr_opt(double *gc, const FINT nf, const double *gp,
 
 /* optimized
  * CINTprim_to_ctr(gc, nf, gp, 1, nprim, nprim, nctr, coeff); */
-void CINTprim_to_ctr_1(double *gc, const FINT nf, const double *gp,
-                       const FINT nprim, const FINT nctr, const double *coeff)
+void CINTprim_to_ctr_1(double *gc, FINT nf, double *gp,
+                       FINT nprim, FINT nctr, double *coeff)
 {
         FINT i;
         double non0coeff[32];

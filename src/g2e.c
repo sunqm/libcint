@@ -12,23 +12,13 @@
 #include "misc.h"
 #include "g2e.h"
 
-#define MIN(X,Y)        ((X) < (Y) ? (X) : (Y))
 #define DEF_GXYZ(type, G, GX, GY, GZ) \
         type *GX = G; \
         type *GY = G + envs->g_size; \
         type *GZ = G + envs->g_size * 2
 
-static void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-static void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-static void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
-static void CINTset_g2e_params(CINTEnvVars *envs);
-void CINTg0_kj2d_3d(double *g, const CINTEnvVars *envs);
-
-
-FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
-                           const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env)
+void CINTinit_int2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -49,10 +39,10 @@ FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         envs->j_prim = bas(NPRIM_OF, j_sh);
         envs->k_prim = bas(NPRIM_OF, k_sh);
         envs->l_prim = bas(NPRIM_OF, l_sh);
-        envs->i_ctr = bas(NCTR_OF, i_sh);
-        envs->j_ctr = bas(NCTR_OF, j_sh);
-        envs->k_ctr = bas(NCTR_OF, k_sh);
-        envs->l_ctr = bas(NCTR_OF, l_sh);
+        envs->x_ctr[0] = bas(NCTR_OF, i_sh);
+        envs->x_ctr[1] = bas(NCTR_OF, j_sh);
+        envs->x_ctr[2] = bas(NCTR_OF, k_sh);
+        envs->x_ctr[3] = bas(NCTR_OF, l_sh);
         envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
         envs->nfj = (envs->j_l+1)*(envs->j_l+2)/2;
         envs->nfk = (envs->k_l+1)*(envs->k_l+2)/2;
@@ -88,18 +78,10 @@ FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         assert(envs->j_l < ANG_MAX);
         assert(envs->k_l < ANG_MAX);
         assert(envs->l_l < ANG_MAX);
-        assert(envs->i_ctr < NCTR_MAX);
-        assert(envs->j_ctr < NCTR_MAX);
-        assert(envs->k_ctr < NCTR_MAX);
-        assert(envs->l_ctr < NCTR_MAX);
         assert(envs->i_prim < NPRIM_MAX);
         assert(envs->j_prim < NPRIM_MAX);
         assert(envs->k_prim < NPRIM_MAX);
         assert(envs->l_prim < NPRIM_MAX);
-        assert(envs->i_prim >= envs->i_ctr);
-        assert(envs->j_prim >= envs->j_ctr);
-        assert(envs->k_prim >= envs->k_ctr);
-        assert(envs->l_prim >= envs->l_ctr);
         assert(bas(ATOM_OF,i_sh) >= 0);
         assert(bas(ATOM_OF,j_sh) >= 0);
         assert(bas(ATOM_OF,k_sh) >= 0);
@@ -110,13 +92,6 @@ FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
         assert(bas(ATOM_OF,l_sh) < natm);
         assert(envs->nrys_roots < MXRYSROOTS);
 
-        CINTset_g2e_params(envs);
-        return 0;
-}
-
-/* set strides and parameters for g0_2d4d algorithm */
-static void CINTset_g2e_params(CINTEnvVars *envs)
-{
         FINT dli, dlj, dlk, dll;
         FINT ibase = envs->li_ceil > envs->lj_ceil;
         FINT kbase = envs->lk_ceil > envs->ll_ceil;
@@ -186,6 +161,7 @@ static void CINTset_g2e_params(CINTEnvVars *envs)
                         envs->f_g0_2d4d = &CINTg0_2e_lj2d4d;
                 }
         }
+        envs->f_g0_2e = &CINTg0_2e;
 }
 
 void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs)
@@ -414,7 +390,7 @@ void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
  * g0[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
 /* 2d is based on l,j */
-void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
+static void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -471,7 +447,7 @@ void static CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
         } }
 }
 /* 2d is based on k,j */
-void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
+static void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -528,7 +504,7 @@ void static CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
         } }
 }
 /* 2d is based on i,l */
-void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
+static void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -584,7 +560,7 @@ void static CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
         } } }
 }
 /* 2d is based on i,k */
-void static CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
+static void CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -1595,7 +1571,7 @@ static inline void _g0_lj_4d_2100(double *g, double *c0, double *cp,
 
 
 
-static void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -1689,103 +1665,17 @@ error:
         exit(1);
 }
 
-void CINTg0_3c2e_kj2d3d(double *g, const CINTEnvVars *envs,struct _BC *bc)
-{
-        FINT nmax = envs->li_ceil + envs->lj_ceil;
-        switch (nmax) {
-                case 0: switch(envs->lk_ceil) {
-                        case 0: goto _g0_4d_default; // ssss
-                        case 1: _g0_lj_4d_1000(g, bc->c0p, envs->rkrl); goto normal_end;
-                        case 2: _g0_lj_4d_2000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
-                        case 3: _g0_lj_4d_3000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
-                        default: goto _g0_4d_default; }
-                case 1: switch(envs->lk_ceil) {
-                        case 0: switch (envs->li_ceil) {
-                                case 0: _g0_lj_4d_0001(g, bc->c00, envs->rirj); goto normal_end;
-                                case 1: _g0_lj_4d_1000(g, bc->c00, envs->rirj); goto normal_end;
-                                default: goto error; }
-                        case 1: switch (envs->li_ceil) {
-                                case 0: _g0_lj_4d_0101(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
-                                case 1: _g0_lj_4d_1100(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
-                                default: goto error; }
-                        case 2: switch (envs->li_ceil) {
-                                case 0: _g0_lj_4d_0201(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
-                                case 1: _g0_lj_4d_1200(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                case 2: switch(envs->lk_ceil) {
-                        case 0: switch (envs->li_ceil) {
-                                case 0: _g0_lj_4d_0002(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                case 1: _g0_lj_4d_1001(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                case 2: _g0_lj_4d_2000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                default: goto error; }
-                        case 1: switch (envs->li_ceil) {
-                                case 0: _g0_lj_4d_0102(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
-                                case 1: _g0_lj_4d_1101(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
-                                case 2: _g0_lj_4d_2100(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                case 3: switch(envs->lk_ceil) {
-                        case 0: switch (envs->li_ceil) {
-                                case 0: _g0_lj_4d_0003(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                case 1: _g0_lj_4d_1002(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                case 2: _g0_lj_4d_2001(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                case 3: _g0_lj_4d_3000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                                default: goto error; }
-                        default: goto _g0_4d_default; }
-                default:
-_g0_4d_default:
-                        CINTg0_2e_2d(g, bc, envs);
-                        CINTg0_kj2d_3d(g, envs);
-        }
-normal_end:
-        return;
-error:
-        fprintf(stderr, "Dimension error for CINTg0_3c2e_kj2d3d: ikj = %d %d %d",
-                (int)envs->li_ceil, (int)envs->lk_ceil, (int)envs->lj_ceil);
-        exit(1);
-}
-
-void CINTg0_2c2e_ik2d(double *g, const CINTEnvVars *envs,struct _BC *bc)
-{
-        switch (envs->li_ceil) {
-                case 0: switch(envs->lk_ceil) {
-                        case 0: goto _g0_4d_default; // ssss
-                        case 1: _g0_lj_4d_1000(g, bc->c0p, envs->rkrl); goto normal_end;
-                        case 2: _g0_lj_4d_2000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
-                        case 3: _g0_lj_4d_3000(g, bc->c0p, bc->b01, envs->rkrl); goto normal_end;
-                        default: goto _g0_4d_default; }
-                case 1: switch(envs->lk_ceil) {
-                        case 0: _g0_lj_4d_1000(g, bc->c00, envs->rirj); goto normal_end;
-                        case 1: _g0_lj_4d_1100(g, bc->c00, bc->c0p, bc->b00, envs->rirj, envs->rkrl); goto normal_end;
-                        case 2: _g0_lj_4d_1200(g, bc->c00, bc->c0p, bc->b00, bc->b01, envs->rirj, envs->rkrl); goto normal_end;
-                        default: goto _g0_4d_default; }
-                case 2: switch(envs->lk_ceil) {
-                        case 0: _g0_lj_4d_2000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                        case 1: _g0_lj_4d_2100(g, bc->c00, bc->c0p, bc->b00, bc->b10, envs->rirj, envs->rkrl); goto normal_end;
-                        default: goto _g0_4d_default; }
-                case 3: switch(envs->lk_ceil) {
-                        case 0: _g0_lj_4d_3000(g, bc->c00, bc->b10, envs->rirj); goto normal_end;
-                        default: goto _g0_4d_default; }
-                default:
-_g0_4d_default:
-                        CINTg0_2e_2d(g, bc, envs);
-        }
-normal_end:
-        return;
-}
-
-static void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_kj2d_4d(g, envs);
 }
-static void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_ik2d_4d(g, envs);
 }
-static void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
+void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_il2d_4d(g, envs);
@@ -1798,11 +1688,6 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
         const double aij = envs->aij;
         const double akl = envs->akl;
-#ifdef WITH_RANGE_COULOMB
-        const double omega = envs->env[PTR_RANGE_OMEGA];
-#else
-        const double omega = 0;
-#endif
         double a0, a1, fac1, x;
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
@@ -1814,12 +1699,15 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
 
+#ifdef WITH_RANGE_COULOMB
+        const double omega = envs->env[PTR_RANGE_OMEGA];
         double theta = 0;
         if (omega > 0) {
 // For long-range part of range-separated Coulomb operator
                 theta = omega * omega / (omega * omega + a0);
                 a0 *= theta;
         }
+#endif
 
         fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
         x = a0 *(rijrkl[0] * rijrkl[0]
@@ -1828,6 +1716,7 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         CINTrys_roots(envs->nrys_roots, x, u, w);
 
         FINT irys;
+#ifdef WITH_RANGE_COULOMB
         if (omega > 0) {
                 /* u[:] = tau^2 / (1 - tau^2)
                  * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
@@ -1837,6 +1726,12 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                 for (irys = 0; irys < envs->nrys_roots; irys++) {
                         u[irys] /= u[irys] + 1 - u[irys] * theta;
                 }
+        }
+#endif
+        if (envs->g_size == 1) {
+                g[0] = 1;
+                g[1] = 1;
+                return;
         }
 
         double u2, div, tmp1, tmp2, tmp3, tmp4;
@@ -1871,94 +1766,6 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         }
 
         (*envs->f_g0_2d4d)(g, envs, &bc);
-}
-
-
-static double rys_root1(double x)
-{
-        const double pie4 = 7.85398163397448e-01;
-        double ww1;
-        double f1,e,y;
-        if (x < 3.e-7){
-                ww1 = 1.0e+00 -x/3.0e+00;
-        } else if (x < 1.) {
-                f1 = ((((((((-8.36313918003957e-08*x+1.21222603512827e-06 )*x-
-                            1.15662609053481e-05 )*x+9.25197374512647e-05 )*x-
-                          6.40994113129432e-04 )*x+3.78787044215009e-03 )*x-
-                        1.85185172458485e-02 )*x+7.14285713298222e-02 )*x-
-                      1.99999999997023e-01 )*x+3.33333333333318e-01;
-                ww1 = (x+x)*f1+exp(-x);
-        } else if (x < 3.) {
-                y = x-2.0e+00;
-                f1 = ((((((((((-1.61702782425558e-10*y+1.96215250865776e-09 )*y-
-                              2.14234468198419e-08 )*y+2.17216556336318e-07 )*y-
-                            1.98850171329371e-06 )*y+1.62429321438911e-05 )*y-
-                          1.16740298039895e-04 )*y+7.24888732052332e-04 )*y-
-                        3.79490003707156e-03 )*y+1.61723488664661e-02 )*y-
-                      5.29428148329736e-02 )*y+1.15702180856167e-01;
-                ww1 = (x+x)*f1+exp(-x);
-        } else if (x < 5.) {
-                y = x-4.0e+00;
-                f1 = ((((((((((-2.62453564772299e-11*y+3.24031041623823e-10 )*y-
-                              3.614965656163e-09)*y+3.760256799971e-08)*y-
-                            3.553558319675e-07)*y+3.022556449731e-06)*y-
-                          2.290098979647e-05)*y+1.526537461148e-04)*y-
-                        8.81947375894379e-04 )*y+4.33207949514611e-03 )*y-
-                      1.75257821619926e-02 )*y+5.28406320615584e-02;
-                ww1 = (x+x)*f1+exp(-x);
-        } else if (x < 10) {
-                e = exp(-x);
-                ww1 = (((((( 4.6897511375022e-01/x-6.9955602298985e-01)/x +
-                           5.3689283271887e-01)/x-3.2883030418398e-01)/x +
-                         2.4645596956002e-01)/x-4.9984072848436e-01)/x -
-                       3.1501078774085e-06)*e + sqrt(pie4/x);
-        } else if (x < 15) {
-                e = exp(-x);
-                ww1 = (((-1.8784686463512e-01/x+2.2991849164985e-01)/x -
-                        4.9893752514047e-01)/x-2.1916512131607e-05)*e
-                        + sqrt(pie4/x);
-        } else if (x < 33) {
-                e = exp(-x);
-                ww1 = (( 1.9623264149430e-01/x-4.9695241464490e-01)/x -
-                       6.0156581186481e-05)*e + sqrt(pie4/x);
-        } else {
-                ww1 = sqrt(pie4/x);
-        }
-        return ww1;
-}
-double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs)
-{
-        const double aij = envs->aij;
-        const double akl = envs->akl;
-#ifdef WITH_RANGE_COULOMB
-        const double omega = envs->env[PTR_RANGE_OMEGA];
-#else
-        const double omega = 0;
-#endif
-        double a0, a1, x;
-        double rijrkl[3];
-        double rr;
-        rijrkl[0] = envs->rij[0] - envs->rkl[0];
-        rijrkl[1] = envs->rij[1] - envs->rkl[1];
-        rijrkl[2] = envs->rij[2] - envs->rkl[2];
-        rr = rijrkl[0]*rijrkl[0] + rijrkl[1]*rijrkl[1] + rijrkl[2]*rijrkl[2];
-
-        a1 = aij * akl;
-        a0 = a1 / (aij + akl);
-
-        double theta, u;
-        if (omega > 0) {
-// For long-range part of range-separated Coulomb operator
-                theta = omega * omega / (omega * omega + a0);
-                a0 *= theta;
-                x = a0 * rr;
-                u = rys_root1(x);
-                u /= u + 1 - u * theta;
-        } else {
-                x = a0 * rr;
-                u = rys_root1(x);
-        }
-        return sqrt(a0 / (a1 * a1 * a1)) * fac * u;
 }
 
 /*

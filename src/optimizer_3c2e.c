@@ -11,8 +11,7 @@
 #include <string.h>
 #include "cint_const.h"
 #include "cint_bas.h"
-#include "g3c2e.h"
-#include "g2c2e.h"
+#include "g2e.h"
 #include "optimizer.h"
 #include "misc.h"
 
@@ -57,7 +56,7 @@ void CINTOpt_set_3cindex_xyz(CINTOpt *opt, FINT *ng,
                 ptr = i*ANG_MAX*ANG_MAX + j*ANG_MAX + k;
                 opt->index_xyz_array[ptr] =
                         (FINT *)malloc(sizeof(FINT)*envs.nf*3);
-                CINTg3c2e_index_xyz(opt->index_xyz_array[ptr], &envs);
+                CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
         } } }
 }
 

@@ -1,14 +1,3 @@
-/*
- *
- * Rys quadrature
- 
- Code is edited based on
- * PyQuante quantum chemistry program suite http://pyquante.sourceforge.net
- * BDF program package
-
- */
-
-
 #include "config.h"
 
 void CINTrys_roots(FINT nroots, double x, double *u, double *w);
@@ -20,3 +9,6 @@ static void R_lroot(FINT nroots, double x, double roots[], double weights[]);
 #ifdef HAVE_QUADMATH_H
 static void R_qroot(FINT nroots, double x, double roots[], double weights[]);
 #endif
+
+void CINTstg_roots(int nroots, double* ta, double* ua, double* rr, double* ww, int count);
+

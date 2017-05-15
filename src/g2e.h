@@ -21,15 +21,19 @@ struct _BC {
 
 void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs);
 
-FINT CINTinit_int2e_EnvVars(CINTEnvVars *envs, const FINT ng[],
-                            const FINT *shls,
-                            const FINT *atm, const FINT natm,
-                            const FINT *bas, const FINT nbas, const double *env);
+void CINTinit_int2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
 void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs);
-
-double CINTg0_2e_ssss(const double fac, const CINTEnvVars *envs);
+void CINTg0_2e_lj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+void CINTg0_2e_kj2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+void CINTg0_2e_il2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
+void CINTg0_2e_ik2d4d(double *g, const CINTEnvVars *envs,struct _BC *bc);
 
 void CINTnabla1i_2e(double *f, const double *g,
                     const FINT li, const FINT lj, const FINT lk, const FINT ll,
@@ -69,10 +73,10 @@ void CINTx1l_2e(double *f, const double *g, const double *rl,
 #define G2E_D_K(f, g, li, lj, lk, ll)   CINTnabla1k_2e(f, g, li, lj, lk, ll, envs)
 #define G2E_D_L(f, g, li, lj, lk, ll)   CINTnabla1l_2e(f, g, li, lj, lk, ll, envs)
 /* r-R_0, R_0 is (0,0,0) */
-#define G2E_R0I(f, g, li, lj, lk, ll)   CINTx1i_2e(f, g, ri, li, lj, lk, ll, envs)
-#define G2E_R0J(f, g, li, lj, lk, ll)   CINTx1j_2e(f, g, rj, li, lj, lk, ll, envs)
-#define G2E_R0K(f, g, li, lj, lk, ll)   CINTx1k_2e(f, g, rk, li, lj, lk, ll, envs)
-#define G2E_R0L(f, g, li, lj, lk, ll)   CINTx1l_2e(f, g, rl, li, lj, lk, ll, envs)
+#define G2E_R0I(f, g, li, lj, lk, ll)   CINTx1i_2e(f, g, envs->ri, li, lj, lk, ll, envs)
+#define G2E_R0J(f, g, li, lj, lk, ll)   CINTx1j_2e(f, g, envs->rj, li, lj, lk, ll, envs)
+#define G2E_R0K(f, g, li, lj, lk, ll)   CINTx1k_2e(f, g, envs->rk, li, lj, lk, ll, envs)
+#define G2E_R0L(f, g, li, lj, lk, ll)   CINTx1l_2e(f, g, envs->rl, li, lj, lk, ll, envs)
 /* r-R_C, R_C is common origin */
 #define G2E_RCI(f, g, li, lj, lk, ll)   CINTx1i_2e(f, g, dri, li, lj, lk, ll, envs)
 #define G2E_RCJ(f, g, li, lj, lk, ll)   CINTx1j_2e(f, g, drj, li, lj, lk, ll, envs)

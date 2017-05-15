@@ -5,20 +5,47 @@
 
 #include "config.h"
 
-#define __CVAR_CALL__   atm, *natm, bas, *nbas, env
-#define __FVAR_FUNC__   const FINT *atm, const FINT *natm, \
-                        const FINT *bas, const FINT *nbas, const double *env
-#define C2F_(NAME)      FINT NAME##_(double *op, const FINT *shls, \
-                                    __FVAR_FUNC__) \
-                        { return NAME(op, shls, __CVAR_CALL__); }
-// C2Fo for 2e integrals with optimizer
-#define C2Fo_(NAME)     FINT NAME##_(double *op, const FINT *shls, \
-                                    __FVAR_FUNC__, unsigned long *optptr) \
-                        { CINTOpt *opt = (CINTOpt *)*optptr; \
-                            return NAME(op, shls, __CVAR_CALL__, opt); }
+#define ALL_CINT_FORTRAN_(NAME) \
+int c##NAME##_sph_(double *out, int *shls, int *atm, int *natm, \
+                    int *bas, int *nbas, double *env, CINTOpt *opt) { \
+        return NAME##_sph(out, NULL, shls, \
+                          atm, *natm, bas, *nbas, env, opt, NULL); \
+} \
+void c##NAME##_sph_optimizer_(CINTOpt **opt, int *atm, int *natm, \
+                              int *bas, int *nbas, double *env) { \
+        NAME##_optimizer(opt, atm, *natm, bas, *nbas, env); \
+} \
+int c##NAME##_cart_(double *out, int *shls, int *atm, int *natm, \
+                    int *bas, int *nbas, double *env, CINTOpt *opt) { \
+        return NAME##_cart(out, NULL, shls, \
+                           atm, *natm, bas, *nbas, env, opt, NULL); \
+} \
+void c##NAME##_cart_optimizer_(CINTOpt **opt, int *atm, int *natm, \
+                               int *bas, int *nbas, double *env) { \
+        NAME##_optimizer(opt, atm, *natm, bas, *nbas, env); \
+} \
+int c##NAME##_(double *out, int *shls, int *atm, int *natm, \
+               int *bas, int *nbas, double *env, CINTOpt *opt) { \
+        return NAME##_spinor((double complex *)out, NULL, shls, \
+                             atm, *natm, bas, *nbas, env, opt, NULL); \
+} \
+void c##NAME##_optimizer_(CINTOpt **opt, int *atm, int *natm, \
+                         int *bas, int *nbas, double *env) { \
+        NAME##_optimizer(opt, atm, *natm, bas, *nbas, env); \
+}
 
-typedef long CINTOptPtrAsInteger8;
-#define OPTIMIZER2F_(NAME) \
-    void NAME##_(CINTOptPtrAsInteger8 *optptr, __FVAR_FUNC__) { \
-        CINTOpt **opt = (CINTOpt **)optptr; \
-        NAME(opt, __CVAR_CALL__); }
+#define ALL_CINT1E_FORTRAN_(NAME) \
+int c##NAME##_sph_(double *out, int *shls, int *atm, int *natm, \
+                    int *bas, int *nbas, double *env) { \
+        return NAME##_sph(out, NULL, shls, atm, *natm, bas, *nbas, env, NULL, NULL); \
+} \
+int c##NAME##_cart_(double *out, int *shls, int *atm, int *natm, \
+                    int *bas, int *nbas, double *env) { \
+        return NAME##_cart(out, NULL, shls, \
+                           atm, *natm, bas, *nbas, env, NULL, NULL); \
+} \
+int c##NAME##_(double *out, int *shls, int *atm, int *natm, \
+               int *bas, int *nbas, double *env) { \
+        return NAME##_spinor((double complex *)out, NULL, shls, \
+                             atm, *natm, bas, *nbas, env, NULL, NULL); \
+}
