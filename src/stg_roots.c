@@ -421,7 +421,7 @@ static void _matmul_14_14(double *imc, double *im, int nroot)
     }
 }
 
-void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww, int count)
+void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww)
 {
   const double* x = DATA_X + (nroots-1)*nroots/2 * 19600;
   const double* w = DATA_W + (nroots-1)*nroots/2 * 19600;
@@ -432,7 +432,7 @@ void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww, int
   double imc[14*nroots];
 
   t = ta;
-  if (t < 0.0) continue;
+  if (t < 0.0)
   if (t > 19682.99) t = 19682.99;
   u = ua;
   if (t > 1.0) {

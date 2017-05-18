@@ -219,8 +219,7 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
 
-        for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3)
-        {
+        for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3) {
                 /*
                  *t2 = u(irys)/(1+u(irys))
                  *u2 = aij*akl/(aij+akl)*t2/(1-t2)

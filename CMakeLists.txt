@@ -47,28 +47,33 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/include/cint.h.in"
   "${PROJECT_BINARY_DIR}/include/cint.h")
 
-#set(cintSrc 
-#  src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
-#  src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
-#  src/rys_roots.c
-#  src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c src/optimizer_3c2e.c 
-#  src/cint3c1e.c src/g3c1e.c src/breit.c
-#  src/autocode/auto_intor1.c src/autocode/auto_intor2.c
-#  src/autocode/auto_intor3.c src/autocode/grad1.c
-#  src/autocode/grad2.c src/autocode/grad3.c src/autocode/auto_hess.c
-#  src/autocode/auto_3c2e.c src/autocode/auto_3c1e.c
-#  src/autocode/gaunt1.c src/autocode/breit1.c)
 set(cintSrc 
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
   src/rys_roots.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c
   src/cint3c1e.c src/g3c1e.c src/breit.c
-  #src/g2e_coulerf.c src/g2e_stg.c src/g2e_yp.c src/stg_roots.c
   src/autocode/breit1.c src/autocode/dkb.c src/autocode/gaunt1.c
   src/autocode/grad1.c src/autocode/grad2.c src/autocode/hess.c
   src/autocode/int3c1e.c src/autocode/int3c2e.c src/autocode/intor1.c
   src/autocode/intor2.c src/autocode/intor3.c src/autocode/intor4.c)
+
+#option(WITH_RANGE_COULOMB "Range separated Coulomb" on)
+if(WITH_RANGE_COULOMB)
+# defined in config.h
+#  add_definitions(-DWITH_RANGE_COULOMB)
+  message("Enabled WITH_RANGE_COULOMB")
+endif(WITH_RANGE_COULOMB)
+
+if(WITH_COULOMB_ERF)
+  set(cintSrc ${cintSrc} src/g2e_coulerf.c)
+  message("Enabled WITH_COULOMB_ERF")
+endif(WITH_COULOMB_ERF)
+
+if(WITH_F12)
+  set(cintSrc ${cintSrc} src/g2e_stg.c src/g2e_yp.c src/stg_roots.c)
+  message("Enabled WITH_F12")
+endif(WITH_F12)
 
 option(BUILD_SHARED_LIBS "build shared libraries" 1)
 option(ENABLE_EXAMPLE "build examples" 0)

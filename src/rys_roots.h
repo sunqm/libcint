@@ -10,5 +10,5 @@ static void R_lroot(FINT nroots, double x, double roots[], double weights[]);
 static void R_qroot(FINT nroots, double x, double roots[], double weights[]);
 #endif
 
-void CINTstg_roots(int nroots, double* ta, double* ua, double* rr, double* ww, int count);
+void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww);
 

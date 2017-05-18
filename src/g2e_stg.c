@@ -12,6 +12,8 @@
 #include "rys_roots.h"
 #include "g2e.h"
 
+void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
+
 void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
@@ -136,8 +138,6 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         double *rij = envs->rij;
         double *rkl = envs->rkl;
         double rijrkl[3];
-        double rijrx[3];
-        double rklrx[3];
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
         double stg_zeta = envs->env[PTR_F12_STG_ZETA];
@@ -163,9 +163,9 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
         if (stg_zeta > 0) {
-                CINTstg_roots(nroots, x, ua, u, w, 1);
+                CINTstg_roots(nroots, x, ua, u, w);
         } else {
-                CINTrys_roots(nroots, x, u, w, 1);
+                CINTrys_roots(nroots, x, u, w);
         }
 
         double *gx = g;
@@ -196,29 +196,29 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
 
-        for (irys = 0; irys < nroots; irys++, c00+=3, c0p+=3)
+        for (i = 0; i < nroots; i++, c00+=3, c0p+=3) {
                 /*
                  *t2 = u(i)/(1+u(i))
                  *u2 = aij*akl/(aij+akl)*t2/(1-t2)
                  */
-                u2 = a0 * u[irys];
+                u2 = a0 * u[i];
                 div = 1 / (u2 * (aij + akl) + a1);
                 tmp1 = u2 * div;
                 tmp2 = tmp1 * akl;
                 tmp3 = tmp1 * aij;
                 tmp4 = .5 * div;
-                bc.b00[irys] = 0.5 * tmp1;
-                bc.b10[irys] = bc.b00[irys] + tmp4 * akl;
-                bc.b01[irys] = bc.b00[irys] + tmp4 * aij;
+                bc.b00[i] = 0.5 * tmp1;
+                bc.b10[i] = bc.b00[i] + tmp4 * akl;
+                bc.b01[i] = bc.b00[i] + tmp4 * aij;
                 c00[0] = rijrx[0] - tmp2 * rijrkl[0];
                 c00[1] = rijrx[1] - tmp2 * rijrkl[1];
                 c00[2] = rijrx[2] - tmp2 * rijrkl[2];
                 c0p[0] = rklrx[0] + tmp3 * rijrkl[0];
                 c0p[1] = rklrx[1] + tmp3 * rijrkl[1];
                 c0p[2] = rklrx[2] + tmp3 * rijrkl[2];
-                w[irys] *= fac1;
+                w[i] *= fac1;
         }
 
-        (*envs->f_g0_2d4d_simd1)(g, bc, envs);
+        (*envs->f_g0_2d4d)(g, bc, envs);
 }
 
