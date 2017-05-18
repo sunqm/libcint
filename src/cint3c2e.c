@@ -377,57 +377,6 @@ i_contracted: ;
         return !*jempty;
 }
 
-// k_ctr = n; i_ctr = j_ctr = l_ctr = 1;
-FINT CINT3c2e_11n_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
-{
-        COMMON_ENVS_AND_DECLARE;
-
-        const FINT nc = k_ctr;
-        const FINT leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
-        const FINT lenk = envs->nf * k_ctr * n_comp; // gctrk
-        const FINT len0 = envs->nf * n_comp; // gout
-        const FINT len = leng + lenk + len0;
-        double *const g = (double *)malloc(sizeof(double)*len);
-        double *g1 = g + leng;
-        double *gout, *gctrk;
-        if (n_comp == 1) {
-                gctrk = gctr;
-        } else {
-                gctrk = g1;
-                g1 += lenk;
-        }
-        gout = g1;
-
-        USE_OPT;
-
-        for (kp = 0; kp < envs->k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
-                fac1k = envs->common_factor * ck[kp];
-                *jempty = 1;
-                for (jp = 0; jp < envs->j_prim; jp++) {
-                        envs->aj = aj[jp];
-                        fac1j = fac1k * cj[jp];
-                        for (ip = 0; ip < envs->i_prim; ip++) {
-                                SET_RIJ;
-                                fac1i = fac1j*ci[ip]*expij;
-                                CINT2e_core(gout, g, fac1i, envs, *jempty);
-                                *jempty = 0;
-i_contracted: ;
-                        } // end loop i_prim
-                } // end loop j_prim
-                if (!*jempty) {
-                        PRIM2CTR(k, gout,envs->nf*n_comp);
-                }
-        } // end loop k_prim
-
-        if (n_comp > 1 && !*kempty) {
-                CINTdmat_transpose(gctr, gctrk, envs->nf*nc, n_comp);
-        }
-        free(g);
-        return !*kempty;
-}
-
 
 FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt)
 {
@@ -549,7 +498,7 @@ static FINT (*CINTf_3c2e_loop[8])() = {
         CINT3c2e_n11_loop,
         CINT3c2e_loop,
         CINT3c2e_1n1_loop,
-        CINT3c2e_11n_loop,
+        CINT3c2e_loop,
         CINT3c2e_111_loop,
 };
 

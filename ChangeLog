@@ -1,3 +1,6 @@
+Version 2.8.14 (2017-05-18):
+	* Fix cint3c2e bug for general contraction on auxiliary basis
+
 Version 2.8.13 (2017-05-13):
 	* Bugfix for range-separated ssss type integral;
 	* Bugfix for quad-prec gamma_inc function in rys_roots.
