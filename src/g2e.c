@@ -1681,6 +1681,14 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         CINTg0_il2d_4d(g, envs);
 }
 
+#ifdef WITH_F12
+void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
+{
+        CINTg0_2e_2d(g, bc, envs);
+        CINTg0_lj2d_4d(g, envs);
+}
+#endif
+
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
@@ -1745,6 +1753,7 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3)
         {
                 /*
+                 *u(irys) = t2/(1-t2)
                  *t2 = u(irys)/(1+u(irys))
                  *u2 = aij*akl/(aij+akl)*t2/(1-t2)
                  */

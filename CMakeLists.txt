@@ -66,12 +66,14 @@ if(WITH_RANGE_COULOMB)
 endif(WITH_RANGE_COULOMB)
 
 if(WITH_COULOMB_ERF)
-  set(cintSrc ${cintSrc} src/g2e_coulerf.c)
+  set(cintSrc ${cintSrc} src/g2e_coulerf.c src/cint2e_coulerf.c)
+  add_definitions(-DWITH_COULOMB_ERF)
   message("Enabled WITH_COULOMB_ERF")
 endif(WITH_COULOMB_ERF)
 
 if(WITH_F12)
-  set(cintSrc ${cintSrc} src/g2e_stg.c src/g2e_yp.c src/stg_roots.c)
+  set(cintSrc ${cintSrc} src/g2e_f12.c src/stg_roots.c src/cint2e_f12.c)
+  add_definitions(-DWITH_F12)
   message("Enabled WITH_F12")
 endif(WITH_F12)
 

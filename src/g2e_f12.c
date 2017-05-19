@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
  *
- * Yukawa potential
+ * Yukawa potential and Slater-type geminal
  */
 
 
@@ -13,10 +13,12 @@
 #include "rys_roots.h"
 #include "g2e.h"
 
+void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
 void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs);
+void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
-void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
+void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                               int *atm, int natm, int *bas, int nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -25,14 +27,18 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->env = env;
         envs->shls = shls;
 
-        FINT i_sh = shls[0];
-        FINT j_sh = shls[1];
-        FINT k_sh = shls[2];
-        FINT l_sh = shls[3];
+        int i_sh = shls[0];
+        int j_sh = shls[1];
+        int k_sh = shls[2];
+        int l_sh = shls[3];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
         envs->l_l = bas(ANG_OF, l_sh);
+        envs->i_prim = bas(NPRIM_OF, i_sh);
+        envs->j_prim = bas(NPRIM_OF, j_sh);
+        envs->k_prim = bas(NPRIM_OF, k_sh);
+        envs->l_prim = bas(NPRIM_OF, l_sh);
         envs->x_ctr[0] = bas(NCTR_OF, i_sh);
         envs->x_ctr[1] = bas(NCTR_OF, j_sh);
         envs->x_ctr[2] = bas(NCTR_OF, k_sh);
@@ -42,7 +48,15 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->nfk = (envs->k_l+1)*(envs->k_l+2)/2;
         envs->nfl = (envs->l_l+1)*(envs->l_l+2)/2;
         envs->nf = envs->nfi * envs->nfk * envs->nfl * envs->nfj;
-        envs->common_factor = 1;
+
+        envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
+        envs->rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
+        envs->rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
+        envs->rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
+
+        envs->common_factor = (M_PI*M_PI*M_PI)*2/SQRTPI
+                * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
+                * CINTcommon_fac_sp(envs->k_l) * CINTcommon_fac_sp(envs->l_l);
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
@@ -54,20 +68,15 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lk_ceil = envs->k_l + ng[KINC];
         envs->ll_ceil = envs->l_l + ng[LINC];
 
-        envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
-        envs->rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
-        envs->rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
-        envs->rl = env + atm(PTR_COORD, bas(ATOM_OF, l_sh));
-
         // ceil(L_tot/2) + 1
-        FINT nroots = (envs->li_ceil + envs->lj_ceil +
+        int nroots = (envs->li_ceil + envs->lj_ceil +
                       envs->lk_ceil + envs->ll_ceil + 3)/2;
         envs->nrys_roots = nroots;
         assert(nroots < MXRYSROOTS);
 
-        FINT dli, dlj, dlk, dll;
-        FINT ibase = envs->li_ceil > envs->lj_ceil;
-        FINT kbase = envs->lk_ceil > envs->ll_ceil;
+        int dli, dlj, dlk, dll;
+        int ibase = envs->li_ceil > envs->lj_ceil;
+        int kbase = envs->lk_ceil > envs->ll_ceil;
         if (kbase) {
                 if (ibase) {
                         envs->f_g0_2d4d = &CINTg0_2e_ik2d4d;
@@ -78,7 +87,7 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                 if (ibase) {
                         envs->f_g0_2d4d = &CINTg0_2e_il2d4d;
                 } else {
-                        envs->f_g0_2d4d = &CINTg0_2e_lj2d4d;
+                        envs->f_g0_2d4d = &CINTg0_2e_stg_lj2d4d;
                 }
         }
         envs->f_g0_2e = &CINTg0_2e_yp;
@@ -133,6 +142,14 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         }
 }
 
+void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                                int *atm, int natm, int *bas, int nbas, double *env)
+{
+        CINTinit_int2e_yp_EnvVars(envs, ng, shls, atm, natm, bas, nbas, env);
+        envs->f_g0_2e = &CINTg0_2e_stg;
+}
+
+
 void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x, ua;
@@ -142,8 +159,8 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
         double yp_zeta = envs->env[PTR_F12_YP_ZETA];
-        FINT nroots = envs->nrys_roots;
-        FINT i;
+        int nroots = envs->nrys_roots;
+        int i;
 
         aij = envs->ai + envs->aj;
         akl = envs->ak + envs->al;
@@ -169,25 +186,19 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
                 CINTrys_roots(nroots, x, u, w);
         }
 
-        double *gx = g;
-        double *gy = g + envs->g_size;
-        double *gz = g + envs->g_size * 2;
-        for (i = 0; i < nroots; i++) {
-                gx[i] = 1;
-                gy[i] = 1;
-                gz[i] = w[i] * fac1;
-        }
-
         if (yp_zeta > 0) {
-                //:w *= (1-t) * 2*ua/yp_zeta;
-                //:uu = t/(1-t);
-                double ua2 = 2. * ua / yp_zeta;
+                //:w *= t;
+                //:u -> t/(1-t);
                 for (i = 0; i < nroots; i++) {
-                        w[i] *= (1-u[i]) * ua2;
+                        w[i] *= u[i];
                         u[i] = u[i] / (1 - u[i]);
                 }
         }
+
         if (envs->g_size == 1) {
+                g[0] = 1;
+                g[1] = 1;
+                g[2] *= fac1;
                 return;
         }
 
@@ -200,6 +211,7 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 
         for (i = 0; i < nroots; i++, c00+=3, c0p+=3) {
                 /*
+                 *u(i) = t2/(1-t2)
                  *t2 = u(i)/(1+u(i))
                  *u2 = aij*akl/(aij+akl)*t2/(1-t2)
                  */
@@ -221,6 +233,94 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
                 w[i] *= fac1;
         }
 
-        (*envs->f_g0_2d4d)(g, bc, envs);
+        (*envs->f_g0_2d4d)(g, &bc, envs);
+}
+
+
+void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
+{
+        double aij, akl, a0, a1, fac1, x, ua;
+        double *rij = envs->rij;
+        double *rkl = envs->rkl;
+        double rijrkl[3];
+        double u[MXRYSROOTS];
+        double *w = g + envs->g_size * 2; // ~ gz
+        double stg_zeta = envs->env[PTR_F12_STG_ZETA];
+        int nroots = envs->nrys_roots;
+        int i;
+
+        aij = envs->ai + envs->aj;
+        akl = envs->ak + envs->al;
+        a1 = aij * akl;
+        a0 = a1 / (aij + akl);
+        //fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
+        fac1 = fac / (sqrt(aij+akl) * a1);
+
+        //:ua[k] = zeta*zeta / a0[k];
+        if (stg_zeta > 0) {
+                ua = .25 * stg_zeta * stg_zeta / a0;
+        }
+
+        rijrkl[0] = rij[0] - rkl[0];
+        rijrkl[1] = rij[1] - rkl[1];
+        rijrkl[2] = rij[2] - rkl[2];
+        x = a0 *(rijrkl[0] * rijrkl[0]
+               + rijrkl[1] * rijrkl[1]
+               + rijrkl[2] * rijrkl[2]);
+        if (stg_zeta > 0) {
+                CINTstg_roots(nroots, x, ua, u, w);
+        } else {
+                CINTrys_roots(nroots, x, u, w);
+        }
+
+        if (stg_zeta > 0) {
+                //:w *= (1-t) * 2*ua/stg_zeta;
+                //:u -> t/(1-t);
+                double ua2 = 2. * ua / stg_zeta;
+                for (i = 0; i < nroots; i++) {
+                        w[i] *= (1-u[i]) * ua2;
+                        u[i] = u[i] / (1 - u[i]);
+                }
+        }
+
+        if (envs->g_size == 1) {
+                g[0] = 1;
+                g[1] = 1;
+                g[2] *= fac1;
+                return;
+        }
+
+        double u2, div, tmp1, tmp2, tmp3, tmp4;
+        double *rijrx = envs->rijrx;
+        double *rklrx = envs->rklrx;
+        struct _BC bc;
+        double *c00 = bc.c00;
+        double *c0p = bc.c0p;
+
+        for (i = 0; i < nroots; i++, c00+=3, c0p+=3) {
+                /*
+                 *u(i) = t2/(1-t2)
+                 *t2 = u(i)/(1+u(i))
+                 *u2 = aij*akl/(aij+akl)*t2/(1-t2)
+                 */
+                u2 = a0 * u[i];
+                div = 1 / (u2 * (aij + akl) + a1);
+                tmp1 = u2 * div;
+                tmp2 = tmp1 * akl;
+                tmp3 = tmp1 * aij;
+                tmp4 = .5 * div;
+                bc.b00[i] = 0.5 * tmp1;
+                bc.b10[i] = bc.b00[i] + tmp4 * akl;
+                bc.b01[i] = bc.b00[i] + tmp4 * aij;
+                c00[0] = rijrx[0] - tmp2 * rijrkl[0];
+                c00[1] = rijrx[1] - tmp2 * rijrkl[1];
+                c00[2] = rijrx[2] - tmp2 * rijrkl[2];
+                c0p[0] = rklrx[0] + tmp3 * rijrkl[0];
+                c0p[1] = rklrx[1] + tmp3 * rijrkl[1];
+                c0p[2] = rklrx[2] + tmp3 * rijrkl[2];
+                w[i] *= fac1;
+        }
+
+        (*envs->f_g0_2d4d)(g, &bc, envs);
 }
 

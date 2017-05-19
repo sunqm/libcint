@@ -273,23 +273,23 @@ void CINTOpt_3c1eindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
 }
 
 #ifdef WITH_F12
-void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
-void CINTOpt_stg_4cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
-                             FINT *bas, FINT nbas, double *env)
+int CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                           int *atm, int natm, int *bas, int nbas, double *env);
+void CINTOpt_stg_4cindex_xyz(CINTOpt *opt, int *ng, int *atm, int natm,
+                             int *bas, int nbas, double *env)
 {
-        FINT i, j, k, l, ptr;
-        FINT n = ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = malloc(sizeof(FINT*) * n);
+        int i, j, k, l, ptr;
+        int n = ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX;
+        opt->index_xyz_array = malloc(sizeof(int*) * n);
         for (i = 0; i < n; i++) {
                 opt->index_xyz_array[i] = NULL;
         }
 
-        FINT fakebas[BAS_SLOTS*ANG_MAX];
-        FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
-        FINT fakenbas = max_l+1;
+        int fakebas[BAS_SLOTS*ANG_MAX];
+        int max_l = _make_fakebas(fakebas, bas, nbas, env);
+        int fakenbas = max_l+1;
         CINTEnvVars envs;
-        FINT shls[4];
+        int shls[4];
         for (i = 0; i <= max_l; i++) {
         for (j = 0; j <= max_l; j++) {
         for (k = 0; k <= max_l; k++) {
@@ -301,13 +301,12 @@ void CINTOpt_stg_4cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                     + j*ANG_MAX*ANG_MAX
                     + k*ANG_MAX
                     + l;
-                opt->index_xyz_array[ptr] = malloc(sizeof(FINT)*envs.nf*3);
+                opt->index_xyz_array[ptr] = malloc(sizeof(int)*envs.nf*3);
                 CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
         } } } }
 }
-
-void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
-                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
+void CINTall_2e_stg_optimizer(CINTOpt **opt, int *ng,
+                              int *atm, int natm, int *bas, int nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);

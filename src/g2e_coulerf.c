@@ -15,9 +15,8 @@
 
 void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs);
 
-FINT CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                           FINT *atm, FINT natm,
-                           FINT *bas, FINT nbas, double *env)
+int CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                           int *atm, int natm, int *bas, int nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -26,10 +25,10 @@ FINT CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->env = env;
         envs->shls = shls;
 
-        FINT i_sh = shls[0];
-        FINT j_sh = shls[1];
-        FINT k_sh = shls[2];
-        FINT l_sh = shls[3];
+        int i_sh = shls[0];
+        int j_sh = shls[1];
+        int k_sh = shls[2];
+        int l_sh = shls[3];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
@@ -91,9 +90,9 @@ FINT CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         assert(bas(ATOM_OF,l_sh) < natm);
         assert(envs->nrys_roots < MXRYSROOTS);
 
-        FINT dli, dlj, dlk, dll;
-        FINT ibase = envs->li_ceil > envs->lj_ceil;
-        FINT kbase = envs->lk_ceil > envs->ll_ceil;
+        int dli, dlj, dlk, dll;
+        int ibase = envs->li_ceil > envs->lj_ceil;
+        int kbase = envs->lk_ceil > envs->ll_ceil;
         if (envs->nrys_roots <= 2) { // use the fully optimized lj_4d algorithm
                 ibase = 0;
                 kbase = 0;
@@ -201,7 +200,7 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
                 return;
         }
 
-        FINT irys;
+        int irys;
         if (omega > 0) {
                 /* u[:] = tau^2 / (1 - tau^2)
                  * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
@@ -242,5 +241,5 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
                 w[irys] *= fac1;
         }
 
-        (*envs->f_g0_2d4d)(g, envs, &bc);
+        (*envs->f_g0_2d4d)(g, &bc, envs);
 }
