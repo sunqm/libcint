@@ -1,5 +1,8 @@
-Version 2.8.14 (2017-05-22):
+Version 2.8.15 (2017-05-22):
 	* Improved R_qnode convergence
+
+Version 2.8.14 (2017-05-18):
+	* Fix cint3c2e bug for general contraction on auxiliary basis
 
 Version 2.8.13 (2017-05-13):
 	* Bugfix for range-separated ssss type integral;
