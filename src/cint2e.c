@@ -16,7 +16,7 @@
 #include "cart2sph.h"
 #include "c2f.h"
 
-#define SQUARE(r)       (r)[0]*(r)[0] + (r)[1]*(r)[1] + (r)[2]*(r)[2]
+#define SQUARE(r)       ((r)[0]*(r)[0] + (r)[1]*(r)[1] + (r)[2]*(r)[2])
 
 #define PRIM2CTR0(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
@@ -771,7 +771,7 @@ FINT CINT2e_cart_drv(double *opijkl, CINTEnvVars *envs, const CINTOpt *opt)
         const FINT lp = CINTcgto_cart(envs->shls[3], envs->bas);
         const FINT nop = ip * jp * kp * lp;
         const FINT nc = envs->nf * envs->i_ctr * envs->j_ctr
-                                * envs->k_ctr * envs->l_ctr;
+                                 * envs->k_ctr * envs->l_ctr;
         const FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
         double *const gctr = malloc(sizeof(double) * nc * n_comp);
         double *pgctr = gctr;
