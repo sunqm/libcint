@@ -446,7 +446,7 @@ void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww)
   tt = tt - it;
   tt = 2.0 * tt - 1.0;
 
-  iu = (int)uu + 7; // 0 <= iu <= 9
+  iu = uu + 7; // 0 <= iu <= 9
   if (iu < 0 || iu > 10) {
       fprintf(stderr, "current implementation assumes 1.0e-7 < U < 1.0e3");
       exit(1);
