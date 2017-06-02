@@ -1,5 +1,7 @@
-Version 2.8.16 (2017-05-29):
+Version 2.8.16 (2017-06-02):
 	* Add 4-center 1-electron overlap integral
+	* Add Breit-type integral p1 dot r12 (1/r12^3) r12 dot p2
+	* Fix code generator to handle (1/r12^3)
 
 Version 2.8.15 (2017-05-22):
 	* Improved R_qnode convergence

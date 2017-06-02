@@ -12,7 +12,6 @@
 #include "misc.h"
 #include "g2e.h"
 
-#define MIN(X,Y)        ((X) < (Y) ? (X) : (Y))
 #define DEF_GXYZ(type, G, GX, GY, GZ) \
         type *GX = G; \
         type *GY = G + envs->g_size; \
