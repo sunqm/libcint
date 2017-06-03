@@ -52,7 +52,7 @@ set(cintSrc
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
   src/rys_roots.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c
-  src/cint3c1e.c src/g3c1e.c src/breit.c
+  src/cint3c1e.c src/g3c1e.c src/breit.c src/cint4c1e.c src/g4c1e.c
   src/autocode/breit1.c src/autocode/dkb.c src/autocode/gaunt1.c
   src/autocode/grad1.c src/autocode/grad2.c src/autocode/hess.c
   src/autocode/int3c1e.c src/autocode/int3c2e.c src/autocode/intor1.c

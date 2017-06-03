@@ -390,7 +390,7 @@ void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs)
  * g0[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
 /* 2d is based on l,j */
-static void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
+void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -447,7 +447,7 @@ static void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
         } }
 }
 /* 2d is based on k,j */
-static void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
+void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -504,7 +504,7 @@ static void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
         } }
 }
 /* 2d is based on i,l */
-static void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
+void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
@@ -560,7 +560,7 @@ static void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)
         } } }
 }
 /* 2d is based on i,k */
-static void CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
+void CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs)
 {
         const FINT nmax = envs->li_ceil + envs->lj_ceil;
         const FINT mmax = envs->lk_ceil + envs->ll_ceil;
