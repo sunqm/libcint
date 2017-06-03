@@ -20,10 +20,8 @@
 #define PTR_RINV_ZETA   7
 // omega parameter in range-separated coulomb operator erf(omega*r12)/r12
 #define PTR_RANGE_OMEGA 8
-// Yukawa potential
-#define PTR_F12_YP_ZETA 9
-// slater-type geminal e^{-zeta r}
-#define PTR_F12_STG_ZETA 10
+// Yukawa potential and slater-type geminal e^{-zeta r}
+#define PTR_F12_ZETA    9
 #define PTR_ENV_START   20
 
 // slots of atm

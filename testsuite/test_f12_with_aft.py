@@ -58,12 +58,12 @@ print abs(eri0-eri1).max(), abs(eri0).max()
 
 mydf.weighted_coulG = weighted_stg
 eri0 = get_eri(mydf)
-cell.set_f12_stg(zeta)
+cell.set_f12_zeta(zeta)
 eri1 = cell.intor('cint2e_stg_sph', aosym='s4')
 print abs(eri0-eri1).max(), abs(eri0).max()
 
 mydf.weighted_coulG = weighted_yp
 eri0 = get_eri(mydf)
-cell.set_f12_yp(zeta)
+cell.set_f12_zeta(zeta)
 eri1 = cell.intor('cint2e_yp_sph', aosym='s4')
 print abs(eri0-eri1).max(), abs(eri0).max()
