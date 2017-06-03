@@ -158,7 +158,7 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         double rijrkl[3];
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
-        double yp_zeta = envs->env[PTR_F12_YP_ZETA];
+        double zeta = envs->env[PTR_F12_ZETA];
         int nroots = envs->nrys_roots;
         int i;
 
@@ -170,8 +170,8 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         fac1 = fac / (sqrt(aij+akl) * a1);
 
         //:ua[k] = zeta*zeta / a0[k];
-        if (yp_zeta > 0) {
-                ua = .25 * yp_zeta * yp_zeta / a0;
+        if (zeta > 0) {
+                ua = .25 * zeta * zeta / a0;
         }
 
         rijrkl[0] = rij[0] - rkl[0];
@@ -180,13 +180,13 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
-        if (yp_zeta > 0) {
+        if (zeta > 0) {
                 CINTstg_roots(nroots, x, ua, u, w);
         } else {
                 CINTrys_roots(nroots, x, u, w);
         }
 
-        if (yp_zeta > 0) {
+        if (zeta > 0) {
                 //:w *= t;
                 //:u -> t/(1-t);
                 for (i = 0; i < nroots; i++) {
@@ -245,7 +245,7 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         double rijrkl[3];
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
-        double stg_zeta = envs->env[PTR_F12_STG_ZETA];
+        double zeta = envs->env[PTR_F12_ZETA];
         int nroots = envs->nrys_roots;
         int i;
 
@@ -257,8 +257,8 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         fac1 = fac / (sqrt(aij+akl) * a1);
 
         //:ua[k] = zeta*zeta / a0[k];
-        if (stg_zeta > 0) {
-                ua = .25 * stg_zeta * stg_zeta / a0;
+        if (zeta > 0) {
+                ua = .25 * zeta * zeta / a0;
         }
 
         rijrkl[0] = rij[0] - rkl[0];
@@ -267,16 +267,16 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
-        if (stg_zeta > 0) {
+        if (zeta > 0) {
                 CINTstg_roots(nroots, x, ua, u, w);
         } else {
                 CINTrys_roots(nroots, x, u, w);
         }
 
-        if (stg_zeta > 0) {
-                //:w *= (1-t) * 2*ua/stg_zeta;
+        if (zeta > 0) {
+                //:w *= (1-t) * 2*ua/zeta;
                 //:u -> t/(1-t);
-                double ua2 = 2. * ua / stg_zeta;
+                double ua2 = 2. * ua / zeta;
                 for (i = 0; i < nroots; i++) {
                         w[i] *= (1-u[i]) * ua2;
                         u[i] = u[i] / (1 - u[i]);
