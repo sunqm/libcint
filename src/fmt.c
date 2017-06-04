@@ -16,10 +16,12 @@
 #include <math.h>
 #define SML_FLOAT64   1.0e-16
 #define SML_FLOAT80   1.0e-20
+#define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264
+#define SQRTPIE4l     .8862269254527580136490837416705725913987747280611935641069038949264l
 
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
-#define PI_SQRD_128 M_PIq * M_PIq
+#define SQRTPIE4q     .8862269254527580136490837416705725913987747280611935641069038949264q
 #define SML_FLOAT128  1.0e-34
 #endif
 
@@ -150,7 +152,7 @@ void gamma_inc_like(double *f, double t, FINT m)
                         }
                 }
         } else {
-                double pi2 = 0.8862269254527579409597138;
+                double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
                 f[0] = pi2 / tt * erf(tt);
                 if (m > 0) {
@@ -188,7 +190,7 @@ void lgamma_inc_like(long double *f, long double t, FINT m)
                         }
                 }
         } else {
-                long double pi2 = 0.8862269254527579409597138l;
+                long double pi2 = SQRTPIE4l;
                 long double tt = sqrtl(t);
                 f[0] = pi2 / tt * erfl(tt);
                 if (m > 0) {
@@ -227,7 +229,7 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
                         }
                 }
         } else {
-                __float128 pi2 = PI_SQRD_128;
+                __float128 pi2 = SQRTPIE4q;
                 __float128 tt = sqrtq(t);
                 f[0] = pi2 / tt * erfq(tt);
                 if (m > 0) {
