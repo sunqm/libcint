@@ -15,11 +15,12 @@
 
 #include <math.h>
 #define SML_FLOAT64   1.0e-16
-#define SML_FLOAT80   1.0e-21
+#define SML_FLOAT80   1.0e-20
 
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #define PI_SQRD_128 M_PIq * M_PIq
+#define SML_FLOAT128  1.0e-34
 #endif
 
 /*
@@ -208,11 +209,11 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
                 __float128 x = 1;
                 __float128 s = 1;
                 __float128 e = .5q * expq(-t);
-                if (t < SML_FLOAT80) {
+                if (t < SML_FLOAT128) {
                         f[m] = .5q / b;
                 } else {
                         //f[m] = fmtpse(m, t);
-                        for (i = 1; x > SML_FLOAT80; i++)
+                        for (i = 1; x > SML_FLOAT128; i++)
                         {
                                 x *= t / (b + i);
                                 s += x;

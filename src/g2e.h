@@ -4,7 +4,6 @@
  * Provide the intermediate variable g(nroots,i,j,k,l,[xyz])
  */
 
-#include "config.h"
 #include "cint_const.h"
 #include "g1e.h"
 

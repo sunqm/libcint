@@ -11,15 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-#include "config.h"
-#ifdef HAVE_QUADMATH_H
-#include <quadmath.h>
-#endif
-
 #include "cint_const.h"
 #include "rys_roots.h"
 
+#ifdef HAVE_QUADMATH_H
+#include <quadmath.h>
+#endif
 #define MXROOTS   MXRYSROOTS
 //#define MXROOTS1  (MXROOTS+1)
 #define MXROOTS1  MXROOTS
@@ -1379,100 +1376,79 @@ static void Root5(double X, double roots[], double weights[]){
   return;
 }
 
-/* bdf_cvwint_dnode_ */
-static void R_dnode(double *a, double *rt, FINT k)
+#define POLYNOMIAL_VALUE1(p, x) \
+p = a[order]; \
+for (i = 1; i <= order; i++) { \
+        p = p * x + a[order-i]; \
+}
+
+static void R_dnode(double *a, double *rt, int order)
 {
-    const double accrt = 1e-11;
+        const double accrt = 1e-15;
+        double x0, x1, xi, x1init, p0, p1, pi, p1init;
+        int i, m, n;
 
-    FINT i, m;
-    FINT icoun2, icount;
-    double r;
-    double p1, p2, r1, r2, p5, p6, r5, r6, r3, p3, r4, p4, dr, prod, delta;
+        x1init = 0;
+        p1init = a[0];
+        for (m = 0; m < order; ++m) {
+                x0 = x1init;
+                p0 = p1init;
+                x1init = rt[m];
+                POLYNOMIAL_VALUE1(p1init, x1init);
+                if (p0 * p1init > 0) {
+                        fprintf(stderr, "ROOT NUMBER %d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %d\n", m, order);
+                        exit(1);
+                }
 
-    r2 = 0;
-    p2 = a[0];
-    for (m = 0; m < k; ++m) {
-        r1 = r2;
-        p1 = p2;
-        r2 = rt[m];
-        p2 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p2 = p2 * r2 + a[k - i];
+                if (x0 <= x1init) {
+                        x1 = x1init;
+                        p1 = p1init;
+                } else {
+                        x1 = x0;
+                        p1 = p0;
+                        x0 = x1init;
+                        p0 = p1init;
+                }
+                // interpolate/extrapolate between [x0,x1]
+                if (p0 == p1) {
+                        xi = x0;
+                } else {
+                        xi = x0 + (x0 - x1) / (p1 - p0) * p0;
+                }
+                n = 0;
+                while (x1 > accrt+x0 || x0 > x1+accrt) {
+                        n++;
+                        if (n > 200) {
+                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_qnode\n");
+                                exit(1);
+                        }
+                        POLYNOMIAL_VALUE1(pi, xi);
+                        if (p0 * pi <= 0) {
+                                x1 = xi;
+                                p1 = pi;
+                                xi = x0 * .125 + xi * .875;
+                        } else {
+                                x0 = xi;
+                                p0 = pi;
+                                xi = xi * .875 + x1 * .125;
+                        }
+                        POLYNOMIAL_VALUE1(pi, xi);
+                        if (p0 * pi <= 0) {
+                                x1 = xi;
+                                p1 = pi;
+                        } else {
+                                x0 = xi;
+                                p0 = pi;
+                        }
+
+                        if (p0 == p1) {
+                                xi = x0;
+                        } else {
+                                xi = x0 + (x0 - x1) / (p1 - p0) * p0;
+                        }
+                }
+                rt[m] = xi;
         }
-        prod = p1 * p2;
-        if (prod < 0) {
-            goto L20;
-        }
-        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n", (int)m, (int)k);
-L20:
-        r5 = r1;
-        p5 = p1;
-        r6 = r2;
-        p6 = p2;
-        icount = 0;
-L30:
-        r3 = r5;
-        p3 = p5;
-        r4 = r6;
-        p4 = p6;
-        r = (r3 * p4 - r4 * p3) / (p4 - p3);
-        dr = r4 - r3;
-        delta = dr;
-        dr = .0625 * dr;
-        r5 = r - dr;
-        r6 = r + dr;
-        if (fabs(delta) < accrt || r5 == r || r6 == r) {
-            goto L90;
-        }
-        ++icount;
-        if (icount == 50) {
-            fprintf(stderr, "libcint::rys_roots NO CONV. IN DNODE: DELTA= %.15g\n", delta);
-            exit(1);
-        }
-        if (r5 < r3) {
-            r5 = r3;
-        }
-        if (r6 > r4) {
-            r6 = r4;
-        }
-        p5 = a[k];
-        p6 = p5;
-        for (i = 1; i <= k; ++i) {
-            p5 = p5 * r5 + a[k - i];
-            p6 = p6 * r6 + a[k - i];
-        }
-        icoun2 = 0;
-L45:
-        prod = p5 * p6;
-        if (prod < 0) {
-            goto L30;
-        }
-        ++icoun2;
-        if (icoun2 > 50) {
-                fprintf(stderr, "libcint::rys_roots ERROR NO CONVERGENCE IN LOOP DNODE (L 45), PROD= %12.4f\n", prod);
-                exit(1);
-        }
-        prod = p3 * p5;
-        if (prod > 0.) {
-            goto L60;
-        }
-        r5 = .25 * r3 + .75 * r5;
-        p5 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p5 = p5 * r5 + a[k - i];
-        }
-        goto L45;
-L60:
-        r6 = .25 * r4 + .75 * r6;
-        p6 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p6 = p6 * r6 + a[k - i];
-        }
-        goto L45;
-L90:
-        rt[m] = r;
-    }
-    return;
 }
 
 /* bdf_cvwint_dsmit_ */
@@ -1636,99 +1612,73 @@ static long double c99_expl(long double x)
 #define EXPL    c99_expl
 #endif
 
-static void R_lnode(long double *a, long double *rt, FINT k)
+static void R_lnode(long double *a, long double *rt, int order)
 {
-    const long double accrt = 1e-11l;
+        const long double accrt = 1e-18l;
+        long double x0, x1, xi, x1init, p0, p1, pi, p1init;
+        int i, m, n;
 
-    FINT i, m;
-    FINT icoun2, icount;
-    long double r;
-    long double p1, p2, r1, r2, p5, p6, r5, r6, r3, p3, r4, p4, dr, prod, delta;
+        x1init = 0;
+        p1init = a[0];
+        for (m = 0; m < order; ++m) {
+                x0 = x1init;
+                p0 = p1init;
+                x1init = rt[m];
+                POLYNOMIAL_VALUE1(p1init, x1init);
+                if (p0 * p1init > 0) {
+                        fprintf(stderr, "ROOT NUMBER %d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %d\n", m, order);
+                        exit(1);
+                }
 
-    r2 = 0;
-    p2 = a[0];
-    for (m = 0; m < k; ++m) {
-        r1 = r2;
-        p1 = p2;
-        r2 = rt[m];
-        p2 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p2 = p2 * r2 + a[k - i];
+                if (x0 <= x1init) {
+                        x1 = x1init;
+                        p1 = p1init;
+                } else {
+                        x1 = x0;
+                        p1 = p0;
+                        x0 = x1init;
+                        p0 = p1init;
+                }
+                // interpolate/extrapolate between [x0,x1]
+                if (p0 == p1) {
+                        xi = x0;
+                } else {
+                        xi = x0 + (x0 - x1) / (p1 - p0) * p0;
+                }
+                n = 0;
+                while (x1 > accrt+x0 || x0 > x1+accrt) {
+                        n++;
+                        if (n > 200) {
+                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_qnode\n");
+                                exit(1);
+                        }
+                        POLYNOMIAL_VALUE1(pi, xi);
+                        if (p0 * pi <= 0) {
+                                x1 = xi;
+                                p1 = pi;
+                                xi = x0 * .125l + xi * .875l;
+                        } else {
+                                x0 = xi;
+                                p0 = pi;
+                                xi = xi * .875l + x1 * .125l;
+                        }
+                        POLYNOMIAL_VALUE1(pi, xi);
+                        if (p0 * pi <= 0) {
+                                x1 = xi;
+                                p1 = pi;
+                        } else {
+                                x0 = xi;
+                                p0 = pi;
+                        }
+
+                        if (p0 == p1) {
+                                xi = x0;
+                        } else {
+                                xi = x0 + (x0 - x1) / (p1 - p0) * p0;
+                        }
+                }
+                rt[m] = xi;
         }
-        prod = p1 * p2;
-        if (prod < 0) {
-            goto L20;
-        }
-        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n", (int)m, (int)k);
-L20:
-        r5 = r1;
-        p5 = p1;
-        r6 = r2;
-        p6 = p2;
-        icount = 0;
-L30:
-        r3 = r5;
-        p3 = p5;
-        r4 = r6;
-        p4 = p6;
-        r = (r3 * p4 - r4 * p3) / (p4 - p3);
-        dr = r4 - r3;
-        delta = dr;
-        dr = .0625l * dr;
-        r5 = r - dr;
-        r6 = r + dr;
-        if (fabsl(delta) < accrt || r5 == r || r6 == r) {
-            goto L90;
-        }
-        ++icount;
-        if (icount == 50) {
-            fprintf(stderr, "libcint::rys_roots NO CONV. IN DNODE: DELTA= %.15Lg\n", delta);
-            exit(1);
-        }
-        if (r5 < r3) {
-            r5 = r3;
-        }
-        if (r6 > r4) {
-            r6 = r4;
-        }
-        p5 = a[k];
-        p6 = p5;
-        for (i = 1; i <= k; ++i) {
-            p5 = p5 * r5 + a[k - i];
-            p6 = p6 * r6 + a[k - i];
-        }
-        icoun2 = 0;
-L45:
-        prod = p5 * p6;
-        if (prod < 0) {
-            goto L30;
-        }
-        ++icoun2;
-        if (icoun2 > 50) {
-                fprintf(stderr, "libcint::rys_roots no convergence in R_lnode, prod= %12.4Lf\n", prod);
-                exit(1);
-        }
-        prod = p3 * p5;
-        if (prod > 0.) {
-            goto L60;
-        }
-        r5 = .25l * r3 + .75l * r5;
-        p5 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p5 = p5 * r5 + a[k - i];
-        }
-        goto L45;
-L60:
-        r6 = .25l * r4 + .75l * r6;
-        p6 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p6 = p6 * r6 + a[k - i];
-        }
-        goto L45;
-L90:
-        rt[m] = r;
-    }
-    return;
 }
 
 static void R_lsmit(long double *cs, long double *s, FINT n)
@@ -1778,8 +1728,8 @@ static void R_lroot(FINT nroots, double x,
                     double roots[], double weights[])
 {
     FINT i, k, j, m;
-    long double r[MXROOTS*MXROOTS] = {0};
-    long double w[MXROOTS*MXROOTS] = {0};
+    long double r[MXROOTS*MXROOTS];
+    long double w[MXROOTS*MXROOTS];
     long double cs[MXROOTS1*MXROOTS1];
     long double s[MXROOTS1*MXROOTS1];
     long double rt[MXROOTS1];
@@ -1855,111 +1805,73 @@ L70:
 
 #ifdef HAVE_QUADMATH_H
 
-static void R_qnode(__float128 *a, __float128 *rt, FINT k)
+static void R_qnode(__float128 *a, __float128 *rt, int order)
 {
-    const __float128 accrt = 1e-11q;
+        const __float128 accrt = 1e-32q;
+        __float128 x0, x1, xi, x1init, p0, p1, pi, p1init;
+        int i, m, n;
 
-    FINT i, m;
-    FINT icoun2, icount;
-    __float128 r;
-    __float128 p1, p2, r1, r2, p5, p6, r5, r6, r3, p3, r4, p4, dr, prod, delta;
+        x1init = 0;
+        p1init = a[0];
+        for (m = 0; m < order; ++m) {
+                x0 = x1init;
+                p0 = p1init;
+                x1init = rt[m];
+                POLYNOMIAL_VALUE1(p1init, x1init);
+                if (p0 * p1init > 0) {
+                        fprintf(stderr, "ROOT NUMBER %d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %d\n", m, order);
+                        exit(1);
+                }
 
-    r2 = 0;
-    p2 = a[0];
-    for (m = 0; m < k; ++m) {
-        r1 = r2;
-        p1 = p2;
-        r2 = rt[m];
-        p2 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p2 = p2 * r2 + a[k - i];
+                if (x0 <= x1init) {
+                        x1 = x1init;
+                        p1 = p1init;
+                } else {
+                        x1 = x0;
+                        p1 = p0;
+                        x0 = x1init;
+                        p0 = p1init;
+                }
+                // interpolate/extrapolate between [x0,x1]
+                if (p0 == p1) {
+                        xi = x0;
+                } else {
+                        xi = x0 + (x0 - x1) / (p1 - p0) * p0;
+                }
+                n = 0;
+                while (x1 > accrt+x0 || x0 > x1+accrt) {
+                        n++;
+                        if (n > 200) {
+                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_qnode\n");
+                                exit(1);
+                        }
+                        POLYNOMIAL_VALUE1(pi, xi);
+                        if (p0 * pi <= 0) {
+                                x1 = xi;
+                                p1 = pi;
+                                xi = x0 * .125q + xi * .875q;
+                        } else {
+                                x0 = xi;
+                                p0 = pi;
+                                xi = xi * .875q + x1 * .125q;
+                        }
+                        POLYNOMIAL_VALUE1(pi, xi);
+                        if (p0 * pi <= 0) {
+                                x1 = xi;
+                                p1 = pi;
+                        } else {
+                                x0 = xi;
+                                p0 = pi;
+                        }
+
+                        if (p0 == p1) {
+                                xi = x0;
+                        } else {
+                                xi = x0 + (x0 - x1) / (p1 - p0) * p0;
+                        }
+                }
+                rt[m] = xi;
         }
-        prod = p1 * p2;
-        if (prod < 0) {
-            goto L20;
-        }
-        fprintf(stderr, " 0ROOT NUMBER %4d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %4d\n", (int)m, (int)k);
-L20:
-        r5 = r1;
-        p5 = p1;
-        r6 = r2;
-        p6 = p2;
-        icount = 0;
-L30:
-        r3 = r5;
-        p3 = p5;
-        r4 = r6;
-        p4 = p6;
-        r = (r3 * p4 - r4 * p3) / (p4 - p3);
-        dr = r4 - r3;
-        delta = dr;
-        dr = .0625q * dr;
-        r5 = r - dr;
-        r6 = r + dr;
-        if (fabsq(delta) < accrt || r5 == r || r6 == r) {
-            goto L90;
-        }
-        ++icount;
-        if (icount == 50) {
-            char string[128];
-            int rc = quadmath_snprintf(string, sizeof(string), "%Qe", 46 /* width */, delta);
-            if (rc<128) {
-                fprintf(stderr, "libcint::rys_roots NO CONV. IN DNODE: DELTA= %s\n", string);
-            } else {
-                fprintf(stderr, "libcint::rys_roots NO CONV. IN DNODE: DELTA= %lf\n", (double)delta );
-            }
-            exit(1);
-        }
-        if (r5 < r3) {
-            r5 = r3;
-        }
-        if (r6 > r4) {
-            r6 = r4;
-        }
-        p5 = a[k];
-        p6 = p5;
-        for (i = 1; i <= k; ++i) {
-            p5 = p5 * r5 + a[k - i];
-            p6 = p6 * r6 + a[k - i];
-        }
-        icoun2 = 0;
-L45:
-        prod = p5 * p6;
-        if (prod < 0) {
-            goto L30;
-        }
-        ++icoun2;
-        if (icoun2 > 50) {
-            char string[128];
-            int rc = quadmath_snprintf(string, sizeof(string), "%Qe", 46 /* width */, prod);
-            if (rc<128) {
-                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %s\n", string);
-            } else {
-                fprintf(stderr, "libcint::rys_roots no convergence in R_qnode, prod= %12.4lf\n", (double)prod);
-            }
-            exit(1);
-        }
-        prod = p3 * p5;
-        if (prod > 0.) {
-            goto L60;
-        }
-        r5 = .25q * r3 + .75q * r5;
-        p5 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p5 = p5 * r5 + a[k - i];
-        }
-        goto L45;
-L60:
-        r6 = .25q * r4 + .75q * r6;
-        p6 = a[k];
-        for (i = 1; i <= k; ++i) {
-            p6 = p6 * r6 + a[k - i];
-        }
-        goto L45;
-L90:
-        rt[m] = r;
-    }
-    return;
 }
 
 static void R_qsmit(__float128 *cs, __float128 *s, FINT n)
@@ -1997,7 +1909,7 @@ static void R_qsmit(__float128 *cs, __float128 *s, FINT n)
                 fprintf(stderr, "libcint::rys_roots negative value in sqrt\n");
                 exit(1);
         }
-        fac = 1 / SQRTL(fac);
+        fac = 1 / sqrtq(fac);
         cs[j + j * MXROOTS1] = fac;
         for (k = 0; k < j; ++k) {
             cs[k + j * MXROOTS1] = fac * v[k];
@@ -2009,8 +1921,8 @@ static void R_qroot(FINT nroots, double x,
                     double roots[], double weights[])
 {
     FINT i, k, j, m;
-    __float128 r[MXROOTS*MXROOTS] = {0};
-    __float128 w[MXROOTS*MXROOTS] = {0};
+    __float128 r[MXROOTS*MXROOTS];
+    __float128 w[MXROOTS*MXROOTS];
     __float128 cs[MXROOTS1*MXROOTS1];
     __float128 s[MXROOTS1*MXROOTS1];
     __float128 rt[MXROOTS1];
@@ -2036,7 +1948,7 @@ static void R_qroot(FINT nroots, double x,
     w[0] = wsum;
     r[0] = ff[1] / wsum;
 
-    dum = SQRTL(cs[2*MXROOTS1+1] * cs[2*MXROOTS1+1]
+    dum = sqrtq(cs[2*MXROOTS1+1] * cs[2*MXROOTS1+1]
                - 4 * cs[2*MXROOTS1+0] * cs[2*MXROOTS1+2]);
     r[MXROOTS  ] = .5 * (-cs[2*MXROOTS1+1] - dum) / cs[2*MXROOTS1+2];
     r[MXROOTS+1] = .5 * (-cs[2*MXROOTS1+1] + dum) / cs[2*MXROOTS1+2];

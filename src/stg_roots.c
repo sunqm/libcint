@@ -234,7 +234,7 @@ static const double COS_14_14[] = {
 -1.1196447610330785560e-01,
 };
 
-static void _recursive_dc(double *rr, const double *x, double u, int nroot)
+static void _clenshaw_dc(double *rr, const double *x, double u, int nroot)
 {
     double d[14];
     double g[14];
@@ -311,7 +311,7 @@ static void _recursive_dc(double *rr, const double *x, double u, int nroot)
     }
 }
 
-static void _recursive_d1(double *rr, const double *x, double u, int nroot)
+static void _clenshaw_d1(double *rr, const double *x, double u, int nroot)
 {
     int i;
     double d0, d1, g0, g1;
@@ -426,13 +426,12 @@ void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww)
   const double* x = DATA_X + (nroots-1)*nroots/2 * 19600;
   const double* w = DATA_W + (nroots-1)*nroots/2 * 19600;
   double u, uu, t, tt;
-  int i, k, iu, it;
+  int k, iu, it;
   int offset;
   double im [14*nroots];
   double imc[14*nroots];
 
   t = ta;
-  if (t < 0.0)
   if (t > 19682.99) t = 19682.99;
   u = ua;
   if (t > 1.0) {
@@ -456,16 +455,15 @@ void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww)
   }
 
   offset = nroots * 196 * (iu + it * 10);
-  _recursive_dc(im, x+offset, uu, nroots);
+  _clenshaw_dc(im, x+offset, uu, nroots);
   _matmul_14_14(imc, im, nroots);
-  _recursive_d1(rr+i*nroots, imc, tt, nroots);
-  _recursive_dc(im, w+offset, uu, nroots);
+  _clenshaw_d1(rr, imc, tt, nroots);
+  _clenshaw_dc(im, w+offset, uu, nroots);
   _matmul_14_14(imc, im, nroots);
-  _recursive_d1(ww+i*nroots, imc, tt, nroots);
-  //uu = 1./sqrt(ua[i]);
+  _clenshaw_d1(ww, imc, tt, nroots);
   uu = 1./sqrt(ua);
   for (k = 0; k < nroots; k++) {
-      ww[i*nroots+k] *= uu;
+      ww[k] *= uu;
   }
 }
 

@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <complex.h>
-#include "config.h"
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "cart2sph.h"
