@@ -11,7 +11,6 @@
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
-#include "fblas.h"
 #include "c2f.h"
 /* (NABLA i j|R12 |k) */
 void CINTgout2e_int3c2e_ip1(double *gout,
@@ -59,12 +58,10 @@ if (gout_empty) {
 gout[n*3+0] = + s[0];
 gout[n*3+1] = + s[1];
 gout[n*3+2] = + s[2];
-
 } else {
 gout[n*3+0] += + s[0];
 gout[n*3+1] += + s[1];
 gout[n*3+2] += + s[2];
-
 }}}
 void int3c2e_ip1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
@@ -142,12 +139,10 @@ if (gout_empty) {
 gout[n*3+0] = + s[0];
 gout[n*3+1] = + s[1];
 gout[n*3+2] = + s[2];
-
 } else {
 gout[n*3+0] += + s[0];
 gout[n*3+1] += + s[1];
 gout[n*3+2] += + s[2];
-
 }}}
 void int3c2e_ip2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {0, 0, 1, 0, 1, 1, 1, 3};
@@ -211,10 +206,8 @@ s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
 if (gout_empty) {
 gout[n*1+0] = + s[0] + s[4] + s[8];
-
 } else {
 gout[n*1+0] += + s[0] + s[4] + s[8];
-
 }}}
 void int3c2e_pvp1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 1, 0, 0, 2, 1, 1, 1};
@@ -292,12 +285,10 @@ if (gout_empty) {
 gout[n*3+0] = + s[0];
 gout[n*3+1] = + s[1];
 gout[n*3+2] = + s[2];
-
 } else {
 gout[n*3+0] += + s[0];
 gout[n*3+1] += + s[1];
 gout[n*3+2] += + s[2];
-
 }}}
 void int2c2e_ip1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
@@ -375,12 +366,10 @@ if (gout_empty) {
 gout[n*3+0] = + s[0];
 gout[n*3+1] = + s[1];
 gout[n*3+2] = + s[2];
-
 } else {
 gout[n*3+0] += + s[0];
 gout[n*3+1] += + s[1];
 gout[n*3+2] += + s[2];
-
 }}}
 void int2c2e_ip2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {0, 0, 1, 0, 1, 1, 1, 3};
@@ -465,12 +454,10 @@ if (gout_empty) {
 gout[n*3+0] = - c[1]*s[2] + c[2]*s[1];
 gout[n*3+1] = - c[2]*s[0] + c[0]*s[2];
 gout[n*3+2] = - c[0]*s[1] + c[1]*s[0];
-
 } else {
 gout[n*3+0] += - c[1]*s[2] + c[2]*s[1];
 gout[n*3+1] += - c[2]*s[0] + c[0]*s[2];
 gout[n*3+2] += - c[0]*s[1] + c[1]*s[0];
-
 }}}
 void int3c2e_ig1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
@@ -576,13 +563,11 @@ gout[n*4+0] = + s[5] - s[7];
 gout[n*4+1] = + s[6] - s[2];
 gout[n*4+2] = + s[1] - s[3];
 gout[n*4+3] = + s[0] + s[4] + s[8];
-
 } else {
 gout[n*4+0] += + s[5] - s[7];
 gout[n*4+1] += + s[6] - s[2];
 gout[n*4+2] += + s[1] - s[3];
 gout[n*4+3] += + s[0] + s[4] + s[8];
-
 }}}
 void int3c2e_spsp1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 1, 0, 0, 2, 4, 1, 1};
@@ -683,7 +668,6 @@ gout[n*12+8] = + s[17] - s[25];
 gout[n*12+9] = + s[24] - s[8];
 gout[n*12+10] = + s[7] - s[15];
 gout[n*12+11] = + s[6] + s[16] + s[26];
-
 } else {
 gout[n*12+0] += + s[11] - s[19];
 gout[n*12+1] += + s[18] - s[2];
@@ -697,7 +681,6 @@ gout[n*12+8] += + s[17] - s[25];
 gout[n*12+9] += + s[24] - s[8];
 gout[n*12+10] += + s[7] - s[15];
 gout[n*12+11] += + s[6] + s[16] + s[26];
-
 }}}
 void int3c2e_ipspsp1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {2, 1, 0, 0, 3, 4, 1, 3};
@@ -798,7 +781,6 @@ gout[n*12+8] = + s[17] - s[23];
 gout[n*12+9] = + s[20] - s[8];
 gout[n*12+10] = + s[5] - s[11];
 gout[n*12+11] = + s[2] + s[14] + s[26];
-
 } else {
 gout[n*12+0] += + s[15] - s[21];
 gout[n*12+1] += + s[18] - s[6];
@@ -812,7 +794,6 @@ gout[n*12+8] += + s[17] - s[23];
 gout[n*12+9] += + s[20] - s[8];
 gout[n*12+10] += + s[5] - s[11];
 gout[n*12+11] += + s[2] + s[14] + s[26];
-
 }}}
 void int3c2e_spsp1ip2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 1, 1, 0, 3, 4, 1, 3};

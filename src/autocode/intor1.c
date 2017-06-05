@@ -11,7 +11,6 @@
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
-#include "fblas.h"
 #include "c2f.h"
 /* <i|OVLP |j> */
 static void CINTgout1e_int1e_ovlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
@@ -2242,12 +2241,10 @@ if (gout_empty) {
 gout[n*3+0] = + s[5] - s[7];
 gout[n*3+1] = + s[6] - s[2];
 gout[n*3+2] = + s[1] - s[3];
-
 } else {
 gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
-
 }}}
 void int2e_p1vxp1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
@@ -2259,6 +2256,7 @@ int ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_p1vxp1;
+envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_p1vxp1_cart
 int int2e_p1vxp1_sph(double *out, int *dims, int *shls,
@@ -2267,6 +2265,7 @@ int ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_p1vxp1;
+envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_p1vxp1_sph
 int int2e_p1vxp1_spinor(double complex *out, int *dims, int *shls,

@@ -11,7 +11,6 @@
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
-#include "fblas.h"
 #include "c2f.h"
 /* <k i|BREIT-R1 |R0 SIGMA DOT P j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (i R0 SIGMA DOT P j|BREIT-R1 |k SIGMA DOT P l) */
@@ -162,7 +161,6 @@ gout[n*16+12] = + s[33] - s[57] + s[43] - s[67] + s[53] - s[77];
 gout[n*16+13] = + s[54] - s[6] + s[64] - s[16] + s[74] - s[26];
 gout[n*16+14] = + s[3] - s[27] + s[13] - s[37] + s[23] - s[47];
 gout[n*16+15] = + s[0] + s[30] + s[60] + s[10] + s[40] + s[70] + s[20] + s[50] + s[80];
-
 } else {
 gout[n*16+0] += + s[44] - s[68] - s[52] + s[76];
 gout[n*16+1] += + s[65] - s[17] - s[73] + s[25];
@@ -180,7 +178,6 @@ gout[n*16+12] += + s[33] - s[57] + s[43] - s[67] + s[53] - s[77];
 gout[n*16+13] += + s[54] - s[6] + s[64] - s[16] + s[74] - s[26];
 gout[n*16+14] += + s[3] - s[27] + s[13] - s[37] + s[23] - s[47];
 gout[n*16+15] += + s[0] + s[30] + s[60] + s[10] + s[40] + s[70] + s[20] + s[50] + s[80];
-
 }}}
 void int2e_gauge_r1_ssp1ssp2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 3, 0, 1, 4, 4, 4, 1};
@@ -192,6 +189,7 @@ int ng[] = {1, 3, 0, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_ssp1ssp2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_ssp1ssp2_cart
 int int2e_gauge_r1_ssp1ssp2_sph(double *out, int *dims, int *shls,
@@ -200,6 +198,7 @@ int ng[] = {1, 3, 0, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_ssp1ssp2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_ssp1ssp2_sph
 int int2e_gauge_r1_ssp1ssp2_spinor(double complex *out, int *dims, int *shls,
@@ -361,7 +360,6 @@ gout[n*16+12] = - s[33] + s[57] - s[43] + s[67] - s[53] + s[77];
 gout[n*16+13] = - s[54] + s[6] - s[64] + s[16] - s[74] + s[26];
 gout[n*16+14] = - s[3] + s[27] - s[13] + s[37] - s[23] + s[47];
 gout[n*16+15] = - s[0] - s[30] - s[60] - s[10] - s[40] - s[70] - s[20] - s[50] - s[80];
-
 } else {
 gout[n*16+0] += + s[44] - s[68] - s[52] + s[76];
 gout[n*16+1] += + s[65] - s[17] - s[73] + s[25];
@@ -379,7 +377,6 @@ gout[n*16+12] += - s[33] + s[57] - s[43] + s[67] - s[53] + s[77];
 gout[n*16+13] += - s[54] + s[6] - s[64] + s[16] - s[74] + s[26];
 gout[n*16+14] += - s[3] + s[27] - s[13] + s[37] - s[23] + s[47];
 gout[n*16+15] += - s[0] - s[30] - s[60] - s[10] - s[40] - s[70] - s[20] - s[50] - s[80];
-
 }}}
 void int2e_gauge_r1_ssp1sps2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 3, 1, 0, 4, 4, 4, 1};
@@ -391,6 +388,7 @@ int ng[] = {1, 3, 1, 0, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_ssp1sps2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_ssp1sps2_cart
 int int2e_gauge_r1_ssp1sps2_sph(double *out, int *dims, int *shls,
@@ -399,6 +397,7 @@ int ng[] = {1, 3, 1, 0, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_ssp1sps2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_ssp1sps2_sph
 int int2e_gauge_r1_ssp1sps2_spinor(double complex *out, int *dims, int *shls,
@@ -560,7 +559,6 @@ gout[n*16+12] = - s[45] + s[63] - s[49] + s[67] - s[53] + s[71];
 gout[n*16+13] = - s[54] + s[18] - s[58] + s[22] - s[62] + s[26];
 gout[n*16+14] = - s[9] + s[27] - s[13] + s[31] - s[17] + s[35];
 gout[n*16+15] = - s[0] - s[36] - s[72] - s[4] - s[40] - s[76] - s[8] - s[44] - s[80];
-
 } else {
 gout[n*16+0] += - s[50] + s[68] + s[52] - s[70];
 gout[n*16+1] += - s[59] + s[23] + s[61] - s[25];
@@ -578,7 +576,6 @@ gout[n*16+12] += - s[45] + s[63] - s[49] + s[67] - s[53] + s[71];
 gout[n*16+13] += - s[54] + s[18] - s[58] + s[22] - s[62] + s[26];
 gout[n*16+14] += - s[9] + s[27] - s[13] + s[31] - s[17] + s[35];
 gout[n*16+15] += - s[0] - s[36] - s[72] - s[4] - s[40] - s[76] - s[8] - s[44] - s[80];
-
 }}}
 void int2e_gauge_r1_sps1ssp2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {2, 2, 0, 1, 4, 4, 4, 1};
@@ -590,6 +587,7 @@ int ng[] = {2, 2, 0, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_sps1ssp2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_sps1ssp2_cart
 int int2e_gauge_r1_sps1ssp2_sph(double *out, int *dims, int *shls,
@@ -598,6 +596,7 @@ int ng[] = {2, 2, 0, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_sps1ssp2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_sps1ssp2_sph
 int int2e_gauge_r1_sps1ssp2_spinor(double complex *out, int *dims, int *shls,
@@ -759,7 +758,6 @@ gout[n*16+12] = + s[45] - s[63] + s[49] - s[67] + s[53] - s[71];
 gout[n*16+13] = + s[54] - s[18] + s[58] - s[22] + s[62] - s[26];
 gout[n*16+14] = + s[9] - s[27] + s[13] - s[31] + s[17] - s[35];
 gout[n*16+15] = + s[0] + s[36] + s[72] + s[4] + s[40] + s[76] + s[8] + s[44] + s[80];
-
 } else {
 gout[n*16+0] += - s[50] + s[68] + s[52] - s[70];
 gout[n*16+1] += - s[59] + s[23] + s[61] - s[25];
@@ -777,7 +775,6 @@ gout[n*16+12] += + s[45] - s[63] + s[49] - s[67] + s[53] - s[71];
 gout[n*16+13] += + s[54] - s[18] + s[58] - s[22] + s[62] - s[26];
 gout[n*16+14] += + s[9] - s[27] + s[13] - s[31] + s[17] - s[35];
 gout[n*16+15] += + s[0] + s[36] + s[72] + s[4] + s[40] + s[76] + s[8] + s[44] + s[80];
-
 }}}
 void int2e_gauge_r1_sps1sps2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {2, 2, 1, 0, 4, 4, 4, 1};
@@ -789,6 +786,7 @@ int ng[] = {2, 2, 1, 0, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_sps1sps2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_sps1sps2_cart
 int int2e_gauge_r1_sps1sps2_sph(double *out, int *dims, int *shls,
@@ -797,6 +795,7 @@ int ng[] = {2, 2, 1, 0, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r1_sps1sps2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r1_sps1sps2_sph
 int int2e_gauge_r1_sps1sps2_spinor(double complex *out, int *dims, int *shls,
@@ -962,7 +961,6 @@ gout[n*16+12] = + s[45] - s[63] + s[49] - s[67] + s[53] - s[71];
 gout[n*16+13] = + s[54] - s[18] + s[58] - s[22] + s[62] - s[26];
 gout[n*16+14] = + s[9] - s[27] + s[13] - s[31] + s[17] - s[35];
 gout[n*16+15] = + s[0] + s[36] + s[72] + s[4] + s[40] + s[76] + s[8] + s[44] + s[80];
-
 } else {
 gout[n*16+0] += + s[50] - s[68] - s[52] + s[70];
 gout[n*16+1] += + s[59] - s[23] - s[61] + s[25];
@@ -980,7 +978,6 @@ gout[n*16+12] += + s[45] - s[63] + s[49] - s[67] + s[53] - s[71];
 gout[n*16+13] += + s[54] - s[18] + s[58] - s[22] + s[62] - s[26];
 gout[n*16+14] += + s[9] - s[27] + s[13] - s[31] + s[17] - s[35];
 gout[n*16+15] += + s[0] + s[36] + s[72] + s[4] + s[40] + s[76] + s[8] + s[44] + s[80];
-
 }}}
 void int2e_gauge_r2_ssp1ssp2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 2, 0, 2, 4, 4, 4, 1};
@@ -992,6 +989,7 @@ int ng[] = {1, 2, 0, 2, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_ssp1ssp2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_ssp1ssp2_cart
 int int2e_gauge_r2_ssp1ssp2_sph(double *out, int *dims, int *shls,
@@ -1000,6 +998,7 @@ int ng[] = {1, 2, 0, 2, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_ssp1ssp2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_ssp1ssp2_sph
 int int2e_gauge_r2_ssp1ssp2_spinor(double complex *out, int *dims, int *shls,
@@ -1165,7 +1164,6 @@ gout[n*16+12] = - s[45] + s[63] - s[49] + s[67] - s[53] + s[71];
 gout[n*16+13] = - s[54] + s[18] - s[58] + s[22] - s[62] + s[26];
 gout[n*16+14] = - s[9] + s[27] - s[13] + s[31] - s[17] + s[35];
 gout[n*16+15] = - s[0] - s[36] - s[72] - s[4] - s[40] - s[76] - s[8] - s[44] - s[80];
-
 } else {
 gout[n*16+0] += - s[50] + s[68] + s[52] - s[70];
 gout[n*16+1] += - s[59] + s[23] + s[61] - s[25];
@@ -1183,7 +1181,6 @@ gout[n*16+12] += - s[45] + s[63] - s[49] + s[67] - s[53] + s[71];
 gout[n*16+13] += - s[54] + s[18] - s[58] + s[22] - s[62] + s[26];
 gout[n*16+14] += - s[9] + s[27] - s[13] + s[31] - s[17] + s[35];
 gout[n*16+15] += - s[0] - s[36] - s[72] - s[4] - s[40] - s[76] - s[8] - s[44] - s[80];
-
 }}}
 void int2e_gauge_r2_ssp1sps2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 2, 1, 1, 4, 4, 4, 1};
@@ -1195,6 +1192,7 @@ int ng[] = {1, 2, 1, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_ssp1sps2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_ssp1sps2_cart
 int int2e_gauge_r2_ssp1sps2_sph(double *out, int *dims, int *shls,
@@ -1203,6 +1201,7 @@ int ng[] = {1, 2, 1, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_ssp1sps2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_ssp1sps2_sph
 int int2e_gauge_r2_ssp1sps2_spinor(double complex *out, int *dims, int *shls,
@@ -1368,7 +1367,6 @@ gout[n*16+12] = - s[45] + s[63] - s[49] + s[67] - s[53] + s[71];
 gout[n*16+13] = - s[54] + s[18] - s[58] + s[22] - s[62] + s[26];
 gout[n*16+14] = - s[9] + s[27] - s[13] + s[31] - s[17] + s[35];
 gout[n*16+15] = - s[0] - s[36] - s[72] - s[4] - s[40] - s[76] - s[8] - s[44] - s[80];
-
 } else {
 gout[n*16+0] += - s[50] + s[68] + s[52] - s[70];
 gout[n*16+1] += - s[59] + s[23] + s[61] - s[25];
@@ -1386,7 +1384,6 @@ gout[n*16+12] += - s[45] + s[63] - s[49] + s[67] - s[53] + s[71];
 gout[n*16+13] += - s[54] + s[18] - s[58] + s[22] - s[62] + s[26];
 gout[n*16+14] += - s[9] + s[27] - s[13] + s[31] - s[17] + s[35];
 gout[n*16+15] += - s[0] - s[36] - s[72] - s[4] - s[40] - s[76] - s[8] - s[44] - s[80];
-
 }}}
 void int2e_gauge_r2_sps1ssp2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {2, 1, 0, 2, 4, 4, 4, 1};
@@ -1398,6 +1395,7 @@ int ng[] = {2, 1, 0, 2, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_sps1ssp2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_sps1ssp2_cart
 int int2e_gauge_r2_sps1ssp2_sph(double *out, int *dims, int *shls,
@@ -1406,6 +1404,7 @@ int ng[] = {2, 1, 0, 2, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_sps1ssp2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_sps1ssp2_sph
 int int2e_gauge_r2_sps1ssp2_spinor(double complex *out, int *dims, int *shls,
@@ -1571,7 +1570,6 @@ gout[n*16+12] = + s[45] - s[63] + s[49] - s[67] + s[53] - s[71];
 gout[n*16+13] = + s[54] - s[18] + s[58] - s[22] + s[62] - s[26];
 gout[n*16+14] = + s[9] - s[27] + s[13] - s[31] + s[17] - s[35];
 gout[n*16+15] = + s[0] + s[36] + s[72] + s[4] + s[40] + s[76] + s[8] + s[44] + s[80];
-
 } else {
 gout[n*16+0] += + s[50] - s[68] - s[52] + s[70];
 gout[n*16+1] += + s[59] - s[23] - s[61] + s[25];
@@ -1589,7 +1587,6 @@ gout[n*16+12] += + s[45] - s[63] + s[49] - s[67] + s[53] - s[71];
 gout[n*16+13] += + s[54] - s[18] + s[58] - s[22] + s[62] - s[26];
 gout[n*16+14] += + s[9] - s[27] + s[13] - s[31] + s[17] - s[35];
 gout[n*16+15] += + s[0] + s[36] + s[72] + s[4] + s[40] + s[76] + s[8] + s[44] + s[80];
-
 }}}
 void int2e_gauge_r2_sps1sps2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {2, 1, 1, 1, 4, 4, 4, 1};
@@ -1601,6 +1598,7 @@ int ng[] = {2, 1, 1, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_sps1sps2;
+envs.common_factor *= -1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_sps1sps2_cart
 int int2e_gauge_r2_sps1sps2_sph(double *out, int *dims, int *shls,
@@ -1609,6 +1607,7 @@ int ng[] = {2, 1, 1, 1, 4, 4, 4, 1};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gauge_r2_sps1sps2;
+envs.common_factor *= -1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_gauge_r2_sps1sps2_sph
 int int2e_gauge_r2_sps1sps2_spinor(double complex *out, int *dims, int *shls,

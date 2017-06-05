@@ -11,7 +11,6 @@
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
-#include "fblas.h"
 #include "c2f.h"
 /* <k G i|R12 |j l> : i,j \in electron 1; k,l \in electron 2
  * = (G i j|R12 |k l) */
@@ -68,12 +67,10 @@ if (gout_empty) {
 gout[n*3+0] = - c[1]*s[2] + c[2]*s[1];
 gout[n*3+1] = - c[2]*s[0] + c[0]*s[2];
 gout[n*3+2] = - c[0]*s[1] + c[1]*s[0];
-
 } else {
 gout[n*3+0] += - c[1]*s[2] + c[2]*s[1];
 gout[n*3+1] += - c[2]*s[0] + c[0]*s[2];
 gout[n*3+2] += - c[0]*s[1] + c[1]*s[0];
-
 }}}
 void int2e_ig1_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
@@ -85,6 +82,7 @@ int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ig1;
+envs.common_factor *= 0.5;
 envs.common_factor *= 0.5;
 int i, nout;
 int counts[4];
@@ -106,6 +104,7 @@ int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ig1;
+envs.common_factor *= 0.5;
 envs.common_factor *= 0.5;
 int i, nout;
 int counts[4];
@@ -203,7 +202,6 @@ gout[n*9+5] = + c[6]*s[1] - c[0]*s[7] - c[7]*s[0] + c[1]*s[6];
 gout[n*9+6] = + c[1]*s[5] - c[4]*s[2] - c[2]*s[4] + c[5]*s[1];
 gout[n*9+7] = + c[2]*s[3] - c[5]*s[0] - c[0]*s[5] + c[3]*s[2];
 gout[n*9+8] = + c[0]*s[4] - c[3]*s[1] - c[1]*s[3] + c[4]*s[0];
-
 } else {
 gout[n*9+0] += + c[4]*s[8] - c[7]*s[5] - c[5]*s[7] + c[8]*s[4];
 gout[n*9+1] += + c[5]*s[6] - c[8]*s[3] - c[3]*s[8] + c[6]*s[5];
@@ -214,7 +212,6 @@ gout[n*9+5] += + c[6]*s[1] - c[0]*s[7] - c[7]*s[0] + c[1]*s[6];
 gout[n*9+6] += + c[1]*s[5] - c[4]*s[2] - c[2]*s[4] + c[5]*s[1];
 gout[n*9+7] += + c[2]*s[3] - c[5]*s[0] - c[0]*s[5] + c[3]*s[2];
 gout[n*9+8] += + c[0]*s[4] - c[3]*s[1] - c[1]*s[3] + c[4]*s[0];
-
 }}}
 void int2e_ig1ig2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
 int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
@@ -227,6 +224,7 @@ CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ig1ig2;
 envs.common_factor *= -0.25;
+envs.common_factor *= 0.25;
 int i, nout;
 int counts[4];
 if (envs.shls[0] == envs.shls[1]) {
@@ -258,6 +256,7 @@ CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ig1ig2;
 envs.common_factor *= -0.25;
+envs.common_factor *= 0.25;
 int i, nout;
 int counts[4];
 if (envs.shls[0] == envs.shls[1]) {

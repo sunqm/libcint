@@ -100,9 +100,9 @@
 (defun gen-c-block-with-empty (fout flat-script)
   (format fout "if (gout_empty) {~%")
   (gen-c-block fout flat-script)
-  (format fout "~%} else {~%")
+  (format fout "} else {~%")
   (gen-c-block+ fout flat-script)
-  (format fout "~%}"))
+  (format fout "}"))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; effective keys are p,r,ri,...
@@ -138,7 +138,6 @@
 #include \"cint1e.h\"
 #include \"cint2e.h\"
 #include \"misc.h\"
-#include \"fblas.h\"
 #include \"c2f.h\"
 "))
 
@@ -263,8 +262,8 @@
                   (g?e-of op) ig ig0 i-len right
                   (g?e-of op) (1+ ig) ig0 i-len right
                   ig (1+ ig))
-          (if (and (breit-int? opj-rev)
-                   (< (1+ right) (length opj-rev))) ; more ops on the left of breit-op
+          (if (and (intersection *act-left-right* opj-rev)
+                   (< (1+ right) (length opj-rev))) ; ops have *act-left-right* but the rightmost op is not
               (format fout fmt-j (g?e-of op) ig ig0 (1+ i-len) right)
               (format fout fmt-j (g?e-of op) ig ig0 i-len right)))))))
 
@@ -570,7 +569,7 @@ double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
 int nrys_roots = envs->nrys_roots;
 int ix, iy, iz, i, n;
 double *g0 = g;~%")
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
               (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
         (loop for i in (range (1- (ash 1 tot-bits))) do
@@ -580,7 +579,7 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout bra-k "k")
       (dump-declare-dri-for-rc fout ket-l "l")
       (dump-declare-giao-ijkl fout bra-i ket-j bra-k ket-l)
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
                             ", envs->k_l+~a, envs->l_l);~%"))
               (fmt-op "")
@@ -631,7 +630,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
                           (t (/ goutinc 4))))
            (ngdef (with-output-to-string (tmpout)
-                    (if (breit-int? op)
+                    (if (intersection *act-left-right* op)
                       (format tmpout "int ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
                               (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
                       (format tmpout "int ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
@@ -655,6 +654,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout "int ~a_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
+      (if (and (eql ts1 'tas) (eql ts2 'tas))
+        (format fout "envs.common_factor *= ~a;~%" (- (factor-of raw-infix)))
+        (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix)))
       (when (member 'g raw-infix)
         (format fout "int i, nout;
 int counts[4];~%")
@@ -685,6 +687,9 @@ return 0; }~%")))
       (format fout "int ~a_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
+      (if (and (eql ts1 'tas) (eql ts2 'tas))
+        (format fout "envs.common_factor *= ~a;~%" (- (factor-of raw-infix)))
+        (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix)))
       (when (member 'g raw-infix)
         (format fout "int i, nout;
 int counts[4];~%")
@@ -765,7 +770,7 @@ double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
 int nrys_roots = envs->nrys_roots;
 int ix, iy, iz, i, n;
 double *g0 = g;~%")
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
               (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
         (loop for i in (range (1- (ash 1 tot-bits))) do
@@ -774,7 +779,7 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout ket-j "j")
       (dump-declare-dri-for-rc fout bra-k "k")
       (dump-declare-giao-ij fout bra-i ket-j)
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
                             ", envs->k_l+~a, 0);~%"))
               (fmt-op "")
@@ -821,7 +826,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
                           (t (/ goutinc 4))))
            (ngdef (with-output-to-string (tmpout)
-                    (if (breit-int? op)
+                    (if (intersection *act-left-right* op)
                       (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
                               (1+ i-len) (1+ j-len) k-len tot-bits e1comps e2comps tensors)
                       (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
@@ -919,14 +924,14 @@ double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
 int nrys_roots = envs->nrys_roots;
 int ix, iy, iz, i, n;
 double *g0 = g;~%")
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
               (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
         (loop for i in (range (1- (ash 1 tot-bits))) do
               (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i)))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout bra-k "k")
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", 0, envs->k_l+~a, 0);~%"))
               (fmt-op "")
               (fmt-l ""))
@@ -969,7 +974,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           ((and (eql sf1 'si) (eql sf2 'si)) (/ goutinc 16))
                           (t (/ goutinc 4))))
            (ngdef (with-output-to-string (tmpout)
-                    (if (breit-int? op)
+                    (if (intersection *act-left-right* op)
                       (format tmpout "int ng[] = {~d, 1, ~d, 0, ~d, ~d, ~d, ~d};~%"
                               (1+ i-len) k-len tot-bits e1comps e2comps tensors)
                       (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
@@ -1027,7 +1032,7 @@ double *g, int *idx, CINTEnvVars *envs, int count) {~%" intname)
       (format fout "int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;~%")
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
               (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
         (loop for i in (range (1- (ash 1 tot-bits))) do

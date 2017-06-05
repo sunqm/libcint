@@ -11,7 +11,6 @@
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
-#include "fblas.h"
 #include "c2f.h"
 static void CINTgout1e_int3c1e_p2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int count) {
