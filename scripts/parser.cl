@@ -27,7 +27,7 @@
 (defparameter *one-electron-operator* '(ovlp rinv nuc nabla-rinv ccc1e))
 (defparameter *two-electron-operator* '(r12 ccc2e nabla-r12 gaunt breit-r1 breit-r2))
 (defparameter *one-componet-operator* '(rinv nuc r12))
-(defparameter *nabla-not-comutable* '(rinv nuc nabla-rinv r12 nabla-r12 gaunt2 breit-r1 breit-r2))
+(defparameter *nabla-not-comutable* '(rinv nuc nabla-rinv r12 nabla-r12 gaunt breit-r1 breit-r2))
 (defparameter *act-left-right* '(nabla-rinv nabla-r12 breit-r1 breit-r2))
 
 ;;; *operator*: precedence from high to low
@@ -60,6 +60,8 @@
 (defparameter *var-sticker* '(p* ip* nabla* px* py* pz*))
 (defparameter *var-vec* '(p ip nabla p* ip* nabla* r r0 rc ri rj rk rl g))
 
+(defun gaunt-int? (expr)
+  (member 'gaunt expr))
 (defun breit-int? (expr)
   (or (member 'breit-r1 expr) (member 'breit-r2 expr)))
 ;;;;;; convert to reversed polish notation ;;;;;;;;;;;
@@ -500,7 +502,9 @@
          (ts1 (car vs1))
          (sf1 (cadr vs1))
          (pv1 (caddr vs1))
-         (vs2 (format-vs-1e 1 bra-k ket-l '(r12)))
+         (vs2 (if (gaunt-int? op)
+                (format-vs-1e 1 bra-k ket-l op)
+                (format-vs-1e 1 bra-k ket-l '(r12))))
          (ts2 (car vs2))
          (sf2 (cadr vs2))
          (pv2 (caddr vs2)))
