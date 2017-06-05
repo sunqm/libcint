@@ -628,7 +628,9 @@ CINTdset0(kp * ip * jp * lp * OF_CMPLX * ng[TENSOR], opijkl);"))
       (format fout "CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
       (format fout "envs.f_gout = &CINTgout2e_~a;~%" intname)
-      (if (and (eql sp 'spheric) (eql ts1 'tas) (eql ts2 'tas))
+      (if (and (eql sp 'spheric)
+               (eql sf1 'si) (eql ts1 'tas)
+               (eql sf2 'si) (eql ts2 'tas))
         (format fout "envs.common_factor *= ~a;~%" (- (factor-of raw-infix)))
         (format fout "envs.common_factor *= ~a;~%" (factor-of raw-infix)))
 ;;; determine function caller

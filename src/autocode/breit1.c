@@ -6,6 +6,7 @@
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "g2e.h"
+#include "g3c1e.h"
 #include "g3c2e.h"
 #include "g2c2e.h"
 #include "optimizer.h"

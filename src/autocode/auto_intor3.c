@@ -6,6 +6,7 @@
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "g2e.h"
+#include "g3c1e.h"
 #include "g3c2e.h"
 #include "g2c2e.h"
 #include "optimizer.h"
@@ -401,11 +402,11 @@ rirj[2] = ri[2] - rj[2];
 c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
-G1E_D_J(g1, g0, i_l+1, j_l+0);
+G1E_D_J(g1, g0, i_l+2, j_l+0);
 G1E_D_J(g2, g0, i_l+1, j_l+1);
 G1E_D_I(g3, g0, i_l+1, j_l+1);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g2[ix] += g3[ix];}
-G1E_D_J(g3, g2, i_l+1, j_l+0);
+G1E_D_J(g3, g2, i_l+2, j_l+0);
 G1E_R0I(g4, g0, i_l+0, j_l);
 G1E_R0I(g5, g1, i_l+0, j_l);
 G1E_R0I(g6, g2, i_l+0, j_l);
