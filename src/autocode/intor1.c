@@ -505,11 +505,11 @@ c[0] = 1 * rirj[0];
 c[1] = 1 * rirj[1];
 c[2] = 1 * rirj[2];
 double s[27];
-G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
 G1E_D_J(g2, g0, envs->i_l+1, envs->j_l+1, 0);
 G1E_D_I(g3, g0, envs->i_l+1, envs->j_l+1, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g2[ix] += g3[ix];}
-G1E_D_J(g3, g2, envs->i_l+1, envs->j_l+0, 0);
+G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
 G1E_R0I(g4, g0, envs->i_l+0, envs->j_l, 0);
 G1E_R0I(g5, g1, envs->i_l+0, envs->j_l, 0);
 G1E_R0I(g6, g2, envs->i_l+0, envs->j_l, 0);

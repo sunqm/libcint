@@ -164,27 +164,27 @@ static void CINTgout2e_int2e_breit_r1p2(double *gout, double *g,
         G2E_R0J(g7, g5, envs->i_l+1, envs->j_l+0, envs->k_l, envs->l_l);
         G2E_D_I(g12, g4, envs->i_l+0, envs->j_l, envs->k_l, envs->l_l);
         G2E_D_I(g15, g7, envs->i_l+0, envs->j_l, envs->k_l, envs->l_l);
-        double s[9];
+        double s;
         for (n = 0; n < nf; n++) {
                 ix = idx[0+n*3];
                 iy = idx[1+n*3];
                 iz = idx[2+n*3];
-                for (i = 0; i < 9; i++) { s[i] = 0; }
+                s = 0;
                 for (i = 0; i < nrys_roots; i++) {
-                        s[0] += g15[ix+i] * g0[iy+i] * g0[iz+i];
-                        s[1] += g12[ix+i] * g3[iy+i] * g0[iz+i];
-                        s[2] += g12[ix+i] * g0[iy+i] * g3[iz+i];
-                        s[3] += g3[ix+i] * g12[iy+i] * g0[iz+i];
-                        s[4] += g0[ix+i] * g15[iy+i] * g0[iz+i];
-                        s[5] += g0[ix+i] * g12[iy+i] * g3[iz+i];
-                        s[6] += g3[ix+i] * g0[iy+i] * g12[iz+i];
-                        s[7] += g0[ix+i] * g3[iy+i] * g12[iz+i];
-                        s[8] += g0[ix+i] * g0[iy+i] * g15[iz+i];
+                        s += g15[ix+i] * g0[iy+i] * g0[iz+i];
+                        s += g12[ix+i] * g3[iy+i] * g0[iz+i];
+                        s += g12[ix+i] * g0[iy+i] * g3[iz+i];
+                        s += g3[ix+i] * g12[iy+i] * g0[iz+i];
+                        s += g0[ix+i] * g15[iy+i] * g0[iz+i];
+                        s += g0[ix+i] * g12[iy+i] * g3[iz+i];
+                        s += g3[ix+i] * g0[iy+i] * g12[iz+i];
+                        s += g0[ix+i] * g3[iy+i] * g12[iz+i];
+                        s += g0[ix+i] * g0[iy+i] * g15[iz+i];
                 }
                 if (gout_empty) {
-                        gout[n] = s[0] + s[3] + s[6] + s[1] + s[4] + s[7] + s[2] + s[5] + s[8];
+                        gout[n] = s;
                 } else {
-                        gout[n] += s[0] + s[3] + s[6] + s[1] + s[4] + s[7] + s[2] + s[5] + s[8];
+                        gout[n] += s;
                 }
         }
 }
@@ -253,27 +253,27 @@ static void CINTgout2e_int2e_breit_r2p2(double *gout,
         for (ix = 0; ix < envs->g_size * 3; ix++) {g7[ix] += g8[ix];}
         G2E_D_I(g12, g4, envs->i_l+0, envs->j_l, envs->k_l, envs->l_l);
         G2E_D_I(g15, g7, envs->i_l+0, envs->j_l, envs->k_l, envs->l_l);
-        double s[9];
+        double s;
         for (n = 0; n < nf; n++) {
                 ix = idx[0+n*3];
                 iy = idx[1+n*3];
                 iz = idx[2+n*3];
-                for (i = 0; i < 9; i++) { s[i] = 0; }
+                s = 0;
                 for (i = 0; i < nrys_roots; i++) {
-                        s[0] += g15[ix+i] * g0[iy+i] * g0[iz+i];
-                        s[1] += g12[ix+i] * g3[iy+i] * g0[iz+i];
-                        s[2] += g12[ix+i] * g0[iy+i] * g3[iz+i];
-                        s[3] += g3[ix+i] * g12[iy+i] * g0[iz+i];
-                        s[4] += g0[ix+i] * g15[iy+i] * g0[iz+i];
-                        s[5] += g0[ix+i] * g12[iy+i] * g3[iz+i];
-                        s[6] += g3[ix+i] * g0[iy+i] * g12[iz+i];
-                        s[7] += g0[ix+i] * g3[iy+i] * g12[iz+i];
-                        s[8] += g0[ix+i] * g0[iy+i] * g15[iz+i];
+                        s += g15[ix+i] * g0[iy+i] * g0[iz+i];
+                        s += g12[ix+i] * g3[iy+i] * g0[iz+i];
+                        s += g12[ix+i] * g0[iy+i] * g3[iz+i];
+                        s += g3[ix+i] * g12[iy+i] * g0[iz+i];
+                        s += g0[ix+i] * g15[iy+i] * g0[iz+i];
+                        s += g0[ix+i] * g12[iy+i] * g3[iz+i];
+                        s += g3[ix+i] * g0[iy+i] * g12[iz+i];
+                        s += g0[ix+i] * g3[iy+i] * g12[iz+i];
+                        s += g0[ix+i] * g0[iy+i] * g15[iz+i];
                 }
                 if (gout_empty) {
-                        gout[n] = s[0] + s[3] + s[6] + s[1] + s[4] + s[7] + s[2] + s[5] + s[8];
+                        gout[n] = s;
                 } else {
-                        gout[n] += s[0] + s[3] + s[6] + s[1] + s[4] + s[7] + s[2] + s[5] + s[8];
+                        gout[n] += s;
                 }
         }
 }
