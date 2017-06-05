@@ -7,7 +7,7 @@
 #if !defined HAVE_DEFINED_CINTOPT_H
 #define HAVE_DEFINED_CINTOPT_H
 typedef struct {
-    FINT **index_xyz_array; // ANG_MAX**4 pointers to index_xyz
+    FINT **index_xyz_array; // LMAX1**4 pointers to index_xyz
     FINT *prim_offset;
     FINT *non0ctr;
     FINT **non0idx;

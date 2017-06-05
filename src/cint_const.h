@@ -92,6 +92,7 @@
 #define MXRYSROOTS      16 // > ANG_MAX*2+1 for 4c2e
 #endif
 #define ANG_MAX         12 // l = 0..12
+#define LMAX1           16 // > ANG_MAX
 #define CART_MAX        128 // > (ANG_MAX*(ANG_MAX+1)/2)
 #define SHLS_MAX        0x7fffffff
 #define NPRIM_MAX       64

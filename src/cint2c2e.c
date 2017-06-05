@@ -145,7 +145,7 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT off; \
         const FINT io = opt->prim_offset[i_sh]; \
         const FINT ko = opt->prim_offset[k_sh]; \
-        envs->idx = opt->index_xyz_array[envs->i_l*ANG_MAX+envs->k_l]
+        envs->idx = opt->index_xyz_array[envs->i_l*LMAX1+envs->k_l]
 
 #define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
@@ -333,7 +333,7 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
         FINT off;
         const FINT io = opt->prim_offset[i_sh];
         const FINT ko = opt->prim_offset[k_sh];
-        envs->idx = opt->index_xyz_array[envs->i_l*ANG_MAX+envs->k_l];
+        envs->idx = opt->index_xyz_array[envs->i_l*LMAX1+envs->k_l];
         /* USE_OPT end */
 
         *kempty = 1;

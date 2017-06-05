@@ -240,9 +240,9 @@ k_contracted: ;
         const FINT jo = opt->prim_offset[j_sh]; \
         const FINT ko = opt->prim_offset[k_sh]; \
         const FINT lo = opt->prim_offset[l_sh]; \
-        envs->idx = opt->index_xyz_array[envs->i_l*ANG_MAX*ANG_MAX*ANG_MAX \
-                                        +envs->j_l*ANG_MAX*ANG_MAX \
-                                        +envs->k_l*ANG_MAX \
+        envs->idx = opt->index_xyz_array[envs->i_l*LMAX1*LMAX1*LMAX1 \
+                                        +envs->j_l*LMAX1*LMAX1 \
+                                        +envs->k_l*LMAX1 \
                                         +envs->l_l]
 
 #define SET_RIJ(I,J)    \
@@ -630,9 +630,9 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cache)
         const FINT jo = opt->prim_offset[j_sh];
         const FINT ko = opt->prim_offset[k_sh];
         const FINT lo = opt->prim_offset[l_sh];
-        envs->idx = opt->index_xyz_array[envs->i_l*ANG_MAX*ANG_MAX*ANG_MAX
-                                        +envs->j_l*ANG_MAX*ANG_MAX
-                                        +envs->k_l*ANG_MAX
+        envs->idx = opt->index_xyz_array[envs->i_l*LMAX1*LMAX1*LMAX1
+                                        +envs->j_l*LMAX1*LMAX1
+                                        +envs->k_l*LMAX1
                                         +envs->l_l];
         /* USE_OPT end */
 

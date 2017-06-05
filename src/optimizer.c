@@ -46,11 +46,7 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
         FINT i;
 
         if (opt0->index_xyz_array != NULL) {
-                for (i = 0; i < ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX; i++) {
-                        if (opt0->index_xyz_array[i] != NULL) {
-                                free(opt0->index_xyz_array[i]);
-                        };
-                }
+                free(opt0->index_xyz_array[0]);
                 free(opt0->index_xyz_array);
         }
 
@@ -158,6 +154,21 @@ static FINT _make_fakebas(FINT *fakebas, FINT *bas, FINT nbas, double *env)
         }
         return max_l;
 }
+static FINT *_allocate_index_xyz(CINTOpt *opt, FINT max_l, FINT order)
+{
+        FINT i;
+        FINT ll = 1;
+        FINT cc = 1;
+        FINT cumcart = (max_l+1) * (max_l+2) * (max_l+3) / 6;
+        for (i = 0; i < order; i++) {
+                ll *= LMAX1;
+                cc *= cumcart;
+        }
+        FINT *buf = malloc(sizeof(FINT) * cc * 3);
+        opt->index_xyz_array = malloc(sizeof(FINT*) * ll);
+        opt->index_xyz_array[0] = buf;
+        return buf;
+}
 
 /* len(ng) = 8. The first 4 items are the increment adding to envs.li_ceil
  * ... envs.ll_ceil for shell i, j, k, l */
@@ -165,15 +176,11 @@ void CINTOpt_4cindex_xyz(CINTOpt *opt, FINT *ng,
                          FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         FINT i, j, k, l, ptr;
-        FINT n = ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = malloc(sizeof(FINT*) * n);
-        for (i = 0; i < n; i++) {
-                opt->index_xyz_array[i] = NULL;
-        }
-
-        FINT fakebas[BAS_SLOTS*ANG_MAX];
+        FINT fakebas[BAS_SLOTS*LMAX1];
         FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
         FINT fakenbas = max_l+1;
+        FINT *buf = _allocate_index_xyz(opt, max_l, 4);
+
         CINTEnvVars envs;
         FINT shls[4];
         for (i = 0; i <= max_l; i++) {
@@ -183,12 +190,13 @@ void CINTOpt_4cindex_xyz(CINTOpt *opt, FINT *ng,
                 shls[0] = i; shls[1] = j; shls[2] = k; shls[3] = l;
                 CINTinit_int2e_EnvVars(&envs, ng, shls,
                                        atm, natm, fakebas, fakenbas, env);
-                ptr = i*ANG_MAX*ANG_MAX*ANG_MAX
-                    + j*ANG_MAX*ANG_MAX
-                    + k*ANG_MAX
+                ptr = i*LMAX1*LMAX1*LMAX1
+                    + j*LMAX1*LMAX1
+                    + k*LMAX1
                     + l;
-                opt->index_xyz_array[ptr] = malloc(sizeof(FINT)*envs.nf*3);
+                opt->index_xyz_array[ptr] = buf;
                 CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
+                buf += envs.nf * 3;
         } } } }
 }
 
@@ -196,15 +204,11 @@ void CINTOpt_3cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                          FINT *bas, FINT nbas, double *env)
 {
         FINT i, j, k, ptr;
-        FINT n = ANG_MAX*ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = malloc(sizeof(FINT*) * n);
-        for (i = 0; i < n; i++) {
-                opt->index_xyz_array[i] = NULL;
-        }
-
-        FINT fakebas[BAS_SLOTS*ANG_MAX];
+        FINT fakebas[BAS_SLOTS*LMAX1];
         FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
         FINT fakenbas = max_l+1;
+        FINT *buf = _allocate_index_xyz(opt, max_l, 3);
+
         CINTEnvVars envs;
         FINT shls[3];
         for (i = 0; i <= max_l; i++) {
@@ -213,9 +217,10 @@ void CINTOpt_3cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                 shls[0] = i; shls[1] = j; shls[2] = k;
                 CINTinit_int3c2e_EnvVars(&envs, ng, shls,
                                          atm, natm, fakebas, fakenbas, env);
-                ptr = i*ANG_MAX*ANG_MAX + j*ANG_MAX + k;
-                opt->index_xyz_array[ptr] = malloc(sizeof(FINT)*envs.nf*3);
+                ptr = i*LMAX1*LMAX1 + j*LMAX1 + k;
+                opt->index_xyz_array[ptr] = buf;
                 CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
+                buf += envs.nf * 3;
         } } }
 }
 
@@ -223,15 +228,11 @@ void CINTOpt_2cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                          FINT *bas, FINT nbas, double *env)
 {
         FINT i, j, ptr;
-        FINT n = ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = malloc(sizeof(FINT*) * n);
-        for (i = 0; i < n; i++) {
-                opt->index_xyz_array[i] = NULL;
-        }
-
-        FINT fakebas[BAS_SLOTS*ANG_MAX];
+        FINT fakebas[BAS_SLOTS*LMAX1];
         FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
         FINT fakenbas = max_l+1;
+        FINT *buf = _allocate_index_xyz(opt, max_l, 2);
+
         CINTEnvVars envs;
         FINT shls[2];
         for (i = 0; i <= max_l; i++) {
@@ -239,9 +240,10 @@ void CINTOpt_2cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                 shls[0] = i; shls[1] = j;
                 CINTinit_int1e_EnvVars(&envs, ng, shls,
                                        atm, natm, fakebas, fakenbas, env);
-                ptr = i*ANG_MAX + j;
-                opt->index_xyz_array[ptr] = malloc(sizeof(FINT)*envs.nf*3);
+                ptr = i*LMAX1 + j;
+                opt->index_xyz_array[ptr] = buf;
                 CINTg1e_index_xyz(opt->index_xyz_array[ptr], &envs);
+                buf += envs.nf * 3;
         } }
 }
 
@@ -249,15 +251,11 @@ void CINTOpt_3c1eindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                          FINT *bas, FINT nbas, double *env)
 {
         FINT i, j, k, ptr;
-        FINT n = ANG_MAX*ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = malloc(sizeof(FINT*) * n);
-        for (i = 0; i < n; i++) {
-                opt->index_xyz_array[i] = NULL;
-        }
-
-        FINT fakebas[BAS_SLOTS*ANG_MAX];
+        FINT fakebas[BAS_SLOTS*LMAX1];
         FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
         FINT fakenbas = max_l+1;
+        FINT *buf = _allocate_index_xyz(opt, max_l, 2);
+
         CINTEnvVars envs;
         FINT shls[3];
         for (i = 0; i <= max_l; i++) {
@@ -266,30 +264,27 @@ void CINTOpt_3c1eindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
                 shls[0] = i; shls[1] = j; shls[2] = k;
                 CINTinit_int3c1e_EnvVars(&envs, ng, shls,
                                          atm, natm, fakebas, fakenbas, env);
-                ptr = i*ANG_MAX*ANG_MAX + j*ANG_MAX + k;
-                opt->index_xyz_array[ptr] = malloc(sizeof(FINT)*envs.nf*3);
+                ptr = i*LMAX1*LMAX1 + j*LMAX1 + k;
+                opt->index_xyz_array[ptr] = buf;
                 CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
+                buf += envs.nf * 3;
         } } }
 }
 
 #ifdef WITH_F12
-int CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                           int *atm, int natm, int *bas, int nbas, double *env);
-void CINTOpt_stg_4cindex_xyz(CINTOpt *opt, int *ng, int *atm, int natm,
-                             int *bas, int nbas, double *env)
+FINT CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTOpt_stg_4cindex_xyz(CINTOpt *opt, FINT *ng, FINT *atm, FINT natm,
+                             FINT *bas, FINT nbas, double *env)
 {
-        int i, j, k, l, ptr;
-        int n = ANG_MAX*ANG_MAX*ANG_MAX*ANG_MAX;
-        opt->index_xyz_array = malloc(sizeof(int*) * n);
-        for (i = 0; i < n; i++) {
-                opt->index_xyz_array[i] = NULL;
-        }
+        FINT i, j, k, l, ptr;
+        FINT fakebas[BAS_SLOTS*LMAX1];
+        FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
+        FINT fakenbas = max_l+1;
+        FINT *buf = _allocate_index_xyz(opt, max_l, 4);
 
-        int fakebas[BAS_SLOTS*ANG_MAX];
-        int max_l = _make_fakebas(fakebas, bas, nbas, env);
-        int fakenbas = max_l+1;
         CINTEnvVars envs;
-        int shls[4];
+        FINT shls[4];
         for (i = 0; i <= max_l; i++) {
         for (j = 0; j <= max_l; j++) {
         for (k = 0; k <= max_l; k++) {
@@ -297,16 +292,18 @@ void CINTOpt_stg_4cindex_xyz(CINTOpt *opt, int *ng, int *atm, int natm,
                 shls[0] = i; shls[1] = j; shls[2] = k; shls[3] = l;
                 CINTinit_int2e_stg_EnvVars(&envs, ng, shls,
                                            atm, natm, fakebas, fakenbas, env);
-                ptr = i*ANG_MAX*ANG_MAX*ANG_MAX
-                    + j*ANG_MAX*ANG_MAX
-                    + k*ANG_MAX
+                ptr = i*LMAX1*LMAX1*LMAX1
+                    + j*LMAX1*LMAX1
+                    + k*LMAX1
                     + l;
-                opt->index_xyz_array[ptr] = malloc(sizeof(int)*envs.nf*3);
+                opt->index_xyz_array[ptr] = buf;
                 CINTg2e_index_xyz(opt->index_xyz_array[ptr], &envs);
+                buf += envs.nf * 3;
         } } } }
 }
-void CINTall_2e_stg_optimizer(CINTOpt **opt, int *ng,
-                              int *atm, int natm, int *bas, int nbas, double *env)
+
+void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
