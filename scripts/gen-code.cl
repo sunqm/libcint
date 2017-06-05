@@ -255,8 +255,8 @@
                   (g?e-of op) ig ig0 i-len right
                   (g?e-of op) (1+ ig) ig0 i-len right
                   ig (1+ ig))
-          (if (and (breit-int? opj-rev)
-                   (< (1+ right) (length opj-rev))) ; more ops on the left of breit-op
+          (if (and (intersection *act-left-right* opj-rev)
+                   (< (1+ right) (length opj-rev))) ; ops have *act-left-right* but the rightmost op is not
               (format fout fmt-j (g?e-of op) ig ig0 (1+ i-len) right)
               (format fout fmt-j (g?e-of op) ig ig0 i-len right)))))))
 
@@ -545,7 +545,7 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout ket-l "l")
       (dump-declare-giao-ijkl fout bra-i ket-j bra-k ket-l)
 ;;; generate g_(bin)
-      (if (breit-int? op)
+      (if (intersection *act-left-right* op)
         (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, i_l+" (1+ i-len) ", j_l+" (1+ j-len)
                             ", k_l+~a, l_l);~%"))
               (fmt-op "")
@@ -588,7 +588,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                            (t (/ goutinc 4)))))
         (format fout "void ~a_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env) {~%" intname)
-        (if (breit-int? op)
+        (if (intersection *act-left-right* op)
             (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
                     (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
             (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
@@ -597,7 +597,7 @@ const FINT *bas, const FINT nbas, const double *env) {~%" intname)
         (format fout "FINT ~a(double *opijkl, const FINT *shls,
 const FINT *atm, const FINT natm,
 const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {~%" intname)
-        (if (breit-int? op)
+        (if (intersection *act-left-right* op)
             (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
                     (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
             (format fout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"

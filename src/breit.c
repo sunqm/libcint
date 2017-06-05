@@ -106,7 +106,7 @@ static void CINTgout2e_cint2e_breit_r1p2_sph(double *g, double *gout,
         double *g15 = g14 + envs->g_size * 3;
         double *g16 = g15 + envs->g_size * 3;
         double s[9];
-        G2E_D_L(g1, g0, i_l+1, j_l+2, k_l+0, l_l+0);
+        G2E_D_L(g1, g0, i_l+2, j_l+2, k_l+0, l_l+0);
         G2E_R0J(g3, g1, i_l+1, j_l+0, k_l, l_l);
         G2E_D_J(g4, g0, i_l+1, j_l+1, k_l, l_l);
         G2E_D_I(g5, g0, i_l+1, j_l+1, k_l, l_l);
@@ -142,13 +142,13 @@ static void CINTgout2e_cint2e_breit_r1p2_sph(double *g, double *gout,
 }
 void cint2e_breit_r1p2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
                                      const FINT *bas, const FINT nbas, const double *env) {
-        FINT ng[] = {1, 2, 0, 1, 4, 1, 1, 1};
+        FINT ng[] = {2, 2, 0, 1, 4, 1, 1, 1};
         CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_breit_r1p2_sph(double *opijkl, const FINT *shls,
                            const FINT *atm, const FINT natm,
                            const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
-        FINT ng[] = {1, 2, 0, 1, 4, 1, 1, 1};
+        FINT ng[] = {2, 2, 0, 1, 4, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e_cint2e_breit_r1p2_sph;
@@ -190,8 +190,8 @@ static void CINTgout2e_cint2e_breit_r2p2_sph(double *g, double *gout,
         double *g15 = g14 + envs->g_size * 3;
         double *g16 = g15 + envs->g_size * 3;
         double s[9];
-        G2E_R0L(g2, g0, i_l+1, j_l+1, k_l+0, l_l+1);
-        G2E_D_L(g3, g2, i_l+1, j_l+1, k_l+0, l_l+0);
+        G2E_R0L(g2, g0, i_l+2, j_l+1, k_l+0, l_l+1);
+        G2E_D_L(g3, g2, i_l+2, j_l+1, k_l+0, l_l+0);
         G2E_D_J(g4, g0, i_l+1, j_l+0, k_l, l_l);
         G2E_D_I(g5, g0, i_l+1, j_l+0, k_l, l_l);
         for (ix = 0; ix < envs->g_size * 3; ix++) {g4[ix] += g5[ix];}
@@ -225,13 +225,13 @@ static void CINTgout2e_cint2e_breit_r2p2_sph(double *g, double *gout,
 }
 void cint2e_breit_r2p2_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
                                      const FINT *bas, const FINT nbas, const double *env) {
-        FINT ng[] = {1, 1, 0, 2, 4, 1, 1, 1};
+        FINT ng[] = {2, 1, 0, 2, 4, 1, 1, 1};
         CINTuse_all_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 FINT cint2e_breit_r2p2_sph(double *opijkl, const FINT *shls,
                            const FINT *atm, const FINT natm,
                            const FINT *bas, const FINT nbas, const double *env, CINTOpt *opt) {
-        FINT ng[] = {1, 1, 0, 2, 4, 1, 1, 1};
+        FINT ng[] = {2, 1, 0, 2, 4, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e_cint2e_breit_r2p2_sph;
