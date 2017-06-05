@@ -39,11 +39,16 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
                 case 6: case 7: case 8: case 9:
                         R_droot(nroots, x, u, w);
                         break;
-                default:
 #ifdef HAVE_QUADMATH_H
+                default:
                         R_qroot(nroots, x, u, w);
 #else
+                case 10: case 11: case 12: case 13:
                         R_lroot(nroots, x, u, w);
+                        break;
+                default:
+                        fprintf(stderr, "libcint needs quadmath library to support nroots=%d\n", nroots);
+                        exit(1);
 #endif
         }
 }
