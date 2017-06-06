@@ -879,10 +879,9 @@ FINT CINT2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTO
         if (out == NULL) {
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT n2 = (f_e1_c2s == &c2s_sf_2e1 || f_e1_c2s == &c2s_sf_2e1i) ? 20 : 32;
                 FINT cache_size = MAX(leng+len0+nc*n_comp*3,
                                      nc*n_comp + n1*envs->ncomp_e2*OF_CMPLX
-                                     + envs->nf*n2*OF_CMPLX);
+                                     + envs->nf*32*OF_CMPLX);
                 return cache_size;
         }
         double *stack = NULL;
