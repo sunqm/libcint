@@ -13,7 +13,7 @@
 #include "misc.h"
 #include "c2f.h"
 /* <NABLA i|OVLP |j> */
-static void CINTgout1e_int1e_ipovlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_ipovlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -62,7 +62,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_ipovlp)
 ALL_CINT1E_FORTRAN_(int1e_ipovlp)
 /* <NABLA i|OVLP |P DOT P j> */
-static void CINTgout1e_int1e_ipkin(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_ipkin(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -150,7 +150,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_ipkin)
 ALL_CINT1E_FORTRAN_(int1e_ipkin)
 /* <NABLA i|NUC |j> */
-static void CINTgout1e_int1e_ipnuc(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_ipnuc(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -199,7 +199,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 ALL_CINT1E(int1e_ipnuc)
 ALL_CINT1E_FORTRAN_(int1e_ipnuc)
 /* <NABLA i|RINV |j> */
-static void CINTgout1e_int1e_iprinv(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_iprinv(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -248,7 +248,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_iprinv)
 ALL_CINT1E_FORTRAN_(int1e_iprinv)
 /* <i|RINV |j> */
-static void CINTgout1e_int1e_rinv(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_rinv(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -291,7 +291,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_rinv)
 ALL_CINT1E_FORTRAN_(int1e_rinv)
 /* <NABLA SIGMA DOT P i|NUC |SIGMA DOT P j> */
-static void CINTgout1e_int1e_ipspnucsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_ipspnucsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -385,7 +385,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 2);
 ALL_CINT1E(int1e_ipspnucsp)
 ALL_CINT1E_FORTRAN_(int1e_ipspnucsp)
 /* <NABLA SIGMA DOT P i|RINV |SIGMA DOT P j> */
-static void CINTgout1e_int1e_ipsprinvsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+static void CINTgout1e_int1e_ipsprinvsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;

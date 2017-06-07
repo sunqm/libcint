@@ -66,7 +66,7 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
                         CINTg_ovlp(g, ai[ip], aj[jp], dij, envs);
 
                         CINTdset0(nf * n_comp, gout);
-                        (*envs->f_gout)(gout, g, idx, envs);
+                        (*envs->f_gout)(gout, g, idx, envs, 1);
 
                         n = nf * n_comp;
                         CINTprim_to_ctr(gctri, n, gout, 1, envs->i_prim,
@@ -176,7 +176,7 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
                                 CINTg_nuc(g, aij, rij, cr, t2,
                                           dij * w[i] * tau, envs);
 
-                                (*envs->f_gout)(gout, g, idx, envs);
+                                (*envs->f_gout)(gout, g, idx, envs, 1);
                         }
 
                         n = nf * n_comp;

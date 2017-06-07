@@ -336,7 +336,7 @@ iz = idx[2];~%")
            (tot-bits (+ i-len j-len op-len))
            (goutinc (length flat-script)))
       (format fout "static void CINTgout1e_~a" intname)
-      (format fout "(double *gout, double *g, int *idx, CINTEnvVars *envs, int count) {
+      (format fout "(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;~%")
@@ -1030,7 +1030,7 @@ int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache
            (tot-bits (+ i-len j-len op-len k-len))
            (goutinc (length flat-script)))
       (format fout "static void CINTgout1e_~a(double *gout,
-double *g, int *idx, CINTEnvVars *envs, int count) {~%" intname)
+double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
       (format fout "int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;~%")
@@ -1060,7 +1060,7 @@ ix = idx[0+n*3];
 iy = idx[1+n*3];
 iz = idx[2+n*3];~%")
       (dump-s-for-nroots fout tot-bits 1)
-      (gen-c-block fout flat-script)
+      (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
       goutinc)))
 
