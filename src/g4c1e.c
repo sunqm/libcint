@@ -9,6 +9,7 @@
 #include "cint_bas.h"
 #include "misc.h"
 #include "g1e.h"
+#include "g2e.h"
 
 void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs);
 void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs);
