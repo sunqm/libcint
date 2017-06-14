@@ -33,10 +33,6 @@ int CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
         envs->l_l = bas(ANG_OF, l_sh);
-        envs->i_prim = bas(NPRIM_OF, i_sh);
-        envs->j_prim = bas(NPRIM_OF, j_sh);
-        envs->k_prim = bas(NPRIM_OF, k_sh);
-        envs->l_prim = bas(NPRIM_OF, l_sh);
         envs->x_ctr[0] = bas(NCTR_OF, i_sh);
         envs->x_ctr[1] = bas(NCTR_OF, j_sh);
         envs->x_ctr[2] = bas(NCTR_OF, k_sh);
@@ -76,10 +72,6 @@ int CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
         assert(envs->j_l < ANG_MAX);
         assert(envs->k_l < ANG_MAX);
         assert(envs->l_l < ANG_MAX);
-        assert(envs->i_prim < NPRIM_MAX);
-        assert(envs->j_prim < NPRIM_MAX);
-        assert(envs->k_prim < NPRIM_MAX);
-        assert(envs->l_prim < NPRIM_MAX);
         assert(bas(ATOM_OF,i_sh) >= 0);
         assert(bas(ATOM_OF,j_sh) >= 0);
         assert(bas(ATOM_OF,k_sh) >= 0);

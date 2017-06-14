@@ -29,6 +29,8 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
         FINT j_l = envs->j_l;
         FINT i_ctr = envs->x_ctr[0];
         FINT j_ctr = envs->x_ctr[1];
+        FINT i_prim = bas(NPRIM_OF, i_sh);
+        FINT j_prim = bas(NPRIM_OF, j_sh);
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         FINT nf = envs->nf;
         double *ri = envs->ri;
@@ -50,11 +52,11 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
         rrij = CINTsquare_dist(ri, rj);
         double fac = envs->common_factor * CINTcommon_fac_sp(i_l) * CINTcommon_fac_sp(j_l);
 
-        for (jp = 0; jp < envs->j_prim; jp++) {
+        for (jp = 0; jp < j_prim; jp++) {
                 envs->aj = aj[jp];
                 n = nf * i_ctr * n_comp;
                 CINTdset0(n, gctri);
-                for (ip = 0; ip < envs->i_prim; ip++) {
+                for (ip = 0; ip < i_prim; ip++) {
                         envs->ai = ai[ip];
                         aij = ai[ip] + aj[jp];
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
@@ -69,12 +71,10 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
                         (*envs->f_gout)(gout, g, idx, envs, 1);
 
                         n = nf * n_comp;
-                        CINTprim_to_ctr(gctri, n, gout, 1, envs->i_prim,
-                                        i_ctr, ci+ip);
+                        CINTprim_to_ctr(gctri, n, gout, 1, i_prim, i_ctr, ci+ip);
                 }
                 n = nf * i_ctr;
-                CINTprim_to_ctr(gctr, n, gctri, n_comp, envs->j_prim,
-                                j_ctr, cj+jp);
+                CINTprim_to_ctr(gctr, n, gctri, n_comp, j_prim, j_ctr, cj+jp);
         }
         free(idx);
         return has_value;
@@ -119,6 +119,8 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
         FINT j_l = envs->j_l;
         FINT i_ctr = envs->x_ctr[0];
         FINT j_ctr = envs->x_ctr[1];
+        FINT i_prim = bas(NPRIM_OF, i_sh);
+        FINT j_prim = bas(NPRIM_OF, j_sh);
         FINT nf = envs->nf;
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         double *ri = envs->ri;
@@ -150,11 +152,11 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
         rrij = CINTsquare_dist(ri, rj);
         fac *= envs->common_factor * CINTcommon_fac_sp(i_l) * CINTcommon_fac_sp(j_l);
 
-        for (jp = 0; jp < envs->j_prim; jp++) {
+        for (jp = 0; jp < j_prim; jp++) {
                 envs->aj = aj[jp];
                 n = nf * i_ctr * n_comp;
                 CINTdset0(n, gctri);
-                for (ip = 0; ip < envs->i_prim; ip++) {
+                for (ip = 0; ip < i_prim; ip++) {
                         envs->ai = ai[ip];
                         aij = ai[ip] + aj[jp];
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
@@ -180,12 +182,10 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
                         }
 
                         n = nf * n_comp;
-                        CINTprim_to_ctr(gctri, n, gout, 1, envs->i_prim,
-                                        i_ctr, ci+ip);
+                        CINTprim_to_ctr(gctri, n, gout, 1, i_prim, i_ctr, ci+ip);
                 }
                 n = nf * i_ctr;
-                CINTprim_to_ctr(gctr, n, gctri, n_comp, envs->j_prim,
-                                j_ctr, cj+jp);
+                CINTprim_to_ctr(gctr, n, gctri, n_comp, j_prim, j_ctr, cj+jp);
         }
         free(idx);
         return has_value;

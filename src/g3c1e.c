@@ -27,9 +27,6 @@ void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
         envs->l_l = 0;
-        envs->i_prim = bas(NPRIM_OF, i_sh);
-        envs->j_prim = bas(NPRIM_OF, j_sh);
-        envs->k_prim = bas(NPRIM_OF, k_sh);
         envs->x_ctr[0] = bas(NCTR_OF, i_sh);
         envs->x_ctr[1] = bas(NCTR_OF, j_sh);
         envs->x_ctr[2] = bas(NCTR_OF, k_sh);

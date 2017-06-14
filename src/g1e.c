@@ -26,8 +26,6 @@ void CINTinit_int1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         const FINT j_sh = shls[1];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
-        envs->i_prim = bas(NPRIM_OF, i_sh);
-        envs->j_prim = bas(NPRIM_OF, j_sh);
         envs->x_ctr[0] = bas(NCTR_OF, i_sh);
         envs->x_ctr[1] = bas(NCTR_OF, j_sh);
         envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
@@ -50,8 +48,6 @@ void CINTinit_int1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         assert(j_sh < SHLS_MAX);
         assert(envs->i_l < ANG_MAX);
         assert(envs->j_l < ANG_MAX);
-        assert(envs->i_prim < NPRIM_MAX);
-        assert(envs->j_prim < NPRIM_MAX);
         assert(bas(ATOM_OF,i_sh) >= 0);
         assert(bas(ATOM_OF,j_sh) >= 0);
         assert(bas(ATOM_OF,i_sh) < natm);
