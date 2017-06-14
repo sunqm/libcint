@@ -47,6 +47,8 @@ typedef struct {
 
         int g2d_ijmax;
         int g2d_klmax;
+        double common_factor;
+        double _padding1;
         double rirj[3]; // diff by sign in different g0_2d4d algorithm
         double rkrl[3];
         double *rx_in_rijrx;
@@ -73,7 +75,6 @@ typedef struct {
         double rkl[3];
         double rklrx[3];
         double akl;
-        double common_factor;
 } CINTEnvVars;
 #endif
 
