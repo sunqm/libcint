@@ -92,6 +92,9 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->rkrl[0] = envs->rk[0];
         envs->rkrl[1] = envs->rk[1];
         envs->rkrl[2] = envs->rk[2];
+        envs->rklrx[0] = 0;
+        envs->rklrx[1] = 0;
+        envs->rklrx[2] = 0;
         // in g0_2d rklrx = rkl - rx = 0 => rkl = rx
         envs->rx_in_rklrx = envs->rk;
 
