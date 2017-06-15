@@ -237,7 +237,7 @@ void CINTall_3c1e_optimizer(CINTOpt **opt, FINT *ng,
 }
 
 #ifdef WITH_F12
-FINT CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -396,3 +396,20 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
         }
 }
 
+void CINTdel_pairdata_optimizer(CINTOpt *cintopt)
+{
+        if (cintopt->expij != NULL) {
+                int i;
+                for (i = 0; i < cintopt->tot_prim; i++) {
+                        free(cintopt->expij[i]);
+                        free(cintopt->rij[i]);
+                        free(cintopt->cceij[i]);
+                }
+                free(cintopt->expij);
+                free(cintopt->rij);
+                free(cintopt->cceij);
+                cintopt->expij = NULL;
+                cintopt->rij = NULL;
+                cintopt->cceij = NULL;
+        }
+}

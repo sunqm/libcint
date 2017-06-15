@@ -533,7 +533,7 @@ FINT CINT3c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         FINT n;
         FINT has_value;
 
-        if (opt != NULL) {
+        if (opt != NULL && opt->expij != NULL) {
                 n = ((envs->x_ctr[0]==1) << 2) + ((envs->x_ctr[1]==1) << 1) + (envs->x_ctr[2]==1);
                 has_value = CINTf_3c2e_loop[n](gctr, envs, opt, cache);
         } else {
@@ -589,7 +589,7 @@ FINT CINT3c2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         FINT n;
         FINT has_value;
 
-        if (opt != NULL) {
+        if (opt != NULL && opt->expij != NULL) {
                 n = ((envs->x_ctr[0]==1) << 2) + ((envs->x_ctr[1]==1) << 1) + (envs->x_ctr[2]==1);
                 has_value = CINTf_3c2e_loop[n](gctr, envs, opt, cache);
         } else {
@@ -660,7 +660,7 @@ FINT CINT3c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
         FINT n;
         FINT has_value;
 
-        if (opt != NULL) {
+        if (opt != NULL && opt->expij != NULL) {
                 n = ((envs->x_ctr[0]==1) << 2) + ((envs->x_ctr[1]==1) << 1) + (envs->x_ctr[2]==1);
                 has_value = CINTf_3c2e_loop[n](gctr, envs, opt, cache);
         } else {
