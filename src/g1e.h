@@ -20,33 +20,33 @@ typedef struct {
         FINT j_l;
         FINT k_l;
         FINT l_l;
-        int nfi;  // number of cartesion components
-        int nfj;
-        int nfk;
-        int nfl;
-        int nf;  // = nfi*nfj*nfk*nfl;
-        int _padding;
-        int x_ctr[4];
+        FINT nfi;  // number of cartesion components
+        FINT nfj;
+        FINT nfk;
+        FINT nfl;
+        FINT nf;  // = nfi*nfj*nfk*nfl;
+        FINT _padding;
+        FINT x_ctr[4];
 
-        int gbits;
-        int ncomp_e1; // = 1 if spin free, = 4 when spin included, it
-        int ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
-        int ncomp_tensor; // e.g. = 3 for gradients
+        FINT gbits;
+        FINT ncomp_e1; // = 1 if spin free, = 4 when spin included, it
+        FINT ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
+        FINT ncomp_tensor; // e.g. = 3 for gradients
 
         /* values may diff based on the g0_2d4d algorithm */
-        int li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
-        int lj_ceil;
-        int lk_ceil;
-        int ll_ceil;
-        int g_stride_i; // nrys_roots * shift of (i++,k,l,j)
-        int g_stride_k; // nrys_roots * shift of (i,k++,l,j)
-        int g_stride_l; // nrys_roots * shift of (i,k,l++,j)
-        int g_stride_j; // nrys_roots * shift of (i,k,l,j++)
-        int nrys_roots;
-        int g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
+        FINT li_ceil; // power of x, == i_l if nabla is involved, otherwise == i_l
+        FINT lj_ceil;
+        FINT lk_ceil;
+        FINT ll_ceil;
+        FINT g_stride_i; // nrys_roots * shift of (i++,k,l,j)
+        FINT g_stride_k; // nrys_roots * shift of (i,k++,l,j)
+        FINT g_stride_l; // nrys_roots * shift of (i,k,l++,j)
+        FINT g_stride_j; // nrys_roots * shift of (i,k,l,j++)
+        FINT nrys_roots;
+        FINT g_size;  // ref to cint2e.c g = malloc(sizeof(double)*g_size)
 
-        int g2d_ijmax;
-        int g2d_klmax;
+        FINT g2d_ijmax;
+        FINT g2d_klmax;
         double common_factor;
         double _padding1;
         double rirj[3]; // diff by sign in different g0_2d4d algorithm

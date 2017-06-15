@@ -398,7 +398,7 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
 
 void CINTdel_pairdata_optimizer(CINTOpt *cintopt)
 {
-        if (cintopt->expij != NULL) {
+        if (cintopt != NULL && cintopt->expij != NULL) {
                 int i;
                 for (i = 0; i < cintopt->tot_prim; i++) {
                         free(cintopt->expij[i]);
