@@ -548,7 +548,6 @@ int ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_cg_ssa10ssp2;
-envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_cg_ssa10ssp2_cart
 int int2e_cg_ssa10ssp2_sph(double *out, int *dims, int *shls,
@@ -557,7 +556,6 @@ int ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_cg_ssa10ssp2;
-envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_cg_ssa10ssp2_sph
 int int2e_cg_ssa10ssp2_spinor(double complex *out, int *dims, int *shls,
@@ -710,7 +708,6 @@ int ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_giao_ssa10ssp2;
-envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_giao_ssa10ssp2_cart
 int int2e_giao_ssa10ssp2_sph(double *out, int *dims, int *shls,
@@ -719,7 +716,6 @@ int ng[] = {1, 0, 0, 1, 2, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_giao_ssa10ssp2;
-envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_giao_ssa10ssp2_sph
 int int2e_giao_ssa10ssp2_spinor(double complex *out, int *dims, int *shls,
@@ -907,7 +903,6 @@ CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gssp1ssp2;
 envs.common_factor *= 0.5;
-envs.common_factor *= 0.5;
 int i, nout;
 int counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
@@ -928,7 +923,6 @@ int ng[] = {1, 1, 0, 1, 3, 4, 4, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_gssp1ssp2;
-envs.common_factor *= 0.5;
 envs.common_factor *= 0.5;
 int i, nout;
 int counts[4];

@@ -2046,7 +2046,6 @@ int ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_p1vxp1;
-envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_p1vxp1_cart
 int int2e_p1vxp1_sph(double *out, int *dims, int *shls,
@@ -2055,7 +2054,6 @@ int ng[] = {1, 1, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_p1vxp1;
-envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_p1vxp1_sph
 int int2e_p1vxp1_spinor(double complex *out, int *dims, int *shls,

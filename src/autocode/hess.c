@@ -792,7 +792,6 @@ int ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ipip1;
-envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_ipip1_cart
 int int2e_ipip1_sph(double *out, int *dims, int *shls,
@@ -801,7 +800,6 @@ int ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ipip1;
-envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_ipip1_sph
 int int2e_ipip1_spinor(double complex *out, int *dims, int *shls,
@@ -876,7 +874,6 @@ int ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ipvip1;
-envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_ipvip1_cart
 int int2e_ipvip1_sph(double *out, int *dims, int *shls,
@@ -885,7 +882,6 @@ int ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ipvip1;
-envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_ipvip1_sph
 int int2e_ipvip1_spinor(double complex *out, int *dims, int *shls,
@@ -960,7 +956,6 @@ int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ip1ip2;
-envs.common_factor *= 1;
 return CINT2e_cart_drv(out, dims, &envs, opt, cache);
 } // int2e_ip1ip2_cart
 int int2e_ip1ip2_sph(double *out, int *dims, int *shls,
@@ -969,7 +964,6 @@ int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int2e_ip1ip2;
-envs.common_factor *= 1;
 return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 } // int2e_ip1ip2_sph
 int int2e_ip1ip2_spinor(double complex *out, int *dims, int *shls,
