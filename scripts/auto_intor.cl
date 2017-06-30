@@ -43,6 +43,8 @@
 )
 
 (gen-cint "intor3.c"
+  '("int1e_sigma"               ( \| sigma ))
+  '("int1e_spsigmasp"           (sigma dot p \| sigma sigma dot p))
   '("int1e_srsr"                (sigma dot r \| sigma dot r))
   '("int1e_sr"                  (sigma dot r \|))
   '("int1e_srsp"                (sigma dot r \| sigma dot p))
@@ -163,6 +165,11 @@
   '("int3c2e_spsp1"             (sigma dot p \, sigma dot p \| ))
   '("int3c2e_ipspsp1"           (nabla sigma dot p \, sigma dot p \| ))
   '("int3c2e_spsp1ip2"          (sigma dot p \, sigma dot p \| nabla ))
+;
+  '("int3c2e_ipip1"             ( nabla nabla \, \| ))
+  '("int3c2e_ipvip1"            ( nabla \, nabla \| ))
+  '("int3c2e_ip1ip2"            ( nabla \, \| nabla ))
+  '("int2c2e_ip1ip2"            ( nabla \| r12 \| nabla))
 )
 
 (gen-cint "int3c1e.c"
