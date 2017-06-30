@@ -180,6 +180,10 @@
   '("cint3c2e_spsp1_spinor"   spinor   (sigma dot p \, sigma dot p \| ))
   '("cint3c2e_ipspsp1_spinor" spinor   (nabla sigma dot p \, sigma dot p \| ))
   '("cint3c2e_spsp1ip2_spinor" spinor  (sigma dot p \, sigma dot p \| nabla ))
+  '("cint3c2e_ipip1_sph"   spheric  ( nabla nabla \, \| ))
+  '("cint3c2e_ipvip1_sph"  spheric  ( nabla \, nabla \| ))
+  '("cint3c2e_ip1ip2_sph"  spheric  ( nabla \, \| nabla ))
+  '("cint2c2e_ip1ip2_sph"  spheric  ( nabla \| r12 \| nabla))
 )
  
 (gen-cint "auto_hess.c"

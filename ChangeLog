@@ -1,3 +1,6 @@
+Version 2.8.17 (2017-06-29):
+	* Second order derivatives for 3-center 2-electron integrals
+
 Version 2.8.16 (2017-06-02):
 	* Add 4-center 1-electron overlap integral
 	* Add Breit-type integral p1 dot r12 (1/r12^3) r12 dot p2
