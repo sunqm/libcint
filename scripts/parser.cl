@@ -42,7 +42,7 @@
 ;;; rk = r - R_k
 ;;; rl = r - R_l
 ;;; r = ri/rj/rk/rl; associate with the basis it acts on
-;;; g = i (R_m - R_n) cross r0
+;;; g = i/2 (R_m - R_n) cross r0
 ;;;
 ;;; sticker symbol *, which sticks the decorated operator to op or ket-ops
 ;;;         (bra-ops ... p* |op| ket-ops)

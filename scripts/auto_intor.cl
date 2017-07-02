@@ -33,13 +33,19 @@
   ; cross to the next p
   '("int1e_prinvxp"             (p* \| rinv cross p \| ))
   '("int1e_pnucxp"              (p* \| nuc cross p \| ))
-  '("int2e_p1vxp1"              ( p* \, cross p \| \, )) ; SSO
+  '("int2e_p1vxp1"              (p* \, cross p \| \, )) ; SSO
 )
 
 (gen-cint "intor2.c"
   ;'("int2e"                     ( \, \| \, ))
   '("int2e_ig1"                 (#C(0 1) g \, \| \, ))
   '("int2e_ig1ig2"              (-1 g \, \| g \, ))
+  '("int2e_ip1v_rc1"            ( \, rc \| nabla-r12 \| \, ))
+  '("int2e_ip1v_r1"             ( \, r  \| nabla-r12 \| \, ))
+  '("int2e_ipvg1_xp1"           (g \, \| nabla-r12 cross p \| \, ))
+  '("int2e_ipvg2_xp1"           (  \, \| nabla-r12 cross p \| g \, ))
+  '("int1e_inuc_rcxp"           (#C(0 1) \| nuc \| rc cross p ))
+  '("int1e_inuc_rxp"            (#C(0 1) \| nuc \| r cross p ))
 )
 
 (gen-cint "intor3.c"
