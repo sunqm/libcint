@@ -34,6 +34,6 @@ FINT CINT2c2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
  * should move following two into cint1e.h
  */
 FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                         double *cache, void (*f_e1_c2s)(), FINT is_ssc);
+                         double *cache, void (*f_e1_c2s)(), FINT int_type, FINT is_ssc);
 FINT CINT3c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                      double *cache);
+                      double *cache, FINT int_type);

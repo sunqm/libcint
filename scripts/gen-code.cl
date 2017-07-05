@@ -1061,6 +1061,10 @@ iz = idx[2+n*3];~%")
       (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
       goutinc)))
+(defun gen-code-gout3c1e-nuc (fout intname raw-infix flat-script)
+  (gen-code-gout3c1e fout intname raw-infix flat-script))
+(defun gen-code-gout3c1e-rinv (fout intname raw-infix flat-script)
+  (gen-code-gout3c1e fout intname raw-infix flat-script))
 
 (defun gen-code-int3c1e (fout intname raw-infix)
   (destructuring-bind (op bra-i ket-j bra-k ket-l)
@@ -1081,6 +1085,11 @@ iz = idx[2+n*3];~%")
            (goutinc (length flat-script))
            (e1comps (if (eql sf 'sf) 1 4))
            (tensors (if (eql sf 'sf) goutinc (/ goutinc 4)))
+           (int1e-type (cond ((member 'nuc raw-infix) 2)
+                             ((member 'rinv raw-infix) 1)
+                             ((member 'nabla-rinv raw-infix)
+                              (error "nabla-rinv for 3c1e not support"))
+                             (t 0)))
            (ngdef (with-output-to-string (tmpout)
                     (if (or (member 'nuc raw-infix)
                             (member 'rinv raw-infix)
@@ -1123,7 +1132,8 @@ nout = dims[0] * dims[1] * dims[2];
 for (i = 0; i < envs.ncomp_e1 * envs.ncomp_e2 * envs.ncomp_tensor; i++) {
 c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
-      (format fout "return CINT3c1e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
+      (format fout "return CINT3c1e_cart_drv(out, dims, &envs, opt, cache, ~d);~%}
+// ~a_cart~%" int1e-type intname)
 ;;; _sph
       (format fout "int ~a_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
@@ -1142,8 +1152,8 @@ nout = dims[0] * dims[1] * dims[2];
 for (i = 0; i < envs.ncomp_e1 * envs.ncomp_e2 * envs.ncomp_tensor; i++) {
 c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
-      (format fout "return CINT3c1e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, 0);
-} // ~a_sph~%" intname)
+      (format fout "return CINT3c1e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, ~d, 0);
+} // ~a_sph~%" int1e-type intname)
 ;;; _spinor
       (format fout "int ~a_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
@@ -1162,8 +1172,8 @@ nout = dims[0] * dims[1] * dims[2];
 for (i = 0; i < envs.ncomp_tensor; i++) {
 c2s_zset0(out+nout*i, dims, counts); }
 return 0; }~%")))
-      (format fout "return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, ~a, 0);
-} // ~a_spinor~%" (name-c2sor "3c2e1" 'spinor sf ts) intname)))
+      (format fout "return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, ~a, ~d, 0);
+} // ~a_spinor~%" (name-c2sor "3c2e1" 'spinor sf ts) int1e-type intname)))
   (format fout "ALL_CINT(~a)~%" intname)
   (format fout "ALL_CINT_FORTRAN_(~a)~%" intname))
 

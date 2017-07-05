@@ -50,7 +50,7 @@ void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lj_ceil = envs->j_l + ng[JINC];
         envs->lk_ceil = envs->k_l + ng[KINC];
         envs->ll_ceil = 0;
-        envs->nrys_roots = 1;
+        envs->nrys_roots =(envs->li_ceil + envs->lj_ceil + envs->lk_ceil)/2 + 1;
 
         envs->common_factor = SQRTPI * M_PI
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
@@ -157,11 +157,78 @@ void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
         gy[dj] = -rjrijk[1] * gy[0];
         gz[dj] = -rjrijk[2] * gz[0];
 
-        double *p2x, *p2y, *p2z;
         for (j = 1; j < nmax; j++) {
                 gx[(j+1)*dj] = aijk1 * j * gx[(j-1)*dj] - rjrijk[0] * gx[j*dj];
                 gy[(j+1)*dj] = aijk1 * j * gy[(j-1)*dj] - rjrijk[1] * gy[j*dj];
                 gz[(j+1)*dj] = aijk1 * j * gz[(j-1)*dj] - rjrijk[2] * gz[j*dj];
+        }
+
+        for (i = 1; i <= li; i++) {
+                for (j = 0; j <= nmax-i; j++) { // upper limit lj+lk
+                        gx[i+j*dj] = gx[i-1+(j+1)*dj] - rirj[0] * gx[i-1+j*dj];
+                        gy[i+j*dj] = gy[i-1+(j+1)*dj] - rirj[1] * gy[i-1+j*dj];
+                        gz[i+j*dj] = gz[i-1+(j+1)*dj] - rirj[2] * gz[i-1+j*dj];
+                }
+        }
+
+        dj = envs->g_stride_j;
+        for (k = 1; k <= lk; k++) {
+                for (j = 0; j <= mmax-k; j++) {
+                        off = k * dk + j * dj;
+                        for (i = off; i <= off+li; i++) {
+                                gx[i] = gx[i+dj-dk] + rjrk[0] * gx[i-dk];
+                                gy[i] = gy[i+dj-dk] + rjrk[1] * gy[i-dk];
+                                gz[i] = gz[i+dj-dk] + rjrk[2] * gz[i-dk];
+                        }
+                }
+        }
+}
+
+void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
+                   double *cr, double t2, double fac, CINTEnvVars *envs)
+{
+        const FINT li = envs->li_ceil;
+        const FINT lj = envs->lj_ceil;
+        const FINT lk = envs->lk_ceil;
+        const FINT nmax = li + lj + lk;
+        const FINT mmax = lj + lk;
+        double *gx = g;
+        double *gy = g + envs->g_size;
+        double *gz = g + envs->g_size * 2;
+        gx[0] = 1;
+        gy[0] = 1;
+        gz[0] = 2/SQRTPI * fac;
+        if (nmax == 0) {
+                return;
+        }
+
+        FINT dj = li + 1;
+        const FINT dk = envs->g_stride_k;
+        const double aijk = ai + aj + ak;
+        const double *ri = envs->ri;
+        const double *rj = envs->rj;
+        const double *rk = envs->rk;
+        FINT i, j, k, off;
+        const double *rirj = envs->rirj;
+        double rjrk[3], rjr0[3];
+
+        rjrk[0] = rj[0] - rk[0];
+        rjrk[1] = rj[1] - rk[1];
+        rjrk[2] = rj[2] - rk[2];
+
+        rjr0[0] = rj[0] - (rijk[0] + t2 * (cr[0] - rijk[0]));
+        rjr0[1] = rj[1] - (rijk[1] + t2 * (cr[1] - rijk[1]));
+        rjr0[2] = rj[2] - (rijk[2] + t2 * (cr[2] - rijk[2]));
+
+        gx[dj] = -rjr0[0] * gx[0];
+        gy[dj] = -rjr0[1] * gy[0];
+        gz[dj] = -rjr0[2] * gz[0];
+
+        const double aijk1 = .5 * (1 - t2) / aijk;
+        for (j = 1; j < nmax; j++) {
+                gx[(j+1)*dj] = aijk1 * j * gx[(j-1)*dj] - rjr0[0] * gx[j*dj];
+                gy[(j+1)*dj] = aijk1 * j * gy[(j-1)*dj] - rjr0[1] * gy[j*dj];
+                gz[(j+1)*dj] = aijk1 * j * gz[(j-1)*dj] - rjr0[2] * gz[j*dj];
         }
 
         for (i = 1; i <= li; i++) {

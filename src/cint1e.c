@@ -84,7 +84,7 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
  * For given charge distribution, calculate temporary parameter tau.
  * The charge parameter zeta is defined as    rho(r) = Norm * exp(-zeta*r^2)
  */
-static double CINTnuc_mod(double aij, FINT nuc_id, FINT *atm, double *env)
+double CINTnuc_mod(double aij, FINT nuc_id, FINT *atm, double *env)
 {
         double zeta;
         if (nuc_id < 0) {
