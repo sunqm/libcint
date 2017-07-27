@@ -82,12 +82,12 @@ env(off + 2) = 2.
 env(off + 3) = .8
 off = off + 3
 bas(PTR_COEFF,n) = off
-env(off + 1) = .7 * CINTgto_norm(bas(ANG_OF,n), 6.)
-env(off + 2) = .6 * CINTgto_norm(bas(ANG_OF,n), 2.)
-env(off + 3) = .5 * CINTgto_norm(bas(ANG_OF,n), .8)
-env(off + 4) = .4 * CINTgto_norm(bas(ANG_OF,n), 6.)
-env(off + 5) = .3 * CINTgto_norm(bas(ANG_OF,n), 2.)
-env(off + 6) = .2 * CINTgto_norm(bas(ANG_OF,n), .8)
+env(off + 1) = .7 * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
+env(off + 2) = .6 * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+2))
+env(off + 3) = .5 * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+3))
+env(off + 4) = .4 * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
+env(off + 5) = .3 * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+2))
+env(off + 6) = .2 * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+3))
 off = off + 6
 n = n + 1
 
@@ -100,7 +100,7 @@ bas(PTR_EXP  ,n)  = off
 env(off + 1) = .9
 off = off + 1
 bas(PTR_COEFF,n) = off
-env(off + 1) = 1. * CINTgto_norm(bas(ANG_OF,n), .9)
+env(off + 1) = 1. * CINTgto_norm(bas(ANG_OF,n), env(bas(PTR_EXP,n)+1))
 off = off + 1
 n = n + 1
 
