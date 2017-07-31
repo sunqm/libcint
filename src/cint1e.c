@@ -225,7 +225,7 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
         double *gctr;
         MALLOC_INSTACK(gctr, double, nc*n_comp);
 
-        FINT ip, jp, nout;
+        FINT nout;
         FINT n;
         FINT has_value = 0;
         FINT *atm = envs->atm;
@@ -290,7 +290,7 @@ FINT CINT1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
         double *gctr;
         MALLOC_INSTACK(gctr, double, nc*envs->ncomp_tensor);
 
-        FINT ip, jp, nout;
+        FINT nout;
         FINT n;
         FINT has_value = 0;
         FINT *atm = envs->atm;

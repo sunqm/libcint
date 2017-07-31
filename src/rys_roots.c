@@ -23,6 +23,17 @@
 
 #include "fmt.c"
 
+static void Root123(FINT n, double x, double roots[], double weights[]);
+static void Root4(double x, double roots[], double weights[]);
+static void Root5(double x, double roots[], double weights[]);
+static void R_droot(FINT nroots, double x, double roots[], double weights[]);
+#ifdef HAVE_QUADMATH_H
+static void R_qroot(FINT nroots, double x, double roots[], double weights[]);
+#else
+static void R_lroot(FINT nroots, double x, double roots[], double weights[]);
+#endif
+
+
 // FIXME: R_dsmit causes big errors for nroots > 13
 void CINTrys_roots(FINT nroots, double x, double *u, double *w)
 {
@@ -1587,6 +1598,8 @@ L70:
     return;
 }
 
+#ifndef HAVE_QUADMATH_H
+
 /*
  ******************************************************
  * 80 bit double
@@ -1807,8 +1820,7 @@ L70:
     }
     return;
 }
-
-#ifdef HAVE_QUADMATH_H
+#else // defined HAVE_QUADMATH_H
 
 static void R_qnode(__float128 *a, __float128 *rt, int order)
 {

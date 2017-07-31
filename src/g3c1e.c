@@ -205,7 +205,6 @@ void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
         FINT dj = li + 1;
         const FINT dk = envs->g_stride_k;
         const double aijk = ai + aj + ak;
-        const double *ri = envs->ri;
         const double *rj = envs->rj;
         const double *rk = envs->rk;
         FINT i, j, k, off;

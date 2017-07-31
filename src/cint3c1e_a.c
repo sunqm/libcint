@@ -9,7 +9,6 @@
 #include "g2e.h"
 #include "optimizer.h"
 #include "cint1e.h"
-#include "cint2e.h"
 #include "misc.h"
 #include "c2f.h"
 

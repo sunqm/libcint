@@ -380,7 +380,6 @@ void CINTx1k_1e(double *f, double *g, double *rk,
 void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
                      FINT inc, FINT nprim, FINT nctr, double *coeff)
 {
-        FINT INC1 = 1;
         FINT n, i, k;
         double *pgc = gc;
         double c;

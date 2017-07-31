@@ -36,15 +36,15 @@ FINT int2e_breit_##X##_spinor(double complex *out, FINT *dims, FINT *shls, \
                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, \
                              CINTOpt *opt, double *cache) \
 { \
-        _int2e_breit_drv(out, dims, shls, atm, natm, bas, nbas, env, opt, cache, \
-                         1, &int2e_##X##_spinor, \
-                         &int2e_gauge_r1_##X##_spinor, &int2e_gauge_r2_##X##_spinor); \
+        return _int2e_breit_drv(out, dims, shls, atm, natm, bas, nbas, env, opt, cache, \
+                                1, &int2e_##X##_spinor, \
+                                &int2e_gauge_r1_##X##_spinor, &int2e_gauge_r2_##X##_spinor); \
 } \
 FINT cint2e_breit_##X(double complex *out, FINT *shls, \
                       FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, \
                       CINTOpt *opt) \
 { \
-        int2e_breit_##X##_spinor(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
+        return int2e_breit_##X##_spinor(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
 }
 
 static void _copy_to_out(double complex *out, double complex *in, FINT *dims, FINT *counts)

@@ -1,6 +1,5 @@
-FINT CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, const FINT *ng, const FINT *shls,
-                             const FINT *atm, const FINT natm,
-                             const FINT *bas, const FINT nbas, const double *env);
+void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
                     double fac, CINTEnvVars *envs);

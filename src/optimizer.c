@@ -11,6 +11,7 @@
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "g2e.h"
+#include "g3c1e.h"
 #include "optimizer.h"
 #include "misc.h"
 

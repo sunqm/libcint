@@ -52,7 +52,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         double *ck = env + bas(PTR_COEFF, k_sh);
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         double fac1i, fac1j, fac1k;
-        FINT ip, jp, kp, n;
+        FINT ip, jp, kp;
         FINT empty[4] = {1, 1, 1, 1};
         FINT *iempty = empty + 0;
         FINT *jempty = empty + 1;

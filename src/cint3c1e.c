@@ -9,12 +9,14 @@
 #include <string.h>
 #include <math.h>
 #include "cint_bas.h"
-#include "g1e.h"
+#include "g2e.h"
+#include "g3c1e.h"
 #include "optimizer.h"
 #include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
 #include "cart2sph.h"
+#include "rys_roots.h"
 #include "c2f.h"
 
 #define PRIM2CTR0(ctrsymb, gp, ngp) \
@@ -366,7 +368,7 @@ FINT CINT3c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         }
         double *gctr;
         FINT n;
-        FINT has_value;
+        FINT has_value = 0;
 
         if (int_type == INT1E_TYPE_OVLP) {
                 MALLOC_INSTACK(gctr, double, nc*n_comp);
@@ -445,7 +447,7 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         }
         double *gctr;
         FINT n;
-        FINT has_value;
+        FINT has_value = 0;
 
         if (int_type == INT1E_TYPE_OVLP) {
                 MALLOC_INSTACK(gctr, double, nc*n_comp);
@@ -509,7 +511,7 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
 
 // TODO: ssc type c2s transformation
 FINT CINT3c1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                        double *cache, void (*f_e1_c2s)(), FINT int_type)
+                        double *cache, void (*f_e1_c2s)(), FINT int_type, FINT is_ssc)
 {
         fprintf(stderr, "CINT3c1e_spinor_drv not implemented");
         exit(1);
@@ -568,7 +570,7 @@ FINT int3c1e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT
         CINTEnvVars envs;
         CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout3c1e;
-        return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 0);
+        return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 0, 0);
 }
 
 FINT int3c1e_rinv_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
@@ -603,7 +605,7 @@ FINT int3c1e_rinv_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm,
         CINTEnvVars envs;
         CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout3c1e;
-        return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 1);
+        return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 1, 0);
 }
 
 

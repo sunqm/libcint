@@ -3310,7 +3310,6 @@ static void a_ket_cart2spinor(double complex *gsp, FINT nbra,
 static void a_iket_cart2spinor(double complex *gsp, FINT nbra,
                                double complex *gcart, FINT kappa, FINT l)
 {
-        const double complex Z0 = 0;
         const double complex ZI = 0 + 1 * _Complex_I;
         FINT nf = (l+1)*(l+2)/2;
         FINT nd = _len_spinor(kappa, l);
@@ -8480,7 +8479,6 @@ static void si2e_swap(double complex *new,
         double complex *new22 = new21 + nk * ni * nj * nl;
         double complex *pn11, *pn12, *pn21, *pn22;
         const double complex *ox, *oy, *oz, *o1;
-        const double complex *pox, *poy, *poz, *po1;
 
         //tmp1(k    ,i,j,l    ) = opij(m,n,POS_1) + IZ1*opij(m,n,POS_Z)
         //tmp1(k    ,i,j,l+nfl) = opij(m,n,POS_Y) + IZ1*opij(m,n,POS_X)

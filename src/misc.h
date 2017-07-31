@@ -20,8 +20,6 @@ void CINTdcmplx_nn(const FINT n, double complex *z, const double *re, const doub
 
 double CINTsquare_dist(const double *r1, const double *r2);
 
-void CINTrys_roots(const FINT nroots, double x, double *u, double *w);
-
 double CINTgto_norm(FINT n, double a);
 
 #define MALLOC_INSTACK(var, dtype, n) \

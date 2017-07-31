@@ -10,13 +10,13 @@
 #include <assert.h>
 #include "cint_const.h"
 #include "cint_bas.h"
-#include "misc.h"
+#include "rys_roots.h"
 #include "g2e.h"
 
 void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs);
 
-int CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                           int *atm, int natm, int *bas, int nbas, double *env)
+void CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                                    int *atm, int natm, int *bas, int nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;

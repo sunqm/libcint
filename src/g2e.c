@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "cint_const.h"
 #include "cint_bas.h"
-#include "misc.h"
+#include "rys_roots.h"
 #include "g2e.h"
 
 #define DEF_GXYZ(type, G, GX, GY, GZ) \

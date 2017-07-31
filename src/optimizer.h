@@ -44,8 +44,14 @@ void CINTOpt_3c1eindex_xyz(CINTOpt *opt, FINT *ng,
 // optimizer examples
 void CINTno_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                       FINT *bas, FINT nbas, double *env);
+void CINTall_1e_optimizer(CINTOpt **opt, FINT *ng,
+                          FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTall_2e_optimizer(CINTOpt **opt, FINT *ng,
                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTall_3c2e_optimizer(CINTOpt **opt, FINT *ng,
+                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTall_2c2e_optimizer(CINTOpt **opt, FINT *ng,
+                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTall_3c1e_optimizer(CINTOpt **opt, FINT *ng,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 

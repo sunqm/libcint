@@ -148,7 +148,8 @@ void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
 
 void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 {
-        double aij, akl, a0, a1, fac1, x, ua;
+        double aij, akl, a0, a1, fac1, x;
+        double ua = 0;
         double *rij = envs->rij;
         double *rkl = envs->rkl;
         double rijrkl[3];
@@ -235,7 +236,8 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 
 void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
 {
-        double aij, akl, a0, a1, fac1, x, ua;
+        double aij, akl, a0, a1, fac1, x;
+        double ua = 0;
         double *rij = envs->rij;
         double *rkl = envs->rkl;
         double rijrkl[3];

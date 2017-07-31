@@ -16,6 +16,8 @@
 #include "cart2sph.h"
 #include "c2f.h"
 
+FINT int1e_cache_size(CINTEnvVars *envs);
+
 #define PRIM2CTR0(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \

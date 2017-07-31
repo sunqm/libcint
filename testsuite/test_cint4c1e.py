@@ -188,7 +188,7 @@ def test_int2c1e_sph():
                 ref = by_pp(shls, (di,dj))
                 dd = abs(ref - buf).sum()
                 if dd > 1e-8:
-                    print "* FAIL: cint4c1e", "  shell:", i, j, k, l, "err:", dd
+                    print "* FAIL: cint2c1e", "  shell:", i, j, "err:", dd
                     return
     print 'cint1e_ipiprinv_sph cint1e_iprinvip_sph pass'
 
