@@ -64,12 +64,12 @@ int main()
         env[off + 2] = .8;
         off += 3;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off;
-        env[off + 0] = .7 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
-        env[off + 1] = .6 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
-        env[off + 2] = .5 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
-        env[off + 3] = .4 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 6.);
-        env[off + 4] = .3 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], 2.);
-        env[off + 5] = .2 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], .8);
+        env[off + 0] = .7 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+0]);
+        env[off + 1] = .6 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+1]);
+        env[off + 2] = .5 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+2]);
+        env[off + 3] = .4 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+0]);
+        env[off + 4] = .3 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+1]);
+        env[off + 5] = .2 * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]+2]);
         off += 6;
         n++;
 
@@ -83,7 +83,7 @@ int main()
         env[off + 0] = .9;
         off += 1;
         bas[PTR_COEFF+ BAS_SLOTS * n] = off;
-        env[off + 0] = 1. * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], .9);
+        env[off + 0] = 1. * CINTgto_norm(bas[ANG_OF+BAS_SLOTS*n], env[bas[PTR_EXP+BAS_SLOTS*n]]);
         off += 1;
         n++;
 
