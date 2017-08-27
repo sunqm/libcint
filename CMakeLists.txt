@@ -64,6 +64,7 @@ set(cintSrc
 option(BUILD_SHARED_LIBS "build shared libraries" 1)
 option(ENABLE_EXAMPLE "build examples" 0)
 option(ENABLE_TEST "build tests" 0)
+option(ENABLE_STATIC "Enforce static library build" 0)
 if(QUICK_TEST)
   set(RUN_QUICK_TEST --quick)
 endif()
