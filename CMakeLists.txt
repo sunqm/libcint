@@ -3,7 +3,9 @@ project (cint)
 set(cint_VERSION "2.8")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
-set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
+  set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+endif()
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.8)
@@ -62,6 +64,7 @@ set(cintSrc
 option(BUILD_SHARED_LIBS "build shared libraries" 1)
 option(ENABLE_EXAMPLE "build examples" 0)
 option(ENABLE_TEST "build tests" 0)
+option(ENABLE_STATIC "Enforce static library build" 0)
 if(QUICK_TEST)
   set(RUN_QUICK_TEST --quick)
 endif()
