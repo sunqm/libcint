@@ -1,3 +1,25 @@
+Version 3.0.0  (2017-09-20):
+	* Change github master branch to the 3.0 version
+
+
+Version 2.8.17 (2017-06-29):
+	* Second order derivatives for 3-center 2-electron integrals
+
+Version 2.8.16 (2017-06-02):
+	* Add 4-center 1-electron overlap integral
+	* Add Breit-type integral p1 dot r12 (1/r12^3) r12 dot p2
+	* Fix code generator to handle (1/r12^3)
+
+Version 2.8.15 (2017-05-22):
+	* Improved R_qnode convergence
+
+Version 2.8.14 (2017-05-18):
+	* Fix cint3c2e bug for general contraction on auxiliary basis
+
+Version 2.8.13 (2017-05-13):
+	* Bugfix for range-separated ssss type integral;
+	* Bugfix for quad-prec gamma_inc function in rys_roots.
+
 Version 2.8.12 (2017-03-07):
 	* New 2e integral (ij|pk dot pl)
 
