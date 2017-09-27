@@ -1,9 +1,10 @@
 
 import ctypes
 import numpy
-from pyscf import gto, lib
 
 _cint3 = ctypes.cdll.LoadLibrary('libcint.so.3.0')
+
+from pyscf import gto, lib
 
 mol = gto.M(atom='''H 0 0 0;
             H .2 .5 .8;

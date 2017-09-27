@@ -13,6 +13,7 @@
 #include "misc.h"
 #include "cart2sph.h"
 #include "c2f.h"
+#include "rys_roots.h"
 
 
 /*

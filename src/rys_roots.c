@@ -1435,7 +1435,7 @@ static void R_dnode(double *a, double *rt, int order)
                 while (x1 > accrt+x0 || x0 > x1+accrt) {
                         n++;
                         if (n > 200) {
-                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_qnode\n");
+                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_dnode\n");
                                 exit(1);
                         }
                         POLYNOMIAL_VALUE1(pi, xi);
@@ -1667,7 +1667,7 @@ static void R_lnode(long double *a, long double *rt, int order)
                 while (x1 > accrt+x0 || x0 > x1+accrt) {
                         n++;
                         if (n > 200) {
-                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_qnode\n");
+                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_lnode\n");
                                 exit(1);
                         }
                         POLYNOMIAL_VALUE1(pi, xi);

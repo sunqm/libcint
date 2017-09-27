@@ -1,3 +1,5 @@
+Version 3.0.1  (2017-09-27):
+	* Fix typo in rys_roots output message
 Version 3.0.0  (2017-09-20):
 	* Change github master branch to the 3.0 version
 
