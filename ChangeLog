@@ -1,3 +1,5 @@
+Version 3.0.3  (2017-10-04):
+	* Fix the long double precision issue in rys_roots for armv7
 Version 3.0.2  (2017-10-02):
 	* Update root-finding code in rys_roots
 Version 3.0.1  (2017-09-27):

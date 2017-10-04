@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 #include <math.h>
 #include "cint_const.h"
 #include "rys_roots.h"
@@ -1636,7 +1637,11 @@ static long double c99_expl(long double x)
 
 static void R_lnode(long double *a, long double *rt, int order)
 {
-        const long double accrt = 1e-18l;
+#ifdef LDBL_MANT_DIG
+        const long double accrt = LDBL_EPSILON*10;
+#else
+        const long double accrt = 1e-15;
+#endif
         long double x0, x1, xi, x1init, p0, p1, pi, p1init;
         int i, m, n;
 
@@ -1832,7 +1837,7 @@ L70:
 
 static void R_qnode(__float128 *a, __float128 *rt, int order)
 {
-        const __float128 accrt = 1e-32q;
+        const __float128 accrt = 1e-20q;
         __float128 x0, x1, xi, x1init, p0, p1, pi, p1init;
         int i, m, n;
 
