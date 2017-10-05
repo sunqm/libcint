@@ -14,6 +14,8 @@
 #define PTR_RANGE_OMEGA         8
 // Yukawa potential and slater-type geminal e^{-zeta r}
 #define PTR_F12_ZETA            9
+// Gaussian type geminal e^{-zeta r^2}
+#define PTR_GTG_ZETA            10
 #define PTR_ENV_START           20
 
 // slots of atm

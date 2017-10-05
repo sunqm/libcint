@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
  *
- * Attenuated coulomb operator exp(-w r_{12}^2) / r_{12}
+ * Attenuated coulomb operator erf(-w r_{12}^2) / r_{12}
  */
 
 #include <stdio.h>
@@ -13,19 +13,19 @@
 #include "rys_roots.h"
 #include "g2e.h"
 
-void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs);
+void CINTg0_2e_coul_gtg(double *g, double fac, CINTEnvVars *envs);
 
-void CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                                    FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
+void CINTinit_int2e_coul_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                                     FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_int2e_EnvVars(envs, ng, shls, atm, natm, bas, nbas, env);
-        envs->f_g0_2e = &CINTg0_2e_coulerf;
+        envs->f_g0_2e = &CINTg0_2e_coul_gtg;
 }
 
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
+void CINTg0_2e_coul_gtg(double *g, double fac, CINTEnvVars *envs)
 {
         double aij = envs->aij;
         double akl = envs->akl;
@@ -41,13 +41,6 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
 
-        double theta = 0;
-        if (omega > 0) {
-// For long-range part of range-separated Coulomb operator
-                theta = omega * omega / (omega * omega + a0);
-                a0 *= theta;
-        }
-
         fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
@@ -61,29 +54,24 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
         }
 
         int irys;
-        if (omega > 0) {
-                /* u[:] = tau^2 / (1 - tau^2)
-                 * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
-                 * so the rest code can be reused.
-                 */
-                for (irys = 0; irys < envs->nrys_roots; irys++) {
-                        u[irys] /= u[irys] + 1 - u[irys] * theta;
-                }
-        }
-
         double u2, div, tmp1, tmp2, tmp3, tmp4;
         double *rijrx = envs->rijrx;
         double *rklrx = envs->rklrx;
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
+        double zeta = envs->env[PTR_GTG_ZETA];
 
         for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3) {
                 /*
+                 *u(irys) = t2/(1-t2)
                  *t2 = u(irys)/(1+u(irys))
                  *u2 = aij*akl/(aij+akl)*t2/(1-t2)
                  */
                 u2 = a0 * u[irys];
+                if (zeta > 0) {
+                        u2 += zeta;
+                }
                 div = 1 / (u2 * (aij + akl) + a1);
                 tmp1 = u2 * div;
                 tmp2 = tmp1 * akl;

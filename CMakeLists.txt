@@ -80,6 +80,11 @@ if(WITH_F12)
   message("Enabled WITH_F12")
 endif(WITH_F12)
 
+if(WITH_GTG)
+  set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c)
+  message("Enabled WITH_GTG")
+endif(WITH_GTG)
+
 option(BUILD_SHARED_LIBS "build shared libraries" 1)
 option(ENABLE_EXAMPLE "build examples" 0)
 option(ENABLE_TEST "build tests" 0)

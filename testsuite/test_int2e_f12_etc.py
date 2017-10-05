@@ -38,12 +38,14 @@ def make_cintopt(atm, bas, env, intor):
 fn1 = getattr(_cint3, 'cint2e_sph')
 fn2 = getattr(_cint3, 'cint2e_yp_sph')
 fn3 = getattr(_cint3, 'cint2e_coulerf_sph')
+fn4 = getattr(_cint3, 'cint2e_coul_gtg_sph')
 cintopt1 = lib.c_null_ptr()
 cintopt1 = make_cintopt(mol._atm, mol._bas, mol._env, 'cint2e_yp_sph')
 
 ao_loc = mol.ao_loc_nr()
 mol._env[8] = 1e3
 mol._env[9] = 1e-3
+mol._env[10] = 1e-4
 
 yp_err = []
 for i in range(mol.nbas):
@@ -78,5 +80,13 @@ for i in range(mol.nbas):
                     mol._env.ctypes.data_as(ctypes.c_void_p), lib.c_null_ptr())
                 if numpy.linalg.norm(ref-buf) > 1e-5:
                     print 'coulerf', i, j, k, l, numpy.linalg.norm(ref-buf)
+                    exit()
+                fn4(buf.ctypes.data_as(ctypes.c_void_p),
+                   (ctypes.c_int*4)(i,j,k,l),
+                    mol._atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.natm),
+                    mol._bas.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.nbas),
+                    mol._env.ctypes.data_as(ctypes.c_void_p), lib.c_null_ptr())
+                if numpy.linalg.norm(ref-buf) > 1e-3:
+                    print 'coul_gtg', i, j, k, l, numpy.linalg.norm(ref-buf)
                     exit()
 print max(yp_err)
