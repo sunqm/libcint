@@ -1,6 +1,7 @@
 import numpy
 from pyscf import lib
 from pyscf.pbc import gto, df
+import scipy.special
 cell = gto.M(
 atom = '''H 0 0 0;
 H 0 -1 1
@@ -67,3 +68,17 @@ eri0 = get_eri(mydf)
 cell.set_f12_zeta(zeta)
 eri1 = cell.intor('cint2e_yp_sph', aosym='s4')
 print abs(eri0-eri1).max(), abs(eri0).max()
+
+
+#def weighted_gtg_coul(kpt=numpy.zeros(3), exx=False, gs=None):
+#    if gs is None:
+#        gs = self.gs
+#    Gv, Gvbase, kws = cell.get_Gv_weights(gs)
+#    G2 = numpy.einsum('gx,gx->g', Gv, Gv)
+#    G = numpy.sqrt(G2)
+#    coulG = 4*numpy.pi / (G*numpy.sqrt(zeta)) * scipy.special.dawsn(G/(2*numpy.sqrt(zeta)))
+#    coulG *= kws
+#    return coulG
+#
+#mydf.weighted_coulG = weighted_gtg_coul
+#eri0 = get_eri(mydf)

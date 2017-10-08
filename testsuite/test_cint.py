@@ -377,13 +377,15 @@ if __name__ == "__main__":
         test_int1e_spinor(*f)
 
     for f in (('cint2e_sph'    , 56243.88328768107 , 1, 8 ),
-              ('cint2e_ig1_sph', 8101.087334398195 , 3, 10),
               ('cint2e_ip1_sph', 115489.8643866550 , 3, 8 ),
-              ('cint2e_p1vxp1_sph', 89014.88169743448, 3, 9),
              ):
         test_int2e_sph(*f)
     if "--quick" not in sys.argv:
         # Four tests marked with "# *" may fail in quadmath mode
+        for f in (('cint2e_ip1_sph', 115489.8643866550 , 3, 8 ),
+                  ('cint2e_p1vxp1_sph', 89014.88169743448, 3, 9),
+                 ):
+            test_int2e_sph(*f)
         for f in (('cint2e'             , 37737.11365710611, 1, 8),
                   ('cint2e_spsp1'       , 221528.4764668166, 1, 8),
                   ('cint2e_spsp1spsp2'  , 1391716.876869147, 1, 7),  # *
