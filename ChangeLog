@@ -1,3 +1,5 @@
+Version 3.0.6  (2017-12-20):
+	* Add integrals for X2C graidents and hessian
 Version 3.0.5  (2017-12-11):
 	* Use cmake policy for OSX rpath
 Version 3.0.4  (2017-10-07):

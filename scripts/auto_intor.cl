@@ -31,6 +31,7 @@
   '("int1e_p4"                  ( p dot p \| p dot p ))
   ; use p* instead of p, to ignore the operator after it, then it can
   ; cross to the next p
+  '("int1e_prinvp"              (p* \| rinv dot p \| ))
   '("int1e_prinvxp"             (p* \| rinv cross p \| ))
   '("int1e_pnucxp"              (p* \| nuc cross p \| ))
   '("int2e_p1vxp1"              (p* \, cross p \| \, )) ; SSO
@@ -57,6 +58,7 @@
   '("int1e_spsp"                (sigma dot p \| sigma dot p))
   '("int1e_sp"                  (sigma dot p \|))
   '("int1e_spnucsp"             (sigma dot p \| nuc \| sigma dot p))
+  '("int1e_sprinvsp"            (sigma dot p \| rinv \| sigma dot p))
   '("int1e_srnucsr"             (sigma dot r \| nuc \| sigma dot r))
   '("int1e_govlp"               (g \|))
   '("int1e_gnuc"                (g \| nuc \|))
@@ -113,6 +115,8 @@
   '("int1e_rinv"                (\| rinv \|))
   '("int1e_ipspnucsp"           (nabla sigma dot p \| nuc \| sigma dot p))
   '("int1e_ipsprinvsp"          (nabla sigma dot p \| rinv \| sigma dot p))
+  '("int1e_ippnucp"             (nabla \| p* nuc dot p \|))
+  '("int1e_ipprinvp"            (nabla \| p* rinv dot p \|))
 )
 
 (gen-cint "grad2.c"
@@ -159,6 +163,10 @@
   '("int2e_ipip1"               ( nabla nabla \, \| \, ))
   '("int2e_ipvip1"              ( nabla \, nabla \| \, ))
   '("int2e_ip1ip2"              ( nabla \, \| nabla \, ))
+  '("int1e_ipippnucp"           ( nabla nabla \| p* nuc dot p \| ))
+  '("int1e_ippnucpip"           ( nabla \| p* nuc dot p \| nabla ))
+  '("int1e_ipipspnucsp"         ( nabla nabla \| sigma dot p nuc sigma dot p \| ))
+  '("int1e_ipspnucspip"         ( nabla \| sigma dot p nuc sigma dot p \| nabla ))
 )
 
 (gen-cint "int3c2e.c"
