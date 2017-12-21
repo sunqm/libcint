@@ -376,7 +376,8 @@ if __name__ == "__main__":
              ):
         test_int1e_spinor(*f)
 
-    for f in (('cint2e_sph'    , 56243.88328768107 , 1, 8 ),
+    for f in (# rys_roots for i,j,k,l=3,3,3,3 has round-off error ~ 1e-5
+              ('cint2e_sph'    , 56243.88328768107 , 1, 8 ),
               ('cint2e_ip1_sph', 115489.8643866550 , 3, 8 ),
              ):
         test_int2e_sph(*f)

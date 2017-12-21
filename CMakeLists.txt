@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint C)
-set(cint_VERSION "3.0")
+set(cint_VERSION "3.0.6")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")

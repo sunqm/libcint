@@ -612,7 +612,7 @@
                     (eval-breit-gauge-r2 phasefac ops-i ops-j ops-k ops-l))
                    ((or (member 'r12 op) (member 'nabla-r12 op))
                     (eval-int-r12 phasefac op ops-i ops-j ops-k ops-l))
-                   (t (error "unsupport operator ~s~%" op))))
+                   (t (error "unsupport int4c2e operator ~s~%" op))))
             ((int3c2e? expr)
              (cond ((member 'gaunt op)
                     (error "3c2e-gaunt not implemented~%"))
@@ -621,7 +621,7 @@
                            (error "sigma, g not allowed in int3c2e electron 2 expression~%"))
                           (ops-l (error "auxiliary basis should be in electron 2~%"))
                           (t (eval-int-r12 phasefac op ops-i ops-j ops-k '()))))
-                   (t (error "unsupport operator ~s~%" op))))
+                   (t (error "unsupport int3c2e operator ~s~%" op))))
             ((int2c2e? expr)
              (cond ((member 'gaunt op)
                     (error "2c2e-gaunt not implemented~%"))
@@ -630,7 +630,7 @@
                                (intersection '(sigma g) ops-i))
                            (error "sigma, g not allowed in int2c2e expression~%"))
                           (t (eval-int-r12 phasefac op ops-i '() ops-k '()))))
-                   (t (error "unsupport operator ~s~%" op))))
+                   (t (error "unsupport int2c2e operator ~s~%" op))))
             (t (error "unknown integral expression~%"))))))
 
 
