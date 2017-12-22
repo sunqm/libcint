@@ -115,8 +115,8 @@
   '("int1e_rinv"                (\| rinv \|))
   '("int1e_ipspnucsp"           (nabla sigma dot p \| nuc \| sigma dot p))
   '("int1e_ipsprinvsp"          (nabla sigma dot p \| rinv \| sigma dot p))
-  '("int1e_ippnucp"             (nabla \| p* nuc dot p \|))
-  '("int1e_ipprinvp"            (nabla \| p* rinv dot p \|))
+  '("int1e_ippnucp"             (p* nabla \| nuc dot p \|))
+  '("int1e_ipprinvp"            (p* nabla \| rinv dot p \|))
 )
 
 (gen-cint "grad2.c"
@@ -163,14 +163,14 @@
   '("int2e_ipip1"               ( nabla nabla \, \| \, ))
   '("int2e_ipvip1"              ( nabla \, nabla \| \, ))
   '("int2e_ip1ip2"              ( nabla \, \| nabla \, ))
-  '("int1e_ipippnucp"           ( nabla nabla \| p* nuc dot p \| ))
-  '("int1e_ippnucpip"           ( nabla \| p* nuc dot p \| nabla ))
-  '("int1e_ipipprinvp"          ( nabla nabla \| p* rinv dot p \| ))
-  '("int1e_ipprinvpip"          ( nabla \| p* rinv dot p \| nabla ))
-  '("int1e_ipipspnucsp"         ( nabla nabla \| sigma dot p nuc sigma dot p \| ))
-  '("int1e_ipspnucspip"         ( nabla \| sigma dot p nuc sigma dot p \| nabla ))
-  '("int1e_ipipsprinvsp"        ( nabla nabla \| sigma dot p rinv sigma dot p \| ))
-  '("int1e_ipsprinvspip"        ( nabla \| sigma dot p rinv sigma dot p \| nabla ))
+  '("int1e_ipippnucp"           ( p* nabla nabla \| nuc dot p \| ))
+  '("int1e_ippnucpip"           ( p* nabla \| nuc dot p \| nabla ))
+  '("int1e_ipipprinvp"          ( p* nabla nabla \| rinv dot p \| ))
+  '("int1e_ipprinvpip"          ( p* nabla \| rinv dot p \| nabla ))
+  '("int1e_ipipspnucsp"         ( nabla nabla sigma dot p \| nuc sigma dot p \| ))
+  '("int1e_ipspnucspip"         ( nabla sigma dot p \| nuc sigma dot p \| nabla ))
+  '("int1e_ipipsprinvsp"        ( nabla nabla sigma dot p \| rinv sigma dot p \| ))
+  '("int1e_ipsprinvspip"        ( nabla sigma dot p \| rinv sigma dot p \| nabla ))
 )
 
 (gen-cint "int3c2e.c"

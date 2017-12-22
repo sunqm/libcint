@@ -976,7 +976,7 @@ return CINT2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_2e1, &c2s_sf_2e2)
 } // int2e_ip1ip2_spinor
 ALL_CINT(int2e_ip1ip2)
 ALL_CINT_FORTRAN_(int2e_ip1ip2)
-/* <NABLA NABLA i|P* NUC DOT P |j> */
+/* <P* NABLA NABLA i|NUC DOT P |j> */
 static void CINTgout1e_int1e_ipippnucp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -997,9 +997,9 @@ double *g13 = g12  + envs->g_size * 3;
 double *g14 = g13  + envs->g_size * 3;
 double *g15 = g14  + envs->g_size * 3;
 double s[81];
-G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+2, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+3, envs->j_l+0, 0);
+G1E_D_I(g2, g0, envs->i_l+2, envs->j_l, 0);
+G1E_D_I(g3, g1, envs->i_l+2, envs->j_l, 0);
 G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
@@ -1097,23 +1097,23 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*9+0] += - s[0] - s[4] - s[8];
-gout[n*9+1] += - s[27] - s[31] - s[35];
-gout[n*9+2] += - s[54] - s[58] - s[62];
-gout[n*9+3] += - s[9] - s[13] - s[17];
-gout[n*9+4] += - s[36] - s[40] - s[44];
-gout[n*9+5] += - s[63] - s[67] - s[71];
-gout[n*9+6] += - s[18] - s[22] - s[26];
-gout[n*9+7] += - s[45] - s[49] - s[53];
-gout[n*9+8] += - s[72] - s[76] - s[80];
+gout[n*9+0] += + s[0] + s[4] + s[8];
+gout[n*9+1] += + s[27] + s[31] + s[35];
+gout[n*9+2] += + s[54] + s[58] + s[62];
+gout[n*9+3] += + s[9] + s[13] + s[17];
+gout[n*9+4] += + s[36] + s[40] + s[44];
+gout[n*9+5] += + s[63] + s[67] + s[71];
+gout[n*9+6] += + s[18] + s[22] + s[26];
+gout[n*9+7] += + s[45] + s[49] + s[53];
+gout[n*9+8] += + s[72] + s[76] + s[80];
 }}
 void int1e_ipippnucp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ipippnucp_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipippnucp;
@@ -1121,7 +1121,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_ipippnucp_cart
 int int1e_ipippnucp_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipippnucp;
@@ -1129,7 +1129,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_ipippnucp_sph
 int int1e_ipippnucp_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipippnucp;
@@ -1137,7 +1137,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 } // int1e_ipippnucp_spinor
 ALL_CINT1E(int1e_ipippnucp)
 ALL_CINT1E_FORTRAN_(int1e_ipippnucp)
-/* <NABLA i|P* NUC DOT P |NABLA j> */
+/* <P* NABLA i|NUC DOT P |NABLA j> */
 static void CINTgout1e_int1e_ippnucpip(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -1158,13 +1158,13 @@ double *g13 = g12  + envs->g_size * 3;
 double *g14 = g13  + envs->g_size * 3;
 double *g15 = g14  + envs->g_size * 3;
 double s[81];
-G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g4, g0, envs->i_l+1, envs->j_l+2, 0);
-G1E_D_J(g5, g4, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g6, g4, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g7, g6, envs->i_l+1, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_J(g2, g0, envs->i_l+2, envs->j_l+1, 0);
+G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g7, g3, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g8, g0, envs->i_l+0, envs->j_l, 0);
 G1E_D_I(g9, g1, envs->i_l+0, envs->j_l, 0);
 G1E_D_I(g10, g2, envs->i_l+0, envs->j_l, 0);
@@ -1258,23 +1258,23 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*9+0] += - s[0] - s[12] - s[24];
-gout[n*9+1] += - s[1] - s[13] - s[25];
-gout[n*9+2] += - s[2] - s[14] - s[26];
-gout[n*9+3] += - s[27] - s[39] - s[51];
-gout[n*9+4] += - s[28] - s[40] - s[52];
-gout[n*9+5] += - s[29] - s[41] - s[53];
-gout[n*9+6] += - s[54] - s[66] - s[78];
-gout[n*9+7] += - s[55] - s[67] - s[79];
-gout[n*9+8] += - s[56] - s[68] - s[80];
+gout[n*9+0] += + s[0] + s[12] + s[24];
+gout[n*9+1] += + s[27] + s[39] + s[51];
+gout[n*9+2] += + s[54] + s[66] + s[78];
+gout[n*9+3] += + s[1] + s[13] + s[25];
+gout[n*9+4] += + s[28] + s[40] + s[52];
+gout[n*9+5] += + s[55] + s[67] + s[79];
+gout[n*9+6] += + s[2] + s[14] + s[26];
+gout[n*9+7] += + s[29] + s[41] + s[53];
+gout[n*9+8] += + s[56] + s[68] + s[80];
 }}
 void int1e_ippnucpip_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ippnucpip_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ippnucpip;
@@ -1282,7 +1282,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_ippnucpip_cart
 int int1e_ippnucpip_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ippnucpip;
@@ -1290,7 +1290,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_ippnucpip_sph
 int int1e_ippnucpip_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ippnucpip;
@@ -1298,7 +1298,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 } // int1e_ippnucpip_spinor
 ALL_CINT1E(int1e_ippnucpip)
 ALL_CINT1E_FORTRAN_(int1e_ippnucpip)
-/* <NABLA NABLA i|P* RINV DOT P |j> */
+/* <P* NABLA NABLA i|RINV DOT P |j> */
 static void CINTgout1e_int1e_ipipprinvp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -1319,9 +1319,9 @@ double *g13 = g12  + envs->g_size * 3;
 double *g14 = g13  + envs->g_size * 3;
 double *g15 = g14  + envs->g_size * 3;
 double s[81];
-G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+2, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+3, envs->j_l+0, 0);
+G1E_D_I(g2, g0, envs->i_l+2, envs->j_l, 0);
+G1E_D_I(g3, g1, envs->i_l+2, envs->j_l, 0);
 G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
@@ -1419,23 +1419,23 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*9+0] += - s[0] - s[4] - s[8];
-gout[n*9+1] += - s[27] - s[31] - s[35];
-gout[n*9+2] += - s[54] - s[58] - s[62];
-gout[n*9+3] += - s[9] - s[13] - s[17];
-gout[n*9+4] += - s[36] - s[40] - s[44];
-gout[n*9+5] += - s[63] - s[67] - s[71];
-gout[n*9+6] += - s[18] - s[22] - s[26];
-gout[n*9+7] += - s[45] - s[49] - s[53];
-gout[n*9+8] += - s[72] - s[76] - s[80];
+gout[n*9+0] += + s[0] + s[4] + s[8];
+gout[n*9+1] += + s[27] + s[31] + s[35];
+gout[n*9+2] += + s[54] + s[58] + s[62];
+gout[n*9+3] += + s[9] + s[13] + s[17];
+gout[n*9+4] += + s[36] + s[40] + s[44];
+gout[n*9+5] += + s[63] + s[67] + s[71];
+gout[n*9+6] += + s[18] + s[22] + s[26];
+gout[n*9+7] += + s[45] + s[49] + s[53];
+gout[n*9+8] += + s[72] + s[76] + s[80];
 }}
 void int1e_ipipprinvp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ipipprinvp_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipipprinvp;
@@ -1443,7 +1443,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_ipipprinvp_cart
 int int1e_ipipprinvp_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipipprinvp;
@@ -1451,7 +1451,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_ipipprinvp_sph
 int int1e_ipipprinvp_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipipprinvp;
@@ -1459,7 +1459,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 } // int1e_ipipprinvp_spinor
 ALL_CINT1E(int1e_ipipprinvp)
 ALL_CINT1E_FORTRAN_(int1e_ipipprinvp)
-/* <NABLA i|P* RINV DOT P |NABLA j> */
+/* <P* NABLA i|RINV DOT P |NABLA j> */
 static void CINTgout1e_int1e_ipprinvpip(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -1480,13 +1480,13 @@ double *g13 = g12  + envs->g_size * 3;
 double *g14 = g13  + envs->g_size * 3;
 double *g15 = g14  + envs->g_size * 3;
 double s[81];
-G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g4, g0, envs->i_l+1, envs->j_l+2, 0);
-G1E_D_J(g5, g4, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g6, g4, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g7, g6, envs->i_l+1, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_J(g2, g0, envs->i_l+2, envs->j_l+1, 0);
+G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g7, g3, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g8, g0, envs->i_l+0, envs->j_l, 0);
 G1E_D_I(g9, g1, envs->i_l+0, envs->j_l, 0);
 G1E_D_I(g10, g2, envs->i_l+0, envs->j_l, 0);
@@ -1580,23 +1580,23 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*9+0] += - s[0] - s[12] - s[24];
-gout[n*9+1] += - s[1] - s[13] - s[25];
-gout[n*9+2] += - s[2] - s[14] - s[26];
-gout[n*9+3] += - s[27] - s[39] - s[51];
-gout[n*9+4] += - s[28] - s[40] - s[52];
-gout[n*9+5] += - s[29] - s[41] - s[53];
-gout[n*9+6] += - s[54] - s[66] - s[78];
-gout[n*9+7] += - s[55] - s[67] - s[79];
-gout[n*9+8] += - s[56] - s[68] - s[80];
+gout[n*9+0] += + s[0] + s[12] + s[24];
+gout[n*9+1] += + s[27] + s[39] + s[51];
+gout[n*9+2] += + s[54] + s[66] + s[78];
+gout[n*9+3] += + s[1] + s[13] + s[25];
+gout[n*9+4] += + s[28] + s[40] + s[52];
+gout[n*9+5] += + s[55] + s[67] + s[79];
+gout[n*9+6] += + s[2] + s[14] + s[26];
+gout[n*9+7] += + s[29] + s[41] + s[53];
+gout[n*9+8] += + s[56] + s[68] + s[80];
 }}
 void int1e_ipprinvpip_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ipprinvpip_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipprinvpip;
@@ -1604,7 +1604,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_ipprinvpip_cart
 int int1e_ipprinvpip_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipprinvpip;
@@ -1612,7 +1612,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_ipprinvpip_sph
 int int1e_ipprinvpip_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 1, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipprinvpip;
@@ -1620,7 +1620,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 } // int1e_ipprinvpip_spinor
 ALL_CINT1E(int1e_ipprinvpip)
 ALL_CINT1E_FORTRAN_(int1e_ipprinvpip)
-/* <NABLA NABLA i|SIGMA DOT P NUC SIGMA DOT P |j> */
+/* <NABLA NABLA SIGMA DOT P i|NUC SIGMA DOT P |j> */
 static void CINTgout1e_int1e_ipipspnucsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -1641,9 +1641,9 @@ double *g13 = g12  + envs->g_size * 3;
 double *g14 = g13  + envs->g_size * 3;
 double *g15 = g14  + envs->g_size * 3;
 double s[81];
-G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+2, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+3, envs->j_l+0, 0);
+G1E_D_I(g2, g0, envs->i_l+2, envs->j_l, 0);
+G1E_D_I(g3, g1, envs->i_l+2, envs->j_l, 0);
 G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
@@ -1741,50 +1741,50 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*36+0] += - s[5] + s[7];
-gout[n*36+1] += - s[6] + s[2];
-gout[n*36+2] += - s[1] + s[3];
-gout[n*36+3] += - s[0] - s[4] - s[8];
-gout[n*36+4] += - s[32] + s[34];
-gout[n*36+5] += - s[33] + s[29];
-gout[n*36+6] += - s[28] + s[30];
-gout[n*36+7] += - s[27] - s[31] - s[35];
-gout[n*36+8] += - s[59] + s[61];
-gout[n*36+9] += - s[60] + s[56];
-gout[n*36+10] += - s[55] + s[57];
-gout[n*36+11] += - s[54] - s[58] - s[62];
-gout[n*36+12] += - s[14] + s[16];
-gout[n*36+13] += - s[15] + s[11];
-gout[n*36+14] += - s[10] + s[12];
-gout[n*36+15] += - s[9] - s[13] - s[17];
-gout[n*36+16] += - s[41] + s[43];
-gout[n*36+17] += - s[42] + s[38];
-gout[n*36+18] += - s[37] + s[39];
-gout[n*36+19] += - s[36] - s[40] - s[44];
-gout[n*36+20] += - s[68] + s[70];
-gout[n*36+21] += - s[69] + s[65];
-gout[n*36+22] += - s[64] + s[66];
-gout[n*36+23] += - s[63] - s[67] - s[71];
-gout[n*36+24] += - s[23] + s[25];
-gout[n*36+25] += - s[24] + s[20];
-gout[n*36+26] += - s[19] + s[21];
-gout[n*36+27] += - s[18] - s[22] - s[26];
-gout[n*36+28] += - s[50] + s[52];
-gout[n*36+29] += - s[51] + s[47];
-gout[n*36+30] += - s[46] + s[48];
-gout[n*36+31] += - s[45] - s[49] - s[53];
-gout[n*36+32] += - s[77] + s[79];
-gout[n*36+33] += - s[78] + s[74];
-gout[n*36+34] += - s[73] + s[75];
-gout[n*36+35] += - s[72] - s[76] - s[80];
+gout[n*36+0] += + s[29] - s[55];
+gout[n*36+1] += + s[54] - s[2];
+gout[n*36+2] += + s[1] - s[27];
+gout[n*36+3] += + s[0] + s[28] + s[56];
+gout[n*36+4] += + s[32] - s[58];
+gout[n*36+5] += + s[57] - s[5];
+gout[n*36+6] += + s[4] - s[30];
+gout[n*36+7] += + s[3] + s[31] + s[59];
+gout[n*36+8] += + s[35] - s[61];
+gout[n*36+9] += + s[60] - s[8];
+gout[n*36+10] += + s[7] - s[33];
+gout[n*36+11] += + s[6] + s[34] + s[62];
+gout[n*36+12] += + s[38] - s[64];
+gout[n*36+13] += + s[63] - s[11];
+gout[n*36+14] += + s[10] - s[36];
+gout[n*36+15] += + s[9] + s[37] + s[65];
+gout[n*36+16] += + s[41] - s[67];
+gout[n*36+17] += + s[66] - s[14];
+gout[n*36+18] += + s[13] - s[39];
+gout[n*36+19] += + s[12] + s[40] + s[68];
+gout[n*36+20] += + s[44] - s[70];
+gout[n*36+21] += + s[69] - s[17];
+gout[n*36+22] += + s[16] - s[42];
+gout[n*36+23] += + s[15] + s[43] + s[71];
+gout[n*36+24] += + s[47] - s[73];
+gout[n*36+25] += + s[72] - s[20];
+gout[n*36+26] += + s[19] - s[45];
+gout[n*36+27] += + s[18] + s[46] + s[74];
+gout[n*36+28] += + s[50] - s[76];
+gout[n*36+29] += + s[75] - s[23];
+gout[n*36+30] += + s[22] - s[48];
+gout[n*36+31] += + s[21] + s[49] + s[77];
+gout[n*36+32] += + s[53] - s[79];
+gout[n*36+33] += + s[78] - s[26];
+gout[n*36+34] += + s[25] - s[51];
+gout[n*36+35] += + s[24] + s[52] + s[80];
 }}
 void int1e_ipipspnucsp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ipipspnucsp_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipipspnucsp;
@@ -1792,7 +1792,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_ipipspnucsp_cart
 int int1e_ipipspnucsp_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipipspnucsp;
@@ -1800,7 +1800,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_ipipspnucsp_sph
 int int1e_ipipspnucsp_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipipspnucsp;
@@ -1808,7 +1808,7 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 2);
 } // int1e_ipipspnucsp_spinor
 ALL_CINT1E(int1e_ipipspnucsp)
 ALL_CINT1E_FORTRAN_(int1e_ipipspnucsp)
-/* <NABLA i|SIGMA DOT P NUC SIGMA DOT P |NABLA j> */
+/* <NABLA SIGMA DOT P i|NUC SIGMA DOT P |NABLA j> */
 static void CINTgout1e_int1e_ipspnucspip(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -1829,13 +1829,13 @@ double *g13 = g12  + envs->g_size * 3;
 double *g14 = g13  + envs->g_size * 3;
 double *g15 = g14  + envs->g_size * 3;
 double s[81];
-G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g4, g0, envs->i_l+1, envs->j_l+2, 0);
-G1E_D_J(g5, g4, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g6, g4, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g7, g6, envs->i_l+1, envs->j_l+0, 0);
+G1E_D_J(g1, g0, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_J(g2, g0, envs->i_l+2, envs->j_l+1, 0);
+G1E_D_J(g3, g2, envs->i_l+2, envs->j_l+0, 0);
+G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g7, g3, envs->i_l+1, envs->j_l, 0);
 G1E_D_I(g8, g0, envs->i_l+0, envs->j_l, 0);
 G1E_D_I(g9, g1, envs->i_l+0, envs->j_l, 0);
 G1E_D_I(g10, g2, envs->i_l+0, envs->j_l, 0);
@@ -1929,50 +1929,50 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*36+0] += - s[15] + s[21];
-gout[n*36+1] += - s[18] + s[6];
-gout[n*36+2] += - s[3] + s[9];
-gout[n*36+3] += - s[0] - s[12] - s[24];
-gout[n*36+4] += - s[16] + s[22];
-gout[n*36+5] += - s[19] + s[7];
-gout[n*36+6] += - s[4] + s[10];
-gout[n*36+7] += - s[1] - s[13] - s[25];
-gout[n*36+8] += - s[17] + s[23];
-gout[n*36+9] += - s[20] + s[8];
-gout[n*36+10] += - s[5] + s[11];
-gout[n*36+11] += - s[2] - s[14] - s[26];
-gout[n*36+12] += - s[42] + s[48];
-gout[n*36+13] += - s[45] + s[33];
-gout[n*36+14] += - s[30] + s[36];
-gout[n*36+15] += - s[27] - s[39] - s[51];
-gout[n*36+16] += - s[43] + s[49];
-gout[n*36+17] += - s[46] + s[34];
-gout[n*36+18] += - s[31] + s[37];
-gout[n*36+19] += - s[28] - s[40] - s[52];
-gout[n*36+20] += - s[44] + s[50];
-gout[n*36+21] += - s[47] + s[35];
-gout[n*36+22] += - s[32] + s[38];
-gout[n*36+23] += - s[29] - s[41] - s[53];
-gout[n*36+24] += - s[69] + s[75];
-gout[n*36+25] += - s[72] + s[60];
-gout[n*36+26] += - s[57] + s[63];
-gout[n*36+27] += - s[54] - s[66] - s[78];
-gout[n*36+28] += - s[70] + s[76];
-gout[n*36+29] += - s[73] + s[61];
-gout[n*36+30] += - s[58] + s[64];
-gout[n*36+31] += - s[55] - s[67] - s[79];
-gout[n*36+32] += - s[71] + s[77];
-gout[n*36+33] += - s[74] + s[62];
-gout[n*36+34] += - s[59] + s[65];
-gout[n*36+35] += - s[56] - s[68] - s[80];
+gout[n*36+0] += + s[33] - s[57];
+gout[n*36+1] += + s[54] - s[6];
+gout[n*36+2] += + s[3] - s[27];
+gout[n*36+3] += + s[0] + s[30] + s[60];
+gout[n*36+4] += + s[34] - s[58];
+gout[n*36+5] += + s[55] - s[7];
+gout[n*36+6] += + s[4] - s[28];
+gout[n*36+7] += + s[1] + s[31] + s[61];
+gout[n*36+8] += + s[35] - s[59];
+gout[n*36+9] += + s[56] - s[8];
+gout[n*36+10] += + s[5] - s[29];
+gout[n*36+11] += + s[2] + s[32] + s[62];
+gout[n*36+12] += + s[42] - s[66];
+gout[n*36+13] += + s[63] - s[15];
+gout[n*36+14] += + s[12] - s[36];
+gout[n*36+15] += + s[9] + s[39] + s[69];
+gout[n*36+16] += + s[43] - s[67];
+gout[n*36+17] += + s[64] - s[16];
+gout[n*36+18] += + s[13] - s[37];
+gout[n*36+19] += + s[10] + s[40] + s[70];
+gout[n*36+20] += + s[44] - s[68];
+gout[n*36+21] += + s[65] - s[17];
+gout[n*36+22] += + s[14] - s[38];
+gout[n*36+23] += + s[11] + s[41] + s[71];
+gout[n*36+24] += + s[51] - s[75];
+gout[n*36+25] += + s[72] - s[24];
+gout[n*36+26] += + s[21] - s[45];
+gout[n*36+27] += + s[18] + s[48] + s[78];
+gout[n*36+28] += + s[52] - s[76];
+gout[n*36+29] += + s[73] - s[25];
+gout[n*36+30] += + s[22] - s[46];
+gout[n*36+31] += + s[19] + s[49] + s[79];
+gout[n*36+32] += + s[53] - s[77];
+gout[n*36+33] += + s[74] - s[26];
+gout[n*36+34] += + s[23] - s[47];
+gout[n*36+35] += + s[20] + s[50] + s[80];
 }}
 void int1e_ipspnucspip_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ipspnucspip_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipspnucspip;
@@ -1980,7 +1980,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_ipspnucspip_cart
 int int1e_ipspnucspip_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipspnucspip;
@@ -1988,7 +1988,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_ipspnucspip_sph
 int int1e_ipspnucspip_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipspnucspip;
@@ -1996,8 +1996,196 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 2);
 } // int1e_ipspnucspip_spinor
 ALL_CINT1E(int1e_ipspnucspip)
 ALL_CINT1E_FORTRAN_(int1e_ipspnucspip)
-/* <NABLA NABLA i|SIGMA DOT P RINV SIGMA DOT P |j> */
+/* <NABLA NABLA SIGMA DOT P i|RINV SIGMA DOT P |j> */
 static void CINTgout1e_int1e_ipipsprinvsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
+int nf = envs->nf;
+int ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double *g3 = g2  + envs->g_size * 3;
+double *g4 = g3  + envs->g_size * 3;
+double *g5 = g4  + envs->g_size * 3;
+double *g6 = g5  + envs->g_size * 3;
+double *g7 = g6  + envs->g_size * 3;
+double *g8 = g7  + envs->g_size * 3;
+double *g9 = g8  + envs->g_size * 3;
+double *g10 = g9  + envs->g_size * 3;
+double *g11 = g10  + envs->g_size * 3;
+double *g12 = g11  + envs->g_size * 3;
+double *g13 = g12  + envs->g_size * 3;
+double *g14 = g13  + envs->g_size * 3;
+double *g15 = g14  + envs->g_size * 3;
+double s[81];
+G1E_D_J(g1, g0, envs->i_l+3, envs->j_l+0, 0);
+G1E_D_I(g2, g0, envs->i_l+2, envs->j_l, 0);
+G1E_D_I(g3, g1, envs->i_l+2, envs->j_l, 0);
+G1E_D_I(g4, g0, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g5, g1, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g6, g2, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g7, g3, envs->i_l+1, envs->j_l, 0);
+G1E_D_I(g8, g0, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g9, g1, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g10, g2, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g11, g3, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g12, g4, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g13, g5, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g14, g6, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g15, g7, envs->i_l+0, envs->j_l, 0);
+for (n = 0; n < nf; n++) {
+ix = idx[0+n*3];
+iy = idx[1+n*3];
+iz = idx[2+n*3];
+s[0] = + g15[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g14[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g14[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g13[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g12[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g12[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g13[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g12[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g12[ix+0]*g0[iy+0]*g3[iz+0];
+s[9] = + g11[ix+0]*g4[iy+0]*g0[iz+0];
+s[10] = + g10[ix+0]*g5[iy+0]*g0[iz+0];
+s[11] = + g10[ix+0]*g4[iy+0]*g1[iz+0];
+s[12] = + g9[ix+0]*g6[iy+0]*g0[iz+0];
+s[13] = + g8[ix+0]*g7[iy+0]*g0[iz+0];
+s[14] = + g8[ix+0]*g6[iy+0]*g1[iz+0];
+s[15] = + g9[ix+0]*g4[iy+0]*g2[iz+0];
+s[16] = + g8[ix+0]*g5[iy+0]*g2[iz+0];
+s[17] = + g8[ix+0]*g4[iy+0]*g3[iz+0];
+s[18] = + g11[ix+0]*g0[iy+0]*g4[iz+0];
+s[19] = + g10[ix+0]*g1[iy+0]*g4[iz+0];
+s[20] = + g10[ix+0]*g0[iy+0]*g5[iz+0];
+s[21] = + g9[ix+0]*g2[iy+0]*g4[iz+0];
+s[22] = + g8[ix+0]*g3[iy+0]*g4[iz+0];
+s[23] = + g8[ix+0]*g2[iy+0]*g5[iz+0];
+s[24] = + g9[ix+0]*g0[iy+0]*g6[iz+0];
+s[25] = + g8[ix+0]*g1[iy+0]*g6[iz+0];
+s[26] = + g8[ix+0]*g0[iy+0]*g7[iz+0];
+s[27] = + g7[ix+0]*g8[iy+0]*g0[iz+0];
+s[28] = + g6[ix+0]*g9[iy+0]*g0[iz+0];
+s[29] = + g6[ix+0]*g8[iy+0]*g1[iz+0];
+s[30] = + g5[ix+0]*g10[iy+0]*g0[iz+0];
+s[31] = + g4[ix+0]*g11[iy+0]*g0[iz+0];
+s[32] = + g4[ix+0]*g10[iy+0]*g1[iz+0];
+s[33] = + g5[ix+0]*g8[iy+0]*g2[iz+0];
+s[34] = + g4[ix+0]*g9[iy+0]*g2[iz+0];
+s[35] = + g4[ix+0]*g8[iy+0]*g3[iz+0];
+s[36] = + g3[ix+0]*g12[iy+0]*g0[iz+0];
+s[37] = + g2[ix+0]*g13[iy+0]*g0[iz+0];
+s[38] = + g2[ix+0]*g12[iy+0]*g1[iz+0];
+s[39] = + g1[ix+0]*g14[iy+0]*g0[iz+0];
+s[40] = + g0[ix+0]*g15[iy+0]*g0[iz+0];
+s[41] = + g0[ix+0]*g14[iy+0]*g1[iz+0];
+s[42] = + g1[ix+0]*g12[iy+0]*g2[iz+0];
+s[43] = + g0[ix+0]*g13[iy+0]*g2[iz+0];
+s[44] = + g0[ix+0]*g12[iy+0]*g3[iz+0];
+s[45] = + g3[ix+0]*g8[iy+0]*g4[iz+0];
+s[46] = + g2[ix+0]*g9[iy+0]*g4[iz+0];
+s[47] = + g2[ix+0]*g8[iy+0]*g5[iz+0];
+s[48] = + g1[ix+0]*g10[iy+0]*g4[iz+0];
+s[49] = + g0[ix+0]*g11[iy+0]*g4[iz+0];
+s[50] = + g0[ix+0]*g10[iy+0]*g5[iz+0];
+s[51] = + g1[ix+0]*g8[iy+0]*g6[iz+0];
+s[52] = + g0[ix+0]*g9[iy+0]*g6[iz+0];
+s[53] = + g0[ix+0]*g8[iy+0]*g7[iz+0];
+s[54] = + g7[ix+0]*g0[iy+0]*g8[iz+0];
+s[55] = + g6[ix+0]*g1[iy+0]*g8[iz+0];
+s[56] = + g6[ix+0]*g0[iy+0]*g9[iz+0];
+s[57] = + g5[ix+0]*g2[iy+0]*g8[iz+0];
+s[58] = + g4[ix+0]*g3[iy+0]*g8[iz+0];
+s[59] = + g4[ix+0]*g2[iy+0]*g9[iz+0];
+s[60] = + g5[ix+0]*g0[iy+0]*g10[iz+0];
+s[61] = + g4[ix+0]*g1[iy+0]*g10[iz+0];
+s[62] = + g4[ix+0]*g0[iy+0]*g11[iz+0];
+s[63] = + g3[ix+0]*g4[iy+0]*g8[iz+0];
+s[64] = + g2[ix+0]*g5[iy+0]*g8[iz+0];
+s[65] = + g2[ix+0]*g4[iy+0]*g9[iz+0];
+s[66] = + g1[ix+0]*g6[iy+0]*g8[iz+0];
+s[67] = + g0[ix+0]*g7[iy+0]*g8[iz+0];
+s[68] = + g0[ix+0]*g6[iy+0]*g9[iz+0];
+s[69] = + g1[ix+0]*g4[iy+0]*g10[iz+0];
+s[70] = + g0[ix+0]*g5[iy+0]*g10[iz+0];
+s[71] = + g0[ix+0]*g4[iy+0]*g11[iz+0];
+s[72] = + g3[ix+0]*g0[iy+0]*g12[iz+0];
+s[73] = + g2[ix+0]*g1[iy+0]*g12[iz+0];
+s[74] = + g2[ix+0]*g0[iy+0]*g13[iz+0];
+s[75] = + g1[ix+0]*g2[iy+0]*g12[iz+0];
+s[76] = + g0[ix+0]*g3[iy+0]*g12[iz+0];
+s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
+s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
+s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
+s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
+gout[n*36+0] += + s[29] - s[55];
+gout[n*36+1] += + s[54] - s[2];
+gout[n*36+2] += + s[1] - s[27];
+gout[n*36+3] += + s[0] + s[28] + s[56];
+gout[n*36+4] += + s[32] - s[58];
+gout[n*36+5] += + s[57] - s[5];
+gout[n*36+6] += + s[4] - s[30];
+gout[n*36+7] += + s[3] + s[31] + s[59];
+gout[n*36+8] += + s[35] - s[61];
+gout[n*36+9] += + s[60] - s[8];
+gout[n*36+10] += + s[7] - s[33];
+gout[n*36+11] += + s[6] + s[34] + s[62];
+gout[n*36+12] += + s[38] - s[64];
+gout[n*36+13] += + s[63] - s[11];
+gout[n*36+14] += + s[10] - s[36];
+gout[n*36+15] += + s[9] + s[37] + s[65];
+gout[n*36+16] += + s[41] - s[67];
+gout[n*36+17] += + s[66] - s[14];
+gout[n*36+18] += + s[13] - s[39];
+gout[n*36+19] += + s[12] + s[40] + s[68];
+gout[n*36+20] += + s[44] - s[70];
+gout[n*36+21] += + s[69] - s[17];
+gout[n*36+22] += + s[16] - s[42];
+gout[n*36+23] += + s[15] + s[43] + s[71];
+gout[n*36+24] += + s[47] - s[73];
+gout[n*36+25] += + s[72] - s[20];
+gout[n*36+26] += + s[19] - s[45];
+gout[n*36+27] += + s[18] + s[46] + s[74];
+gout[n*36+28] += + s[50] - s[76];
+gout[n*36+29] += + s[75] - s[23];
+gout[n*36+30] += + s[22] - s[48];
+gout[n*36+31] += + s[21] + s[49] + s[77];
+gout[n*36+32] += + s[53] - s[79];
+gout[n*36+33] += + s[78] - s[26];
+gout[n*36+34] += + s[25] - s[51];
+gout[n*36+35] += + s[24] + s[52] + s[80];
+}}
+void int1e_ipipsprinvsp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
+CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int1e_ipipsprinvsp_cart(double *out, int *dims, int *shls,
+int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_int1e_ipipsprinvsp;
+return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
+} // int1e_ipipsprinvsp_cart
+int int1e_ipipsprinvsp_sph(double *out, int *dims, int *shls,
+int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_int1e_ipipsprinvsp;
+return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
+} // int1e_ipipsprinvsp_sph
+int int1e_ipipsprinvsp_spinor(double complex *out, int *dims, int *shls,
+int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+int ng[] = {3, 1, 0, 0, 4, 4, 0, 9};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_int1e_ipipsprinvsp;
+return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 1);
+} // int1e_ipipsprinvsp_spinor
+ALL_CINT1E(int1e_ipipsprinvsp)
+ALL_CINT1E_FORTRAN_(int1e_ipipsprinvsp)
+/* <NABLA SIGMA DOT P i|RINV SIGMA DOT P |NABLA j> */
+static void CINTgout1e_int1e_ipsprinvspip(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
 double *g0 = g;
@@ -2117,238 +2305,50 @@ s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
 s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
 s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*36+0] += - s[5] + s[7];
-gout[n*36+1] += - s[6] + s[2];
-gout[n*36+2] += - s[1] + s[3];
-gout[n*36+3] += - s[0] - s[4] - s[8];
-gout[n*36+4] += - s[32] + s[34];
-gout[n*36+5] += - s[33] + s[29];
-gout[n*36+6] += - s[28] + s[30];
-gout[n*36+7] += - s[27] - s[31] - s[35];
-gout[n*36+8] += - s[59] + s[61];
-gout[n*36+9] += - s[60] + s[56];
-gout[n*36+10] += - s[55] + s[57];
-gout[n*36+11] += - s[54] - s[58] - s[62];
-gout[n*36+12] += - s[14] + s[16];
-gout[n*36+13] += - s[15] + s[11];
-gout[n*36+14] += - s[10] + s[12];
-gout[n*36+15] += - s[9] - s[13] - s[17];
-gout[n*36+16] += - s[41] + s[43];
-gout[n*36+17] += - s[42] + s[38];
-gout[n*36+18] += - s[37] + s[39];
-gout[n*36+19] += - s[36] - s[40] - s[44];
-gout[n*36+20] += - s[68] + s[70];
-gout[n*36+21] += - s[69] + s[65];
-gout[n*36+22] += - s[64] + s[66];
-gout[n*36+23] += - s[63] - s[67] - s[71];
-gout[n*36+24] += - s[23] + s[25];
-gout[n*36+25] += - s[24] + s[20];
-gout[n*36+26] += - s[19] + s[21];
-gout[n*36+27] += - s[18] - s[22] - s[26];
-gout[n*36+28] += - s[50] + s[52];
-gout[n*36+29] += - s[51] + s[47];
-gout[n*36+30] += - s[46] + s[48];
-gout[n*36+31] += - s[45] - s[49] - s[53];
-gout[n*36+32] += - s[77] + s[79];
-gout[n*36+33] += - s[78] + s[74];
-gout[n*36+34] += - s[73] + s[75];
-gout[n*36+35] += - s[72] - s[76] - s[80];
-}}
-void int1e_ipipsprinvsp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
-CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
-}
-int int1e_ipipsprinvsp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
-CINTEnvVars envs;
-CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_int1e_ipipsprinvsp;
-return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
-} // int1e_ipipsprinvsp_cart
-int int1e_ipipsprinvsp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
-CINTEnvVars envs;
-CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_int1e_ipipsprinvsp;
-return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
-} // int1e_ipipsprinvsp_sph
-int int1e_ipipsprinvsp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
-CINTEnvVars envs;
-CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
-envs.f_gout = &CINTgout1e_int1e_ipipsprinvsp;
-return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 1);
-} // int1e_ipipsprinvsp_spinor
-ALL_CINT1E(int1e_ipipsprinvsp)
-ALL_CINT1E_FORTRAN_(int1e_ipipsprinvsp)
-/* <NABLA i|SIGMA DOT P RINV SIGMA DOT P |NABLA j> */
-static void CINTgout1e_int1e_ipsprinvspip(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
-double *g0 = g;
-double *g1 = g0  + envs->g_size * 3;
-double *g2 = g1  + envs->g_size * 3;
-double *g3 = g2  + envs->g_size * 3;
-double *g4 = g3  + envs->g_size * 3;
-double *g5 = g4  + envs->g_size * 3;
-double *g6 = g5  + envs->g_size * 3;
-double *g7 = g6  + envs->g_size * 3;
-double *g8 = g7  + envs->g_size * 3;
-double *g9 = g8  + envs->g_size * 3;
-double *g10 = g9  + envs->g_size * 3;
-double *g11 = g10  + envs->g_size * 3;
-double *g12 = g11  + envs->g_size * 3;
-double *g13 = g12  + envs->g_size * 3;
-double *g14 = g13  + envs->g_size * 3;
-double *g15 = g14  + envs->g_size * 3;
-double s[81];
-G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g2, g0, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g4, g0, envs->i_l+1, envs->j_l+2, 0);
-G1E_D_J(g5, g4, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_J(g6, g4, envs->i_l+1, envs->j_l+1, 0);
-G1E_D_J(g7, g6, envs->i_l+1, envs->j_l+0, 0);
-G1E_D_I(g8, g0, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g9, g1, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g10, g2, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g11, g3, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g12, g4, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g13, g5, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g14, g6, envs->i_l+0, envs->j_l, 0);
-G1E_D_I(g15, g7, envs->i_l+0, envs->j_l, 0);
-for (n = 0; n < nf; n++) {
-ix = idx[0+n*3];
-iy = idx[1+n*3];
-iz = idx[2+n*3];
-s[0] = + g15[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g14[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g14[ix+0]*g0[iy+0]*g1[iz+0];
-s[3] = + g13[ix+0]*g2[iy+0]*g0[iz+0];
-s[4] = + g12[ix+0]*g3[iy+0]*g0[iz+0];
-s[5] = + g12[ix+0]*g2[iy+0]*g1[iz+0];
-s[6] = + g13[ix+0]*g0[iy+0]*g2[iz+0];
-s[7] = + g12[ix+0]*g1[iy+0]*g2[iz+0];
-s[8] = + g12[ix+0]*g0[iy+0]*g3[iz+0];
-s[9] = + g11[ix+0]*g4[iy+0]*g0[iz+0];
-s[10] = + g10[ix+0]*g5[iy+0]*g0[iz+0];
-s[11] = + g10[ix+0]*g4[iy+0]*g1[iz+0];
-s[12] = + g9[ix+0]*g6[iy+0]*g0[iz+0];
-s[13] = + g8[ix+0]*g7[iy+0]*g0[iz+0];
-s[14] = + g8[ix+0]*g6[iy+0]*g1[iz+0];
-s[15] = + g9[ix+0]*g4[iy+0]*g2[iz+0];
-s[16] = + g8[ix+0]*g5[iy+0]*g2[iz+0];
-s[17] = + g8[ix+0]*g4[iy+0]*g3[iz+0];
-s[18] = + g11[ix+0]*g0[iy+0]*g4[iz+0];
-s[19] = + g10[ix+0]*g1[iy+0]*g4[iz+0];
-s[20] = + g10[ix+0]*g0[iy+0]*g5[iz+0];
-s[21] = + g9[ix+0]*g2[iy+0]*g4[iz+0];
-s[22] = + g8[ix+0]*g3[iy+0]*g4[iz+0];
-s[23] = + g8[ix+0]*g2[iy+0]*g5[iz+0];
-s[24] = + g9[ix+0]*g0[iy+0]*g6[iz+0];
-s[25] = + g8[ix+0]*g1[iy+0]*g6[iz+0];
-s[26] = + g8[ix+0]*g0[iy+0]*g7[iz+0];
-s[27] = + g7[ix+0]*g8[iy+0]*g0[iz+0];
-s[28] = + g6[ix+0]*g9[iy+0]*g0[iz+0];
-s[29] = + g6[ix+0]*g8[iy+0]*g1[iz+0];
-s[30] = + g5[ix+0]*g10[iy+0]*g0[iz+0];
-s[31] = + g4[ix+0]*g11[iy+0]*g0[iz+0];
-s[32] = + g4[ix+0]*g10[iy+0]*g1[iz+0];
-s[33] = + g5[ix+0]*g8[iy+0]*g2[iz+0];
-s[34] = + g4[ix+0]*g9[iy+0]*g2[iz+0];
-s[35] = + g4[ix+0]*g8[iy+0]*g3[iz+0];
-s[36] = + g3[ix+0]*g12[iy+0]*g0[iz+0];
-s[37] = + g2[ix+0]*g13[iy+0]*g0[iz+0];
-s[38] = + g2[ix+0]*g12[iy+0]*g1[iz+0];
-s[39] = + g1[ix+0]*g14[iy+0]*g0[iz+0];
-s[40] = + g0[ix+0]*g15[iy+0]*g0[iz+0];
-s[41] = + g0[ix+0]*g14[iy+0]*g1[iz+0];
-s[42] = + g1[ix+0]*g12[iy+0]*g2[iz+0];
-s[43] = + g0[ix+0]*g13[iy+0]*g2[iz+0];
-s[44] = + g0[ix+0]*g12[iy+0]*g3[iz+0];
-s[45] = + g3[ix+0]*g8[iy+0]*g4[iz+0];
-s[46] = + g2[ix+0]*g9[iy+0]*g4[iz+0];
-s[47] = + g2[ix+0]*g8[iy+0]*g5[iz+0];
-s[48] = + g1[ix+0]*g10[iy+0]*g4[iz+0];
-s[49] = + g0[ix+0]*g11[iy+0]*g4[iz+0];
-s[50] = + g0[ix+0]*g10[iy+0]*g5[iz+0];
-s[51] = + g1[ix+0]*g8[iy+0]*g6[iz+0];
-s[52] = + g0[ix+0]*g9[iy+0]*g6[iz+0];
-s[53] = + g0[ix+0]*g8[iy+0]*g7[iz+0];
-s[54] = + g7[ix+0]*g0[iy+0]*g8[iz+0];
-s[55] = + g6[ix+0]*g1[iy+0]*g8[iz+0];
-s[56] = + g6[ix+0]*g0[iy+0]*g9[iz+0];
-s[57] = + g5[ix+0]*g2[iy+0]*g8[iz+0];
-s[58] = + g4[ix+0]*g3[iy+0]*g8[iz+0];
-s[59] = + g4[ix+0]*g2[iy+0]*g9[iz+0];
-s[60] = + g5[ix+0]*g0[iy+0]*g10[iz+0];
-s[61] = + g4[ix+0]*g1[iy+0]*g10[iz+0];
-s[62] = + g4[ix+0]*g0[iy+0]*g11[iz+0];
-s[63] = + g3[ix+0]*g4[iy+0]*g8[iz+0];
-s[64] = + g2[ix+0]*g5[iy+0]*g8[iz+0];
-s[65] = + g2[ix+0]*g4[iy+0]*g9[iz+0];
-s[66] = + g1[ix+0]*g6[iy+0]*g8[iz+0];
-s[67] = + g0[ix+0]*g7[iy+0]*g8[iz+0];
-s[68] = + g0[ix+0]*g6[iy+0]*g9[iz+0];
-s[69] = + g1[ix+0]*g4[iy+0]*g10[iz+0];
-s[70] = + g0[ix+0]*g5[iy+0]*g10[iz+0];
-s[71] = + g0[ix+0]*g4[iy+0]*g11[iz+0];
-s[72] = + g3[ix+0]*g0[iy+0]*g12[iz+0];
-s[73] = + g2[ix+0]*g1[iy+0]*g12[iz+0];
-s[74] = + g2[ix+0]*g0[iy+0]*g13[iz+0];
-s[75] = + g1[ix+0]*g2[iy+0]*g12[iz+0];
-s[76] = + g0[ix+0]*g3[iy+0]*g12[iz+0];
-s[77] = + g0[ix+0]*g2[iy+0]*g13[iz+0];
-s[78] = + g1[ix+0]*g0[iy+0]*g14[iz+0];
-s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
-s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
-gout[n*36+0] += - s[15] + s[21];
-gout[n*36+1] += - s[18] + s[6];
-gout[n*36+2] += - s[3] + s[9];
-gout[n*36+3] += - s[0] - s[12] - s[24];
-gout[n*36+4] += - s[16] + s[22];
-gout[n*36+5] += - s[19] + s[7];
-gout[n*36+6] += - s[4] + s[10];
-gout[n*36+7] += - s[1] - s[13] - s[25];
-gout[n*36+8] += - s[17] + s[23];
-gout[n*36+9] += - s[20] + s[8];
-gout[n*36+10] += - s[5] + s[11];
-gout[n*36+11] += - s[2] - s[14] - s[26];
-gout[n*36+12] += - s[42] + s[48];
-gout[n*36+13] += - s[45] + s[33];
-gout[n*36+14] += - s[30] + s[36];
-gout[n*36+15] += - s[27] - s[39] - s[51];
-gout[n*36+16] += - s[43] + s[49];
-gout[n*36+17] += - s[46] + s[34];
-gout[n*36+18] += - s[31] + s[37];
-gout[n*36+19] += - s[28] - s[40] - s[52];
-gout[n*36+20] += - s[44] + s[50];
-gout[n*36+21] += - s[47] + s[35];
-gout[n*36+22] += - s[32] + s[38];
-gout[n*36+23] += - s[29] - s[41] - s[53];
-gout[n*36+24] += - s[69] + s[75];
-gout[n*36+25] += - s[72] + s[60];
-gout[n*36+26] += - s[57] + s[63];
-gout[n*36+27] += - s[54] - s[66] - s[78];
-gout[n*36+28] += - s[70] + s[76];
-gout[n*36+29] += - s[73] + s[61];
-gout[n*36+30] += - s[58] + s[64];
-gout[n*36+31] += - s[55] - s[67] - s[79];
-gout[n*36+32] += - s[71] + s[77];
-gout[n*36+33] += - s[74] + s[62];
-gout[n*36+34] += - s[59] + s[65];
-gout[n*36+35] += - s[56] - s[68] - s[80];
+gout[n*36+0] += + s[33] - s[57];
+gout[n*36+1] += + s[54] - s[6];
+gout[n*36+2] += + s[3] - s[27];
+gout[n*36+3] += + s[0] + s[30] + s[60];
+gout[n*36+4] += + s[34] - s[58];
+gout[n*36+5] += + s[55] - s[7];
+gout[n*36+6] += + s[4] - s[28];
+gout[n*36+7] += + s[1] + s[31] + s[61];
+gout[n*36+8] += + s[35] - s[59];
+gout[n*36+9] += + s[56] - s[8];
+gout[n*36+10] += + s[5] - s[29];
+gout[n*36+11] += + s[2] + s[32] + s[62];
+gout[n*36+12] += + s[42] - s[66];
+gout[n*36+13] += + s[63] - s[15];
+gout[n*36+14] += + s[12] - s[36];
+gout[n*36+15] += + s[9] + s[39] + s[69];
+gout[n*36+16] += + s[43] - s[67];
+gout[n*36+17] += + s[64] - s[16];
+gout[n*36+18] += + s[13] - s[37];
+gout[n*36+19] += + s[10] + s[40] + s[70];
+gout[n*36+20] += + s[44] - s[68];
+gout[n*36+21] += + s[65] - s[17];
+gout[n*36+22] += + s[14] - s[38];
+gout[n*36+23] += + s[11] + s[41] + s[71];
+gout[n*36+24] += + s[51] - s[75];
+gout[n*36+25] += + s[72] - s[24];
+gout[n*36+26] += + s[21] - s[45];
+gout[n*36+27] += + s[18] + s[48] + s[78];
+gout[n*36+28] += + s[52] - s[76];
+gout[n*36+29] += + s[73] - s[25];
+gout[n*36+30] += + s[22] - s[46];
+gout[n*36+31] += + s[19] + s[49] + s[79];
+gout[n*36+32] += + s[53] - s[77];
+gout[n*36+33] += + s[74] - s[26];
+gout[n*36+34] += + s[23] - s[47];
+gout[n*36+35] += + s[20] + s[50] + s[80];
 }}
 void int1e_ipsprinvspip_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 int int1e_ipsprinvspip_cart(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipsprinvspip;
@@ -2356,7 +2356,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_ipsprinvspip_cart
 int int1e_ipsprinvspip_sph(double *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipsprinvspip;
@@ -2364,7 +2364,7 @@ return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_ipsprinvspip_sph
 int int1e_ipsprinvspip_spinor(double complex *out, int *dims, int *shls,
 int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 3, 0, 0, 4, 4, 0, 9};
+int ng[] = {2, 2, 0, 0, 4, 4, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ipsprinvspip;
