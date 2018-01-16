@@ -177,6 +177,7 @@
   '("int3c2e_ip1"               (nabla \, \| ))
   '("int3c2e_ip2"               ( \, \| nabla))
   '("int3c2e_pvp1"              (p* \, dot p \|))
+  '("int3c2e_pvxp1"             (p* \, cross p \|))
   '("int2c2e_ip1"               (nabla \| r12 \| ))
   '("int2c2e_ip2"               ( \| r12 \| nabla))
   '("int3c2e_ig1"               (#C(0 1) g \, \| ))
