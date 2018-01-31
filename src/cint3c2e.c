@@ -754,6 +754,12 @@ FINT int3c2e_spsp1_spinor_ssc(double complex *out, FINT *dims, FINT *shls, FINT 
         envs.f_gout = &CINTgout2e_int3c2e_spsp1;
         return CINT3c2e_spinor_drv(out, dims, &envs, opt, cache, &c2s_si_3c2e1_ssc, 1);
 }
+void int3c2e_ssc_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env)
+{
+        int3c2e_ssc_optimizer(opt, atm, natm, bas, nbas, env);
+}
+
 
 
 ALL_CINT(int3c2e)
