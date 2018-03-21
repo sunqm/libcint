@@ -1,8 +1,14 @@
-Version 3.0.9  (2017-03-08):
+Version 3.0.10  (2018-03-20):
+	* New integrals
+	  <i | r p | j>,
+	  <i | r r p | j>,
+	  <i | r p r | j> and
+	  <i | r r r | j>
+Version 3.0.9  (2018-03-08):
 	* New integrals (i |nabla j) and  -1/2 *(i | nabla^2 j)
-Version 3.0.8  (2017-02-14):
+Version 3.0.8  (2018-02-14):
 	* Fix Fortran APIs
-Version 3.0.7  (2017-01-15):
+Version 3.0.7  (2018-01-15):
 	* Add 3-center SOC integrals
 Version 3.0.6  (2017-12-20):
 	* Add integrals for X2C graidents and hessian

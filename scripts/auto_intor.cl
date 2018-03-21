@@ -35,6 +35,10 @@
   '("int1e_prinvxp"             (p* \| rinv cross p \| ))
   '("int1e_pnucxp"              (p* \| nuc cross p \| ))
   '("int2e_p1vxp1"              (p* \, cross p \| \, )) ; SSO
+  '("int1e_irp"                 ( \| rc nabla \| ))
+  '("int1e_irrp"                ( \| rc rc nabla \| ))
+  '("int1e_irpr"                ( \| rc nabla rc \| ))
+  '("int1e_irrr"                ( \| rc rc rc \| ))
 )
 
 (gen-cint "intor2.c"
