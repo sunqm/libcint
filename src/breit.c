@@ -37,10 +37,10 @@ FINT int2e_breit_##X##_spinor(double complex *out, FINT *dims, FINT *shls, \
                              CINTOpt *opt, double *cache) \
 { \
         return _int2e_breit_drv(out, dims, shls, atm, natm, bas, nbas, env, opt, cache, \
-                                1, &int2e_##X##_spinor, \
+                                ncomp_tensor, &int2e_##X##_spinor, \
                                 &int2e_gauge_r1_##X##_spinor, &int2e_gauge_r2_##X##_spinor); \
 } \
-FINT cint2e_breit_##X(double complex *out, FINT *shls, \
+FINT cint2e_breit_##X##_spinor(double complex *out, FINT *shls, \
                       FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, \
                       CINTOpt *opt) \
 { \
@@ -84,6 +84,14 @@ static FINT _int2e_breit_drv(double complex *out, FINT *dims, FINT *shls,
                             CINTOpt *opt, double *cache, int ncomp_tensor,
                             int (*f_gaunt)(), int (*f_gauge_r1)(), int (*f_gauge_r2)())
 {
+        if (out == NULL) {
+                FINT cache_size1 = (*f_gauge_r1)(NULL, NULL, shls,
+                                atm, natm, bas, nbas, env, NULL, cache);
+                FINT cache_size2 = (*f_gauge_r2)(NULL, NULL, shls,
+                                atm, natm, bas, nbas, env, NULL, cache);
+                return MAX(cache_size1, cache_size2);
+        }
+
         FINT counts[4];
         counts[0] = CINTcgto_spinor(shls[0], bas);
         counts[1] = CINTcgto_spinor(shls[1], bas);
