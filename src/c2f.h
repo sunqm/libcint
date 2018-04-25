@@ -6,50 +6,51 @@
 #include "config.h"
 
 #define ALL_CINT_FORTRAN_(NAME) \
-int c##NAME##_sph_(double *out, int *shls, int *atm, int *natm, \
-                    int *bas, int *nbas, double *env, int64_t optptr_as_integer8) { \
+FINT c##NAME##_sph_(double *out, FINT *shls, FINT *atm, FINT *natm, \
+                    FINT *bas, FINT *nbas, double *env, size_t optptr_as_integer8) { \
         CINTOpt **opt = (CINTOpt **)optptr_as_integer8; \
         return NAME##_sph(out, NULL, shls, \
                           atm, *natm, bas, *nbas, env, *opt, NULL); \
 } \
-void c##NAME##_sph_optimizer_(CINTOpt **opt, int *atm, int *natm, \
-                              int *bas, int *nbas, double *env) { \
+void c##NAME##_sph_optimizer_(size_t optptr_as_integer8, FINT *atm, FINT *natm, \
+                              FINT *bas, FINT *nbas, double *env) { \
+        CINTOpt **opt = (CINTOpt **)optptr_as_integer8; \
         NAME##_optimizer(opt, atm, *natm, bas, *nbas, env); \
 } \
-int c##NAME##_cart_(double *out, int *shls, int *atm, int *natm, \
-                    int *bas, int *nbas, double *env, int64_t optptr_as_integer8) { \
+FINT c##NAME##_cart_(double *out, FINT *shls, FINT *atm, FINT *natm, \
+                     FINT *bas, FINT *nbas, double *env, size_t optptr_as_integer8) { \
         CINTOpt **opt = (CINTOpt **)optptr_as_integer8; \
         return NAME##_cart(out, NULL, shls, \
                            atm, *natm, bas, *nbas, env, *opt, NULL); \
 } \
-void c##NAME##_cart_optimizer_(CINTOpt **opt, int *atm, int *natm, \
-                               int *bas, int *nbas, double *env) { \
+void c##NAME##_cart_optimizer_(CINTOpt **opt, FINT *atm, FINT *natm, \
+                               FINT *bas, FINT *nbas, double *env) { \
         NAME##_optimizer(opt, atm, *natm, bas, *nbas, env); \
 } \
-int c##NAME##_(double *out, int *shls, int *atm, int *natm, \
-               int *bas, int *nbas, double *env, int64_t optptr_as_integer8) { \
+FINT c##NAME##_(double *out, FINT *shls, FINT *atm, FINT *natm, \
+                FINT *bas, FINT *nbas, double *env, size_t optptr_as_integer8) { \
         CINTOpt **opt = (CINTOpt **)optptr_as_integer8; \
         return NAME##_spinor((double complex *)out, NULL, shls, \
                              atm, *natm, bas, *nbas, env, *opt, NULL); \
 } \
-void c##NAME##_optimizer_(int64_t optptr_as_integer8, int *atm, int *natm, \
-                         int *bas, int *nbas, double *env) { \
+void c##NAME##_optimizer_(size_t optptr_as_integer8, FINT *atm, FINT *natm, \
+                         FINT *bas, FINT *nbas, double *env) { \
         CINTOpt **opt = (CINTOpt **)optptr_as_integer8; \
         NAME##_optimizer(opt, atm, *natm, bas, *nbas, env); \
 }
 
 #define ALL_CINT1E_FORTRAN_(NAME) \
-int c##NAME##_sph_(double *out, int *shls, int *atm, int *natm, \
-                    int *bas, int *nbas, double *env) { \
+FINT c##NAME##_sph_(double *out, FINT *shls, FINT *atm, FINT *natm, \
+                    FINT *bas, FINT *nbas, double *env) { \
         return NAME##_sph(out, NULL, shls, atm, *natm, bas, *nbas, env, NULL, NULL); \
 } \
-int c##NAME##_cart_(double *out, int *shls, int *atm, int *natm, \
-                    int *bas, int *nbas, double *env) { \
+FINT c##NAME##_cart_(double *out, FINT *shls, FINT *atm, FINT *natm, \
+                     FINT *bas, FINT *nbas, double *env) { \
         return NAME##_cart(out, NULL, shls, \
                            atm, *natm, bas, *nbas, env, NULL, NULL); \
 } \
-int c##NAME##_(double *out, int *shls, int *atm, int *natm, \
-               int *bas, int *nbas, double *env) { \
+FINT c##NAME##_(double *out, FINT *shls, FINT *atm, FINT *natm, \
+                FINT *bas, FINT *nbas, double *env) { \
         return NAME##_spinor((double complex *)out, NULL, shls, \
                              atm, *natm, bas, *nbas, env, NULL, NULL); \
 }
