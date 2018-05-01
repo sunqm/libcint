@@ -64,6 +64,7 @@
   '("int1e_spnucsp"             (sigma dot p \| nuc \| sigma dot p))
   '("int1e_sprinvsp"            (sigma dot p \| rinv \| sigma dot p))
   '("int1e_srnucsr"             (sigma dot r \| nuc \| sigma dot r))
+  '("int1e_sprsp"               (sigma dot p \| rc \| sigma dot p))
   '("int1e_govlp"               (g \|))
   '("int1e_gnuc"                (g \| nuc \|))
   '("int1e_cg_sa10sa01"         (.5 sigma cross rc \| sigma cross nabla-rinv \|))

@@ -591,6 +591,104 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 2);
 } // int1e_srnucsr_spinor
 ALL_CINT1E(int1e_srnucsr)
 ALL_CINT1E_FORTRAN_(int1e_srnucsr)
+/* <SIGMA DOT P i|RC |SIGMA DOT P j> */
+static void CINTgout1e_int1e_sprsp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
+int nf = envs->nf;
+int ix, iy, iz, n;
+double *g0 = g;
+double *g1 = g0  + envs->g_size * 3;
+double *g2 = g1  + envs->g_size * 3;
+double *g3 = g2  + envs->g_size * 3;
+double *g4 = g3  + envs->g_size * 3;
+double *g5 = g4  + envs->g_size * 3;
+double *g6 = g5  + envs->g_size * 3;
+double *g7 = g6  + envs->g_size * 3;
+double drj[3];
+drj[0] = envs->rj[0] - envs->env[PTR_COMMON_ORIG+0];
+drj[1] = envs->rj[1] - envs->env[PTR_COMMON_ORIG+1];
+drj[2] = envs->rj[2] - envs->env[PTR_COMMON_ORIG+2];
+double s[27];
+G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
+G1E_RCJ(g2, g0, envs->i_l+1, envs->j_l+1, 0);
+G1E_D_J(g3, g2, envs->i_l+1, envs->j_l+0, 0);
+G1E_D_I(g4, g0, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g5, g1, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g6, g2, envs->i_l+0, envs->j_l, 0);
+G1E_D_I(g7, g3, envs->i_l+0, envs->j_l, 0);
+for (n = 0; n < nf; n++) {
+ix = idx[0+n*3];
+iy = idx[1+n*3];
+iz = idx[2+n*3];
+s[0] = + g7[ix+0]*g0[iy+0]*g0[iz+0];
+s[1] = + g6[ix+0]*g1[iy+0]*g0[iz+0];
+s[2] = + g6[ix+0]*g0[iy+0]*g1[iz+0];
+s[3] = + g5[ix+0]*g2[iy+0]*g0[iz+0];
+s[4] = + g4[ix+0]*g3[iy+0]*g0[iz+0];
+s[5] = + g4[ix+0]*g2[iy+0]*g1[iz+0];
+s[6] = + g5[ix+0]*g0[iy+0]*g2[iz+0];
+s[7] = + g4[ix+0]*g1[iy+0]*g2[iz+0];
+s[8] = + g4[ix+0]*g0[iy+0]*g3[iz+0];
+s[9] = + g3[ix+0]*g4[iy+0]*g0[iz+0];
+s[10] = + g2[ix+0]*g5[iy+0]*g0[iz+0];
+s[11] = + g2[ix+0]*g4[iy+0]*g1[iz+0];
+s[12] = + g1[ix+0]*g6[iy+0]*g0[iz+0];
+s[13] = + g0[ix+0]*g7[iy+0]*g0[iz+0];
+s[14] = + g0[ix+0]*g6[iy+0]*g1[iz+0];
+s[15] = + g1[ix+0]*g4[iy+0]*g2[iz+0];
+s[16] = + g0[ix+0]*g5[iy+0]*g2[iz+0];
+s[17] = + g0[ix+0]*g4[iy+0]*g3[iz+0];
+s[18] = + g3[ix+0]*g0[iy+0]*g4[iz+0];
+s[19] = + g2[ix+0]*g1[iy+0]*g4[iz+0];
+s[20] = + g2[ix+0]*g0[iy+0]*g5[iz+0];
+s[21] = + g1[ix+0]*g2[iy+0]*g4[iz+0];
+s[22] = + g0[ix+0]*g3[iy+0]*g4[iz+0];
+s[23] = + g0[ix+0]*g2[iy+0]*g5[iz+0];
+s[24] = + g1[ix+0]*g0[iy+0]*g6[iz+0];
+s[25] = + g0[ix+0]*g1[iy+0]*g6[iz+0];
+s[26] = + g0[ix+0]*g0[iy+0]*g7[iz+0];
+gout[n*12+0] += 0;
+gout[n*12+1] += + s[18] - s[2];
+gout[n*12+2] += + s[1] - s[9];
+gout[n*12+3] += + s[0] + s[10] + s[20];
+gout[n*12+4] += + s[14] - s[22];
+gout[n*12+5] += 0;
+gout[n*12+6] += + s[4] - s[12];
+gout[n*12+7] += + s[3] + s[13] + s[23];
+gout[n*12+8] += + s[17] - s[25];
+gout[n*12+9] += + s[24] - s[8];
+gout[n*12+10] += 0;
+gout[n*12+11] += + s[6] + s[16] + s[26];
+}}
+void int1e_sprsp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
+int ng[] = {1, 2, 0, 0, 3, 4, 1, 3};
+CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int1e_sprsp_cart(double *out, int *dims, int *shls,
+int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+int ng[] = {1, 2, 0, 0, 3, 4, 1, 3};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_int1e_sprsp;
+return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
+} // int1e_sprsp_cart
+int int1e_sprsp_sph(double *out, int *dims, int *shls,
+int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+int ng[] = {1, 2, 0, 0, 3, 4, 1, 3};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_int1e_sprsp;
+return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
+} // int1e_sprsp_sph
+int int1e_sprsp_spinor(double complex *out, int *dims, int *shls,
+int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+int ng[] = {1, 2, 0, 0, 3, 4, 1, 3};
+CINTEnvVars envs;
+CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+envs.f_gout = &CINTgout1e_int1e_sprsp;
+return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_si_1e, 0);
+} // int1e_sprsp_spinor
+ALL_CINT1E(int1e_sprsp)
+ALL_CINT1E_FORTRAN_(int1e_sprsp)
 /* <G i|OVLP |j> */
 static void CINTgout1e_int1e_govlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
