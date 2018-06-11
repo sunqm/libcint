@@ -22,6 +22,8 @@
   '("int1e_r"                   ( \| rc \| ))
   '("int1e_r2"                  ( \| rc dot rc \| ))
   '("int1e_rr"                  ( \| rc rc \| ))
+  '("int1e_rrr"                 ( \| rc rc rc \| ))
+  '("int1e_rrrr"                ( \| rc rc rc rc \| ))
   '("int1e_z_origj"             ( \| z \| ))
   '("int1e_zz_origj"            ( \| z z \| ))
   '("int1e_r_origj"             ( \| r \| ))
@@ -38,7 +40,6 @@
   '("int1e_irp"                 ( \| rc nabla \| ))
   '("int1e_irrp"                ( \| rc rc nabla \| ))
   '("int1e_irpr"                ( \| rc nabla rc \| ))
-  '("int1e_irrr"                ( \| rc rc rc \| ))
 )
 
 (gen-cint "intor2.c"
