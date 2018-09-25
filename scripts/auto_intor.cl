@@ -36,16 +36,21 @@
   '("int1e_prinvp"              (p* \| rinv dot p \| ))
   '("int1e_prinvxp"             (p* \| rinv cross p \| ))
   '("int1e_pnucxp"              (p* \| nuc cross p \| ))
-  '("int2e_p1vxp1"              (p* \, cross p \| \, )) ; SSO
   '("int1e_irp"                 ( \| rc nabla \| ))
   '("int1e_irrp"                ( \| rc rc nabla \| ))
   '("int1e_irpr"                ( \| rc nabla rc \| ))
+  '("int1e_ggovlp"              ( \| g g \|))
+  '("int1e_ggkin"               (.5 \| g g nabla dot nabla \|))
+  '("int1e_ggnuc"               ( \| g g nuc \|))
+  '("int1e_grjxp"               ( \| g r cross p \|))
 )
 
 (gen-cint "intor2.c"
   ;'("int2e"                     ( \, \| \, ))
   '("int2e_ig1"                 (#C(0 1) g \, \| \, ))
-  '("int2e_ig1ig2"              (-1 g \, \| g \, ))
+  '("int2e_gg1"                 (g g \, \| \, ))
+  '("int2e_g1g2"                (-1 g \, \| g \, ))
+  '("int2e_p1vxp1"              (p* \, cross p \| \, )) ; SSO
   '("int2e_ip1v_rc1"            ( \, rc \| nabla-r12 \| \, ))
   '("int2e_ip1v_r1"             ( \, r  \| nabla-r12 \| \, ))
   '("int2e_ipvg1_xp1"           (g \, \| nabla-r12 cross p \| \, ))
@@ -196,6 +201,7 @@
   '("int3c2e_ipip1"             ( nabla nabla \, \| ))
   '("int3c2e_ipvip1"            ( nabla \, nabla \| ))
   '("int3c2e_ip1ip2"            ( nabla \, \| nabla ))
+  '("int2c2e_ipip1"             ( nabla nabla \| r12 \|))
   '("int2c2e_ip1ip2"            ( nabla \| r12 \| nabla))
 )
 
