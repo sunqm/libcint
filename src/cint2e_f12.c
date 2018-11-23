@@ -70,7 +70,7 @@ ALL_CINT(int2e_stg)
  * ((NABLA i) j| F12 |k l)
  */
 void CINTgout2e_int2e_ip1(double *gout,
-                          double *g, int *idx, CINTEnvVars *envs, int gout_empty);
+        double *g, int *idx, CINTEnvVars *envs, int gout_empty);
 
 void int2e_yp_ip1_optimizer(CINTOpt **opt, int *atm, int natm,
                              int *bas, int nbas, double *env) {
@@ -101,3 +101,112 @@ int int2e_stg_ip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
         return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
 }
 ALL_CINT(int2e_stg_ip1)
+
+/*
+ * ((NABLA NABLA i) j| F12 |k l)
+ */
+void CINTgout2e_int2e_ipip1(double *gout,
+        double *g, int *idx, CINTEnvVars *envs, int gout_empty);
+
+void int2e_yp_ipip1_optimizer(CINTOpt **opt, int *atm, int natm,
+                              int *bas, int nbas, double *env) {
+        int ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_yp_ipip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                       int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
+        CINTEnvVars envs;
+        CINTinit_int2e_yp_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ipip1;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_yp_ipip1)
+
+void int2e_stg_ipip1_optimizer(CINTOpt **opt, int *atm, int natm,
+                               int *bas, int nbas, double *env) {
+        int ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_stg_ipip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                        int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {2, 0, 0, 0, 2, 1, 1, 9};
+        CINTEnvVars envs;
+        CINTinit_int2e_stg_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ipip1;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_stg_ipip1)
+
+/*
+ * ((NABLA i) (NABLA j)| F12 |k l)
+ */
+void CINTgout2e_int2e_ipvip1(double *gout,
+        double *g, int *idx, CINTEnvVars *envs, int gout_empty);
+
+void int2e_yp_ipvip1_optimizer(CINTOpt **opt, int *atm, int natm,
+                               int *bas, int nbas, double *env) {
+        int ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_yp_ipvip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                        int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
+        CINTEnvVars envs;
+        CINTinit_int2e_yp_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ipvip1;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_yp_ipvip1)
+
+void int2e_stg_ipvip1_optimizer(CINTOpt **opt, int *atm, int natm,
+                                int *bas, int nbas, double *env) {
+        int ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_stg_ipvip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                         int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {1, 1, 0, 0, 2, 1, 1, 9};
+        CINTEnvVars envs;
+        CINTinit_int2e_stg_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ipvip1;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_stg_ipvip1)
+
+/*
+ * ((NABLA i) j| F12 |(NABLA k) l)
+ */
+void CINTgout2e_int2e_ip1ip2(double *gout,
+        double *g, int *idx, CINTEnvVars *envs, int gout_empty);
+
+void int2e_yp_ip1ip2_optimizer(CINTOpt **opt, int *atm, int natm,
+                               int *bas, int nbas, double *env) {
+        int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_yp_ip1ip2_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                        int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
+        CINTEnvVars envs;
+        CINTinit_int2e_yp_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ip1ip2;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_yp_ip1ip2)
+
+void int2e_stg_ip1ip2_optimizer(CINTOpt **opt, int *atm, int natm,
+                                int *bas, int nbas, double *env) {
+        int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_stg_ip1ip2_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                         int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {1, 0, 1, 0, 2, 1, 1, 9};
+        CINTEnvVars envs;
+        CINTinit_int2e_stg_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ip1ip2;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_stg_ip1ip2)
+
