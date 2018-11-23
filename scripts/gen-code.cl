@@ -335,7 +335,7 @@ iz = idx[2];~%")
            (op-len (length op-rev))
            (tot-bits (+ i-len j-len op-len))
            (goutinc (length flat-script)))
-      (format fout "static void CINTgout1e_~a" intname)
+      (format fout "void CINTgout1e_~a" intname)
       (format fout "(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int ix, iy, iz, n;
@@ -563,7 +563,7 @@ for (i = 0; i < nrys_roots; i++) {~%" (expt 3 tot-bits))
            (l-len (length l-rev))
            (tot-bits (+ i-len j-len op-len k-len l-len))
            (goutinc (length flat-script)))
-      (format fout "static void CINTgout2e_~a(double *gout,
+      (format fout "void CINTgout2e_~a(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
       (format fout "int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;

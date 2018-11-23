@@ -14,7 +14,7 @@
 #include "c2f.h"
 /* <k SIGMA DOT P i|R12 |SIGMA DOT P j l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT P i SIGMA DOT P j|R12 |k l) */
-static void CINTgout2e_int2e_spsp1(double *gout,
+void CINTgout2e_int2e_spsp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -86,7 +86,7 @@ ALL_CINT(int2e_spsp1)
 ALL_CINT_FORTRAN_(int2e_spsp1)
 /* <SIGMA DOT P k SIGMA DOT P i|R12 |SIGMA DOT P j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT P i SIGMA DOT P j|R12 |SIGMA DOT P k SIGMA DOT P l) */
-static void CINTgout2e_int2e_spsp1spsp2(double *gout,
+void CINTgout2e_int2e_spsp1spsp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -278,7 +278,7 @@ ALL_CINT(int2e_spsp1spsp2)
 ALL_CINT_FORTRAN_(int2e_spsp1spsp2)
 /* <k SIGMA DOT R i|R12 |SIGMA DOT R j l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT R i SIGMA DOT R j|R12 |k l) */
-static void CINTgout2e_int2e_srsr1(double *gout,
+void CINTgout2e_int2e_srsr1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -350,7 +350,7 @@ ALL_CINT(int2e_srsr1)
 ALL_CINT_FORTRAN_(int2e_srsr1)
 /* <SIGMA DOT R k SIGMA DOT R i|R12 |SIGMA DOT R j SIGMA DOT R l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT R i SIGMA DOT R j|R12 |SIGMA DOT R k SIGMA DOT R l) */
-static void CINTgout2e_int2e_srsr1srsr2(double *gout,
+void CINTgout2e_int2e_srsr1srsr2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -542,7 +542,7 @@ ALL_CINT(int2e_srsr1srsr2)
 ALL_CINT_FORTRAN_(int2e_srsr1srsr2)
 /* <k RC CROSS SIGMA i|R12 |SIGMA DOT P j l> : i,j \in electron 1; k,l \in electron 2
  * = (RC CROSS SIGMA i SIGMA DOT P j|R12 |k l) */
-static void CINTgout2e_int2e_cg_sa10sp1(double *gout,
+void CINTgout2e_int2e_cg_sa10sp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -637,7 +637,7 @@ ALL_CINT(int2e_cg_sa10sp1)
 ALL_CINT_FORTRAN_(int2e_cg_sa10sp1)
 /* <SIGMA DOT P k RC CROSS SIGMA i|R12 |SIGMA DOT P j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (RC CROSS SIGMA i SIGMA DOT P j|R12 |SIGMA DOT P k SIGMA DOT P l) */
-static void CINTgout2e_int2e_cg_sa10sp1spsp2(double *gout,
+void CINTgout2e_int2e_cg_sa10sp1spsp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -900,7 +900,7 @@ ALL_CINT(int2e_cg_sa10sp1spsp2)
 ALL_CINT_FORTRAN_(int2e_cg_sa10sp1spsp2)
 /* <k R CROSS SIGMA i|R12 |SIGMA DOT P j l> : i,j \in electron 1; k,l \in electron 2
  * = (R CROSS SIGMA i SIGMA DOT P j|R12 |k l) */
-static void CINTgout2e_int2e_giao_sa10sp1(double *gout,
+void CINTgout2e_int2e_giao_sa10sp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -991,7 +991,7 @@ ALL_CINT(int2e_giao_sa10sp1)
 ALL_CINT_FORTRAN_(int2e_giao_sa10sp1)
 /* <SIGMA DOT P k R CROSS SIGMA i|R12 |SIGMA DOT P j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (R CROSS SIGMA i SIGMA DOT P j|R12 |SIGMA DOT P k SIGMA DOT P l) */
-static void CINTgout2e_int2e_giao_sa10sp1spsp2(double *gout,
+void CINTgout2e_int2e_giao_sa10sp1spsp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1250,7 +1250,7 @@ ALL_CINT(int2e_giao_sa10sp1spsp2)
 ALL_CINT_FORTRAN_(int2e_giao_sa10sp1spsp2)
 /* <k G i|R12 |j l> : i,j \in electron 1; k,l \in electron 2
  * = (G i j|R12 |k l) */
-static void CINTgout2e_int2e_g1(double *gout,
+void CINTgout2e_int2e_g1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1379,7 +1379,7 @@ ALL_CINT(int2e_g1)
 ALL_CINT_FORTRAN_(int2e_g1)
 /* <k G SIGMA DOT P i|R12 |SIGMA DOT P j l> : i,j \in electron 1; k,l \in electron 2
  * = (G SIGMA DOT P i SIGMA DOT P j|R12 |k l) */
-static void CINTgout2e_int2e_spgsp1(double *gout,
+void CINTgout2e_int2e_spgsp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1540,7 +1540,7 @@ ALL_CINT(int2e_spgsp1)
 ALL_CINT_FORTRAN_(int2e_spgsp1)
 /* <SIGMA DOT P k G i|R12 |j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (G i j|R12 |SIGMA DOT P k SIGMA DOT P l) */
-static void CINTgout2e_int2e_g1spsp2(double *gout,
+void CINTgout2e_int2e_g1spsp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1701,7 +1701,7 @@ ALL_CINT(int2e_g1spsp2)
 ALL_CINT_FORTRAN_(int2e_g1spsp2)
 /* <SIGMA DOT P k G SIGMA DOT P i|R12 |SIGMA DOT P j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (G SIGMA DOT P i SIGMA DOT P j|R12 |SIGMA DOT P k SIGMA DOT P l) */
-static void CINTgout2e_int2e_spgsp1spsp2(double *gout,
+void CINTgout2e_int2e_spgsp1spsp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -2198,7 +2198,7 @@ ALL_CINT(int2e_spgsp1spsp2)
 ALL_CINT_FORTRAN_(int2e_spgsp1spsp2)
 /* <k P* i|R12 |DOT P j l> : i,j \in electron 1; k,l \in electron 2
  * = (P* i DOT P j|R12 |k l) */
-static void CINTgout2e_int2e_pp1(double *gout,
+void CINTgout2e_int2e_pp1(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -2264,7 +2264,7 @@ ALL_CINT(int2e_pp1)
 ALL_CINT_FORTRAN_(int2e_pp1)
 /* <P* k i|R12 |j DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (i j|R12 |P* k DOT P l) */
-static void CINTgout2e_int2e_pp2(double *gout,
+void CINTgout2e_int2e_pp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -2330,7 +2330,7 @@ ALL_CINT(int2e_pp2)
 ALL_CINT_FORTRAN_(int2e_pp2)
 /* <P* k P* i|R12 |DOT P j DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (P* i DOT P j|R12 |P* k DOT P l) */
-static void CINTgout2e_int2e_pp1pp2(double *gout,
+void CINTgout2e_int2e_pp1pp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;

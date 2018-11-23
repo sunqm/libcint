@@ -63,3 +63,41 @@ void c##NAME##_sph_optimizer(CINTOpt **opt, int *atm, int natm, \
 
 ALL_CINT(int2e_yp)
 ALL_CINT(int2e_stg)
+
+
+
+/*
+ * ((NABLA i) j| F12 |k l)
+ */
+void CINTgout2e_int2e_ip1(double *gout,
+                          double *g, int *idx, CINTEnvVars *envs, int gout_empty);
+
+void int2e_yp_ip1_optimizer(CINTOpt **opt, int *atm, int natm,
+                             int *bas, int nbas, double *env) {
+        int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_yp_ip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                      int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+        CINTEnvVars envs;
+        CINTinit_int2e_yp_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ip1;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_yp_ip1)
+
+void int2e_stg_ip1_optimizer(CINTOpt **opt, int *atm, int natm,
+                             int *bas, int nbas, double *env) {
+        int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+        CINTall_2e_stg_optimizer(opt, ng, atm, natm, bas, nbas, env);
+}
+int int2e_stg_ip1_sph(double *out, int *dims, int *shls, int *atm, int natm,
+                      int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
+        int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+        CINTEnvVars envs;
+        CINTinit_int2e_stg_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout2e_int2e_ip1;
+        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+}
+ALL_CINT(int2e_stg_ip1)

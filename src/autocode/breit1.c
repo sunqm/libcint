@@ -14,7 +14,7 @@
 #include "c2f.h"
 /* <k i|BREIT-R1 |R0 SIGMA DOT P j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (i R0 SIGMA DOT P j|BREIT-R1 |k SIGMA DOT P l) */
-static void CINTgout2e_int2e_gauge_r1_ssp1ssp2(double *gout,
+void CINTgout2e_int2e_gauge_r1_ssp1ssp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -213,7 +213,7 @@ ALL_CINT(int2e_gauge_r1_ssp1ssp2)
 ALL_CINT_FORTRAN_(int2e_gauge_r1_ssp1ssp2)
 /* <SIGMA DOT P k i|BREIT-R1 |R0 SIGMA DOT P j l> : i,j \in electron 1; k,l \in electron 2
  * = (i R0 SIGMA DOT P j|BREIT-R1 |SIGMA DOT P k l) */
-static void CINTgout2e_int2e_gauge_r1_ssp1sps2(double *gout,
+void CINTgout2e_int2e_gauge_r1_ssp1sps2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -412,7 +412,7 @@ ALL_CINT(int2e_gauge_r1_ssp1sps2)
 ALL_CINT_FORTRAN_(int2e_gauge_r1_ssp1sps2)
 /* <k SIGMA DOT P i|BREIT-R1 |R0 j SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT P i R0 j|BREIT-R1 |k SIGMA DOT P l) */
-static void CINTgout2e_int2e_gauge_r1_sps1ssp2(double *gout,
+void CINTgout2e_int2e_gauge_r1_sps1ssp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -611,7 +611,7 @@ ALL_CINT(int2e_gauge_r1_sps1ssp2)
 ALL_CINT_FORTRAN_(int2e_gauge_r1_sps1ssp2)
 /* <SIGMA DOT P k SIGMA DOT P i|BREIT-R1 |R0 j l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT P i R0 j|BREIT-R1 |SIGMA DOT P k l) */
-static void CINTgout2e_int2e_gauge_r1_sps1sps2(double *gout,
+void CINTgout2e_int2e_gauge_r1_sps1sps2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -810,7 +810,7 @@ ALL_CINT(int2e_gauge_r1_sps1sps2)
 ALL_CINT_FORTRAN_(int2e_gauge_r1_sps1sps2)
 /* <k i|BREIT-R2 |SIGMA DOT P j R0 SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (i SIGMA DOT P j|BREIT-R2 |k R0 SIGMA DOT P l) */
-static void CINTgout2e_int2e_gauge_r2_ssp1ssp2(double *gout,
+void CINTgout2e_int2e_gauge_r2_ssp1ssp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1013,7 +1013,7 @@ ALL_CINT(int2e_gauge_r2_ssp1ssp2)
 ALL_CINT_FORTRAN_(int2e_gauge_r2_ssp1ssp2)
 /* <SIGMA DOT P k i|BREIT-R2 |SIGMA DOT P j R0 l> : i,j \in electron 1; k,l \in electron 2
  * = (i SIGMA DOT P j|BREIT-R2 |SIGMA DOT P k R0 l) */
-static void CINTgout2e_int2e_gauge_r2_ssp1sps2(double *gout,
+void CINTgout2e_int2e_gauge_r2_ssp1sps2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1216,7 +1216,7 @@ ALL_CINT(int2e_gauge_r2_ssp1sps2)
 ALL_CINT_FORTRAN_(int2e_gauge_r2_ssp1sps2)
 /* <k SIGMA DOT P i|BREIT-R2 |j R0 SIGMA DOT P l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT P i j|BREIT-R2 |k R0 SIGMA DOT P l) */
-static void CINTgout2e_int2e_gauge_r2_sps1ssp2(double *gout,
+void CINTgout2e_int2e_gauge_r2_sps1ssp2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
@@ -1419,7 +1419,7 @@ ALL_CINT(int2e_gauge_r2_sps1ssp2)
 ALL_CINT_FORTRAN_(int2e_gauge_r2_sps1ssp2)
 /* <SIGMA DOT P k SIGMA DOT P i|BREIT-R2 |j R0 l> : i,j \in electron 1; k,l \in electron 2
  * = (SIGMA DOT P i j|BREIT-R2 |SIGMA DOT P k R0 l) */
-static void CINTgout2e_int2e_gauge_r2_sps1sps2(double *gout,
+void CINTgout2e_int2e_gauge_r2_sps1sps2(double *gout,
 double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
 int nf = envs->nf;
 int nrys_roots = envs->nrys_roots;
