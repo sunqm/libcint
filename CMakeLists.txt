@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint C)
+set(cint_SOVERSION "3")
 set(cint_VERSION "3.0.14")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
@@ -101,6 +102,7 @@ endif()
 add_library(cint ${cintSrc})
 set_target_properties(cint PROPERTIES
   VERSION ${cint_VERSION}
+  SOVERSION ${cint_SOVERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 target_link_libraries(cint ${BLAS_LIBRARIES})
 if(QUADMATH_FOUND)
