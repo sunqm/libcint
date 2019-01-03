@@ -10,7 +10,7 @@ H 1 0 -1''',
 basis = {'H': [[0, (2., 1)],
                [0, (.625, 1)],
                [1, ( .8, 1)],
-               #[2, (1.2, 1)]
+               [2, (1.2, 1)]
               ]},
 dimension = 0,
 a = numpy.eye(3),
@@ -180,3 +180,18 @@ print('laplacian', abs(eri0-eri1.trace()).max(), abs(eri0).max())
 #
 #mydf.weighted_coulG = weighted_gtg_coul
 #eri0 = get_eri(mydf)
+
+zeta = .4
+def weighted_gtg(kpt=numpy.zeros(3), exx=False, mesh=None):
+    if mesh is None:
+        mesh = self.mesh
+    Gv, Gvbase, kws = cell.get_Gv_weights(mesh)
+    G2 = numpy.einsum('gx,gx->g', Gv, Gv)
+    coulG = (numpy.pi/zeta)**1.5 * numpy.exp(G2/(-4*zeta))
+    coulG *= kws
+    return coulG
+mydf.weighted_coulG = weighted_gtg
+cell._env[10] = zeta
+eri0 = get_eri(mydf)
+eri1 = cell.intor('int2e_gtg_sph', aosym='s4')
+print('int2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())

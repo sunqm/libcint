@@ -146,6 +146,12 @@ void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
 }
 
 
+void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
+{
+        CINTg0_2e_2d(g, bc, envs);
+        CINTg0_lj2d_4d(g, envs);
+}
+
 void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
@@ -321,4 +327,3 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
 
         (*envs->f_g0_2d4d)(g, &bc, envs);
 }
-

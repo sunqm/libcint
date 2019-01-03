@@ -1673,14 +1673,6 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         CINTg0_il2d_4d(g, envs);
 }
 
-#ifdef WITH_F12
-void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
-{
-        CINTg0_2e_2d(g, bc, envs);
-        CINTg0_lj2d_4d(g, envs);
-}
-#endif
-
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
@@ -1741,9 +1733,11 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
+        double *b00 = bc.b00;
+        double *b10 = bc.b10;
+        double *b01 = bc.b01;
 
-        for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3)
-        {
+        for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3) {
                 /*
                  *u(irys) = t2/(1-t2)
                  *t2 = u(irys)/(1+u(irys))
@@ -1755,9 +1749,9 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                 tmp2 = tmp1 * akl;
                 tmp3 = tmp1 * aij;
                 tmp4 = .5 * div;
-                bc.b00[irys] = 0.5 * tmp1;
-                bc.b10[irys] = bc.b00[irys] + tmp4 * akl;
-                bc.b01[irys] = bc.b00[irys] + tmp4 * aij;
+                b00[irys] = 0.5 * tmp1;
+                b10[irys] = b00[irys] + tmp4 * akl;
+                b01[irys] = b00[irys] + tmp4 * aij;
                 c00[0] = rijrx[0] - tmp2 * rijrkl[0];
                 c00[1] = rijrx[1] - tmp2 * rijrkl[1];
                 c00[2] = rijrx[2] - tmp2 * rijrkl[2];
