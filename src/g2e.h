@@ -66,6 +66,18 @@ void CINTx1l_2e(double *f, const double *g, const double *rl,
                 const FINT li, const FINT lj, const FINT lk, const FINT ll,
                 const CINTEnvVars *envs);
 
+#ifdef WITH_F12
+void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                           int *atm, int natm, int *bas, int nbas, double *env);
+void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                           int *atm, int natm, int *bas, int nbas, double *env);
+#endif
+
+#ifdef WITH_GTG
+void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                                int *atm, int natm, int *bas, int nbas, double *env);
+#endif
+
 
 #define G2E_D_I(f, g, li, lj, lk, ll)   CINTnabla1i_2e(f, g, li, lj, lk, ll, envs)
 #define G2E_D_J(f, g, li, lj, lk, ll)   CINTnabla1j_2e(f, g, li, lj, lk, ll, envs)

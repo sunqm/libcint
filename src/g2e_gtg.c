@@ -180,9 +180,7 @@ void CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
         fac1 = (1-t) / a1;
-        fac1 = fac1*sqrt(fac1) * exp(-t * x) * fac;
-
-        gz[0] = fac1;
+        gz[0] = fac1*sqrt(fac1) * exp(-t * x) * fac;
         if (envs->g_size == 1) {
                 g[0] = 1;
                 g[1] = 1;

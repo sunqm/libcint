@@ -8,15 +8,6 @@
 #include "optimizer.h"
 #include "cint2e.h"
 
-int CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                           int *atm, int natm, int *bas, int nbas, double *env);
-int CINT2e_spheric_drv(double *out, int *dims, CINTEnvVars *envs, CINTOpt *opt,
-                       double *cache);
-void CINTgout2e(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty);
-
-void CINkall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
-                              int *atm, int natm, int *bas, int nbas, double *env);
-
 int int2e_gtg_sph(double *out, int *dims, int *shls, int *atm, int natm,
                   int *bas, int nbas, double *env, CINTOpt *opt, double *cache)
 {

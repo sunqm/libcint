@@ -55,3 +55,12 @@ void CINTall_2c2e_optimizer(CINTOpt **opt, FINT *ng,
 void CINTall_3c1e_optimizer(CINTOpt **opt, FINT *ng,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
+#ifdef WITH_F12
+void CINTall_2e_stg_optimizer(CINTOpt **opt, int *ng,
+                              int *atm, int natm, int *bas, int nbas, double *env);
+#endif
+
+#ifdef WITH_GTG
+void CINkall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
+                              int *atm, int natm, int *bas, int nbas, double *env);
+#endif

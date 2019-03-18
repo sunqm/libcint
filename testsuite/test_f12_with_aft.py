@@ -7,7 +7,7 @@ atom = '''H 0 0 0;
 H 0 -1 1
 H 0  1 1
 H 1 0 -1''',
-basis = {'H': [[0, (2., 1)],
+basis = {'H': [[0, (2., .8), (1.5, .3)],
                [0, (.625, 1)],
                [1, ( .8, 1)],
                [2, (1.2, 1)]
@@ -193,5 +193,5 @@ def weighted_gtg(kpt=numpy.zeros(3), exx=False, mesh=None):
 mydf.weighted_coulG = weighted_gtg
 cell._env[10] = zeta
 eri0 = get_eri(mydf)
-eri1 = cell.intor('int2e_gtg_sph', aosym='s4')
+eri1 = cell.intor('int2e_gtg_sph', aosym='s4', comp=1)
 print('int2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())

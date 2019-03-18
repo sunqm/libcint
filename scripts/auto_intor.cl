@@ -184,6 +184,7 @@
   '("int1e_ipspnucspip"         ( nabla sigma dot p \| nuc sigma dot p \| nabla ))
   '("int1e_ipipsprinvsp"        ( nabla nabla sigma dot p \| rinv sigma dot p \| ))
   '("int1e_ipsprinvspip"        ( nabla sigma dot p \| rinv sigma dot p \| nabla ))
+  '("int2e_ipip1ipip2"          ( nabla nabla \, \| nabla nabla \, ))
 )
 
 (gen-cint "int3c2e.c"
