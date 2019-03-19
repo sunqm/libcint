@@ -185,6 +185,7 @@
   '("int1e_ipipsprinvsp"        ( nabla nabla sigma dot p \| rinv sigma dot p \| ))
   '("int1e_ipsprinvspip"        ( nabla sigma dot p \| rinv sigma dot p \| nabla ))
   '("int2e_ipip1ipip2"          ( nabla nabla \, \| nabla nabla \, ))
+  '("int2e_ipvip1ipvip2"        ( nabla \, nabla \| nabla \, nabla ))
 )
 
 (gen-cint "int3c2e.c"

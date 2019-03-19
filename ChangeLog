@@ -1,6 +1,7 @@
-Version 3.0.15  (2019-?-?):
+Version 3.0.15  (2019-03-18):
 	* F12 second derivatives
 	* Add integrals for Gaussian type geminals
+	* Add 4th order derivatives of 2e integrals
 Version 3.0.14  (2018-11-22):
 	* F12 derivative integrals
 	* New 2c2e integral ( nabla nabla i | j )
