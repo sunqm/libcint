@@ -201,6 +201,7 @@
   '("int3c2e_spsp1ip2"          (sigma dot p \, sigma dot p \| nabla ))
 ;
   '("int3c2e_ipip1"             ( nabla nabla \, \| ))
+  '("int3c2e_ipip2"             ( \, \| nabla nabla ))
   '("int3c2e_ipvip1"            ( nabla \, nabla \| ))
   '("int3c2e_ip1ip2"            ( nabla \, \| nabla ))
   '("int2c2e_ipip1"             ( nabla nabla \| r12 \|))
