@@ -40,6 +40,7 @@ integer :: shls(4)
 double complex,allocatable :: buf1e(:,:), buf2e(:,:,:,:)
 integer,external :: CINTcgto_spinor
 external :: cint1e_spnucsp, cint2e_spsp1
+! On 32-bit machine, integer(4) :: opt
 integer(8) :: opt
 allocate (atm(ATM_SLOTS,natm))
 allocate (bas(BAS_SLOTS,nbas))

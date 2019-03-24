@@ -47,6 +47,7 @@ integer :: shls(4)
 double precision,allocatable :: buf1e(:,:,:), buf2e(:,:,:,:,:)
 integer,external :: CINTcgto_spheric
 integer,external :: cint1e_ipovlp_sph, cint2e_ip1_sph
+! On 32-bit machine, integer(4) :: opt
 integer(8) :: opt
 allocate (atm(ATM_SLOTS,natm))
 allocate (bas(BAS_SLOTS,nbas))
