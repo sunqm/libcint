@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint C)
 set(cint_SOVERSION "3")
-set(cint_VERSION "3.0.16")
+set(cint_VERSION "3.0.17")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -82,7 +82,7 @@ if(WITH_F12)
 endif(WITH_F12)
 
 if(WITH_GTG)
-  set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c)
+  set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c src/cint3c2e_gtg.c)
   add_definitions(-DWITH_GTG)
   message("Enabled WITH_GTG")
 endif(WITH_GTG)

@@ -34,6 +34,11 @@ void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 void CINTg0_2e_ik2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
+void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs);
+void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs);
+void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs);
+void CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs);
+
 void CINTnabla1i_2e(double *f, const double *g,
                     const FINT li, const FINT lj, const FINT lk, const FINT ll,
                     const CINTEnvVars *envs);
@@ -76,6 +81,8 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
 #ifdef WITH_GTG
 void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
                                 int *atm, int natm, int *bas, int nbas, double *env);
+void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
+                                  int *atm, int natm, int *bas, int nbas, double *env);
 #endif
 
 

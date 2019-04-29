@@ -61,6 +61,8 @@ void CINTall_2e_stg_optimizer(CINTOpt **opt, int *ng,
 #endif
 
 #ifdef WITH_GTG
-void CINkall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
+void CINTall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
                               int *atm, int natm, int *bas, int nbas, double *env);
+void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, int *ng,
+                                int *atm, int natm, int *bas, int nbas, double *env);
 #endif
