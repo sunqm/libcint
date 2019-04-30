@@ -252,8 +252,6 @@ void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
 #endif
 
 #ifdef WITH_GTG
-void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                                int *atm, int natm, int *bas, int nbas, double *env);
 void CINTall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
                               int *atm, int natm, int *bas, int nbas, double *env)
 {
@@ -264,8 +262,6 @@ void CINTall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
                 4, 0, ng, atm, natm, bas, nbas, env);
 }
 
-void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                                  int *atm, int natm, int *bas, int nbas, double *env);
 void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, int *ng,
                                 int *atm, int natm, int *bas, int nbas, double *env)
 {
@@ -274,6 +270,15 @@ void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, int *ng,
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int3c2e_gtg_EnvVars, &CINTg2e_index_xyz,
                 3, 0, ng, atm, natm, bas, nbas, env);
+}
+
+void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, int *ng,
+                                int *atm, int natm, int *bas, int nbas, double *env)
+{
+        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+        gen_idx(*opt, &CINTinit_int2c2e_EnvVars, &CINTg1e_index_xyz,
+                2, 0, ng, atm, natm, bas, nbas, env);
 }
 #endif
 

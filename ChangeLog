@@ -1,5 +1,5 @@
 Version 3.0.17  (2019-04-29):
-	* 3c2e integrals for Gaussian type geminals
+	* 3c2e and 2c2e integrals for Gaussian type geminals
 Version 3.0.16  (2019-03-23):
 	* New 2nd order 3c2e integral ( i j | nabla nabla k )
 Version 3.0.15  (2019-03-18):
