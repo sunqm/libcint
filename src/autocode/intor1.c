@@ -13,9 +13,9 @@
 #include "misc.h"
 #include "c2f.h"
 /* <i|OVLP |j> */
-void CINTgout1e_int1e_ovlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_ovlp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double s[1];
 for (n = 0; n < nf; n++) {
@@ -25,29 +25,29 @@ iz = idx[2+n*3];
 s[0] = + g0[ix+0]*g0[iy+0]*g0[iz+0];
 gout[n*1+0] += + s[0];
 }}
-void int1e_ovlp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+void int1e_ovlp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_ovlp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+FINT int1e_ovlp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ovlp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_ovlp_cart
-int int1e_ovlp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+FINT int1e_ovlp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ovlp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_ovlp_sph
-int int1e_ovlp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+FINT int1e_ovlp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ovlp;
@@ -56,9 +56,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_ovlp)
 ALL_CINT1E_FORTRAN_(int1e_ovlp)
 /* <i|NUC |j> */
-void CINTgout1e_int1e_nuc(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_nuc(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double s[1];
 for (n = 0; n < nf; n++) {
@@ -68,29 +68,29 @@ iz = idx[2+n*3];
 s[0] = + g0[ix+0]*g0[iy+0]*g0[iz+0];
 gout[n*1+0] += + s[0];
 }}
-void int1e_nuc_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
+void int1e_nuc_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_nuc_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
+FINT int1e_nuc_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_nuc;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_nuc_cart
-int int1e_nuc_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
+FINT int1e_nuc_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_nuc;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_nuc_sph
-int int1e_nuc_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
+FINT int1e_nuc_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 0, 0, 0, 0, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_nuc;
@@ -99,9 +99,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 ALL_CINT1E(int1e_nuc)
 ALL_CINT1E_FORTRAN_(int1e_nuc)
 /* <i|OVLP |P DOT P j> */
-void CINTgout1e_int1e_kin(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_kin(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -125,31 +125,31 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += - s[0] - s[4] - s[8];
 }}
-void int1e_kin_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+void int1e_kin_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_kin_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_kin_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_kin;
 envs.common_factor *= 0.5;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_kin_cart
-int int1e_kin_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_kin_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_kin;
 envs.common_factor *= 0.5;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_kin_sph
-int int1e_kin_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_kin_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_kin;
@@ -159,9 +159,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_kin)
 ALL_CINT1E_FORTRAN_(int1e_kin)
 /* <i|NABLA-RINV |CROSS P j> */
-void CINTgout1e_int1e_ia01p(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_ia01p(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -189,29 +189,29 @@ gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
 }}
-void int1e_ia01p_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
+void int1e_ia01p_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_ia01p_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
+FINT int1e_ia01p_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ia01p;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_ia01p_cart
-int int1e_ia01p_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
+FINT int1e_ia01p_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ia01p;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_ia01p_sph
-int int1e_ia01p_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
+FINT int1e_ia01p_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ia01p;
@@ -220,9 +220,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_ia01p)
 ALL_CINT1E_FORTRAN_(int1e_ia01p)
 /* <i|OVLP |R CROSS P j> */
-void CINTgout1e_int1e_giao_irjxp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_giao_irjxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -248,29 +248,29 @@ gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
 }}
-void int1e_giao_irjxp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+void int1e_giao_irjxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_giao_irjxp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+FINT int1e_giao_irjxp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_giao_irjxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_giao_irjxp_cart
-int int1e_giao_irjxp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+FINT int1e_giao_irjxp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_giao_irjxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_giao_irjxp_sph
-int int1e_giao_irjxp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+FINT int1e_giao_irjxp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_giao_irjxp;
@@ -279,9 +279,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_giao_irjxp)
 ALL_CINT1E_FORTRAN_(int1e_giao_irjxp)
 /* <i|OVLP |RC CROSS P j> */
-void CINTgout1e_int1e_cg_irxp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_cg_irxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -311,29 +311,29 @@ gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
 }}
-void int1e_cg_irxp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+void int1e_cg_irxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_cg_irxp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+FINT int1e_cg_irxp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_cg_irxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_cg_irxp_cart
-int int1e_cg_irxp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+FINT int1e_cg_irxp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_cg_irxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_cg_irxp_sph
-int int1e_cg_irxp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
+FINT int1e_cg_irxp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_cg_irxp;
@@ -342,9 +342,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_cg_irxp)
 ALL_CINT1E_FORTRAN_(int1e_cg_irxp)
 /* <i|NABLA-RINV |R j> */
-void CINTgout1e_int1e_giao_a11part(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_giao_a11part(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -378,31 +378,31 @@ gout[n*9+6] += + s[6];
 gout[n*9+7] += + s[7];
 gout[n*9+8] += + s[8];
 }}
-void int1e_giao_a11part_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+void int1e_giao_a11part_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_giao_a11part_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_giao_a11part_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_giao_a11part;
 envs.common_factor *= -0.5;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_giao_a11part_cart
-int int1e_giao_a11part_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_giao_a11part_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_giao_a11part;
 envs.common_factor *= -0.5;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_giao_a11part_sph
-int int1e_giao_a11part_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_giao_a11part_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_giao_a11part;
@@ -412,9 +412,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_giao_a11part)
 ALL_CINT1E_FORTRAN_(int1e_giao_a11part)
 /* <i|NABLA-RINV |RC j> */
-void CINTgout1e_int1e_cg_a11part(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_cg_a11part(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -452,31 +452,31 @@ gout[n*9+6] += + s[6];
 gout[n*9+7] += + s[7];
 gout[n*9+8] += + s[8];
 }}
-void int1e_cg_a11part_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+void int1e_cg_a11part_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_cg_a11part_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_cg_a11part_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_cg_a11part;
 envs.common_factor *= -0.5;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_cg_a11part_cart
-int int1e_cg_a11part_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_cg_a11part_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_cg_a11part;
 envs.common_factor *= -0.5;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_cg_a11part_sph
-int int1e_cg_a11part_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_cg_a11part_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_cg_a11part;
@@ -486,9 +486,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_cg_a11part)
 ALL_CINT1E_FORTRAN_(int1e_cg_a11part)
 /* <G i|NABLA-RINV CROSS P |j> */
-void CINTgout1e_int1e_a01gp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_a01gp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -555,19 +555,19 @@ gout[n*9+6] += + c[0]*s[14] - c[1]*s[5] - c[0]*s[16] + c[1]*s[7];
 gout[n*9+7] += + c[0]*s[15] - c[1]*s[6] - c[0]*s[11] + c[1]*s[2];
 gout[n*9+8] += + c[0]*s[10] - c[1]*s[1] - c[0]*s[12] + c[1]*s[3];
 }}
-void int1e_a01gp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
+void int1e_a01gp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_a01gp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
+FINT int1e_a01gp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_a01gp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
@@ -580,15 +580,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_a01gp_cart
-int int1e_a01gp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
+FINT int1e_a01gp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_a01gp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
@@ -601,15 +601,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_a01gp_sph
-int int1e_a01gp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
+FINT int1e_a01gp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_a01gp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
@@ -625,9 +625,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_a01gp)
 ALL_CINT1E_FORTRAN_(int1e_a01gp)
 /* <G i|OVLP |P DOT P j> */
-void CINTgout1e_int1e_igkin(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_igkin(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -686,19 +686,19 @@ gout[n*3+0] += + c[1]*s[18] - c[2]*s[9] + c[1]*s[22] - c[2]*s[13] + c[1]*s[26] -
 gout[n*3+1] += + c[2]*s[0] - c[0]*s[18] + c[2]*s[4] - c[0]*s[22] + c[2]*s[8] - c[0]*s[26];
 gout[n*3+2] += + c[0]*s[9] - c[1]*s[0] + c[0]*s[13] - c[1]*s[4] + c[0]*s[17] - c[1]*s[8];
 }}
-void int1e_igkin_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
+void int1e_igkin_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_igkin_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
+FINT int1e_igkin_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_igkin;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
@@ -711,15 +711,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_igkin_cart
-int int1e_igkin_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
+FINT int1e_igkin_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_igkin;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
@@ -732,15 +732,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_igkin_sph
-int int1e_igkin_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
+FINT int1e_igkin_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 2, 0, 0, 3, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_igkin;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
@@ -756,9 +756,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_igkin)
 ALL_CINT1E_FORTRAN_(int1e_igkin)
 /* <G i|OVLP |j> */
-void CINTgout1e_int1e_igovlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_igovlp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double rirj[3], c[3];
@@ -781,19 +781,19 @@ gout[n*3+0] += - c[1]*s[2] + c[2]*s[1];
 gout[n*3+1] += - c[2]*s[0] + c[0]*s[2];
 gout[n*3+2] += - c[0]*s[1] + c[1]*s[0];
 }}
-void int1e_igovlp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+void int1e_igovlp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_igovlp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+FINT int1e_igovlp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_igovlp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
@@ -806,15 +806,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_igovlp_cart
-int int1e_igovlp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+FINT int1e_igovlp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_igovlp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
@@ -827,15 +827,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_igovlp_sph
-int int1e_igovlp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
+FINT int1e_igovlp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_igovlp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
@@ -851,9 +851,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_igovlp)
 ALL_CINT1E_FORTRAN_(int1e_igovlp)
 /* <G i|NUC |j> */
-void CINTgout1e_int1e_ignuc(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_ignuc(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double rirj[3], c[3];
@@ -876,19 +876,19 @@ gout[n*3+0] += - c[1]*s[2] + c[2]*s[1];
 gout[n*3+1] += - c[2]*s[0] + c[0]*s[2];
 gout[n*3+2] += - c[0]*s[1] + c[1]*s[0];
 }}
-void int1e_ignuc_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+void int1e_ignuc_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_ignuc_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+FINT int1e_ignuc_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ignuc;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
@@ -901,15 +901,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_ignuc_cart
-int int1e_ignuc_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+FINT int1e_ignuc_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ignuc;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
@@ -922,15 +922,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_ignuc_sph
-int int1e_ignuc_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
+FINT int1e_ignuc_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 0, 0, 0, 1, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ignuc;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
@@ -946,9 +946,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 ALL_CINT1E(int1e_ignuc)
 ALL_CINT1E_FORTRAN_(int1e_ignuc)
 /* <P* i|NUC DOT P |j> */
-void CINTgout1e_int1e_pnucp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_pnucp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -972,29 +972,29 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += + s[0] + s[4] + s[8];
 }}
-void int1e_pnucp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+void int1e_pnucp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_pnucp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+FINT int1e_pnucp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_pnucp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_pnucp_cart
-int int1e_pnucp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+FINT int1e_pnucp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_pnucp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_pnucp_sph
-int int1e_pnucp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+FINT int1e_pnucp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_pnucp;
@@ -1003,9 +1003,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 ALL_CINT1E(int1e_pnucp)
 ALL_CINT1E_FORTRAN_(int1e_pnucp)
 /* <i|ZC |j> */
-void CINTgout1e_int1e_z(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_z(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double drj[3];
@@ -1023,29 +1023,29 @@ s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
 s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
 gout[n*1+0] += + s[2];
 }}
-void int1e_z_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+void int1e_z_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_z_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+FINT int1e_z_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_z;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_z_cart
-int int1e_z_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+FINT int1e_z_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_z;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_z_sph
-int int1e_z_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+FINT int1e_z_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_z;
@@ -1054,9 +1054,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_z)
 ALL_CINT1E_FORTRAN_(int1e_z)
 /* <i|ZC ZC |j> */
-void CINTgout1e_int1e_zz(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_zz(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1084,29 +1084,29 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += + s[8];
 }}
-void int1e_zz_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+void int1e_zz_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_zz_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_zz_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_zz;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_zz_cart
-int int1e_zz_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_zz_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_zz;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_zz_sph
-int int1e_zz_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_zz_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_zz;
@@ -1115,9 +1115,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_zz)
 ALL_CINT1E_FORTRAN_(int1e_zz)
 /* <i|RC |j> */
-void CINTgout1e_int1e_r(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_r(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double drj[3];
@@ -1137,29 +1137,29 @@ gout[n*3+0] += + s[0];
 gout[n*3+1] += + s[1];
 gout[n*3+2] += + s[2];
 }}
-void int1e_r_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+void int1e_r_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_r_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+FINT int1e_r_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_r_cart
-int int1e_r_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+FINT int1e_r_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_r_sph
-int int1e_r_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+FINT int1e_r_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r;
@@ -1168,9 +1168,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_r)
 ALL_CINT1E_FORTRAN_(int1e_r)
 /* <i|RC DOT RC |j> */
-void CINTgout1e_int1e_r2(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_r2(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1198,29 +1198,29 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += + s[0] + s[4] + s[8];
 }}
-void int1e_r2_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+void int1e_r2_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_r2_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_r2_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r2;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_r2_cart
-int int1e_r2_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_r2_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r2;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_r2_sph
-int int1e_r2_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_r2_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r2;
@@ -1229,9 +1229,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_r2)
 ALL_CINT1E_FORTRAN_(int1e_r2)
 /* <i|RC RC |j> */
-void CINTgout1e_int1e_rr(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_rr(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1267,29 +1267,29 @@ gout[n*9+6] += + s[6];
 gout[n*9+7] += + s[7];
 gout[n*9+8] += + s[8];
 }}
-void int1e_rr_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+void int1e_rr_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_rr_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_rr_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_rr_cart
-int int1e_rr_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_rr_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_rr_sph
-int int1e_rr_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_rr_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rr;
@@ -1298,9 +1298,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_rr)
 ALL_CINT1E_FORTRAN_(int1e_rr)
 /* <i|RC RC RC |j> */
-void CINTgout1e_int1e_rrr(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_rrr(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1380,29 +1380,29 @@ gout[n*27+24] += + s[24];
 gout[n*27+25] += + s[25];
 gout[n*27+26] += + s[26];
 }}
-void int1e_rrr_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+void int1e_rrr_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_rrr_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_rrr_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rrr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_rrr_cart
-int int1e_rrr_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_rrr_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rrr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_rrr_sph
-int int1e_rrr_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_rrr_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rrr;
@@ -1411,9 +1411,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_rrr)
 ALL_CINT1E_FORTRAN_(int1e_rrr)
 /* <i|RC RC RC RC |j> */
-void CINTgout1e_int1e_rrrr(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_rrrr(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1617,29 +1617,29 @@ gout[n*81+78] += + s[78];
 gout[n*81+79] += + s[79];
 gout[n*81+80] += + s[80];
 }}
-void int1e_rrrr_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
+void int1e_rrrr_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_rrrr_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
+FINT int1e_rrrr_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rrrr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_rrrr_cart
-int int1e_rrrr_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
+FINT int1e_rrrr_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rrrr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_rrrr_sph
-int int1e_rrrr_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
+FINT int1e_rrrr_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 81};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rrrr;
@@ -1648,9 +1648,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_rrrr)
 ALL_CINT1E_FORTRAN_(int1e_rrrr)
 /* <i|Z |j> */
-void CINTgout1e_int1e_z_origj(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_z_origj(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double s[3];
@@ -1664,29 +1664,29 @@ s[1] = + g0[ix+0]*g1[iy+0]*g0[iz+0];
 s[2] = + g0[ix+0]*g0[iy+0]*g1[iz+0];
 gout[n*1+0] += + s[2];
 }}
-void int1e_z_origj_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+void int1e_z_origj_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_z_origj_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+FINT int1e_z_origj_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_z_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_z_origj_cart
-int int1e_z_origj_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+FINT int1e_z_origj_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_z_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_z_origj_sph
-int int1e_z_origj_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
+FINT int1e_z_origj_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_z_origj;
@@ -1695,9 +1695,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_z_origj)
 ALL_CINT1E_FORTRAN_(int1e_z_origj)
 /* <i|Z Z |j> */
-void CINTgout1e_int1e_zz_origj(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_zz_origj(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1721,29 +1721,29 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += + s[8];
 }}
-void int1e_zz_origj_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+void int1e_zz_origj_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_zz_origj_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_zz_origj_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_zz_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_zz_origj_cart
-int int1e_zz_origj_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_zz_origj_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_zz_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_zz_origj_sph
-int int1e_zz_origj_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_zz_origj_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_zz_origj;
@@ -1752,9 +1752,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_zz_origj)
 ALL_CINT1E_FORTRAN_(int1e_zz_origj)
 /* <i|R |j> */
-void CINTgout1e_int1e_r_origj(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_r_origj(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double s[3];
@@ -1770,29 +1770,29 @@ gout[n*3+0] += + s[0];
 gout[n*3+1] += + s[1];
 gout[n*3+2] += + s[2];
 }}
-void int1e_r_origj_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+void int1e_r_origj_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_r_origj_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+FINT int1e_r_origj_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_r_origj_cart
-int int1e_r_origj_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+FINT int1e_r_origj_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_r_origj_sph
-int int1e_r_origj_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
+FINT int1e_r_origj_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 1, 0, 0, 1, 1, 1, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r_origj;
@@ -1801,9 +1801,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_r_origj)
 ALL_CINT1E_FORTRAN_(int1e_r_origj)
 /* <i|R R |j> */
-void CINTgout1e_int1e_rr_origj(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_rr_origj(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1835,29 +1835,29 @@ gout[n*9+6] += + s[6];
 gout[n*9+7] += + s[7];
 gout[n*9+8] += + s[8];
 }}
-void int1e_rr_origj_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+void int1e_rr_origj_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_rr_origj_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_rr_origj_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rr_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_rr_origj_cart
-int int1e_rr_origj_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_rr_origj_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rr_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_rr_origj_sph
-int int1e_rr_origj_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_rr_origj_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_rr_origj;
@@ -1866,9 +1866,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_rr_origj)
 ALL_CINT1E_FORTRAN_(int1e_rr_origj)
 /* <i|R DOT R |j> */
-void CINTgout1e_int1e_r2_origj(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_r2_origj(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -1892,29 +1892,29 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += + s[0] + s[4] + s[8];
 }}
-void int1e_r2_origj_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+void int1e_r2_origj_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_r2_origj_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_r2_origj_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r2_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_r2_origj_cart
-int int1e_r2_origj_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_r2_origj_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r2_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_r2_origj_sph
-int int1e_r2_origj_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
+FINT int1e_r2_origj_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r2_origj;
@@ -1923,9 +1923,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_r2_origj)
 ALL_CINT1E_FORTRAN_(int1e_r2_origj)
 /* <i|OVLP |R DOT R R DOT R j> */
-void CINTgout1e_int1e_r4_origj(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_r4_origj(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2045,29 +2045,29 @@ s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
 gout[n*1+0] += + s[0] + 2*s[4] + 2*s[8] + s[40] + 2*s[44] + s[80];
 }}
-void int1e_r4_origj_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
+void int1e_r4_origj_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_r4_origj_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
+FINT int1e_r4_origj_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r4_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_r4_origj_cart
-int int1e_r4_origj_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
+FINT int1e_r4_origj_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r4_origj;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_r4_origj_sph
-int int1e_r4_origj_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
+FINT int1e_r4_origj_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_r4_origj;
@@ -2076,9 +2076,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_r4_origj)
 ALL_CINT1E_FORTRAN_(int1e_r4_origj)
 /* <P DOT P i|OVLP |P DOT P j> */
-void CINTgout1e_int1e_p4(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_p4(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2198,29 +2198,29 @@ s[79] = + g0[ix+0]*g1[iy+0]*g14[iz+0];
 s[80] = + g0[ix+0]*g0[iy+0]*g15[iz+0];
 gout[n*1+0] += + s[0] + 2*s[4] + 2*s[8] + s[40] + 2*s[44] + s[80];
 }}
-void int1e_p4_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
+void int1e_p4_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_p4_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
+FINT int1e_p4_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_p4;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_p4_cart
-int int1e_p4_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
+FINT int1e_p4_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_p4;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_p4_sph
-int int1e_p4_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
+FINT int1e_p4_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {2, 2, 0, 0, 4, 1, 1, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_p4;
@@ -2229,9 +2229,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_p4)
 ALL_CINT1E_FORTRAN_(int1e_p4)
 /* <P* i|RINV DOT P |j> */
-void CINTgout1e_int1e_prinvp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_prinvp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2255,29 +2255,29 @@ s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 gout[n*1+0] += + s[0] + s[4] + s[8];
 }}
-void int1e_prinvp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+void int1e_prinvp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_prinvp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+FINT int1e_prinvp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_prinvp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_prinvp_cart
-int int1e_prinvp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+FINT int1e_prinvp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_prinvp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_prinvp_sph
-int int1e_prinvp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
+FINT int1e_prinvp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 1};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_prinvp;
@@ -2286,9 +2286,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_prinvp)
 ALL_CINT1E_FORTRAN_(int1e_prinvp)
 /* <P* i|RINV CROSS P |j> */
-void CINTgout1e_int1e_prinvxp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_prinvxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2314,29 +2314,29 @@ gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
 }}
-void int1e_prinvxp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+void int1e_prinvxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_prinvxp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+FINT int1e_prinvxp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_prinvxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 1);
 } // int1e_prinvxp_cart
-int int1e_prinvxp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+FINT int1e_prinvxp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_prinvxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 1);
 } // int1e_prinvxp_sph
-int int1e_prinvxp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+FINT int1e_prinvxp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_prinvxp;
@@ -2345,9 +2345,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 1);
 ALL_CINT1E(int1e_prinvxp)
 ALL_CINT1E_FORTRAN_(int1e_prinvxp)
 /* <P* i|NUC CROSS P |j> */
-void CINTgout1e_int1e_pnucxp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_pnucxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2373,29 +2373,29 @@ gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
 }}
-void int1e_pnucxp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+void int1e_pnucxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_pnucxp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+FINT int1e_pnucxp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_pnucxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_pnucxp_cart
-int int1e_pnucxp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+FINT int1e_pnucxp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_pnucxp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_pnucxp_sph
-int int1e_pnucxp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
+FINT int1e_pnucxp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {1, 1, 0, 0, 2, 1, 0, 3};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_pnucxp;
@@ -2404,9 +2404,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 ALL_CINT1E(int1e_pnucxp)
 ALL_CINT1E_FORTRAN_(int1e_pnucxp)
 /* <i|RC NABLA |j> */
-void CINTgout1e_int1e_irp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_irp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2442,29 +2442,29 @@ gout[n*9+6] += + s[6];
 gout[n*9+7] += + s[7];
 gout[n*9+8] += + s[8];
 }}
-void int1e_irp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+void int1e_irp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_irp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_irp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_irp_cart
-int int1e_irp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_irp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_irp_sph
-int int1e_irp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_irp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irp;
@@ -2473,9 +2473,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_irp)
 ALL_CINT1E_FORTRAN_(int1e_irp)
 /* <i|RC RC NABLA |j> */
-void CINTgout1e_int1e_irrp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_irrp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2555,29 +2555,29 @@ gout[n*27+24] += + s[24];
 gout[n*27+25] += + s[25];
 gout[n*27+26] += + s[26];
 }}
-void int1e_irrp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+void int1e_irrp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_irrp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_irrp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irrp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_irrp_cart
-int int1e_irrp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_irrp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irrp;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_irrp_sph
-int int1e_irrp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_irrp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irrp;
@@ -2586,9 +2586,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_irrp)
 ALL_CINT1E_FORTRAN_(int1e_irrp)
 /* <i|RC NABLA RC |j> */
-void CINTgout1e_int1e_irpr(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_irpr(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2668,29 +2668,29 @@ gout[n*27+24] += + s[24];
 gout[n*27+25] += + s[25];
 gout[n*27+26] += + s[26];
 }}
-void int1e_irpr_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+void int1e_irpr_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_irpr_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_irpr_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irpr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_irpr_cart
-int int1e_irpr_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_irpr_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irpr;
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_irpr_sph
-int int1e_irpr_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
+FINT int1e_irpr_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 27};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_irpr;
@@ -2699,9 +2699,9 @@ return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 ALL_CINT1E(int1e_irpr)
 ALL_CINT1E_FORTRAN_(int1e_irpr)
 /* <i|G G |j> */
-void CINTgout1e_int1e_ggovlp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_ggovlp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2746,49 +2746,49 @@ gout[n*9+6] += - c[1]*s[5] + c[4]*s[2] + c[2]*s[4] - c[5]*s[1];
 gout[n*9+7] += - c[2]*s[3] + c[5]*s[0] + c[0]*s[5] - c[3]*s[2];
 gout[n*9+8] += - c[0]*s[4] + 2*c[1]*s[3] - c[4]*s[0];
 }}
-void int1e_ggovlp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+void int1e_ggovlp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_ggovlp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_ggovlp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggovlp;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_ggovlp_cart
-int int1e_ggovlp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_ggovlp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggovlp;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_ggovlp_sph
-int int1e_ggovlp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
+FINT int1e_ggovlp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggovlp;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 } // int1e_ggovlp_spinor
 ALL_CINT1E(int1e_ggovlp)
 ALL_CINT1E_FORTRAN_(int1e_ggovlp)
 /* <i|G G NABLA DOT NABLA |j> */
-void CINTgout1e_int1e_ggkin(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_ggkin(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -2929,49 +2929,49 @@ gout[n*9+6] += - c[1]*s[45] + c[4]*s[18] + c[2]*s[36] - c[5]*s[9] - c[1]*s[49] +
 gout[n*9+7] += - c[2]*s[27] + c[5]*s[0] + c[0]*s[45] - c[3]*s[18] - c[2]*s[31] + c[5]*s[4] + c[0]*s[49] - c[3]*s[22] - c[2]*s[35] + c[5]*s[8] + c[0]*s[53] - c[3]*s[26];
 gout[n*9+8] += - c[0]*s[36] + 2*c[1]*s[27] - c[4]*s[0] - c[0]*s[40] + 2*c[1]*s[31] - c[4]*s[4] - c[0]*s[44] + 2*c[1]*s[35] - c[4]*s[8];
 }}
-void int1e_ggkin_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
+void int1e_ggkin_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_ggkin_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
+FINT int1e_ggkin_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggkin;
 envs.common_factor *= 0.125;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_ggkin_cart
-int int1e_ggkin_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
+FINT int1e_ggkin_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggkin;
 envs.common_factor *= 0.125;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_ggkin_sph
-int int1e_ggkin_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
+FINT int1e_ggkin_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 4, 0, 0, 4, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggkin;
 envs.common_factor *= 0.125;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 } // int1e_ggkin_spinor
 ALL_CINT1E(int1e_ggkin)
 ALL_CINT1E_FORTRAN_(int1e_ggkin)
 /* <i|G G NUC |j> */
-void CINTgout1e_int1e_ggnuc(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_ggnuc(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -3016,49 +3016,49 @@ gout[n*9+6] += - c[1]*s[5] + c[4]*s[2] + c[2]*s[4] - c[5]*s[1];
 gout[n*9+7] += - c[2]*s[3] + c[5]*s[0] + c[0]*s[5] - c[3]*s[2];
 gout[n*9+8] += - c[0]*s[4] + 2*c[1]*s[3] - c[4]*s[0];
 }}
-void int1e_ggnuc_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+void int1e_ggnuc_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_ggnuc_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_ggnuc_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggnuc;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 2);
 } // int1e_ggnuc_cart
-int int1e_ggnuc_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_ggnuc_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggnuc;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 2);
 } // int1e_ggnuc_sph
-int int1e_ggnuc_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
+FINT int1e_ggnuc_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_ggnuc;
 envs.common_factor *= 0.25;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 2);
 } // int1e_ggnuc_spinor
 ALL_CINT1E(int1e_ggnuc)
 ALL_CINT1E_FORTRAN_(int1e_ggnuc)
 /* <i|G R CROSS P |j> */
-void CINTgout1e_int1e_grjxp(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+void CINTgout1e_int1e_grjxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;
 double *g1 = g0  + envs->g_size * 3;
 double *g2 = g1  + envs->g_size * 3;
@@ -3123,41 +3123,41 @@ gout[n*9+6] += + c[0]*s[14] - c[1]*s[5] - c[0]*s[16] + c[1]*s[7];
 gout[n*9+7] += + c[0]*s[15] - c[1]*s[6] - c[0]*s[11] + c[1]*s[2];
 gout[n*9+8] += + c[0]*s[10] - c[1]*s[1] - c[0]*s[12] + c[1]*s[3];
 }}
-void int1e_grjxp_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
+void int1e_grjxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
-int int1e_grjxp_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
+FINT int1e_grjxp_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_grjxp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, 0);
 } // int1e_grjxp_cart
-int int1e_grjxp_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
+FINT int1e_grjxp_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_grjxp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, 0);
 } // int1e_grjxp_sph
-int int1e_grjxp_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {
-int ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
+FINT int1e_grjxp_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
+FINT ng[] = {0, 3, 0, 0, 3, 1, 1, 9};
 CINTEnvVars envs;
 CINTinit_int1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout1e_int1e_grjxp;
 envs.common_factor *= 0.5;
-int i, nout;
-int counts[4];
+FINT i, nout;
+FINT counts[4];
 return CINT1e_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e, 0);
 } // int1e_grjxp_spinor
 ALL_CINT1E(int1e_grjxp)

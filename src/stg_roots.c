@@ -213,12 +213,12 @@ static const double COS_14_14[] = {
 -1.1196447610330785560e-01,
 };
 
-static void _clenshaw_dc(double *rr, const double *x, double u, int nroot)
+static void _clenshaw_dc(double *rr, const double *x, double u, FINT nroot)
 {
     double d[14];
     double g[14];
     double u2 = u * 2.;
-    int i, k;
+    FINT i, k;
 
     for (i = 0; i < nroot; ++i) {
         d[0 ] = 0; g[0 ] = x[13+14*0 ];
@@ -290,9 +290,9 @@ static void _clenshaw_dc(double *rr, const double *x, double u, int nroot)
     }
 }
 
-static void _clenshaw_d1(double *rr, const double *x, double u, int nroot)
+static void _clenshaw_d1(double *rr, const double *x, double u, FINT nroot)
 {
-    int i;
+    FINT i;
     double d0, d1, g0, g1;
     double u2 = u * 2.;
 
@@ -347,11 +347,11 @@ static void _clenshaw_d1(double *rr, const double *x, double u, int nroot)
     }
 }
 
-static void _matmul_14_14(double *imc, double *im, int nroot)
+static void _matmul_14_14(double *imc, double *im, FINT nroot)
 {
     double o7 = 0.14285714285714285714;
     double d0[14];
-    int i, j;
+    FINT i, j;
     for (i = 0; i < nroot; i++) {
         d0[0 ] = 0;
         d0[1 ] = 0;
@@ -400,13 +400,13 @@ static void _matmul_14_14(double *imc, double *im, int nroot)
     }
 }
 
-void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww)
+void CINTstg_roots(FINT nroots, double ta, double ua, double* rr, double* ww)
 {
   const double* x = DATA_X + (nroots-1)*nroots/2 * 19600;
   const double* w = DATA_W + (nroots-1)*nroots/2 * 19600;
   double u, uu, t, tt;
-  int k, iu, it;
-  int offset;
+  FINT k, iu, it;
+  FINT offset;
   double im [14*nroots];
   double imc[14*nroots];
 
@@ -420,7 +420,7 @@ void CINTstg_roots(int nroots, double ta, double ua, double* rr, double* ww)
   }
   uu = log10(u);
 
-  it = (int)tt;
+  it = (FINT)tt;
   tt = tt - it;
   tt = 2.0 * tt - 1.0;
 

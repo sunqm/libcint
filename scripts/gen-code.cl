@@ -336,9 +336,9 @@ iz = idx[2];~%")
            (tot-bits (+ i-len j-len op-len))
            (goutinc (length flat-script)))
       (format fout "void CINTgout1e_~a" intname)
-      (format fout "(double *gout, double *g, int *idx, CINTEnvVars *envs, int gout_empty) {
-int nf = envs->nf;
-int ix, iy, iz, n;
+      (format fout "(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;~%")
       (loop
         for i in (range (1- (ash 1 tot-bits))) do
@@ -390,9 +390,9 @@ iz = idx[2+n*3];~%")
                     (if (or (member 'nuc raw-infix)
                             (member 'rinv raw-infix)
                             (member 'nabla-rinv raw-infix))
-                      (format tmpout "int ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
                               i-len (+ op-len j-len) tot-bits e1comps tensors)
-                      (format tmpout "int ng[] = {~d, ~d, 0, 0, ~d, ~d, 1, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 1, ~d};~%"
                               i-len (+ op-len j-len) tot-bits e1comps tensors))))
            (envs-common (with-output-to-string (tmpout)
                           (format tmpout ngdef)
@@ -403,16 +403,16 @@ iz = idx[2+n*3];~%")
                             (format tmpout "envs.common_factor *= ~a;~%" (factor-of raw-infix))))))
       (format fout "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */~%" bra-i op ket-j)
       (gen-code-gout1e fout intname raw-infix flat-script)
-      (format fout "void ~a_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {~%" intname)
+      (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "int ~a_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
@@ -427,12 +427,12 @@ return 0; }~%")))
       (format fout "return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, ~d);
 } // ~a_cart~%" int1e-type intname)
 ;;; _sph
-      (format fout "int ~a_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
@@ -447,12 +447,12 @@ return 0; }~%")))
       (format fout "return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, ~d);
 } // ~a_sph~%" int1e-type intname)
 ;;; _spinor
-      (format fout "int ~a_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
@@ -564,10 +564,10 @@ for (i = 0; i < nrys_roots; i++) {~%" (expt 3 tot-bits))
            (tot-bits (+ i-len j-len op-len k-len l-len))
            (goutinc (length flat-script)))
       (format fout "void CINTgout2e_~a(double *gout,
-double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
-      (format fout "int nf = envs->nf;
-int nrys_roots = envs->nrys_roots;
-int ix, iy, iz, i, n;
+double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
+      (format fout "FINT nf = envs->nf;
+FINT nrys_roots = envs->nrys_roots;
+FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
       (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
@@ -631,9 +631,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           (t (/ goutinc 4))))
            (ngdef (with-output-to-string (tmpout)
                     (if (intersection *act-left-right* op)
-                      (format tmpout "int ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
                               (1+ i-len) (1+ j-len) k-len l-len tot-bits e1comps e2comps tensors)
-                      (format tmpout "int ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, ~d, ~d, ~d, ~d, ~d};~%"
                               i-len (+ op-len j-len) k-len l-len tot-bits e1comps e2comps tensors))))
            (envs-common (with-output-to-string (tmpout)
                           (format tmpout ngdef)
@@ -647,19 +647,19 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout " * = (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k ~{~a ~}l) */~%"
               bra-i ket-j op bra-k ket-l)
       (gen-code-gout4c2e fout intname raw-infix flat-script)
-      (format fout "void ~a_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {~%" intname)
+      (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_2e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "int ~a_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (and (eql sf1 'si) (eql ts1 'tas)
                  (eql sf2 'si) (eql ts2 'tas))
         (format fout "envs.common_factor *= -1;~%"))
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
@@ -684,15 +684,15 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
       (format fout "return CINT2e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
 ;;; _sph
-      (format fout "int ~a_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (and (eql sf1 'si) (eql ts1 'tas)
                  (eql sf2 'si) (eql ts2 'tas))
         (format fout "envs.common_factor *= -1;~%"))
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
@@ -717,12 +717,12 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
       (format fout "return CINT2e_spheric_drv(out, dims, &envs, opt, cache);~%} // ~a_sph~%" intname)
 ;;; _spinor
-      (format fout "int ~a_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
@@ -765,10 +765,10 @@ return 0; }~%")))
            (tot-bits (+ i-len j-len op-len k-len))
            (goutinc (length flat-script)))
       (format fout "void CINTgout2e_~a(double *gout,
-double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
-      (format fout "int nf = envs->nf;
-int nrys_roots = envs->nrys_roots;
-int ix, iy, iz, i, n;
+double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
+      (format fout "FINT nf = envs->nf;
+FINT nrys_roots = envs->nrys_roots;
+FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
       (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
@@ -827,9 +827,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           (t (/ goutinc 4))))
            (ngdef (with-output-to-string (tmpout)
                     (if (intersection *act-left-right* op)
-                      (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
                               (1+ i-len) (1+ j-len) k-len tot-bits e1comps e2comps tensors)
-                      (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
                               i-len (+ op-len j-len) k-len tot-bits e1comps e2comps tensors))))
            (envs-common (with-output-to-string (tmpout)
                           (format tmpout ngdef)
@@ -841,16 +841,16 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout "/* (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k) */~%"
               bra-i ket-j op bra-k)
       (gen-code-gout3c2e fout intname raw-infix flat-script)
-      (format fout "void ~a_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {~%" intname)
+      (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_3c2e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "int ~a_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
@@ -864,12 +864,12 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
       (format fout "return CINT3c2e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
 ;;; _sph
-      (format fout "int ~a_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
@@ -884,12 +884,12 @@ return 0; }~%")))
       (format fout "return CINT3c2e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c2e1, 0);
 } // ~a_sph~%" intname)
 ;;; _spinor
-      (format fout "int ~a_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
@@ -919,10 +919,10 @@ return 0; }~%")))
            (tot-bits (+ i-len op-len k-len))
            (goutinc (length flat-script)))
       (format fout "static void CINTgout2e_~a(double *gout,
-double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
-      (format fout "int nf = envs->nf;
-int nrys_roots = envs->nrys_roots;
-int ix, iy, iz, i, n;
+double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
+      (format fout "FINT nf = envs->nf;
+FINT nrys_roots = envs->nrys_roots;
+FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
       (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
@@ -975,9 +975,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           (t (/ goutinc 4))))
            (ngdef (with-output-to-string (tmpout)
                     (if (intersection *act-left-right* op)
-                      (format tmpout "int ng[] = {~d, 1, ~d, 0, ~d, ~d, ~d, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, 1, ~d, 0, ~d, ~d, ~d, ~d};~%"
                               (1+ i-len) k-len tot-bits e1comps e2comps tensors)
-                      (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, 0, ~d, ~d, ~d, ~d};~%"
                               i-len op-len k-len tot-bits e1comps e2comps tensors))))
            (envs-common (with-output-to-string (tmpout)
                           (format tmpout ngdef)
@@ -989,22 +989,22 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout "/* (~{~a ~}i |~{~a ~}|~{~a ~}j) */~%"
               bra-i op bra-k)
       (gen-code-gout2c2e fout intname raw-infix flat-script)
-      (format fout "void ~a_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {~%" intname)
+      (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_2c2e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "int ~a_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (format fout "return CINT2c2e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
 ;;; _sph
-      (format fout "int ~a_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (format fout "return CINT2c2e_spheric_drv(out, dims, &envs, opt, cache);~%} // ~a_sph~%" intname)
 ;;; _spinor
-      (format fout "int ~a_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       ; c2s_ function is incorrect if e1/e2 are spin-included operators
       (format fout "return CINT2c2e_spinor_drv(out, dims, &envs, opt, cache, ~a);
@@ -1028,9 +1028,9 @@ int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache
            (tot-bits (+ i-len j-len op-len k-len))
            (goutinc (length flat-script)))
       (format fout "static void CINTgout1e_~a(double *gout,
-double *g, int *idx, CINTEnvVars *envs, int gout_empty) {~%" intname)
-      (format fout "int nf = envs->nf;
-int ix, iy, iz, n;
+double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
+      (format fout "FINT nf = envs->nf;
+FINT ix, iy, iz, n;
 double *g0 = g;~%")
       (if (intersection *act-left-right* op)
         (loop for i in (range (ash 1 tot-bits)) do
@@ -1094,9 +1094,9 @@ iz = idx[2+n*3];~%")
                     (if (or (member 'nuc raw-infix)
                             (member 'rinv raw-infix)
                             (member 'nabla-rinv raw-infix))
-                      (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, 0, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, 0, ~d, ~d, 0, ~d};~%"
                               i-len (+ op-len j-len) k-len tot-bits e1comps tensors)
-                      (format tmpout "int ng[] = {~d, ~d, ~d, 0, ~d, ~d, 1, ~d};~%"
+                      (format tmpout "FINT ng[] = {~d, ~d, ~d, 0, ~d, ~d, 1, ~d};~%"
                               i-len (+ op-len j-len) k-len tot-bits e1comps tensors))))
            (envs-common (with-output-to-string (tmpout)
                           (format tmpout ngdef)
@@ -1111,16 +1111,16 @@ iz = idx[2+n*3];~%")
                  (member 'nabla-rinv raw-infix))
              (gen-code-gout3c1e-rinv fout intname raw-infix flat-script))
             (t (gen-code-gout3c1e fout intname raw-infix flat-script)))
-      (format fout "void ~a_optimizer(CINTOpt **opt, int *atm, int natm, int *bas, int nbas, double *env) {~%" intname)
+      (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_3c1e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "int ~a_cart(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
@@ -1135,12 +1135,12 @@ return 0; }~%")))
       (format fout "return CINT3c1e_cart_drv(out, dims, &envs, opt, cache, ~d);~%}
 // ~a_cart~%" int1e-type intname)
 ;;; _sph
-      (format fout "int ~a_sph(double *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
@@ -1155,12 +1155,12 @@ return 0; }~%")))
       (format fout "return CINT3c1e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, ~d, 0);
 } // ~a_sph~%" int1e-type intname)
 ;;; _spinor
-      (format fout "int ~a_spinor(double complex *out, int *dims, int *shls,
-int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "int i, nout;
-int counts[4];~%")
+        (format fout "FINT i, nout;
+FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);

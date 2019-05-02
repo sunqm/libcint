@@ -32,7 +32,7 @@
  *
  * Synopsis
  *
- * double fmtpse(int m, double t)
+ * double fmtpse(FINT m, double t)
  *
  * Description
  *
@@ -55,7 +55,7 @@
  *
  * Argument(s)
  *
- * int m:
+ * FINT m:
  * F_m(t), see the Description section.
  *
  * double t:
@@ -74,7 +74,7 @@
  *
  * Synopsis
  *
- * double fmt(int m, double t)
+ * double fmt(FINT m, double t)
  *
  * Description
  *
@@ -114,7 +114,7 @@
  *
  * Argument(s)
  *
- * int m:
+ * FINT m:
  * F_m(t), see the Description section.
  *
  * double t:

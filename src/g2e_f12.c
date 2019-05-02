@@ -17,8 +17,8 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
 void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs);
 void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
-void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                               int *atm, int natm, int *bas, int nbas, double *env)
+void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         envs->natm = natm;
         envs->nbas = nbas;
@@ -27,10 +27,10 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
         envs->env = env;
         envs->shls = shls;
 
-        int i_sh = shls[0];
-        int j_sh = shls[1];
-        int k_sh = shls[2];
-        int l_sh = shls[3];
+        FINT i_sh = shls[0];
+        FINT j_sh = shls[1];
+        FINT k_sh = shls[2];
+        FINT l_sh = shls[3];
         envs->i_l = bas(ANG_OF, i_sh);
         envs->j_l = bas(ANG_OF, j_sh);
         envs->k_l = bas(ANG_OF, k_sh);
@@ -65,14 +65,14 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
         envs->ll_ceil = envs->l_l + ng[LINC];
 
         // ceil(L_tot/2) + 1
-        int nroots = (envs->li_ceil + envs->lj_ceil +
+        FINT nroots = (envs->li_ceil + envs->lj_ceil +
                       envs->lk_ceil + envs->ll_ceil + 3)/2;
         envs->nrys_roots = nroots;
         assert(nroots < MXRYSROOTS);
 
-        int dli, dlj, dlk, dll;
-        int ibase = envs->li_ceil > envs->lj_ceil;
-        int kbase = envs->lk_ceil > envs->ll_ceil;
+        FINT dli, dlj, dlk, dll;
+        FINT ibase = envs->li_ceil > envs->lj_ceil;
+        FINT kbase = envs->lk_ceil > envs->ll_ceil;
         if (kbase) {
                 if (ibase) {
                         envs->f_g0_2d4d = &CINTg0_2e_ik2d4d;
@@ -138,8 +138,8 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
         }
 }
 
-void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                                int *atm, int natm, int *bas, int nbas, double *env)
+void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_int2e_yp_EnvVars(envs, ng, shls, atm, natm, bas, nbas, env);
         envs->f_g0_2e = &CINTg0_2e_stg;
@@ -162,8 +162,8 @@ void CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
         double zeta = envs->env[PTR_F12_ZETA];
-        int nroots = envs->nrys_roots;
-        int i;
+        FINT nroots = envs->nrys_roots;
+        FINT i;
 
         aij = envs->ai + envs->aj;
         akl = envs->ak + envs->al;
@@ -250,8 +250,8 @@ void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
         double zeta = envs->env[PTR_F12_ZETA];
-        int nroots = envs->nrys_roots;
-        int i;
+        FINT nroots = envs->nrys_roots;
+        FINT i;
 
         aij = envs->ai + envs->aj;
         akl = envs->ak + envs->al;

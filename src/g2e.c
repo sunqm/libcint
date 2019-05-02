@@ -1652,8 +1652,8 @@ normal_end:
         return;
 error:
         fprintf(stderr, "Dimension error for CINTg0_2e_lj2d4d: iklj = %d %d %d %d",
-               (int)envs->li_ceil, (int)envs->lk_ceil,
-               (int)envs->ll_ceil, (int)envs->lj_ceil);
+               (FINT)envs->li_ceil, (FINT)envs->lk_ceil,
+               (FINT)envs->ll_ceil, (FINT)envs->lj_ceil);
         exit(1);
 }
 

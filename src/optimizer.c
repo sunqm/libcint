@@ -252,8 +252,8 @@ void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
 #endif
 
 #ifdef WITH_GTG
-void CINTall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
-                              int *atm, int natm, int *bas, int nbas, double *env)
+void CINTall_2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
+                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
@@ -262,8 +262,8 @@ void CINTall_2e_gtg_optimizer(CINTOpt **opt, int *ng,
                 4, 0, ng, atm, natm, bas, nbas, env);
 }
 
-void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, int *ng,
-                                int *atm, int natm, int *bas, int nbas, double *env)
+void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
+                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
@@ -272,8 +272,8 @@ void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, int *ng,
                 3, 0, ng, atm, natm, bas, nbas, env);
 }
 
-void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, int *ng,
-                                int *atm, int natm, int *bas, int nbas, double *env)
+void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
+                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
@@ -431,7 +431,7 @@ void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
 void CINTdel_pairdata_optimizer(CINTOpt *cintopt)
 {
         if (cintopt != NULL && cintopt->expij != NULL) {
-                int i;
+                FINT i;
                 for (i = 0; i < cintopt->tot_prim; i++) {
                         free(cintopt->expij[i]);
                         free(cintopt->rij[i]);

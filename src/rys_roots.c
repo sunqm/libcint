@@ -1399,11 +1399,11 @@ for (i = 1; i <= order; i++) { \
         p = p * x + a[order-i]; \
 }
 
-static void R_dnode(double *a, double *rt, int order)
+static void R_dnode(double *a, double *rt, FINT order)
 {
         const double accrt = 1e-15;
         double x0, x1, xi, x1init, p0, p1, pi, p1init;
-        int i, m, n;
+        FINT i, m, n;
 
         x1init = 0;
         p1init = a[0];
@@ -1635,7 +1635,7 @@ static long double c99_expl(long double x)
 #define EXPL    c99_expl
 #endif
 
-static void R_lnode(long double *a, long double *rt, int order)
+static void R_lnode(long double *a, long double *rt, FINT order)
 {
 #ifdef LDBL_MANT_DIG
         const long double accrt = LDBL_EPSILON*10;
@@ -1643,7 +1643,7 @@ static void R_lnode(long double *a, long double *rt, int order)
         const long double accrt = 1e-15;
 #endif
         long double x0, x1, xi, x1init, p0, p1, pi, p1init;
-        int i, m, n;
+        FINT i, m, n;
 
         x1init = 0;
         p1init = a[0];
@@ -1835,11 +1835,11 @@ L70:
 }
 #else // defined HAVE_QUADMATH_H
 
-static void R_qnode(__float128 *a, __float128 *rt, int order)
+static void R_qnode(__float128 *a, __float128 *rt, FINT order)
 {
         const __float128 accrt = 1e-20q;
         __float128 x0, x1, xi, x1init, p0, p1, pi, p1init;
-        int i, m, n;
+        FINT i, m, n;
 
         x1init = 0;
         p1init = a[0];

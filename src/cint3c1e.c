@@ -176,7 +176,7 @@ FINT CINT3c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
 }
 
 FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
-                            double fac, int nuc_id, double *cache)
+                            double fac, FINT nuc_id, double *cache)
 {
         FINT *shls  = envs->shls;
         FINT *atm = envs->atm;
@@ -208,7 +208,7 @@ FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
         FINT *jempty = empty + 1;
         FINT *kempty = empty + 2;
         FINT *gempty = empty + 3;
-        int rys_empty;
+        FINT rys_empty;
         double *cr;
         double t2, tau, x, u[MXRYSROOTS], w[MXRYSROOTS];
         /* COMMON_ENVS_AND_DECLARE end */

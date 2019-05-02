@@ -72,19 +72,19 @@ void CINTx1l_2e(double *f, const double *g, const double *rl,
                 const CINTEnvVars *envs);
 
 #ifdef WITH_F12
-void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                           int *atm, int natm, int *bas, int nbas, double *env);
-void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                           int *atm, int natm, int *bas, int nbas, double *env);
+void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 #endif
 
 #ifdef WITH_GTG
-void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                                int *atm, int natm, int *bas, int nbas, double *env);
-void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                                  int *atm, int natm, int *bas, int nbas, double *env);
-void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, int *ng, int *shls,
-                                  int *atm, int natm, int *bas, int nbas, double *env);
+void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                                  FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                                  FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 #endif
 
 

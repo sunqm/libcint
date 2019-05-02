@@ -60,7 +60,7 @@ void CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
                 return;
         }
 
-        int irys;
+        FINT irys;
         if (omega > 0) {
                 /* u[:] = tau^2 / (1 - tau^2)
                  * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
