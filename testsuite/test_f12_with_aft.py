@@ -89,6 +89,36 @@ def get_eri_laplacian(mydf):
         pqkR = pqkI = None
     return eriR.reshape(nao,nao,nao,nao)
 
+def get_eri_3c2e(mydf):
+    from pyscf.gto.ft_ao import ft_ao
+    eriR = 0
+    kptijkl = numpy.zeros((4,3))
+    q = numpy.zeros(3)
+    coulG = mydf.weighted_coulG(q, False, mydf.mesh)
+    Gv, Gvbase, kws = cell.get_Gv_weights(mydf.mesh)
+    ao = ft_ao(cell, Gv)
+
+    for pqkR, pqkI, p0, p1 \
+            in mydf.pw_loop(mydf.mesh, kptijkl[:2], q, aosym='s2'):
+        vG = coulG[p0:p1]
+        pqkRv = pqkR * vG
+        pqkIv = pqkI * vG
+        # rho(G) v(G) rho(-G) = rho(G) v(G) [rho(G)]^*
+        eriR += lib.ddot(pqkRv, ao[p0:p1].real)
+        eriR += lib.ddot(pqkIv, ao[p0:p1].imag)
+        pqkR = pqkI = None
+    return eriR
+
+def get_eri_2c2e(mydf):
+    from pyscf.gto.ft_ao import ft_ao
+    eriR = 0
+    kptijkl = numpy.zeros((4,3))
+    q = numpy.zeros(3)
+    coulG = mydf.weighted_coulG(q, False, mydf.mesh)
+    Gv, Gvbase, kws = cell.get_Gv_weights(mydf.mesh)
+    ao = ft_ao(cell, Gv)
+    return lib.dot(ao.T*coulG, ao.conj())
+
 
 mydf = df.AFTDF(cell)
 
@@ -195,3 +225,9 @@ cell._env[10] = zeta
 eri0 = get_eri(mydf)
 eri1 = cell.intor('int2e_gtg_sph', aosym='s4', comp=1)
 print('int2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
+eri0 = get_eri_2c2e(mydf)
+eri1 = cell.intor('int2c2e_gtg_sph', aosym='s1', comp=1)
+print('int2c2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
+eri0 = get_eri_3c2e(mydf)
+eri1 = cell.intor('int3c2e_gtg_sph', aosym='s2ij', comp=1)
+print('int3c2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
