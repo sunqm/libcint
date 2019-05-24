@@ -277,7 +277,7 @@ void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
-        gen_idx(*opt, &CINTinit_int2c2e_EnvVars, &CINTg1e_index_xyz,
+        gen_idx(*opt, &CINTinit_int2c2e_gtg_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
 }
 #endif
