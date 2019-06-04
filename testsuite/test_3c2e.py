@@ -13,7 +13,7 @@ import os
 import ctypes
 import numpy
 
-_cint = numpy.ctypeslib.load_library('libcint', '.')
+_cint = numpy.ctypeslib.load_library('lib/libcint', '.')
 
 
 PTR_LIGHT_SPEED    = 0
@@ -252,7 +252,7 @@ def test_int3c2e_spinor(name, fnref, vref, dim, place):
                 dj = (bas[j,ANG_OF] * 4 + 2) * bas[j,NCTR_OF]
                 dk = (bas[k,ANG_OF] * 2 + 1) * bas[k,NCTR_OF]
                 op = numpy.empty((di,dj,dk,dim), order='F', dtype=numpy.complex)
-                intor(op.ctypes.data_as(ctypes.c_void_p), shls,
+                intor(op.ctypes.data_as(ctypes.POINTER(np.complex128)), shls,
                       c_atm, natm, c_bas, nbas, c_env, opt)
                 if not numpy.allclose(zmat, op[:,:,:,0]):
                     print 'Fail:', name, i,j,k
@@ -306,10 +306,10 @@ if __name__ == "__main__":
               ('cint3c2e_ip2_sph', 'cint2e_ip2_sph', 1970.982483860059, 3, 10),
              ):
         test_int3c2e_sph(*f)
-    if "--quick" not in sys.argv:
-        for f in (('cint3c2e_spinor', 'cint3c2e_sph', 4412.363002831547, 1, 10),
-                 ):
-            test_int3c2e_spinor(*f)
+#    if "--quick" not in sys.argv:
+#        for f in (('cint3c2e_spinor', 'cint3c2e_sph', 4412.363002831547, 1, 10),
+#                 ):
+#            test_int3c2e_spinor(*f)
 
 #    for f in (('cint2c2e_sph', 'cint2e_sph', 782.3104849606677, 1, 10),
 #              ('cint2c2e_ip1_sph', 'cint2e_ip1_sph', 394.6515972715189, 3, 10),

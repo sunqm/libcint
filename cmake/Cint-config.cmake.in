@@ -1,0 +1,7 @@
+@PACKAGE_INIT&
+
+find_package(BLAS REQUIRED)
+
+if(NOT TARGET Cint::Cint)
+  include(${CMAKE_CURRENT_LIST_DIR}/Cint-targets.cmake)
+endif()

@@ -1,0 +1,15 @@
+target_sources(Cint
+        PRIVATE
+            breit1.c
+            dkb.c
+            gaunt1.c
+            grad1.c
+            grad2.c
+            hess.c
+            int3c1e.c
+            int3c2e.c
+            intor1.c
+            intor2.c
+            intor3.c
+            intor4.c
+        )

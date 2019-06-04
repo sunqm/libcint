@@ -1,0 +1,16 @@
+target_sources(Cint
+	PRIVATE
+	   c2f.h
+	   cart2sph.h
+	   cint1e.h
+	   cint2e.h
+	   cint_bas.h
+	   cint_const.h
+	   fblas.h
+	   g1e.h
+	   g2e.h
+	   g3c1e.h
+	   misc.h
+	   optimizer.h
+	   rys_roots.h
+)
