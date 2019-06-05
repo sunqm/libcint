@@ -101,48 +101,41 @@ install(
 # Parse additional options
 # ------------------------
 
-# #option(WITH_RANGE_COULOMB "Range separated Coulomb" on)
-# if(WITH_RANGE_COULOMB)
-# # defined in config.h
-# #  add_definitions(-DWITH_RANGE_COULOMB)
-#   message("Enabled WITH_RANGE_COULOMB")
-# endif(WITH_RANGE_COULOMB)
 
-# if(WITH_COULOMB_ERF)
-#   set(cintSrc ${cintSrc} src/g2e_coulerf.c src/cint2e_coulerf.c)
-#   add_definitions(-DWITH_COULOMB_ERF)
-#   message("Enabled WITH_COULOMB_ERF")
-# endif(WITH_COULOMB_ERF)
-
-# if(WITH_F12)
-#   set(cintSrc ${cintSrc} src/g2e_f12.c src/stg_roots.c src/cint2e_f12.c)
-#   add_definitions(-DWITH_F12)
-#   message("Enabled WITH_F12")
-# endif(WITH_F12)
-
-# if(WITH_GTG)
-#   set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c src/cint3c2e_gtg.c
-#     src/cint2c2e_gtg.c)
-#   add_definitions(-DWITH_GTG)
-#   message("Enabled WITH_GTG")
-# endif(WITH_GTG)
-
-
-if(QUICK_TEST)
-  set(RUN_QUICK_TEST --quick)
+if(WITH_RANGE_COULOMB)
+	target_compile_definitions(Cint PRIVATE WITH_RANGE_COULOMB=TRUE)
+	message(STATUS "Enabled WITH_RANGE_COULOMB")
 endif()
 
+if(WITH_COULOMB_ERF) # source files are added in src/CMakeLists.txt
+	target_compile_definitions(Cint PRIVATE WITH_COULOMB_ERF=TRUE)
+	message(STATUS "Enabled WITH_COULOMB_ERF")
+endif()
 
-# if(ENABLE_EXAMPLE)
-#   enable_language(Fortran)
-#   find_package(OpenMP)
-#   if(OPENMP_FOUND)
-#     set(HAVE_OPENMP 1)
-#   else ()
-#     set(OpenMP_C_FLAGS " ")
-#   endif()
-#   add_subdirectory(examples)
-# endif()
+if(WITH_F12) # source files are added in src/CMakeLists.txt
+	target_compile_definitions(Cint PRIVATE WITH_F12=TRUE)
+	message(STATUS "Enabled WITH_F12")
+endif()
+
+if(WITH_GTG) # source files are added in src/CMakeLists.txt
+	target_compile_definitions(Cint PRIVATE WITH_GTG=TRUE)
+	message(STATUS "Enabled WITH_GTG")
+endif()
+
+if(ENABLE_EXAMPLE)
+	enable_language(Fortran)
+	find_package(OpenMP)
+	if(OPENMP_FOUND)
+		set(HAVE_OPENMP 1)
+	else ()
+		set(OpenMP_C_FLAGS " ")
+	endif()
+	add_subdirectory(examples)
+endif()
+
+if(QUICK_TEST)
+	set(RUN_QUICK_TEST --quick)
+endif()
 
 if(BUILD_SHARED_LIBS AND ENABLE_TEST)
 	find_package(PythonInterp)

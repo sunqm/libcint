@@ -24,4 +24,17 @@ target_sources(Cint
 	cint3c1e_a.c
 )
 
+if(WITH_COULOMB_ERF)
+	target_sources(Cint g2e_coulerf.c cint2e_coulerf.c)
+
+endif()
+
+if(WITH_F12)
+	target_sources(Cint g2e_f12.c stg_roots.c cint2e_f12.c)
+endif()
+
+if(WITH_GTG)
+	target_sources(Cint g2e_gtg.c cint2e_gtg.c cint3c2e_gtg.c cint2c2e_gtg.c)
+endif()
+
 add_subdirectory(autocode)

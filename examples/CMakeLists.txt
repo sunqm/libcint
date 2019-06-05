@@ -7,14 +7,14 @@ add_executable(spinor_f    fortran_call_spinor.F90   )
 add_executable(time_c2h6   time_c2h6.c               )
 add_executable(time_c60    time_c60.c                )
 
-target_link_libraries(cartesian_c cint m)
-target_link_libraries(spheric_c   cint m)
-target_link_libraries(spinor_c    cint m)
-target_link_libraries(cartesian_f cint m)
-target_link_libraries(spheric_f   cint m)
-target_link_libraries(spinor_f    cint m)
-target_link_libraries(time_c2h6   cint m)
-target_link_libraries(time_c60    cint m)
+target_link_libraries(cartesian_c Cint m)
+target_link_libraries(spheric_c   Cint m)
+target_link_libraries(spinor_c    Cint m)
+target_link_libraries(cartesian_f Cint m)
+target_link_libraries(spheric_f   Cint m)
+target_link_libraries(spinor_f    Cint m)
+target_link_libraries(time_c2h6   Cint m)
+target_link_libraries(time_c60    Cint m)
 
 set_target_properties(time_c2h6 PROPERTIES
   COMPILE_FLAGS ${OpenMP_C_FLAGS}
