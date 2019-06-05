@@ -86,21 +86,21 @@ install(EXPORT Cint-targets
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-    ${CMAKE_SOURCE_DIR}/cmake/Cint-config.cmake.in
-    ${CMAKE_BINARY_DIR}/cmake/Cint-config.cmake
+    ${CMAKE_SOURCE_DIR}/cmake/cint-config.cmake.in
+    ${CMAKE_BINARY_DIR}/cmake/cint-config.cmake
     INSTALL_DESTINATION cmake
 )
 
 write_basic_package_version_file(
-    ${CMAKE_BINARY_DIR}/cmake/Cint-config-version.cmake
+    ${CMAKE_BINARY_DIR}/cmake/cint-config-version.cmake
     VERSION ${CINT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 install(
     FILES
-        ${CMAKE_BINARY_DIR}/cmake/Cint-config.cmake
-        ${CMAKE_BINARY_DIR}/cmake/Cint-config-version.cmake
+        ${CMAKE_BINARY_DIR}/cmake/cint-config.cmake
+        ${CMAKE_BINARY_DIR}/cmake/cint-config-version.cmake
     DESTINATION cmake
 )
 
