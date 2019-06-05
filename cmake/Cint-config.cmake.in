@@ -1,4 +1,4 @@
-@PACKAGE_INIT&
+@PACKAGE_INIT@
 
 find_package(BLAS REQUIRED)
 
