@@ -23,6 +23,13 @@ find_package(QUADMATH)
 # Setup library
 # -------------
 
+target_compile_options(Cint PUBLIC -m64 -pipe)
+target_compile_options(Cint PUBLIC "$<IF:$<CONFIG:Debug>,-g,-O2>")
+target_compile_options(Cint PUBLIC "$<IF:$<CXX_COMPILER_ID:Intel>,-xHost,-march=native>")
+target_compile_options(Cint PUBLIC "$<$<CXX_COMPILER_ID:GNU>:-pthread>")
+target_link_options(Cint PUBLIC "$<$<CXX_COMPILER_ID:GNU>:-pthread>")
+target_compile_features(Cint PUBLIC cxx_std_11)
+
 add_subdirectory(src)
 add_subdirectory(include)
 
