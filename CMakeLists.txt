@@ -83,7 +83,7 @@ install(EXPORT Cint-targets
 # Configure package
 # -----------------
 
-include(CmakePackageConfigHelpers)
+include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
     ${CMAKE_SOURCE_DIR}/cmake/Cint-config.cmake.in
