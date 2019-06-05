@@ -77,7 +77,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/include/cint/ DESTINATION ${CMAKE_INSTALL_
 install(EXPORT Cint-targets
 	FILE Cint-targets.cmake
 	NAMESPACE Cint::
-	DESTINATION lib/cmake/Cint
+	DESTINATION cmake/Cint
 	)
 
 # Configure package
@@ -88,7 +88,7 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(
     ${CMAKE_SOURCE_DIR}/cmake/Cint-config.cmake.in
     ${CMAKE_BINARY_DIR}/cmake/Cint-config.cmake
-    INSTALL_DESTINATION lib/cmake/Cint
+    INSTALL_DESTINATION cmake/Cint
 )
 
 write_basic_package_version_file(
@@ -101,7 +101,7 @@ install(
     FILES
         ${CMAKE_BINARY_DIR}/cmake/Cint-config.cmake
         ${CMAKE_BINARY_DIR}/cmake/Cint-config-version.cmake
-    DESTINATION lib/cmake/Cint
+    DESTINATION cmake/Cint
 )
 
 # Parse additional options
