@@ -109,6 +109,7 @@ target_link_libraries(cint ${BLAS_LIBRARIES})
 if(QUADMATH_FOUND)
   target_link_libraries(cint quadmath)
 endif()
+target_link_libraries(cint "-lm")
 
 install(TARGETS cint DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
