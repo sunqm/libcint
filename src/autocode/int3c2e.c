@@ -539,9 +539,9 @@ CINTEnvVars envs;
 CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int3c2e_ig1;
 envs.common_factor *= 0.5;
+if (out != NULL && envs.shls[0] == envs.shls[1]) {
 FINT i, nout;
 FINT counts[4];
-if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
 counts[2] = envs.nfk * envs.x_ctr[2];
@@ -560,9 +560,9 @@ CINTEnvVars envs;
 CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int3c2e_ig1;
 envs.common_factor *= 0.5;
+if (out != NULL && envs.shls[0] == envs.shls[1]) {
 FINT i, nout;
 FINT counts[4];
-if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
 counts[2] = (envs.k_l*2+1) * envs.x_ctr[2];
@@ -581,9 +581,9 @@ CINTEnvVars envs;
 CINTinit_int3c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
 envs.f_gout = &CINTgout2e_int3c2e_ig1;
 envs.common_factor *= 0.5;
+if (out != NULL && envs.shls[0] == envs.shls[1]) {
 FINT i, nout;
 FINT counts[4];
-if (out != NULL && envs.shls[0] == envs.shls[1]) {
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
 counts[2] = (envs.k_l*2+1) * envs.x_ctr[2];

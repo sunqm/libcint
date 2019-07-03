@@ -43,6 +43,8 @@
   '("int1e_ggkin"               (.5 \| g g nabla dot nabla \|))
   '("int1e_ggnuc"               ( \| g g nuc \|))
   '("int1e_grjxp"               ( \| g r cross p \|))
+  '("int1e_rinv"                (\| rinv \|))
+  '("int1e_drinv"               (\| nabla-rinv \|))
 )
 
 (gen-cint "intor2.c"
@@ -125,7 +127,6 @@
   '("int1e_kinip"               (.5 \| p dot p nabla))
   '("int1e_ipnuc"               (nabla \| nuc \|))
   '("int1e_iprinv"              (nabla \| rinv \|))
-  '("int1e_rinv"                (\| rinv \|))
   '("int1e_ipspnucsp"           (nabla sigma dot p \| nuc \| sigma dot p))
   '("int1e_ipsprinvsp"          (nabla sigma dot p \| rinv \| sigma dot p))
   '("int1e_ippnucp"             (p* nabla \| nuc dot p \|))

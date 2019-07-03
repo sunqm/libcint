@@ -1,3 +1,6 @@
+Version 3.0.18  (2019-07-02):
+	* Fix undefined varialbe in nabla-rinv integral
+	* Add integral < i | nabla-rinv | j >
 Version 3.0.17  (2019-04-29):
 	* 3c2e and 2c2e integrals for Gaussian type geminals
 Version 3.0.16  (2019-03-23):

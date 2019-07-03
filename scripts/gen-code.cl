@@ -320,6 +320,14 @@ iz = idx[2];~%")
           (format nil "&c2s_sph_~a" sfx))
          (t (format nil "&c2s_cart_~a" sfx))))
 
+;;; g-intermediates are g0, g1, g2, ...
+(defun num-g-intermediates (tot-bits op i-len j-len)
+  (if (and (intersection *act-left-right* op)
+           ; nabla-rinv is the last one in the operation list
+           (<= (+ i-len (length op) j-len) 1))
+      (ash 1 tot-bits)
+      (1- (ash 1 tot-bits))))
+
 ;!!! Be very cautious of the reverse on i-operators and k operators!
 ;!!! When multiple tensor components (>= rank 2) provided by the operators
 ;!!! on bra functions, the ordering of the multiple tensor components are
@@ -341,8 +349,8 @@ FINT nf = envs->nf;
 FINT ix, iy, iz, n;
 double *g0 = g;~%")
       (loop
-        for i in (range (1- (ash 1 tot-bits))) do
-        (format fout "double *g~a = g~a  + envs->g_size * 3;~%" (1+ i) i))
+        for i in (range (num-g-intermediates tot-bits op i-len j-len)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout (append op ket-j) "j")
       (dump-declare-giao-ij fout bra-i (append op ket-j))
@@ -411,10 +419,10 @@ iz = idx[2+n*3];~%")
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
 counts[2] = 1;
@@ -431,10 +439,10 @@ return 0; }~%")))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
 counts[2] = 1;
@@ -451,10 +459,10 @@ return 0; }~%")))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
 counts[2] = 1;
@@ -569,11 +577,9 @@ double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
 FINT nrys_roots = envs->nrys_roots;
 FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
-      (if (intersection *act-left-right* op)
-        (loop for i in (range (ash 1 tot-bits)) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
-        (loop for i in (range (1- (ash 1 tot-bits))) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i)))
+      (loop
+        for i in (range (num-g-intermediates tot-bits op i-len j-len)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout ket-j "j")
       (dump-declare-dri-for-rc fout bra-k "k")
@@ -770,11 +776,9 @@ double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
 FINT nrys_roots = envs->nrys_roots;
 FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
-      (if (intersection *act-left-right* op)
-        (loop for i in (range (ash 1 tot-bits)) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
-        (loop for i in (range (1- (ash 1 tot-bits))) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i)))
+      (loop
+        for i in (range (num-g-intermediates tot-bits op i-len j-len)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout ket-j "j")
       (dump-declare-dri-for-rc fout bra-k "k")
@@ -791,7 +795,7 @@ double *g0 = g;~%")
               (fmt-l ""))
           (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0)))
       (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l, 0);~%")
-            (fmt-op (mkstr "G2E_~aJ_SIMD1(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);
+            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);
 G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l+~a, envs->k_l, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
             (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);~%")))
@@ -849,10 +853,10 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
 counts[2] = envs.nfk * envs.x_ctr[2];
@@ -868,10 +872,10 @@ return 0; }~%")))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
 counts[2] = (envs.k_l*2+1) * envs.x_ctr[2];
@@ -888,10 +892,10 @@ return 0; }~%")))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
 counts[2] = (envs.k_l*2+1) * envs.x_ctr[2];
@@ -924,11 +928,9 @@ double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
 FINT nrys_roots = envs->nrys_roots;
 FINT ix, iy, iz, i, n;
 double *g0 = g;~%")
-      (if (intersection *act-left-right* op)
-        (loop for i in (range (ash 1 tot-bits)) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
-        (loop for i in (range (1- (ash 1 tot-bits))) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i)))
+      (loop
+        for i in (range (num-g-intermediates tot-bits op i-len 0)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout bra-k "k")
       (if (intersection *act-left-right* op)
@@ -1032,11 +1034,9 @@ double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "FINT nf = envs->nf;
 FINT ix, iy, iz, n;
 double *g0 = g;~%")
-      (if (intersection *act-left-right* op)
-        (loop for i in (range (ash 1 tot-bits)) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
-        (loop for i in (range (1- (ash 1 tot-bits))) do
-              (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i)))
+      (loop
+        for i in (range (num-g-intermediates tot-bits op i-len j-len)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout (append op ket-j) "j")
       (dump-declare-dri-for-rc fout bra-k "k")
@@ -1119,10 +1119,10 @@ iz = idx[2+n*3];~%")
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = envs.nfi * envs.x_ctr[0];
 counts[1] = envs.nfj * envs.x_ctr[1];
 counts[2] = envs.nfk * envs.x_ctr[2];
@@ -1139,10 +1139,10 @@ return 0; }~%")))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = (envs.i_l*2+1) * envs.x_ctr[0];
 counts[1] = (envs.j_l*2+1) * envs.x_ctr[1];
 counts[2] = (envs.k_l*2+1) * envs.x_ctr[2];
@@ -1159,10 +1159,10 @@ return 0; }~%")))
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
-        (format fout "FINT i, nout;
-FINT counts[4];~%")
         (when (or (member 'g bra-i) (member 'g ket-j))
           (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
 counts[0] = CINTcgto_spinor(envs.shls[0], envs.bas);
 counts[1] = CINTcgto_spinor(envs.shls[1], envs.bas);
 counts[2] = (envs.k_l*2+1) * envs.x_ctr[2];

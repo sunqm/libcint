@@ -17,13 +17,13 @@ void CINTgout1e_int1e_spspsp(double *gout, double *g, FINT *idx, CINTEnvVars *en
 FINT nf = envs->nf;
 FINT ix, iy, iz, n;
 double *g0 = g;
-double *g1 = g0  + envs->g_size * 3;
-double *g2 = g1  + envs->g_size * 3;
-double *g3 = g2  + envs->g_size * 3;
-double *g4 = g3  + envs->g_size * 3;
-double *g5 = g4  + envs->g_size * 3;
-double *g6 = g5  + envs->g_size * 3;
-double *g7 = g6  + envs->g_size * 3;
+double *g1 = g0 + envs->g_size * 3;
+double *g2 = g1 + envs->g_size * 3;
+double *g3 = g2 + envs->g_size * 3;
+double *g4 = g3 + envs->g_size * 3;
+double *g5 = g4 + envs->g_size * 3;
+double *g6 = g5 + envs->g_size * 3;
+double *g7 = g6 + envs->g_size * 3;
 double s[27];
 G1E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, 0);
 G1E_D_J(g2, g0, envs->i_l+1, envs->j_l+1, 0);
@@ -103,7 +103,7 @@ void CINTgout1e_int1e_spnuc(double *gout, double *g, FINT *idx, CINTEnvVars *env
 FINT nf = envs->nf;
 FINT ix, iy, iz, n;
 double *g0 = g;
-double *g1 = g0  + envs->g_size * 3;
+double *g1 = g0 + envs->g_size * 3;
 double s[3];
 G1E_D_I(g1, g0, envs->i_l+0, envs->j_l, 0);
 for (n = 0; n < nf; n++) {
