@@ -231,3 +231,21 @@ print('int2c2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
 eri0 = get_eri_3c2e(mydf)
 eri1 = cell.intor('int3c2e_gtg_sph', aosym='s2ij', comp=1)
 print('int3c2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
+
+
+omega = 0.2
+def weighted_rsh(kpt=numpy.zeros(3), exx=False, mesh=None):
+    if mesh is None:
+        mesh = self.mesh
+    Gv, Gvbase, kws = cell.get_Gv_weights(mesh)
+    G2 = numpy.einsum('gx,gx->g', Gv, Gv)
+    coulG = 4*numpy.pi / G2 * numpy.exp(-G2/(4*omega**2))
+    coulG *= kws
+    return coulG
+
+mydf.weighted_coulG = weighted_rsh
+cell._env[10] = zeta
+eri0 = get_eri(mydf)
+with cell.with_range_coulomb(omega):
+    eri1 = cell.intor('int2e_coulerf_sph', aosym='s4', comp=1)
+print('int2e_coulerf', abs(eri0-eri1).max(), abs(eri0).max())
