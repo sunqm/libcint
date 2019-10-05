@@ -158,6 +158,21 @@ Installation
     make install
 
 
+Available Integrals
+-------------------
+
+The available integrals can be found in the header file cint_funcs.h. A simple
+expression for each integral is also listed in the header file. The integral
+function names and integral expressions correspond to the lisp symbol notations
+in scripts/auto_intor.cl
+
+All integral functions have the same function signature
+
+```
+function_name(double *out, int *dims, int *shls, int *atm, int natm, int *bas, int nbas, double *env, CINTOpt *opt, double *cache);
+```
+
+
 Known problems
 --------------
 

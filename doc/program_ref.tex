@@ -225,6 +225,26 @@ for (i = 0; i < nbas; i++) {
 CINTdel_optimizer(&opt);
 \end{verbatim}
 
+In libcint-3 or above, new integral function signature are provided.
+\begin{verbatim}
+int1e_xxx(buf, dims, shls, atm, natm, bas, nbas, env, opt, cache);
+int2e_xxx(buf, dims, shls, atm, natm, bas, nbas, env, opt, cache);
+\end{verbatim}
+In the new
+function signature, the shape of output buffer (in column-major order) can be
+specified. It's the second argument \verb$dims$. Integrals can be written
+to the sub-block or the output buffer according to the information of
+\verb$dims$. Another change is the runtime \verb$cache$ for integral
+intermediates, which comes as the last arguments of the new signature. If
+\verb$cache$ is specified, all integral intermediates will be put in the
+\verb$cache$. The library will not use extra main memory during computatin. The
+size of cache can be determined by the function if the first argument is set to
+\verb$NULL$
+\begin{verbatim}
+int cache_size = int1e_xxx(NULL, dims, shls, atm, natm, bas, nbas, env, opt, NULL);
+\end{verbatim}
+
+
 \subsection{Fortran routine}\label{fortran-routine}
 
 \begin{verbatim}

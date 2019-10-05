@@ -328,6 +328,15 @@ iz = idx[2];~%")
       (ash 1 tot-bits)
       (1- (ash 1 tot-bits))))
 
+;;; Output function signatures for C header file
+(defun write-functype-header (fout intname &optional doc)
+  (if doc
+      (format fout "~a~%" doc))
+  (format fout "CINTOptimizerFunction ~a_optimizer;
+CINTIntegralFunction ~a_cart;
+CINTIntegralFunction ~a_sph;
+CINTIntegralFunction ~a_spinor;~%~%" intname intname intname intname))
+
 ;!!! Be very cautious of the reverse on i-operators and k operators!
 ;!!! When multiple tensor components (>= rank 2) provided by the operators
 ;!!! on bra functions, the ordering of the multiple tensor components are
@@ -409,6 +418,8 @@ iz = idx[2+n*3];~%")
                           (format tmpout "envs.f_gout = &CINTgout1e_~a;~%" intname)
                           (unless (eql (factor-of raw-infix) 1)
                             (format tmpout "envs.common_factor *= ~a;~%" (factor-of raw-infix))))))
+      (write-functype-header
+        t intname (format nil "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */" bra-i op ket-j))
       (format fout "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */~%" bra-i op ket-j)
       (gen-code-gout1e fout intname raw-infix flat-script)
       (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
@@ -648,6 +659,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           (format tmpout "envs.f_gout = &CINTgout2e_~a;~%" intname)
                           (unless (eql (factor-of raw-infix) 1)
                             (format tmpout "envs.common_factor *= ~a;~%" (factor-of raw-infix))))))
+      (write-functype-header
+        t intname (format nil "/* (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k ~{~a ~}l) */"
+                          bra-i ket-j op bra-k ket-l))
       (format fout "/* <~{~a ~}k ~{~a ~}i|~{~a ~}|~{~a ~}j ~{~a ~}l> : i,j \\in electron 1; k,l \\in electron 2~%"
               bra-k bra-i op ket-j ket-l)
       (format fout " * = (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k ~{~a ~}l) */~%"
@@ -842,6 +856,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           (format tmpout "envs.f_gout = &CINTgout2e_~a;~%" intname)
                           (unless (eql (factor-of raw-infix) 1)
                             (format tmpout "envs.common_factor *= ~a;~%" (factor-of raw-infix))))))
+      (write-functype-header
+        t intname (format nil "/* (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k) */"
+                          bra-i ket-j op bra-k))
       (format fout "/* (~{~a ~}i ~{~a ~}j|~{~a ~}|~{~a ~}k) */~%"
               bra-i ket-j op bra-k)
       (gen-code-gout3c2e fout intname raw-infix flat-script)
@@ -988,6 +1005,9 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
                           (format tmpout "envs.f_gout = &CINTgout2e_~a;~%" intname)
                           (unless (eql (factor-of raw-infix) 1)
                             (format tmpout "envs.common_factor *= ~a;~%" (factor-of raw-infix))))))
+      (write-functype-header
+        t intname (format nil "/* (~{~a ~}i |~{~a ~}|~{~a ~}j) */"
+                          bra-i op bra-k))
       (format fout "/* (~{~a ~}i |~{~a ~}|~{~a ~}j) */~%"
               bra-i op bra-k)
       (gen-code-gout2c2e fout intname raw-infix flat-script)
@@ -1111,6 +1131,9 @@ iz = idx[2+n*3];~%")
                  (member 'nabla-rinv raw-infix))
              (gen-code-gout3c1e-rinv fout intname raw-infix flat-script))
             (t (gen-code-gout3c1e fout intname raw-infix flat-script)))
+      (write-functype-header
+        t intname (format nil "/* 3-center 1-electron integral <(~{~a ~}i) (~{~a ~}j) (~{~a ~}k)> */"
+                          bra-i ket-j bra-k))
       (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_3c1e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")

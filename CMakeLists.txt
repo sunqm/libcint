@@ -112,7 +112,10 @@ endif()
 target_link_libraries(cint "-lm")
 
 install(TARGETS cint DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-install(FILES ${PROJECT_BINARY_DIR}/include/cint.h DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
+set(CintHeaders
+  ${PROJECT_SOURCE_DIR}/include/cint_funcs.h
+  ${PROJECT_BINARY_DIR}/include/cint.h)
+install(FILES ${CintHeaders} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
 
 if(ENABLE_EXAMPLE)
   enable_language(Fortran)
