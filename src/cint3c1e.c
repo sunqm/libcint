@@ -382,14 +382,22 @@ FINT CINT3c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                 FINT buf_filled;
                 double fac;
                 double *buf;
+                double *env = envs->env;
                 MALLOC_INSTACK(gctr, double, nc*n_comp);
                 MALLOC_INSTACK(buf, double, nc*n_comp);
                 for (i = 0; i < nc*n_comp; i++) {
                         gctr[i] = 0;
                 }
                 for (n = 0; n < envs->natm; n++) {
-                        if (atm(CHARGE_OF,n) != 0) {
+                        if (atm(NUC_MOD_OF,n) == FRAC_CHARGE_NUC) {
+                                fac = -env[atm(PTR_FRAC_CHARGE,n)];
+                        } else if (atm(CHARGE_OF,n) != 0) {
                                 fac = -abs(atm(CHARGE_OF,n));
+                        } else {
+                                fac = 0;
+                        }
+
+                        if (fac != 0) {
                                 buf_filled = CINT3c1e_nuc_loop_nopt(buf, envs, fac, n, cache);
                                 if (buf_filled) {
                                         for (i = 0; i < nc*n_comp; i++) {

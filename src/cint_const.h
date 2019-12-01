@@ -23,6 +23,7 @@
 #define PTR_COORD       1
 #define NUC_MOD_OF      2
 #define PTR_ZETA        3
+#define PTR_FRAC_CHARGE 3
 #define RESERVE_ATMLOT1 4
 #define RESERVE_ATMLOT2 5
 #define ATM_SLOTS       6
@@ -113,3 +114,4 @@
 
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
+#define FRAC_CHARGE_NUC 3

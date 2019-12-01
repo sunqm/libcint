@@ -230,6 +230,7 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
         FINT n;
         FINT has_value = 0;
         FINT *atm = envs->atm;
+        double *env = envs->env;
         double charge_fac;
 
         CINTdset0(nc*n_comp, gctr);
@@ -245,8 +246,14 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
                 break;
         default:
                 for (n = 0; n < envs->natm; n++) {
-                        if (atm(CHARGE_OF,n) != 0) {
+                        if (atm(NUC_MOD_OF,n) == FRAC_CHARGE_NUC) {
+                                charge_fac = -env[atm(PTR_FRAC_CHARGE,n)];
+                        } else if (atm(CHARGE_OF,n) != 0) {
                                 charge_fac = -abs(atm(CHARGE_OF,n));
+                        } else {
+                                charge_fac = 0;
+                        }
+                        if (charge_fac != 0) {
                                 has_value = CINT1e_nuc_loop(gctr, envs, charge_fac, n, cache)
                                         || has_value;
                         }

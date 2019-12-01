@@ -87,6 +87,7 @@
 #define ANG_MAX         12 // l = 0..11
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
+#define FRAC_CHARGE_NUC 3
 
 #define bas(SLOT,I)     bas[BAS_SLOTS * (I) + (SLOT)]
 #define atm(SLOT,I)     atm[ATM_SLOTS * (I) + (SLOT)]
