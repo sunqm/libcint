@@ -945,6 +945,7 @@ void CINTgout2e(double *gout, double *g, FINT *idx,
 {
         FINT nf = envs->nf;
         FINT i, ix, iy, iz, n;
+        double s;
 
         if (gout_empty) {
                 switch (envs->nrys_roots) {
@@ -1045,9 +1046,11 @@ void CINTgout2e(double *gout, double *g, FINT *idx,
                                         ix = idx[0];
                                         iy = idx[1];
                                         iz = idx[2];
-                                        gout[n] = 0;
-                                        for (i = 0; i < envs->nrys_roots; i++)
-                                                gout[n] += g[ix+i] * g[iy+i] * g[iz+i];
+                                        s = 0;
+                                        for (i = 0; i < envs->nrys_roots; i++) {
+                                                s += g[ix+i] * g[iy+i] * g[iz+i];
+                                        }
+                                        gout[n] = s;
                                 }
                                 break;
                 } // end switch nroots
@@ -1150,8 +1153,11 @@ void CINTgout2e(double *gout, double *g, FINT *idx,
                                         ix = idx[0];
                                         iy = idx[1];
                                         iz = idx[2];
-                                        for (i = 0; i < envs->nrys_roots; i++)
-                                                gout[n] += g[ix+i] * g[iy+i] * g[iz+i];
+                                        s = 0;
+                                        for (i = 0; i < envs->nrys_roots; i++) {
+                                                s += g[ix+i] * g[iy+i] * g[iz+i];
+                                        }
+                                        gout[n] += s;
                                 }
                                 break;
                 } // end switch nroots
