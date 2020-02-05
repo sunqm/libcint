@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # $Id$
 # -*- coding: utf-8
+from __future__ import print_function
 
 '''
 test libcint
@@ -160,9 +161,9 @@ def test_int1e_sph(name, vref, dim, place):
             v1 += abs(numpy.array(op[:di*dj*dim])).sum()
             cnt += di*dj*dim
     if close(v1, vref, cnt, place):
-        print "pass: ", name
+        print("pass: ", name)
     else:
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
+        print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
 
 def cdouble_to_cmplx(arr):
     return numpy.array(arr)[0::2] + numpy.array(arr)[1::2] * 1j
@@ -182,9 +183,9 @@ def test_int1e_spinor(name, vref, dim, place):
             v1 += abs(cdouble_to_cmplx(op[:di*dj*dim*2])).sum()
             cnt += di*dj*dim*2
     if close(v1, vref, cnt, place):
-        print "pass: ", name
+        print("pass: ", name)
     else:
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
+        print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
 
 def max_loc(arr):
     loc = []
@@ -222,11 +223,11 @@ def test_comp1e_spinor(name1, name_ref, shift, dim, place):
                      - cdouble_to_cmplx(op_ref[:di*dj*dim*2]).reshape(di,dj,dim))
             if numpy.round(dd, place).sum():
                 maxi = dd.argmax()
-                print "* FAIL: ", name1, "/", name_ref, ". shell:", i, j, \
+                print("* FAIL: ", name1, "/", name_ref, ". shell:", i, j, \
                         "err:", dd.flatten()[maxi], \
-                        "/", op_ref[maxi*2]+op_ref[maxi*2+1]*1j
+                        "/", op_ref[maxi*2]+op_ref[maxi*2+1]*1j)
                 return
-    print "pass: ", name1, "/", name_ref
+    print("pass: ", name1, "/", name_ref)
 
 ####################
 def test_int2e_sph(name, vref, dim, place):
@@ -248,9 +249,9 @@ def test_int2e_sph(name, vref, dim, place):
                     v1 += abs(numpy.array(op[:di*dj*dk*dl*dim])).sum()
                     cnt += di*dj*dk*dl*dim
     if close(v1, vref, cnt, place):
-        print "pass: ", name
+        print("pass: ", name)
     else:
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
+        print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
 
 def test_int2e_spinor(name, vref, dim, place):
     intor = getattr(_cint, name)
@@ -271,9 +272,9 @@ def test_int2e_spinor(name, vref, dim, place):
                     v1 += abs(cdouble_to_cmplx(op[:di*dj*dk*dl*dim*2])).sum()
                     cnt += di*dj*dk*dl*dim*2
     if close(v1, vref, cnt, place):
-        print "pass: ", name
+        print("pass: ", name)
     else:
-        print "* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref
+        print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
 
 def test_comp2e_spinor(name1, name_ref, shift, dim, place):
     intor     = getattr(_cint, name1)
@@ -309,11 +310,11 @@ def test_comp2e_spinor(name1, name_ref, shift, dim, place):
                              - cdouble_to_cmplx(op_ref[:di*dj*dk*dl*dim*2]).reshape(di,dj,dk,dl,dim))
                     if numpy.round(dd, place).sum():
                         maxi = dd.argmax()
-                        print "* FAIL: ", name1, "/", name_ref, ". shell:", i, j, k, l, \
+                        print("* FAIL: ", name1, "/", name_ref, ". shell:", i, j, k, l, \
                                 "err:", dd.flatten()[maxi], \
-                                "/", op_ref[maxi*2]+op_ref[maxi*2+1]*1j
+                                "/", op_ref[maxi*2]+op_ref[maxi*2+1]*1j)
                         return
-    print "pass: ", name1, "/", name_ref
+    print("pass: ", name1, "/", name_ref)
 
 
 
@@ -442,4 +443,4 @@ if __name__ == "__main__":
             v1 += abs(opzz-oprr[:,:,8]).sum()
             v1 += abs(opr2-oprr[:,:,0]-oprr[:,:,4]-oprr[:,:,8]).sum()
             if round(v1/(di*dj), 13):
-                print "* FAIL: ", i, j, v1
+                print("* FAIL: ", i, j, v1)
