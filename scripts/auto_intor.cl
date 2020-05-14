@@ -40,7 +40,7 @@
   '("int1e_irrp"                ( \| rc rc nabla \| ))
   '("int1e_irpr"                ( \| rc nabla rc \| ))
   '("int1e_ggovlp"              ( \| g g \|))
-  '("int1e_ggkin"               (.5 \| g g nabla dot nabla \|))
+  '("int1e_ggkin"               (.5 \| g g p dot p \|))
   '("int1e_ggnuc"               ( \| g g nuc \|))
   '("int1e_grjxp"               ( \| g r cross p \|))
   '("int1e_rinv"                (\| rinv \|))
