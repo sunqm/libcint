@@ -28,6 +28,7 @@ addons:
     - gfortran-5
     # This should provide OpenMP
     - clang-3.8
+    - libblas-dev
 script:
 - env
 - mkdir build
