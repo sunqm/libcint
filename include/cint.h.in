@@ -53,6 +53,23 @@
 #define POSY            1
 #define POSZ            2
 #define POS1            3
+// For 2-electron integral with two spin operators
+// SIGMA1X * SIGMA2X     0
+// SIGMA1Y * SIGMA2X     1
+// SIGMA1Z * SIGMA2X     2
+// I1_2x2  * SIGMA2X     3
+// SIGMA1X * SIGMA2Y     4
+// SIGMA1Y * SIGMA2Y     5
+// SIGMA1Z * SIGMA2Y     6
+// I1_2x2  * SIGMA2Y     7
+// SIGMA1X * SIGMA2Z     8
+// SIGMA1Y * SIGMA2Z     9
+// SIGMA1Z * SIGMA2Z     10
+// I1_2x2  * SIGMA2Z     11
+// SIGMA1X * I2_2x2      12
+// SIGMA1Y * I2_2x2      13
+// SIGMA1Z * I2_2x2      14
+// I1_2x2  * I2_2x2      15
 #define POSXX           0
 #define POSYX           1
 #define POSZX           2
