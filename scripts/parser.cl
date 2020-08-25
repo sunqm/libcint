@@ -550,7 +550,7 @@
     (list ts1 sf1 ts2 sf2 (vs-by-vs pv1 pv2))))
 
 (defun vs-align-merge (vs1 vs2)
-  "add two tensors/vectors, vs1 and vs2 should be aligned"
+  "sum of two tensors/vectors, vs1 and vs2 should be aligned"
   (cond ((null vs1) '())
         ((vector? vs1)
          (apply #'make-vec

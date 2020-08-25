@@ -22,6 +22,22 @@
 static const double g_trans_cart2sph[] = {
         1, /* factors of s and p are moved to CINTcommon_fac_sp */
         // px
+#ifdef PYPZPX
+        // py
+        0,
+        1,
+        0,
+        // pz
+        0,
+        0,
+        1,
+        // px
+        1,
+        0,
+        0,
+#else
+// by default, p orbitals are ordered px, py, pz
+        // px
         1,
         0,
         0,
@@ -33,6 +49,7 @@ static const double g_trans_cart2sph[] = {
         0,
         0,
         1,
+#endif
         // dxy
         0,
         1.092548430592079070,
@@ -2975,40 +2992,51 @@ static double *s_ket_cart2spheric1(double *gsph, double *gcart,
 // transform p function from cartesian to spheric
 static double *p_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
 {
-        /*
+#ifdef PYPZPX
         double *pgcart = gcart;
         FINT i;
         for (i = 0; i < nket; i++) {
-                gsph[0] = gcart[0];
-                gsph[1] = gcart[1];
-                gsph[2] = gcart[2];
-                gsph += 3;
-                gcart += 3;
+                gsph[i*nket+0] = gcart[i*nket+1];  // py
+                gsph[i*nket+1] = gcart[i*nket+2];  // pz
+                gsph[i*nket+2] = gcart[i*nket+0];  // px
         }
-        return pgcart;*/
+        return gsph;
+#else
         return gcart;
+#endif
 }
 static double *p_ket_cart2spheric(double *gsph, double *gcart,
                                   FINT lds, FINT nbra, FINT l)
 {
-        /*
+#ifdef PYPZPX
         FINT i;
         for (i = 0; i < nbra; i++) {
-                gsph[0*nbra+i] = gcart[0*nbra+i];
-                gsph[1*nbra+i] = gcart[1*nbra+i];
-                gsph[2*nbra+i] = gcart[2*nbra+i];
-        }*/
+                gsph[0*nbra+i] = gcart[1*nbra+i];  // py
+                gsph[1*nbra+i] = gcart[2*nbra+i];  // pz
+                gsph[2*nbra+i] = gcart[0*nbra+i];  // px
+        }
+        return gsph;
+#else
         return gcart;
+#endif
 }
 static double *p_ket_cart2spheric1(double *gsph, double *gcart,
                                    FINT lds, FINT nbra, FINT l)
 {
         FINT i;
+#ifdef PYPZPX
+        for (i = 0; i < nbra; i++) {
+                gsph[0*nbra+i] = gcart[1*nbra+i];  // py
+                gsph[1*nbra+i] = gcart[2*nbra+i];  // pz
+                gsph[2*nbra+i] = gcart[0*nbra+i];  // px
+        }
+#else
         for (i = 0; i < nbra; i++) {
                 gsph[0*lds+i] = gcart[0*nbra+i];
                 gsph[1*lds+i] = gcart[1*nbra+i];
                 gsph[2*lds+i] = gcart[2*nbra+i];
         }
+#endif
         return gsph;
 }
 

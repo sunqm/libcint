@@ -244,7 +244,6 @@ def weighted_rsh(kpt=numpy.zeros(3), exx=False, mesh=None):
     return coulG
 
 mydf.weighted_coulG = weighted_rsh
-cell._env[10] = zeta
 eri0 = get_eri(mydf)
 with cell.with_range_coulomb(omega):
     eri1 = cell.intor('int2e_coulerf_sph', aosym='s4', comp=1)
