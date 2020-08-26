@@ -2993,12 +2993,11 @@ static double *s_ket_cart2spheric1(double *gsph, double *gcart,
 static double *p_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
 {
 #ifdef PYPZPX
-        double *pgcart = gcart;
         FINT i;
         for (i = 0; i < nket; i++) {
-                gsph[i*nket+0] = gcart[i*nket+1];  // py
-                gsph[i*nket+1] = gcart[i*nket+2];  // pz
-                gsph[i*nket+2] = gcart[i*nket+0];  // px
+                gsph[i*3+0] = gcart[i*3+1];  // py
+                gsph[i*3+1] = gcart[i*3+2];  // pz
+                gsph[i*3+2] = gcart[i*3+0];  // px
         }
         return gsph;
 #else
@@ -8135,8 +8134,18 @@ static double *sph2e_inner(double *gsph, double *gcart,
 {
         FINT n;
         switch (l) {
+#ifdef PYPZPX
+        case 0:
+                return gcart;
+        case 1:
+                for (n = 0; n < ncall; n++) {
+                        p_ket_cart2spheric(gsph+n*sizsph, gcart+n*sizcart, nbra, nbra, l);
+                }
+                break;
+#else
         case 0: case 1:
                 return gcart;
+#endif
         case 2:
                 for (n = 0; n < ncall; n++) {
                         d_ket_cart2spheric(gsph+n*sizsph, gcart+n*sizcart, nbra, nbra, l);

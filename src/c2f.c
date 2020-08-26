@@ -4,6 +4,7 @@
  * c to fortran interface
  */
 
+#ifdef WITH_FORTRAN
 #include <stdlib.h>
 #include <math.h>
 #include "cint_bas.h"
@@ -146,3 +147,4 @@ void cintdel_optimizer_(CINTOpt **opt)
 {
         cintdel_2e_optimizer_(opt);
 }
+#endif

@@ -3,6 +3,7 @@
  *
  */
 
+#ifdef WITH_FORTRAN
 #include "config.h"
 
 #define ALL_CINT_FORTRAN_(NAME) \
@@ -54,3 +55,10 @@ FINT c##NAME##_(double *out, FINT *shls, FINT *atm, FINT *natm, \
         return NAME##_spinor((double complex *)out, NULL, shls, \
                              atm, *natm, bas, *nbas, env, NULL, NULL); \
 }
+
+#else
+
+#define ALL_CINT_FORTRAN_(NAME)
+#define ALL_CINT1E_FORTRAN_(NAME)
+
+#endif
