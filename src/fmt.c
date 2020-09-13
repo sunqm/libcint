@@ -129,27 +129,27 @@
 void gamma_inc_like(double *f, double t, FINT m)
 {
         FINT i;
-        if (t < m + 1.5) {
+        double turnover_point;
+        if (m < 3) {
+                turnover_point = m + 1.5;
+        } else {
+                turnover_point = 5;
+        }
+
+        if (t < turnover_point) {
                 double b = m + 0.5;
-                double x = 1;
-                double s = 1;
+                double bi;
                 double e = .5 * exp(-t);
-                if (t < SML_FLOAT64) {
-                        f[m] = .5 / b;
-                } else {
-                        //f[m] = fmtpse(m, t);
-                        for (i = 1; x > SML_FLOAT64; i++)
-                        {
-                                x *= t / (b + i);
-                                s += x;
-                        }
-                        f[m] = e * s / b;
+                double x = e;
+                double s = e;
+                for (bi = b + 1.; x > SML_FLOAT64; bi += 1.) {
+                        x *= t / bi;
+                        s += x;
                 }
-                if (m > 0) {
-                        for (i = m; i > 0; i--) {
-                                b -= 1;
-                                f[i-1] = (e + t * f[i]) / b;
-                        }
+                f[m] = s / b;
+                for (i = m; i > 0; i--) {
+                        b -= 1.;
+                        f[i-1] = (e + t * f[i]) / b;
                 }
         } else {
                 double pi2 = SQRTPIE4;
@@ -167,27 +167,27 @@ void gamma_inc_like(double *f, double t, FINT m)
 void lgamma_inc_like(long double *f, long double t, FINT m)
 {
         FINT i;
-        if (t < m + 1.5) {
+        long double turnover_point;
+        if (m < 3) {
+                turnover_point = m + 1.5;
+        } else {
+                turnover_point = 5;
+        }
+
+        if (t < turnover_point) {
                 long double b = m + 0.5l;
-                long double x = 1;
-                long double s = 1;
+                long double bi;
                 long double e = .5l * expl(-t);
-                if (t < SML_FLOAT80) {
-                        f[m] = .5l / b;
-                } else {
-                        //f[m] = fmtpse(m, t);
-                        for (i = 1; x > SML_FLOAT80; i++)
-                        {
-                                x *= t / (b + i);
-                                s += x;
-                        }
-                        f[m] = e * s / b;
+                long double x = e;
+                long double s = e;
+                for (bi = b + 1.; x > SML_FLOAT80; bi += 1.) {
+                        x *= t / bi;
+                        s += x;
                 }
-                if (m > 0) {
-                        for (i = m; i > 0; i--) {
-                                b -= 1;
-                                f[i-1] = (e + t * f[i]) / b;
-                        }
+                f[m] = s / b;
+                for (i = m; i > 0; i--) {
+                        b -= 1;
+                        f[i-1] = (e + t * f[i]) / b;
                 }
         } else {
                 long double pi2 = SQRTPIE4l;
@@ -206,27 +206,27 @@ void lgamma_inc_like(long double *f, long double t, FINT m)
 void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
 {
         FINT i;
-        if (t < m + 1.5) {
+        __float128 turnover_point;
+        if (m < 3) {
+                turnover_point = m + 1.5;
+        } else {
+                turnover_point = 5;
+        }
+
+        if (t < turnover_point) {
                 __float128 b = m + .5q;
-                __float128 x = 1;
-                __float128 s = 1;
+                __float128 bi;
                 __float128 e = .5q * expq(-t);
-                if (t < SML_FLOAT128) {
-                        f[m] = .5q / b;
-                } else {
-                        //f[m] = fmtpse(m, t);
-                        for (i = 1; x > SML_FLOAT128; i++)
-                        {
-                                x *= t / (b + i);
-                                s += x;
-                        }
-                        f[m] = e * s / b;
+                __float128 x = e;
+                __float128 s = e;
+                for (bi = b + 1.; x > SML_FLOAT128; bi += 1.) {
+                        x *= t / bi;
+                        s += x;
                 }
-                if (m > 0) {
-                        for (i = m; i > 0; i--) {
-                                b -= 1;
-                                f[i-1] = (e + t * f[i]) / b;
-                        }
+                f[m] = s / b;
+                for (i = m; i > 0; i--) {
+                        b -= 1;
+                        f[i-1] = (e + t * f[i]) / b;
                 }
         } else {
                 __float128 pi2 = SQRTPIE4q;
@@ -241,3 +241,69 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
         }
 }
 #endif
+
+/* This function evaluates the auxiliary integral,
+ *
+ *    _ 1           2
+ *   /     2 m  -t u
+ *   |    u    e      du,
+ *  _/  s
+ *
+ * by a power series expansion
+ *
+ * F[m] = int_l^1 u^{2m} e^{-t u^2} du
+ *      = 1/(2m+1) int e^{-t u^2} d u^{2m+1}
+ *      = 1/(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
+ *      = 1/(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
+ */
+void erfc_like(double *f, double t, double lower, FINT m)
+{
+        FINT i;
+        double turnover_point;
+        if (m < 3) {
+                turnover_point = m + .5;
+        } else {
+                turnover_point = 4;
+        }
+        turnover_point = m + 1.5;
+
+        if (t < turnover_point) {
+                double b = m + 0.5;
+                double bi;
+                double lower2 = lower * lower;
+                double e = .5 * exp(-t);
+                double e1 = .5 * exp(-t * lower2) * lower;
+                for (i = 0; i < m; i++) {
+                        e1 *= lower2;
+                }
+                double x = e;
+                double x1 = e1;
+                double s = e - e1;
+                for (bi = b + 1.; x > SML_FLOAT64; bi += 1.) {
+                        x *= t / bi;
+                        x1 *= lower2 * t / bi;
+                        s += x - x1;
+                }
+                f[m] = s / b;
+                for (i = m; i > 0; i--) {
+                        b -= 1.;
+                        e1 /= lower2;
+                        f[i-1] = (e - e1 + t * f[i]) / b;
+                }
+        } else {
+                double pi2 = SQRTPIE4;
+                double tt = sqrt(t);
+                f[0] = pi2 / tt * (erf(tt) - erf(lower * tt));
+                if (m > 0) {
+                        double lower2 = lower * lower;
+                        double e = exp(-t);
+                        double e1 = exp(-t*lower2) * lower;
+                        double b = .5 / t;
+                        for (i = 0; i < m; i++) {
+                                f[i+1] = b * ((2*i+1) * f[i] - e + e1);
+                                e1 *= lower2;
+                        }
+                }
+        }
+}
+

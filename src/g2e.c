@@ -1682,7 +1682,9 @@ error:
         fprintf(stderr, "Dimension error for CINTg0_2e_lj2d4d: iklj = %d %d %d %d",
                (FINT)envs->li_ceil, (FINT)envs->lk_ceil,
                (FINT)envs->ll_ceil, (FINT)envs->lj_ceil);
+#ifdef DEBUG
         exit(1);
+#endif
 }
 
 void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
@@ -1706,6 +1708,7 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
  */
 void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
+        FINT irys;
         const double aij = envs->aij;
         const double akl = envs->akl;
         double a0, a1, fac1, x;
@@ -1722,10 +1725,11 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 #ifdef WITH_RANGE_COULOMB
         const double omega = envs->env[PTR_RANGE_OMEGA];
         double theta = 0;
-        if (omega > 0) {
-// For long-range part of range-separated Coulomb operator
+        if (omega > 0) { // long-range part of range-separated Coulomb
                 theta = omega * omega / (omega * omega + a0);
                 a0 *= theta;
+        } else if (omega < 0) { // short-range part of range-separated Coulomb
+                theta = omega * omega / (omega * omega + a0);
         }
 #endif
 
@@ -1733,10 +1737,13 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
-        CINTrys_roots(envs->nrys_roots, x, u, w);
 
-        FINT irys;
 #ifdef WITH_RANGE_COULOMB
+        if (omega < 0) {
+                CINTerfc_rys_roots(envs->nrys_roots, x, sqrt(theta), u, w);
+        } else {
+                CINTrys_roots(envs->nrys_roots, x, u, w);
+        }
         if (omega > 0) {
                 /* u[:] = tau^2 / (1 - tau^2)
                  * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
@@ -1747,6 +1754,8 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                         u[irys] /= u[irys] + 1 - u[irys] * theta;
                 }
         }
+#else
+        CINTrys_roots(envs->nrys_roots, x, u, w);
 #endif
         if (envs->g_size == 1) {
                 g[0] = 1;
