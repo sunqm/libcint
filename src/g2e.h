@@ -27,7 +27,7 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
-void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
+int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs);
 void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 void CINTg0_2e_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);

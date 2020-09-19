@@ -142,9 +142,10 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                 } else {
                                         fac1i = fac1j*expij;
                                 }
-                                (*envs->f_g0_2e)(g, fac1i, envs);
-                                (*envs->f_gout)(gout, g, idx, envs, *gempty);
-                                PRIM2CTR0(i, gout, envs->nf*n_comp);
+                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                        (*envs->f_gout)(gout, g, idx, envs, *gempty);
+                                        PRIM2CTR0(i, gout, envs->nf*n_comp);
+                                }
 i_contracted: ;
                         } // end loop i_prim
                         if (!*iempty) {
@@ -270,9 +271,10 @@ FINT CINT3c2e_111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doub
                         for (ip = 0; ip < i_prim; ip++) {
                                 SET_RIJ;
                                 fac1i = fac1j*ci[ip]*expij;
-                                (*envs->f_g0_2e)(g, fac1i, envs);
-                                (*envs->f_gout)(gout, g, idx, envs, *empty);
-                                *empty = 0;
+                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                        (*envs->f_gout)(gout, g, idx, envs, *empty);
+                                        *empty = 0;
+                                }
 i_contracted: ;
                         } // end loop i_prim
                 } // end loop j_prim
@@ -322,9 +324,10 @@ FINT CINT3c2e_n11_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doub
                         for (ip = 0; ip < i_prim; ip++) {
                                 SET_RIJ;
                                 fac1i = fac1j*expij;
-                                (*envs->f_g0_2e)(g, fac1i, envs);
-                                (*envs->f_gout)(gout, g, idx, envs, 1);
-                                PRIM2CTR(i, gout,envs->nf*n_comp);
+                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                        (*envs->f_gout)(gout, g, idx, envs, 1);
+                                        PRIM2CTR(i, gout,envs->nf*n_comp);
+                                }
 i_contracted: ;
                         } // end loop i_prim
                 } // end loop j_prim
@@ -375,9 +378,10 @@ FINT CINT3c2e_1n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doub
                         for (ip = 0; ip < i_prim; ip++) {
                                 SET_RIJ;
                                 fac1i = fac1j*ci[ip]*expij;
-                                (*envs->f_g0_2e)(g, fac1i, envs);
-                                (*envs->f_gout)(gout, g, idx, envs, *iempty);
-                                *iempty = 0;
+                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                        (*envs->f_gout)(gout, g, idx, envs, *iempty);
+                                        *iempty = 0;
+                                }
 i_contracted: ;
                         } // end loop i_prim
                         if (!*iempty) {
@@ -467,9 +471,10 @@ FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
                                 } else {
                                         fac1i = fac1j*expij;
                                 }
-                                (*envs->f_g0_2e)(g, fac1i, envs);
-                                (*envs->f_gout)(gout, g, idx, envs, *gempty);
-                                PRIM2CTR(i, gout, envs->nf*n_comp);
+                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                        (*envs->f_gout)(gout, g, idx, envs, *gempty);
+                                        PRIM2CTR(i, gout, envs->nf*n_comp);
+                                }
 i_contracted: ;
                         } // end loop i_prim
                         if (!*iempty) {

@@ -6,13 +6,19 @@
 
 // global parameters in env
 
-#define PTR_LIGHT_SPEED         0
+// Overall cutoff for integral prescreening, value needs to be ~ln(threshold)
+#define PTR_EXPCUTOFF           0
+// R_C of (r-R_C) in dipole, GIAO operators
 #define PTR_COMMON_ORIG         1
+// R_O in 1/|r-R_O|
 #define PTR_RINV_ORIG           4
+// ZETA parameter for Gaussian charge distribution (Gaussian nuclear model)
 #define PTR_RINV_ZETA           7
-// omega parameter in range-separated coulomb operator erf(omega*r12)/r12
+// omega parameter in range-separated coulomb operator
+// LR interaction: erf(omega*r12)/r12 if omega > 0
+// SR interaction: erfc(omega*r12)/r12 if omega < 0
 #define PTR_RANGE_OMEGA         8
-// Yukawa potential and slater-type geminal e^{-zeta r}
+// Yukawa potential and Slater-type geminal e^{-zeta r}
 #define PTR_F12_ZETA            9
 // Gaussian type geminal e^{-zeta r^2}
 #define PTR_GTG_ZETA            10
@@ -101,8 +107,11 @@
 #define NPRIM_MAX       64
 #define NCTR_MAX        64
 
-#define EXPCUTOFF       100
-#define CUTOFF15        40
+#define EXPCUTOFF       60
+#ifndef MIN_EXPCUTOFF
+// ~ 1e-15
+#define MIN_EXPCUTOFF   40
+#endif
 
 #define OF_CMPLX        2
 

@@ -35,6 +35,11 @@ void CINTinit_int1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
         envs->rj = env + atm(PTR_COORD, bas(ATOM_OF, j_sh));
         envs->common_factor = 1;
+        if (env[PTR_EXPCUTOFF] == 0) {
+                envs->expcutoff = EXPCUTOFF;
+        } else {
+                envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
+        }
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];

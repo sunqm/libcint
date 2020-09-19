@@ -10,6 +10,7 @@
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "rys_roots.h"
+#include "misc.h"
 #include "g2e.h"
 
 #define DEF_GXYZ(type, G, GX, GY, GZ) \
@@ -53,6 +54,11 @@ void CINTinit_int2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->common_factor = (M_PI*M_PI*M_PI)*2/SQRTPI
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
                 * CINTcommon_fac_sp(envs->k_l) * CINTcommon_fac_sp(envs->l_l);
+        if (env[PTR_EXPCUTOFF] == 0) {
+                envs->expcutoff = EXPCUTOFF;
+        } else {
+                envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
+        }
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
@@ -1706,7 +1712,7 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
+int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
         FINT irys;
         const double aij = envs->aij;
@@ -1733,35 +1739,39 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         }
 #endif
 
-        fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
         x = a0 *(rijrkl[0] * rijrkl[0]
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
 
 #ifdef WITH_RANGE_COULOMB
         if (omega < 0) {
+                // very small erfc() leads to ~0 weights
+                if (theta * x > envs->exp_cutoff) {
+                        return 0;
+                }
                 CINTerfc_rys_roots(envs->nrys_roots, x, sqrt(theta), u, w);
         } else {
                 CINTrys_roots(envs->nrys_roots, x, u, w);
-        }
-        if (omega > 0) {
-                /* u[:] = tau^2 / (1 - tau^2)
-                 * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
-                 * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
-                 * so the rest code can be reused.
-                 */
-                for (irys = 0; irys < envs->nrys_roots; irys++) {
-                        u[irys] /= u[irys] + 1 - u[irys] * theta;
+                if (omega > 0) {
+                        /* u[:] = tau^2 / (1 - tau^2)
+                         * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
+                         * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
+                         * so the rest code can be reused.
+                         */
+                        for (irys = 0; irys < envs->nrys_roots; irys++) {
+                                u[irys] /= u[irys] + 1 - u[irys] * theta;
+                        }
                 }
         }
 #else
         CINTrys_roots(envs->nrys_roots, x, u, w);
 #endif
+        fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
         if (envs->g_size == 1) {
                 g[0] = 1;
                 g[1] = 1;
                 g[2] *= fac1;
-                return;
+                return 1;
         }
 
         double u2, tmp1, tmp2, tmp3, tmp4, tmp5;
@@ -1799,6 +1809,8 @@ void CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         }
 
         (*envs->f_g0_2d4d)(g, &bc, envs);
+
+        return 1;
 }
 
 /*

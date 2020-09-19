@@ -52,6 +52,7 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
 
         rrij = CINTsquare_dist(ri, rj);
         double fac = envs->common_factor * CINTcommon_fac_sp(i_l) * CINTcommon_fac_sp(j_l);
+        double expcutoff = envs->expcutoff;
 
         for (jp = 0; jp < j_prim; jp++) {
                 envs->aj = aj[jp];
@@ -61,7 +62,7 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
                         envs->ai = ai[ip];
                         aij = ai[ip] + aj[jp];
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
-                        if (eij > EXPCUTOFF)
+                        if (eij > expcutoff)
                                 continue;
                         has_value = 1;
 
@@ -141,6 +142,7 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
         MALLOC_INSTACK(g, double, envs->g_size * 3 * ((1<<envs->gbits)+1)); // +1 as buffer
         MALLOC_INSTACK(gout, double, nf * n_comp);
         MALLOC_INSTACK(gctri, double, nf * i_ctr * n_comp);
+        double expcutoff = envs->expcutoff;
 
         if (nuc_id < 0) {
                 cr = &env[PTR_RINV_ORIG];
@@ -161,7 +163,7 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
                         envs->ai = ai[ip];
                         aij = ai[ip] + aj[jp];
                         eij = (ai[ip] * aj[jp] / aij) * rrij;
-                        if (eij > EXPCUTOFF)
+                        if (eij > expcutoff)
                                 continue;
                         has_value = 1;
 

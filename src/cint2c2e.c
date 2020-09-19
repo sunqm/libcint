@@ -106,9 +106,10 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                         } else {
                                 fac1i = fac1k;
                         }
-                        (*envs->f_g0_2e)(g, fac1i, envs);
-                        (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
-                        PRIM2CTR0(i, gout, envs->nf*n_comp);
+                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
+                                PRIM2CTR0(i, gout, envs->nf*n_comp);
+                        }
                 } // end loop i_prim
                 if (!*iempty) {
                         PRIM2CTR0(k, gctri, envs->nf*i_ctr*n_comp);
@@ -193,9 +194,10 @@ FINT CINT2c2e_11_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doubl
                         envs->ai = ai[ip];
                         envs->aij = ai[ip];
                         fac1i = fac1k*ci[ip];
-                        (*envs->f_g0_2e)(g, fac1i, envs);
-                        (*envs->f_gout)(gout, g, envs->idx, envs, *empty);
-                        *empty = 0;
+                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                (*envs->f_gout)(gout, g, envs->idx, envs, *empty);
+                                *empty = 0;
+                        }
                 } // end loop i_prim
         } // end loop k_prim
 
@@ -237,9 +239,10 @@ FINT CINT2c2e_n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doubl
                         envs->ai = ai[ip];
                         envs->aij = ai[ip];
                         fac1i = fac1k;
-                        (*envs->f_g0_2e)(g, fac1i, envs);
-                        (*envs->f_gout)(gout, g, envs->idx, envs, 1);
-                        PRIM2CTR(i, gout, envs->nf*n_comp);
+                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                (*envs->f_gout)(gout, g, envs->idx, envs, 1);
+                                PRIM2CTR(i, gout, envs->nf*n_comp);
+                        }
                 } // end loop i_prim
         } // end loop k_prim
 
@@ -282,9 +285,10 @@ FINT CINT2c2e_1n_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doubl
                         envs->ai = ai[ip];
                         envs->aij = ai[ip];
                         fac1i = fac1k*ci[ip];
-                        (*envs->f_g0_2e)(g, fac1i, envs);
-                        (*envs->f_gout)(gout, g, envs->idx, envs, *iempty);
-                        *iempty = 0;
+                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                (*envs->f_gout)(gout, g, envs->idx, envs, *iempty);
+                                *iempty = 0;
+                        }
                 } // end loop i_prim
                 if (!*iempty) {
                         PRIM2CTR(k, gout,envs->nf*n_comp);
@@ -357,9 +361,10 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
                         } else {
                                 fac1i = fac1k;
                         }
-                        (*envs->f_g0_2e)(g, fac1i, envs);
-                        (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
-                        PRIM2CTR(i, gout, envs->nf*n_comp);
+                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
+                                PRIM2CTR(i, gout, envs->nf*n_comp);
+                        }
                 } // end loop i_prim
                 if (!*iempty) {
                         PRIM2CTR(k, gctri, envs->nf*i_ctr*n_comp);

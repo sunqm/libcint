@@ -99,6 +99,11 @@ else()
   message("P orbitals convention (px, py, pz)")
 endif(PYPZPX)
 
+if(DEFINED MIN_EXPCUTOFF)
+  message("Minimal cutoff in exponent for integral screening ${MIN_EXPCUTOFF}")
+  add_definitions(-DMIN_EXPCUTOFF=${MIN_EXPCUTOFF})
+endif()
+
 option(WITH_FORTRAN "Fortran interface" on)
 if(WITH_FORTRAN)
   add_definitions(-DWITH_FORTRAN)

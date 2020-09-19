@@ -11,6 +11,7 @@
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "rys_roots.h"
+#include "misc.h"
 #include "g2e.h"
 
 void CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
@@ -53,6 +54,11 @@ void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->common_factor = (M_PI*M_PI*M_PI)*2/SQRTPI
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l)
                 * CINTcommon_fac_sp(envs->k_l) * CINTcommon_fac_sp(envs->l_l);
+        if (env[PTR_EXPCUTOFF] == 0) {
+                envs->expcutoff = EXPCUTOFF;
+        } else {
+                envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
+        }
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
