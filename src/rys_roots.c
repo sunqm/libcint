@@ -1488,8 +1488,8 @@ static void R_dsmit(double *cs, double *s, FINT n)
     double fac, dot;
     double v[MXROOTS1];
 
-    for (i = 0; i < n; ++i) {
-        for (j = 0; j < i; ++j) {
+    for (j = 0; j < n; ++j) {
+        for (i = 0; i < n; ++i) {
             cs[i + j * MXROOTS1] = 0;
         }
     }
@@ -1497,6 +1497,9 @@ static void R_dsmit(double *cs, double *s, FINT n)
     for (j = 0; j < n; ++j) {
 
         fac = s[j + j * MXROOTS1];
+        if (fac == 0) {
+            return;
+        }
 
         for (k = 0; k < j; ++k) {
             v[k] = 0;
@@ -1539,6 +1542,15 @@ static void _rdk_rys_roots(FINT nroots, double *fmt_ints,
     double rt[nroots1];
     double *a;
     double root, poly, wsum, dum;
+
+    // to avoid numerical instability for very small fmt integrals
+    if (fmt_ints[m] == 0) {
+        for (k = 0; k < nroots; ++k) {
+            roots[k] = 0;
+            weights[k] = 0;
+        }
+        return;
+    }
 
     for (j = 0; j < nroots1; ++j) {
        for (i = 0; i < nroots1; ++i) {

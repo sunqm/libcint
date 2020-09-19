@@ -18,6 +18,7 @@
 #define SML_FLOAT80   1.0e-20
 #define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264
 #define SQRTPIE4l     .8862269254527580136490837416705725913987747280611935641069038949264l
+#define ERFC_bound    710
 
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
@@ -259,6 +260,16 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
 void erfc_like(double *f, double t, double lower, FINT m)
 {
         FINT i;
+        double lower2 = lower * lower;
+#ifdef WITH_RANGE_COULOMB
+        if (t * lower2 > ERFC_bound) {
+                for (i = 0; i <= m; i++) {
+                        f[i] = 0;
+                }
+                return;
+        }
+#endif
+
         double turnover_point;
         if (m < 3) {
                 turnover_point = m + .5;
@@ -270,7 +281,6 @@ void erfc_like(double *f, double t, double lower, FINT m)
         if (t < turnover_point) {
                 double b = m + 0.5;
                 double bi;
-                double lower2 = lower * lower;
                 double e = .5 * exp(-t);
                 double e1 = .5 * exp(-t * lower2) * lower;
                 for (i = 0; i < m; i++) {
@@ -293,9 +303,8 @@ void erfc_like(double *f, double t, double lower, FINT m)
         } else {
                 double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
-                f[0] = pi2 / tt * (erf(tt) - erf(lower * tt));
+                f[0] = pi2 / tt * (erfc(lower * tt) - erfc(tt));
                 if (m > 0) {
-                        double lower2 = lower * lower;
                         double e = exp(-t);
                         double e1 = exp(-t*lower2) * lower;
                         double b = .5 / t;
