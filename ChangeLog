@@ -1,3 +1,9 @@
+Version 4.0.0  (2020-09-23):
+	* API Change. PTR_LIGHT_SPEED is replaced with PTR_EXPCUTOFF.
+	  Integral screening parameter can be passed through env[PTR_EXPCUTOFF]
+	* Add short-range integrals for range-separation
+	* Handle linear dependency in Rys polynomial
+	* Avoid calling exit function (issue #41)
 Version 3.1.1  (2020-08-25):
 	* Fix bug in (py, pz, px) order
 Version 3.1.0  (2020-08-25):

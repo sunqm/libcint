@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 3.1.1
-2020-08-25
+version 4.0.0
+2020-09-23
 
 
 What is libcint
@@ -28,6 +28,7 @@ Features
   - Gaunt interaction
   - Breit interaction
   - 2-center, 3-center and 4-center integrals
+  - Long-range part and short-range part of range-separated Coulomb
 * Common lisp script to generate C code for new integrals.
 * Thread safe.
 * Uniform API for all kind of integrals.

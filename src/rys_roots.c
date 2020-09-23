@@ -32,62 +32,130 @@ static void rys_root2(double x, double *roots, double *weights);
 static void rys_root3(double x, double *roots, double *weights);
 static void rys_root4(double x, double *roots, double *weights);
 static void rys_root5(double x, double *roots, double *weights);
-static void R_droot(FINT nroots, double x, double *roots, double *weights);
-static void erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights);
+static int R_droot(FINT nroots, double x, double *roots, double *weights);
 #ifdef HAVE_QUADMATH_H
-static void R_qroot(FINT nroots, double x, double *roots, double *weights);
+static int R_qroot(FINT nroots, double x, double *roots, double *weights);
 #else
-static void R_lroot(FINT nroots, double x, double *roots, double *weights);
+static int R_lroot(FINT nroots, double x, double *roots, double *weights);
+#endif
+#ifdef WITH_RANGE_COULOMB
+static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights);
 #endif
 
 
 // FIXME: R_dsmit causes big errors for nroots > 13
 void CINTrys_roots(FINT nroots, double x, double *u, double *w)
 {
+        FINT error;
         switch (nroots) {
-                case 1:
-                        rys_root1(x, u, w);
-                        break;
-                case 2:
-                        rys_root2(x, u, w);
-                        break;
-                case 3:
-                        rys_root3(x, u, w);
-                        break;
-                case 4:
-                        rys_root4(x, u, w);
-                        break;
-                case 5:
-                        rys_root5(x, u, w);
-                        break;
-                case 6: case 7: case 8: case 9:
-                        R_droot(nroots, x, u, w);
-                        break;
+        case 1:
+                rys_root1(x, u, w);
+                break;
+        case 2:
+                rys_root2(x, u, w);
+                break;
+        case 3:
+                rys_root3(x, u, w);
+                break;
+        case 4:
+                rys_root4(x, u, w);
+                break;
+        case 5:
+                rys_root5(x, u, w);
+                break;
 #ifdef HAVE_QUADMATH_H
-                default:
+        case 6: case 7: case 8: case 9:
+                error = R_droot(nroots, x, u, w);
+                if (error == 1) {
                         R_qroot(nroots, x, u, w);
-#else
-                case 10: case 11: case 12: case 13:
-                        R_lroot(nroots, x, u, w);
-                        break;
-                default:
-                        fprintf(stderr, "libcint needs quadmath library to support nroots=%d\n", nroots);
+                }
+                break;
+        default:
+                error = R_qroot(nroots, x, u, w);
+                if (error == 1) {
 #ifndef KEEP_GOING
                         exit(1);
 #else
+                        fprintf(stderr, "libcint R_lroot fails. nroots=%d\n", nroots);
+#endif
+                }
+#else // QUADMATH
+        case 6: case 7: case 8: case 9:
+                error = R_droot(nroots, x, u, w);
+                if (error == 1) {
                         R_lroot(nroots, x, u, w);
+                }
+                break;
+        case 10: case 11: case 12: case 13:
+                R_lroot(nroots, x, u, w);
+                break;
+        default:
+                fprintf(stderr, "libcint needs quadmath library to support nroots=%d\n", nroots);
+#ifndef KEEP_GOING
+                exit(1);
+#else
+                error = R_lroot(nroots, x, u, w);
+                if (error == 1) {
+                        fprintf(stderr, "libcint R_lroot fails. nroots=%d\n", nroots);
+                }
 #endif
 #endif
         }
 }
 
+#ifdef WITH_RANGE_COULOMB
 /*
  * lower is the lower bound of the erfc integral
  */
+static void erfc_rys_aug_polyfits(FINT nroots, double x, double lower,
+                                  double *u, double *w, FINT turnover_point)
+{
+        int error;
+        if (lower < turnover_point) {
+                error = erfc_rys_roots(nroots, x, lower, u, w);
+        }
+        if (error == 1 || lower >= turnover_point) {
+                // call polyfits for erfc roots and weights. It has
+                // on average errors ~1e-7
+                CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+        }
+
+}
 void CINTerfc_rys_roots(FINT nroots, double x, double lower, double *u, double *w)
 {
-        erfc_rys_roots(nroots, x, lower, u, w);
+        FINT error;
+        switch (nroots) {
+        case 1: case 2: case 3: case 4:
+                error = erfc_rys_roots(nroots, x, lower, u, w);
+                if (error == 1) {
+                        CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+                }
+                break;
+        case 5:
+                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.8);
+                break;
+        case 6:
+                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                break;
+        case 7:
+                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
+                break;
+        case 8:
+                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.3);
+                break;
+        case 9: case 10: case 11: case 12: case 13:
+                CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+                break;
+        default:
+                fprintf(stderr, "libcint erfc_rys_roots does not support nroots=%d\n", nroots);
+#ifndef KEEP_GOING
+                exit(1);
+#else
+                erfc_rys_roots(nroots, x, lower, u, w);
+#endif
+        }
 }
+#endif
 
 static void rys_root1(double X, double *roots, double *weights)
 {
@@ -1457,6 +1525,7 @@ static int R_dnode(double *a, double *rt, FINT order)
 {
         const double accrt = 1e-15;
         double x0, x1, xi, x1init, p0, p1, pi, p1init;
+        double roots[order];
         FINT i, m, n;
 
         x1init = 0;
@@ -1487,10 +1556,10 @@ static int R_dnode(double *a, double *rt, FINT order)
                 }
                 // interpolate/extrapolate between [x0,x1]
                 if (p1 == 0) {
-                        rt[m] = x1;
+                        roots[m] = x1;
                         continue;
                 } else if (p0 == 0) {
-                        rt[m] = x0;
+                        roots[m] = x0;
                         continue;
                 } else {
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
@@ -1500,7 +1569,7 @@ static int R_dnode(double *a, double *rt, FINT order)
                         n++;
                         if (n > 200) {
                                 fprintf(stderr, "libcint::rys_roots NO CONV. IN R_dnode\n");
-                                return 2;
+                                return 1;
                         }
                         POLYNOMIAL_VALUE1(pi, a, order, xi);
                         if (pi == 0) {
@@ -1527,10 +1596,20 @@ static int R_dnode(double *a, double *rt, FINT order)
 
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
-                rt[m] = xi;
+                roots[m] = xi;
+        }
+        for (m = 0; m < order; ++m) {
+                rt[m] = roots[m];
         }
         return 0;
 }
+
+#define SET_ZERO(a, n, start) \
+        for (k = start; k < n; ++k) { \
+                for (i = 0; i < n; ++i) { \
+                        a[i + k * MXROOTS1] = 0; \
+                } \
+        } \
 
 static int R_dsmit(double *cs, double *fmt_ints, FINT n)
 {
@@ -1539,7 +1618,15 @@ static int R_dsmit(double *cs, double *fmt_ints, FINT n)
         double v[MXROOTS1];
 
         fac = -fmt_ints[1] / fmt_ints[0];
-        tmp = 1 / sqrt(fmt_ints[2] + fac * fmt_ints[1]);
+        tmp = fmt_ints[2] + fac * fmt_ints[1];
+        if (tmp <= 0) {
+#ifndef KEEP_GOING
+                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
+#endif
+                SET_ZERO(cs, n, 1);
+                return 1;
+        }
+        tmp = 1 / sqrt(tmp);
         cs[0+0*MXROOTS1] = 1 / sqrt(fmt_ints[0]);
         cs[0+1*MXROOTS1] = fac * tmp;
         cs[1+1*MXROOTS1] = tmp;
@@ -1562,15 +1649,11 @@ static int R_dsmit(double *cs, double *fmt_ints, FINT n)
 
                 if (fac <= 0) {
 #ifndef KEEP_GOING
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d\n", n);
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
 #endif
                         // set rest coefficients to 0
-                        for (k = j; k < n; ++k) {
-                                for (i = 0; i < n; ++i) {
-                                        cs[i + k * MXROOTS1] = 0;
-                                }
-                        }
-                        return 4;
+                        SET_ZERO(cs, n, j);
+                        return j;
                 }
                 fac = 1 / sqrt(fac);
                 cs[j + j * MXROOTS1] = fac;
@@ -1585,8 +1668,8 @@ static int R_dsmit(double *cs, double *fmt_ints, FINT n)
  * Using RDK algorithm (based on Schmidt orthogonalization to search rys roots
  * and weights
  */
-static void _rdk_rys_roots(FINT nroots, double *fmt_ints,
-                           double *roots, double *weights)
+static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
+                          double *roots, double *weights)
 {
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
@@ -1601,18 +1684,22 @@ static void _rdk_rys_roots(FINT nroots, double *fmt_ints,
                         roots[k] = 0;
                         weights[k] = 0;
                 }
-                return;
+                return 0;
         }
         if (nroots == 1) {
                 roots[k] = fmt_ints[1] / (fmt_ints[0] - fmt_ints[1]);
                 weights[k] = fmt_ints[0];
-                return;
+                return 0;
         }
 
         FINT error = R_dsmit(cs, fmt_ints, nroots1);
 #ifndef KEEP_GOING
         if (error) {
                 exit(error);
+        }
+#else
+        if (error == 1) {
+                return 1;
         }
 #endif
 
@@ -1627,9 +1714,11 @@ static void _rdk_rys_roots(FINT nroots, double *fmt_ints,
                 order = k + 1;
                 a = cs + (k + 1) * MXROOTS1;
                 error = R_dnode(a, rt, order);
-#ifndef KEEP_GOING
                 if (error) {
+#ifndef KEEP_GOING
                         exit(error);
+#else
+                        return error;
                 }
 #endif
         }
@@ -1657,23 +1746,26 @@ static void _rdk_rys_roots(FINT nroots, double *fmt_ints,
                 roots[k] = root / (1 - root);
                 weights[k] = 1 / dum;
         }
+        return 0;
 }
 
-static void R_droot(FINT nroots, double x,
-                    double roots[], double weights[])
+static int R_droot(FINT nroots, double x,
+                   double roots[], double weights[])
 {
         double fmt_ints[nroots*2+1];
         gamma_inc_like(fmt_ints, x, nroots*2);
-        _rdk_rys_roots(nroots, fmt_ints, roots, weights);
+        return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
 }
 
-static void erfc_rys_roots(FINT nroots, double x, double lower,
+#ifdef WITH_RANGE_COULOMB
+static int erfc_rys_roots(FINT nroots, double x, double lower,
                            double *roots, double *weights)
 {
         double fmt_ints[nroots*2+1];
         fmt_erfc_like(fmt_ints, x, lower, nroots*2);
-        _rdk_rys_roots(nroots, fmt_ints, roots, weights);
+        return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
 }
+#endif
 
 #ifndef HAVE_QUADMATH_H
 
@@ -1715,6 +1807,7 @@ static void R_lnode(long double *a, long double *rt, FINT order)
         const long double accrt = 1e-15;
 #endif
         long double x0, x1, xi, x1init, p0, p1, pi, p1init;
+        long double roots[order];
         FINT i, m, n;
 
         x1init = 0;
@@ -1742,11 +1835,11 @@ static void R_lnode(long double *a, long double *rt, FINT order)
                         p0 = p1init;
                 }
                 // interpolate/extrapolate between [x0,x1]
-                if (p0 == 0) {
-                        rt[m] = x0;
+                if (p1 == 0) {
+                        roots[m] = x1;
                         continue;
-                } else if (p1 == 0) {
-                        rt[m] = x1;
+                } else if (p0 == 0) {
+                        roots[m] = x0;
                         continue;
                 } else {
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
@@ -1756,7 +1849,7 @@ static void R_lnode(long double *a, long double *rt, FINT order)
                         n++;
                         if (n > 200) {
                                 fprintf(stderr, "libcint::rys_roots NO CONV. IN R_lnode\n");
-                                return 2;
+                                return 1;
                         }
                         POLYNOMIAL_VALUE1(pi, a, order, xi);
                         if (pi == 0) {
@@ -1783,18 +1876,30 @@ static void R_lnode(long double *a, long double *rt, FINT order)
 
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
-                rt[m] = xi;
+                roots[m] = xi;
         }
+        for (m = 0; m < order; ++m) {
+                rt[m] = roots[m];
+        }
+        return 0;
 }
 
-static void R_lsmit(long double *cs, long double *fmt_ints, FINT n)
+static FINT R_lsmit(long double *cs, long double *fmt_ints, FINT n)
 {
         FINT i, j, k;
         long double fac, dot, tmp;
         long double v[MXROOTS1];
 
         fac = -fmt_ints[1] / fmt_ints[0];
-        tmp = 1 / SQRTL(fmt_ints[2] + fac * fmt_ints[1]);
+        tmp = fmt_ints[2] + fac * fmt_ints[1];
+        if (tmp <= 0) {
+#ifndef KEEP_GOING
+                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
+#endif
+                SET_ZERO(cs, n, 1);
+                return 1;
+        }
+        tmp = 1 / SQRTL(tmp);
         cs[0+0*MXROOTS1] = 1 / SQRTL(fmt_ints[0]);
         cs[0+1*MXROOTS1] = fac * tmp;
         cs[1+1*MXROOTS1] = tmp;
@@ -1817,15 +1922,11 @@ static void R_lsmit(long double *cs, long double *fmt_ints, FINT n)
 
                 if (fac <= 0) {
 #ifndef KEEP_GOING
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d\n", n);
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
 #endif
                         // set rest coefficients to 0
-                        for (k = j; k < n; ++k) {
-                                for (i = 0; i < n; ++i) {
-                                        cs[i + k * MXROOTS1] = 0;
-                                }
-                        }
-                        return 4;
+                        SET_ZERO(cs, n, j);
+                        return j;
                 }
                 fac = 1 / SQRTL(fac);
                 cs[j + j * MXROOTS1] = fac;
@@ -1833,10 +1934,11 @@ static void R_lsmit(long double *cs, long double *fmt_ints, FINT n)
                         cs[k + j * MXROOTS1] = fac * v[k];
                 }
         }
+        return 0;
 }
 
-static void R_lroot(FINT nroots, double x,
-                    double roots[], double weights[])
+static int R_lroot(FINT nroots, double x,
+                   double roots[], double weights[])
 {
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
@@ -1852,13 +1954,17 @@ static void R_lroot(FINT nroots, double x,
                         roots[k] = 0;
                         weights[k] = 0;
                 }
-                return;
+                return 0;
         }
 
         FINT error = R_lsmit(cs, fmt_ints, nroots1);
 #ifndef KEEP_GOING
         if (error) {
                 exit(error);
+        }
+#else
+        if (error == 1) {
+                return 1;
         }
 #endif
 
@@ -1877,11 +1983,13 @@ static void R_lroot(FINT nroots, double x,
                 order = k + 1;
                 a = cs + (k + 1) * MXROOTS1;
                 error = R_lnode(a, rt, order);
-#ifndef KEEP_GOING
                 if (error) {
+#ifndef KEEP_GOING
                         exit(error);
-                }
+#else
+                        return error;
 #endif
+                }
         }
 
         for (k = 0; k < nroots; ++k) {
@@ -1903,6 +2011,7 @@ static void R_lroot(FINT nroots, double x,
                 roots[k] = root / (1 - root);
                 weights[k] = 1 / dum;
         }
+        return 0;
 }
 #else // defined HAVE_QUADMATH_H
 
@@ -1910,6 +2019,7 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
 {
         const __float128 accrt = 1e-20q;
         __float128 x0, x1, xi, x1init, p0, p1, pi, p1init;
+        __float128 roots[order];
         FINT i, m, n;
 
         x1init = 0;
@@ -1919,6 +2029,9 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
                 p0 = p1init;
                 x1init = rt[m];
                 POLYNOMIAL_VALUE1(p1init, a, order, x1init);
+
+                // When all coefficients a are 0, short-circuit the rest code to
+                // ensure the roots from the lower order polynomials are preserved
                 if (p1init == 0) {
                         continue;
                 }
@@ -1937,11 +2050,11 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
                         p0 = p1init;
                 }
                 // interpolate/extrapolate between [x0,x1]
-                if (p0 == 0) {
-                        rt[m] = x0;
+                if (p1 == 0) {
+                        roots[m] = x1;
                         continue;
-                } else if (p1 == 0) {
-                        rt[m] = x1;
+                } else if (p0 == 0) {
+                        roots[m] = x0;
                         continue;
                 } else {
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
@@ -1951,7 +2064,7 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
                         n++;
                         if (n > 600) {
                                 fprintf(stderr, "libcint::rys_roots NO CONV. IN R_qnode\n");
-                                return 2;
+                                return 1;
                         }
                         POLYNOMIAL_VALUE1(pi, a, order, xi);
                         if (pi == 0) {
@@ -1978,8 +2091,12 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
 
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
-                rt[m] = xi;
+                roots[m] = xi;
         }
+        for (m = 0; m < order; ++m) {
+                rt[m] = roots[m];
+        }
+        return 0;
 }
 
 static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
@@ -1989,12 +2106,20 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
         __float128 v[MXROOTS1];
 
         fac = -fmt_ints[1] / fmt_ints[0];
-        tmp = 1 / sqrtq(fmt_ints[2] + fac * fmt_ints[1]);
+        tmp = fmt_ints[2] + fac * fmt_ints[1];
+        if (tmp <= 0) {
+#ifndef KEEP_GOING
+                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
+#endif
+                SET_ZERO(cs, n, 1);
+                return 1;
+        }
+        tmp = 1 / sqrtq(tmp);
         cs[0+0*MXROOTS1] = 1 / sqrtq(fmt_ints[0]);
         cs[0+1*MXROOTS1] = fac * tmp;
         cs[1+1*MXROOTS1] = tmp;
 
-        for (i = 2; i < n; ++i) {
+        for (j = 2; j < n; ++j) {
                 for (k = 0; k < j; ++k) {
                         v[k] = 0;
                 }
@@ -2012,15 +2137,11 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
 
                 if (fac <= 0) {
 #ifndef KEEP_GOING
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrt\n");
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
 #endif
                         // set rest coefficients to 0
-                        for (k = j; k < n; ++k) {
-                                for (i = 0; i < n; ++i) {
-                                        cs[i + k * MXROOTS1] = 0;
-                                }
-                        }
-                        return 4;
+                        SET_ZERO(cs, n, j);
+                        return j;
                 }
                 fac = 1.q / sqrtq(fac);
                 cs[j + j * MXROOTS1] = fac;
@@ -2030,8 +2151,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
         }
 }
 
-static void R_qroot(FINT nroots, double x,
-                    double roots[], double weights[])
+static int R_qroot(FINT nroots, double x, double *roots, double *weights)
 {
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
@@ -2047,13 +2167,17 @@ static void R_qroot(FINT nroots, double x,
                         roots[k] = 0;
                         weights[k] = 0;
                 }
-                return;
+                return 0;
         }
 
         FINT error = R_qsmit(cs, fmt_ints, nroots1);
 #ifndef KEEP_GOING
         if (error) {
                 exit(error);
+        }
+#else
+        if (error == 1) {
+                return 1;
         }
 #endif
 
@@ -2072,11 +2196,13 @@ static void R_qroot(FINT nroots, double x,
                 order = k + 1;
                 a = cs + (k + 1) * MXROOTS1;
                 error = R_qnode(a, rt, order);
-#ifndef KEEP_GOING
                 if (error) {
+#ifndef KEEP_GOING
                         exit(error);
-                }
+#else
+                        return error;
 #endif
+                }
         }
 
         for (k = 0; k < nroots; ++k) {
@@ -2098,6 +2224,7 @@ static void R_qroot(FINT nroots, double x,
                 roots[k] = root / (1 - root);
                 weights[k] = 1 / dum;
         }
+        return 0;
 }
 
 #endif

@@ -1731,11 +1731,11 @@ int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 #ifdef WITH_RANGE_COULOMB
         const double omega = envs->env[PTR_RANGE_OMEGA];
         double theta = 0;
-        if (omega > 0) { // long-range part of range-separated Coulomb
+        if (omega != 0) {
                 theta = omega * omega / (omega * omega + a0);
-                a0 *= theta;
-        } else if (omega < 0) { // short-range part of range-separated Coulomb
-                theta = omega * omega / (omega * omega + a0);
+                if (omega > 0) { // long-range part of range-separated Coulomb
+                        a0 *= theta;
+                }
         }
 #endif
 
@@ -1744,7 +1744,7 @@ int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                + rijrkl[2] * rijrkl[2]);
 
 #ifdef WITH_RANGE_COULOMB
-        if (omega < 0) {
+        if (omega < 0) { // short-range part of range-separated Coulomb
                 // very small erfc() leads to ~0 weights
                 if (theta * x > envs->expcutoff) {
                         return 0;

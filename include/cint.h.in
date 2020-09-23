@@ -14,11 +14,14 @@
 #define FINT int
 #endif
 
+// This field is not required. Leave here as a placehold for backward compatibility
 #define PTR_EXPCUTOFF   0
 #define PTR_COMMON_ORIG 1
 #define PTR_RINV_ORIG   4
 #define PTR_RINV_ZETA   7
-// omega parameter in range-separated coulomb operator erf(omega*r12)/r12
+// omega parameter in range-separated coulomb operator
+// LR interaction: erf(omega*r12)/r12 if omega > 0
+// SR interaction: erfc(omega*r12)/r12 if omega < 0
 #define PTR_RANGE_OMEGA 8
 // Yukawa potential and slater-type geminal e^{-zeta r}
 #define PTR_F12_ZETA    9

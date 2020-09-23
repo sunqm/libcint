@@ -290,7 +290,6 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
         } else {
                 turnover_point = 4;
         }
-        turnover_point = m + 1.5;
 
         if (t < turnover_point) {
                 double b = m + 0.5;

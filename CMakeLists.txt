@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 project (cint C)
-set(cint_VERSION_MAJOR "3")
-set(cint_VERSION_MINOR "1")
-set(cint_VERSION_PATCH "1")
+set(cint_VERSION_MAJOR "4")
+set(cint_VERSION_MINOR "0")
+set(cint_VERSION_PATCH "0")
 set(cint_VERSION_TWEAK "0")
 set(cint_VERSION "${cint_VERSION_MAJOR}.${cint_VERSION_MINOR}.${cint_VERSION_PATCH}")
 set(cint_SOVERSION "${cint_VERSION_MAJOR}")
@@ -71,6 +71,7 @@ if(WITH_RANGE_COULOMB)
 # defined in config.h
 #  add_definitions(-DWITH_RANGE_COULOMB)
   message("Enabled WITH_RANGE_COULOMB")
+  set(cintSrc ${cintSrc} src/erfc_roots.c src/polyfits.c)
 endif(WITH_RANGE_COULOMB)
 
 if(WITH_COULOMB_ERF)
@@ -99,9 +100,14 @@ else()
   message("P orbitals convention (px, py, pz)")
 endif(PYPZPX)
 
-if(DEFINED MIN_EXPCUTOFF)
+if(MIN_EXPCUTOFF)
   message("Minimal cutoff in exponent for integral screening ${MIN_EXPCUTOFF}")
   add_definitions(-DMIN_EXPCUTOFF=${MIN_EXPCUTOFF})
+endif()
+
+if(KEEP_GOING)
+  message("Whether to trigger hard exit for numerical issues in Rys quadrature")
+  add_definitions(-DKEEP_GOING)
 endif()
 
 option(WITH_FORTRAN "Fortran interface" on)
@@ -143,11 +149,14 @@ if(QUADMATH_FOUND)
 endif()
 target_link_libraries(cint "-lm")
 
-install(TARGETS cint DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" COMPONENT "lib")
+
 set(CintHeaders
   ${PROJECT_SOURCE_DIR}/include/cint_funcs.h
   ${PROJECT_BINARY_DIR}/include/cint.h)
+
+install(TARGETS cint DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" COMPONENT "lib")
 install(FILES ${CintHeaders} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR} COMPONENT "dev")
+
 
 if(ENABLE_EXAMPLE)
   enable_language(Fortran)
@@ -202,7 +211,7 @@ set("CPACK_DEBIAN_DEV_PACKAGE_NAME" "${CPACK_DEBIAN_LIB_PACKAGE_NAME}-dev")
 set(CPACK_DEBIAN_LIB_PACKAGE_DEPENDS "libopenblas0-pthread")
 set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "${CPACK_DEBIAN_LIB_PACKAGE_NAME},libopenblas-pthread-dev")
 if(HAVE_QUADMATH)
-	set(CPACK_DEBIAN_LIB_PACKAGE_DEPENDS "${CPACK_DEBIAN_LIB_PACKAGE_DEPENDS},libquadmath0")
+  set(CPACK_DEBIAN_LIB_PACKAGE_DEPENDS "${CPACK_DEBIAN_LIB_PACKAGE_DEPENDS},libquadmath0")
 endif()
 
 set(CPACK_COMPONENTS_GROUPING "IGNORE")
