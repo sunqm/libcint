@@ -14,7 +14,7 @@
 #define FINT int
 #endif
 
-#define PTR_LIGHT_SPEED 0
+#define PTR_EXPCUTOFF   0
 #define PTR_COMMON_ORIG 1
 #define PTR_RINV_ORIG   4
 #define PTR_RINV_ZETA   7

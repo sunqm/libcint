@@ -1746,7 +1746,7 @@ int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 #ifdef WITH_RANGE_COULOMB
         if (omega < 0) {
                 // very small erfc() leads to ~0 weights
-                if (theta * x > envs->exp_cutoff) {
+                if (theta * x > envs->expcutoff) {
                         return 0;
                 }
                 CINTerfc_rys_roots(envs->nrys_roots, x, sqrt(theta), u, w);

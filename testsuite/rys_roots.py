@@ -1,4 +1,8 @@
-import numpy
+import mpmath
+DECIMALS = 120
+mpmath.mp.dps = DECIMALS
+
+import numpy as np
 import scipy.linalg
 import scipy.special
 
@@ -22,21 +26,22 @@ def fmt1(t, m, low=None):
 #      = 1/(2m+1) e^{-t} + (2t)/(2m+1) F[m+1]
 #      = 1/(2m+1) e^{-t} + (2t)/(2m+1)(2m+3) e^{-t} + (2t)^2/(2m+1)(2m+3) F[m+2]
 #
-    f = numpy.zeros(m+1)
-    b = m + 0.5
-    e = .5 * numpy.exp(-t)
+    b = mpmath.mpf(m + 0.5)
+    e = .5 * mpmath.exp(-t)
     x = e
     s = e
     bi = b + 1
-    while x > 1e-18:
+    while x > .1**DECIMALS:
         x *= t / bi
         s += x
         bi += 1
-    f[m] = s / b
-    for i in reversed(range(m)):
+    f = s / b
+    out = [f]
+    for i in range(m):
         b -= 1
-        f[i] = (e + t * f[i+1]) / b
-    return f
+        f = (e + t * f) / b
+        out.append(f)
+    return np.array(out)[::-1]
 
 #
 # F[m] = int u^{2m} e^{-t u^2} du
@@ -45,14 +50,15 @@ def fmt1(t, m, low=None):
 #      = 1/2t (-e^{-t} + (2m-1) F[m-1])
 #
 def fmt2(t, m, low=None):
-    f = numpy.zeros(m+1)
-    tt = numpy.sqrt(t)
-    f[0] = numpy.pi**.5/2. / tt * scipy.special.erf(tt)
-    e = numpy.exp(-t)
-    b = .5 / t
+    tt = mpmath.sqrt(t)
+    f = mpmath.pi**.5/2. / tt * mpmath.erf(tt)
+    e = mpmath.exp(-t)
+    b = mpmath.mpf('.5') / t
+    out = [f]
     for i in range(m):
-        f[i+1] = b * ((2*i+1) * f[i] - e)
-    return f
+        f = b * ((2*i+1) * f - e)
+        out.append(f)
+    return np.array(out)
 
 def fmt_erfc(t, m, low=0):
     if m > 3:
@@ -66,31 +72,41 @@ def fmt_erfc(t, m, low=0):
         return fmt2_erfc(t, m, low)
 
 def fmt1_erfc(t, m, low=0):
+#             _ 1           2
+#            /     2 m  -t u
+# F (t)  =   |    u    e      du,
+#  m        _/  s
+#
 #
 # F[m] = int_s^1 u^{2m} e^{-t u^2} du
 #      = 1/(2m+1) int e^{-t u^2} d u^{2m+1}
 #      = 1/(2m+1) [e^{-t u^2} u^{2m+1}]_s^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
 #      = 1/(m+.5) (.5*e^{-t} - .5*e^{-t s^2} s^{2m+1}) + t F[m+1])
 #
-    f = numpy.zeros(m+1)
-    b = m + 0.5
-    e = .5 * numpy.exp(-t)
-    e1 = .5 * numpy.exp(-t * low**2) * low**(2*m+1)
+    low = mpmath.mpf(low)
+    b = mpmath.mpf(m + 0.5)
+    e = .5 * mpmath.exp(-t)
+    e1 = .5 * mpmath.exp(-t * low*low) * mpmath.power(low, 2*m+1)
     x = e
     x1 = e1
     s = e - e1
-    bi = b + 1
-    while x > 1e-18:
-        x *= t / bi
-        x1 *= low**2 * t / bi
-        s += x - x1
+    bi = b
+    div = mpmath.mpf(1)
+    delta = s
+    while abs(delta) > .1**DECIMALS:
         bi += 1
-    f[m] = s / b
-    for i in reversed(range(m)):
+        div *= t / bi
+        x1 *= low*low
+        delta = (x - x1) * div
+        s += delta
+    f = s / b
+    out = [f]
+    for i in range(m):
         b -= 1
-        e1 /= low**2
-        f[i] = (e - e1 + t * f[i+1]) / b
-    return f
+        e1 /= low*low
+        f = (e - e1 + t * f) / b
+        out.append(f)
+    return np.array(out)[::-1]
 
 #
 # F[m] = int_s^1 u^{2m} e^{-t u^2} du
@@ -100,16 +116,19 @@ def fmt1_erfc(t, m, low=0):
 # F[0] = int_s^1 e^{-t u^2} du
 #
 def fmt2_erfc(t, m, low=0):
-    f = numpy.zeros(m+1)
-    tt = numpy.sqrt(t)
-    f[0] = numpy.pi**.5/2. / tt * (scipy.special.erf(tt) - scipy.special.erf(low*tt))
-    e = numpy.exp(-t)
-    e1 = numpy.exp(-t*low**2) * low
-    b = .5 / t
+    tt = mpmath.sqrt(t)
+    low = mpmath.mpf(low)
+    low2 = low * low
+    f = mpmath.sqrt(mpmath.pi)/2. / tt * (mpmath.erf(tt) - mpmath.erf(low*tt))
+    e = mpmath.exp(-t)
+    e1 = mpmath.exp(-t*low2) * low
+    b = mpmath.mpf('.5') / t
+    out = [f]
     for i in range(m):
-        f[i+1] = b * ((2*i+1) * f[i] - e + e1)
-        e1 *= low**2
-    return f
+        f = b * ((2*i+1) * f - e + e1)
+        e1 *= low2
+        out.append(f)
+    return np.array(out)
 ########################################
 
 
@@ -119,17 +138,23 @@ def poly_value1(a, order, x):
         p = p * x + a[order-i]
     return p
 
-def R_dnode(a, rt):
-    #TODO: a several step bisection search followed by Newton-Raphson refinement. 
-    order = a.size - 1
-    accrt = 1e-15
+def zeros(shape):
+    if isinstance(shape, int):
+        size = shape
+    else:
+        size = np.prod(shape)
+    return np.array([mpmath.mpf(0)] * size).reshape(shape)
 
-    x1init = 0
-    p1init = a[0]
+ACCRT = mpmath.power(.1, DECIMALS)
+def R_dnode(a, rt):
+    order = a.size - 1
+
+    x1init = mpmath.mpf(0)
+    p1init = mpmath.mpf(a[0])
     for m in range(order):
         x0 = x1init
         p0 = p1init
-        x1init = rt[m]
+        x1init = mpmath.mpf(rt[m])
         p1init = poly_value1(a, order, x1init)
         if (p0 * p1init > 0):
             raise RuntimeError
@@ -153,13 +178,13 @@ def R_dnode(a, rt):
             xi = x0 + (x0 - x1) / (p1 - p0) * p0
 
         n = 0
-        while (x1 > accrt+x0) or (x0 > x1+accrt):
+        while (x1 > ACCRT+x0) or (x0 > x1+ACCRT):
             n += 1
-            if (n > 600):
+            if (n > 1000):
                 raise RuntimeError
 
             pi = poly_value1(a, order, xi)
-            if (pi == 0):
+            if (-ACCRT < pi < ACCRT):
                 break
             elif (p0 * pi <= 0):
                 x1 = xi
@@ -171,7 +196,7 @@ def R_dnode(a, rt):
                 xi = xi * .75 + x1 * .25
 
             pi = poly_value1(a, order, xi)
-            if (pi == 0):
+            if (-ACCRT < pi < ACCRT):
                 break
             elif (p0 * pi <= 0):
                 x1 = xi
@@ -185,45 +210,51 @@ def R_dnode(a, rt):
     return rt
 
 def R_dsmit(s, n):
-    cs = numpy.zeros_like(s)
+    cs = zeros(s.shape)
     for j in range(n):
         fac = s[j,j]
-        v = numpy.zeros(j)
+        v = zeros(j)
         for k in range(j):
             dot = cs[:j+1,k].dot(s[:j+1,j])
             v -= dot * cs[:j,k]
             fac = fac - dot * dot
 
-        fac = fac ** -.5
+        if fac <= 0:
+            raise RuntimeError(str(fac))
+        fac = 1 / mpmath.sqrt(fac)
         cs[j,j] = fac
         cs[:j,j] = fac * v[:j]
     return cs
 
-def rys_root(nroots, x, ff=None):
-    if ff is None:
+def rys_roots_weights_partial(nroots, x, low=None):
+    if low is None:
         ff = fmt(x, nroots*2)
+    else:
+        ff = fmt_erfc(x, nroots*2, low)
+
+    if ff[0] < .1**(DECIMALS/4):
+        return zeros(nroots), zeros(nroots)
 
     nroots1 = nroots + 1
-    s = numpy.zeros((nroots1, nroots1))
+    s = zeros((nroots1, nroots1))
     for j in range(nroots1):
         for i in range(nroots1):
             s[i, j] = ff[i + j]
 
     cs = R_dsmit(s, nroots1)
-    rt = numpy.ones(nroots1)
+    rt = np.array([mpmath.mpf(1)] * nroots1)
 
     if nroots == 1:
         rt[0] = ff[1] / ff[0]
     else:
-        dum = numpy.sqrt(cs[1,2] * cs[1,2] - 4 * cs[0,2] * cs[2,2])
+        dum = mpmath.sqrt(cs[1,2] * cs[1,2] - 4 * cs[0,2] * cs[2,2])
         rt[0] = .5 * (-cs[1,2] - dum) / cs[2,2]
         rt[1] = .5 * (-cs[1,2] + dum) / cs[2,2]
 
     for k in range(2, nroots):
         R_dnode(cs[:k+2,k+1], rt)
 
-    roots = numpy.zeros(nroots)
-    weights = numpy.zeros(nroots)
+    weights = zeros(nroots)
     for i in range(nroots):
         root = rt[i]
         dum = 1 / ff[0]
@@ -231,5 +262,9 @@ def rys_root(nroots, x, ff=None):
             poly = poly_value1(cs[:j+1,j], j, root)
             dum += poly * poly
         weights[i] = 1 / dum
-        roots[i] = root / (1 - root)
+    return rt[:nroots], weights
+
+def rys_roots_weights(nroots, x, low=None):
+    rt, weights = rys_roots_weights_partial(nroots, x, low)
+    roots = rt / (1 - rt)
     return roots, weights

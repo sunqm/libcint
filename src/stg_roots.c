@@ -350,6 +350,7 @@ static void _clenshaw_d1(double *rr, const double *x, double u, FINT nroot)
 static void _matmul_14_14(double *imc, double *im, FINT nroot)
 {
     double o7 = 0.14285714285714285714;
+    double s;
     double d0[14];
     FINT i, j;
     for (i = 0; i < nroot; i++) {
@@ -368,20 +369,21 @@ static void _matmul_14_14(double *imc, double *im, FINT nroot)
         d0[12] = 0;
         d0[13] = 0;
         for (j = 0; j < 14; j++) {
-            d0[0 ] += im[j+14*i] * COS_14_14[j*14+0 ];
-            d0[1 ] += im[j+14*i] * COS_14_14[j*14+1 ];
-            d0[2 ] += im[j+14*i] * COS_14_14[j*14+2 ];
-            d0[3 ] += im[j+14*i] * COS_14_14[j*14+3 ];
-            d0[4 ] += im[j+14*i] * COS_14_14[j*14+4 ];
-            d0[5 ] += im[j+14*i] * COS_14_14[j*14+5 ];
-            d0[6 ] += im[j+14*i] * COS_14_14[j*14+6 ];
-            d0[7 ] += im[j+14*i] * COS_14_14[j*14+7 ];
-            d0[8 ] += im[j+14*i] * COS_14_14[j*14+8 ];
-            d0[9 ] += im[j+14*i] * COS_14_14[j*14+9 ];
-            d0[10] += im[j+14*i] * COS_14_14[j*14+10];
-            d0[11] += im[j+14*i] * COS_14_14[j*14+11];
-            d0[12] += im[j+14*i] * COS_14_14[j*14+12];
-            d0[13] += im[j+14*i] * COS_14_14[j*14+13];
+            s = im[j+14*i];
+            d0[0 ] += s * COS_14_14[j*14+0 ];
+            d0[1 ] += s * COS_14_14[j*14+1 ];
+            d0[2 ] += s * COS_14_14[j*14+2 ];
+            d0[3 ] += s * COS_14_14[j*14+3 ];
+            d0[4 ] += s * COS_14_14[j*14+4 ];
+            d0[5 ] += s * COS_14_14[j*14+5 ];
+            d0[6 ] += s * COS_14_14[j*14+6 ];
+            d0[7 ] += s * COS_14_14[j*14+7 ];
+            d0[8 ] += s * COS_14_14[j*14+8 ];
+            d0[9 ] += s * COS_14_14[j*14+9 ];
+            d0[10] += s * COS_14_14[j*14+10];
+            d0[11] += s * COS_14_14[j*14+11];
+            d0[12] += s * COS_14_14[j*14+12];
+            d0[13] += s * COS_14_14[j*14+13];
         }
         imc[0 +14*i] = o7 * d0[0 ];
         imc[1 +14*i] = o7 * d0[1 ];

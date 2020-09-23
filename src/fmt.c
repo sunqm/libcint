@@ -18,7 +18,7 @@
 #define SML_FLOAT80   1.0e-20
 #define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264
 #define SQRTPIE4l     .8862269254527580136490837416705725913987747280611935641069038949264l
-#define ERFC_bound    710
+#define ERFC_bound    705
 
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
@@ -243,6 +243,19 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
 }
 #endif
 
+inline double _pow(double base, FINT exponent)
+{
+        FINT i;
+        double result = 1;
+        for (i = 1; i <= exponent; i <<= 1) {
+                if (i & exponent) {
+                        result *= base;
+                }
+                base *= base;
+        }
+        return result;
+}
+
 /* This function evaluates the auxiliary integral,
  *
  *    _ 1           2
@@ -257,11 +270,12 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
  *      = 1/(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
  *      = 1/(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
  */
-void erfc_like(double *f, double t, double lower, FINT m)
+void fmt_erfc_like(double *f, double t, double lower, FINT m)
 {
         FINT i;
         double lower2 = lower * lower;
 #ifdef WITH_RANGE_COULOMB
+        // F[m] < .5*sqrt(pi/t) * erfc(low*tt)
         if (t * lower2 > ERFC_bound) {
                 for (i = 0; i <= m; i++) {
                         f[i] = 0;
@@ -283,34 +297,40 @@ void erfc_like(double *f, double t, double lower, FINT m)
                 double bi;
                 double e = .5 * exp(-t);
                 double e1 = .5 * exp(-t * lower2) * lower;
-                for (i = 0; i < m; i++) {
-                        e1 *= lower2;
-                }
+                e1 *= _pow(lower2, m);
                 double x = e;
                 double x1 = e1;
                 double s = e - e1;
-                for (bi = b + 1.; x > SML_FLOAT64; bi += 1.) {
-                        x *= t / bi;
-                        x1 *= lower2 * t / bi;
-                        s += x - x1;
+                double div = 1;
+                double delta = s;
+                for (bi = b + 1.; fabs(delta) > SML_FLOAT64; bi += 1.) {
+                        div *= t / bi;
+                        x1 *= lower2;
+                        delta = (x - x1) * div;
+                        s += delta;
                 }
-                f[m] = s / b;
+                double val = s / b;
+                f[m] = val;
                 for (i = m; i > 0; i--) {
                         b -= 1.;
                         e1 /= lower2;
-                        f[i-1] = (e - e1 + t * f[i]) / b;
+                        val = (e - e1 + t * val) / b;
+                        f[i-1] = val;
                 }
         } else {
                 double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
-                f[0] = pi2 / tt * (erfc(lower * tt) - erfc(tt));
+                // erfc(a) - erfc(b) is more accurate than erf(b) - erf(a)
+                double val = pi2 / tt * (erfc(lower * tt) - erfc(tt));
+                f[0] = val;
                 if (m > 0) {
                         double e = exp(-t);
                         double e1 = exp(-t*lower2) * lower;
                         double b = .5 / t;
                         for (i = 0; i < m; i++) {
-                                f[i+1] = b * ((2*i+1) * f[i] - e + e1);
+                                val = b * ((2*i+1) * val - e + e1);
                                 e1 *= lower2;
+                                f[i+1] = val;
                         }
                 }
         }
