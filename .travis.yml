@@ -40,7 +40,7 @@ script:
 - export CMAKE_C_FLAGS="-O3 -fopenmp"
 - export CMAKE_CXX_FLAGS="-O3 -fopenmp"
 - echo 'if the following fails, use `cmake --debug-output ..` instead'
-- cmake .. -DENABLE_TEST=1 -DQUICK_TEST=1
+- cmake -DWITH_RANGE_COULOMB=1 .. -DENABLE_TEST=1 -DQUICK_TEST=1
 - make
 - echo 'cannot do `make test` right now'
 after_failure:

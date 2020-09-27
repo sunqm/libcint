@@ -108,7 +108,7 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
  * lower is the lower bound of the erfc integral
  */
 static void erfc_rys_aug_polyfits(FINT nroots, double x, double lower,
-                                  double *u, double *w, FINT turnover_point)
+                                  double *u, double *w, double turnover_point)
 {
         int error;
         if (lower < turnover_point) {
@@ -1719,8 +1719,8 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
                         exit(error);
 #else
                         return error;
-                }
 #endif
+                }
         }
 
         for (k = 0; k < nroots; ++k) {
@@ -1749,8 +1749,7 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
         return 0;
 }
 
-static int R_droot(FINT nroots, double x,
-                   double roots[], double weights[])
+static int R_droot(FINT nroots, double x, double *roots, double *weights)
 {
         double fmt_ints[nroots*2+1];
         gamma_inc_like(fmt_ints, x, nroots*2);
@@ -1758,8 +1757,7 @@ static int R_droot(FINT nroots, double x,
 }
 
 #ifdef WITH_RANGE_COULOMB
-static int erfc_rys_roots(FINT nroots, double x, double lower,
-                           double *roots, double *weights)
+static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights)
 {
         double fmt_ints[nroots*2+1];
         fmt_erfc_like(fmt_ints, x, lower, nroots*2);
@@ -1799,7 +1797,7 @@ static long double c99_expl(long double x)
 #define EXPL    c99_expl
 #endif
 
-static void R_lnode(long double *a, long double *rt, FINT order)
+static int R_lnode(long double *a, long double *rt, FINT order)
 {
 #ifdef LDBL_MANT_DIG
         const long double accrt = LDBL_EPSILON*10;
