@@ -14,7 +14,6 @@
 #define FINT int
 #endif
 
-// This field is not required. Leave here as a placehold for backward compatibility
 #define PTR_EXPCUTOFF   0
 #define PTR_COMMON_ORIG 1
 #define PTR_RINV_ORIG   4

@@ -5,6 +5,7 @@
  */
 
 // global parameters in env
+// Overall cutoff for integral prescreening, value needs to be ~ln(threshold)
 #define PTR_EXPCUTOFF           0
 // R_C of (r-R_C) in dipole, GIAO operators
 #define PTR_COMMON_ORIG         1
@@ -20,7 +21,6 @@
 #define PTR_F12_ZETA            9
 // Gaussian type geminal e^{-zeta r^2}
 #define PTR_GTG_ZETA            10
-// Overall cutoff for integral prescreening, value needs to be ~ln(threshold)
 #define PTR_ENV_START           20
 
 // slots of atm

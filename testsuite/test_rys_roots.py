@@ -187,7 +187,7 @@ def test_rys_roots_vs_polyfit():
 
 if __name__ == '__main__':
     # test_rys_roots_mpmath()
-    # test_polyfit()
+    test_polyfit()
     # test_rys_roots_vs_polyfit()
-    test_rys_roots_weights()
-    test_rys_roots_weights_erfc()
+    #test_rys_roots_weights()
+    #test_rys_roots_weights_erfc()

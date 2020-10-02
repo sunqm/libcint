@@ -223,7 +223,7 @@ void _CINT_clenshaw_dc(double *rr, const double *x, double u, FINT nroot)
                 }
                 for (k = 11; k >= 1; k-=2) {
                         for (j = 0; j < 14; j++) {
-                                d[j] = u2 * g[j] - d[j] + x[(k+1)*14+j ];
+                                d[j] = u2 * g[j] - d[j] + x[(k+1)*14+j];
                         }
                         for (j = 0; j < 14; j++){
                                 g[j] = u2 * d[j] - g[j] + x[k*14+j];

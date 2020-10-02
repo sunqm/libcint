@@ -57,7 +57,7 @@ def tabulate_erfc(nroots, tbase):
     Tp = (Tmin + Tmax) / 2
 
     tabulate_points = get_tabulate_points(tbase, Tp)
-    boundary_points = [(r/2 + 0.5)**2 for r in chebrt]
+    boundary_points = [r/2 + 0.5 for r in chebrt]
 
     fac = mpmath.mpf(2) / ngrids
 
@@ -71,9 +71,9 @@ def tabulate_erfc(nroots, tbase):
     rs = np.array(rs).reshape(ngrids, ngrids, nroots)
     ws = np.array(ws).reshape(ngrids, ngrids, nroots)
 
-    # einsum('ikn,jk->nji', rs, cs)
-    tab_rs = np.array([rs[:,:,ir].dot(cs.T).T * fac for ir in range(nroots)])
-    tab_ws = np.array([ws[:,:,ir].dot(cs.T).T * fac for ir in range(nroots)])
+    # einsum('lkn,il,jk->nji', rs, cs)
+    tab_rs = np.array([cs.dot(rs[:,:,ir]).dot(cs.T).T * fac**2 for ir in range(nroots)])
+    tab_ws = np.array([cs.dot(ws[:,:,ir]).dot(cs.T).T * fac**2 for ir in range(nroots)])
     return tab_rs, tab_ws
 
 def clenshaw_d1(x, u, nroots):
@@ -112,11 +112,6 @@ def polyfit_erf(nroots, x):
     rr = [r/(1-r) for r in rr]
     return rr, ww
 
-def intermediate(im):
-    # einsum('ij,kj->ik',im, cs)
-    fac = mpmath.mpf(2) / ngrids
-    return np.asarray(im).dot(cs.T) * fac
-
 def polyfit_erfc(nroots, x, low):
     t = x
     if t > 19682.99:
@@ -134,13 +129,11 @@ def polyfit_erfc(nroots, x, low):
 
     tab_rs, tab_ws = tabulate_erfc(nroots, it)
     im = clenshaw_d1(tab_rs.astype(float), u, nroots)
-    imc = intermediate(im)
-    rr = clenshaw_d1(imc, tt, nroots)
+    rr = clenshaw_d1(im, tt, nroots)
     rr = [r/(1-r) for r in rr]
 
     im = clenshaw_d1(tab_ws.astype(float), u, nroots)
-    imc = intermediate(im)
-    ww = clenshaw_d1(imc, tt, nroots)
+    ww = clenshaw_d1(im, tt, nroots)
     return rr, ww
 
 def generate_table(path):
