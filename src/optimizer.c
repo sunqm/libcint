@@ -62,16 +62,6 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 free(opt0->cceij);
         }
 
-        if (opt0->non0ctr != NULL) {
-                free(opt0->non0ctr);
-                for (i = 0; i < opt0->tot_prim; i++) {
-                        free(opt0->non0idx[i]);
-                        free(opt0->non0coeff[i]);
-                }
-                free(opt0->non0idx);
-                free(opt0->non0coeff);
-        }
-
         if (opt0->prim_offset != NULL) {
                 free(opt0->prim_offset);
         }
@@ -192,7 +182,6 @@ void CINTall_1e_optimizer(CINTOpt **opt, FINT *ng,
                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int1e_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -202,7 +191,6 @@ void CINTall_2e_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2e_EnvVars, &CINTg2e_index_xyz,
                 4, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -212,7 +200,6 @@ void CINTall_3c2e_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int3c2e_EnvVars, &CINTg2e_index_xyz,
                 3, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -221,7 +208,6 @@ void CINTall_2c2e_optimizer(CINTOpt **opt, FINT *ng,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2c2e_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -232,7 +218,6 @@ void CINTall_3c1e_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int3c1e_EnvVars, &CINTg3c1e_index_xyz,
                 3, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -245,7 +230,6 @@ void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2e_stg_EnvVars, &CINTg2e_index_xyz,
                 4, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -257,7 +241,6 @@ void CINTall_2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2e_gtg_EnvVars, &CINTg2e_index_xyz,
                 4, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -267,7 +250,6 @@ void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int3c2e_gtg_EnvVars, &CINTg2e_index_xyz,
                 3, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -276,7 +258,6 @@ void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
                                 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2c2e_gtg_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
 }
@@ -385,48 +366,30 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
         }
 }
 
-void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
-                           FINT *bas, FINT nbas, double *env)
+void CINTOpt_non0coeff_byshell(FINT *sortedidx, FINT *non0ctr, double *ci,
+                               FINT iprim, FINT ictr)
 {
-        FINT i, j, k, ip, io;
-        if (opt->prim_offset == NULL) {
-                opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
-                opt->tot_prim = 0;
-                for (i = 0; i < nbas; i++) {
-                        opt->prim_offset[i] = opt->tot_prim;
-                        opt->tot_prim += bas(NPRIM_OF, i);
-                }
-        }
-
-        FINT iprim, ictr;
-        double *ci;
-        double *non0coeff;
-        FINT *non0idx;
-        opt->non0ctr = (FINT *)malloc(sizeof(FINT) * opt->tot_prim);
-        opt->non0idx = (FINT **)malloc(sizeof(FINT *) * opt->tot_prim);
-        opt->non0coeff = (double **)malloc(sizeof(double *) * opt->tot_prim);
-        for (i = 0; i < nbas; i++) {
-                io = opt->prim_offset[i];
-                iprim = bas(NPRIM_OF,i);
-                ictr = bas(NCTR_OF,i);
-                ci = env + bas(PTR_COEFF,i);
-                for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
-                        non0idx = (FINT *)malloc(sizeof(FINT) * ictr);
-                        non0coeff = (double *)malloc(sizeof(double) * ictr);
-                        opt->non0idx[io+ip] = non0idx;
-                        opt->non0coeff[io+ip] = non0coeff;
-
-                        for (j = 0, k = 0; j < ictr; j++) {
-                                if (ci[iprim*j+ip] != 0) {
-                                        non0coeff[k] = ci[iprim*j+ip];
-                                        non0idx[k] = j;
-                                        k++;
-                                }
+        FINT ip, j, k, kp;
+        FINT zeroidx[ictr];
+        for (ip = 0; ip < iprim; ip++) {
+                for (j = 0, k = 0, kp = 0; j < ictr; j++) {
+                        if (ci[iprim*j+ip] != 0) {
+                                sortedidx[k] = j;
+                                k++;
+                        } else {
+                                zeroidx[kp] = j;
+                                kp++;
                         }
-                        opt->non0ctr[io+ip] = k;
                 }
+// Append the index of zero-coeff to sortedidx for function CINTprim_to_ctr_0
+                for (j = 0; j < kp; j++) {
+                        sortedidx[k+j] = zeroidx[j];
+                }
+                non0ctr[ip] = k;
+                sortedidx += ictr;
         }
 }
+
 
 void CINTdel_pairdata_optimizer(CINTOpt *cintopt)
 {

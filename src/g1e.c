@@ -404,95 +404,56 @@ void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
         }
 }
 
-/* optimized
- * memset(gc, 0, sizeof(double)*nf*nctr);
- * CINTprim_to_ctr(gc, nf, gp, 1, nprim, nprim, nctr, coeff); */
-void CINTprim_to_ctr_0(double *gc, FINT nf, double *gp,
-                       FINT nprim, FINT nctr, double *coeff)
+void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, FINT nf,
+                       FINT nprim, FINT nctr, int non0ctr, int *sortedidx)
 {
         FINT n, i;
         double c0, c1;
         double *p0, *p1;
-        double non0coeff[32];
-        double *non0pgc[32];
-        FINT ncoeff = 0;
 
-        for (i = 0; i < nctr; i++) {
-                if (coeff[nprim*i] != 0) {
-                        non0coeff[ncoeff] = coeff[nprim*i];
-                        non0pgc[ncoeff] = gc + nf * i;
-                        ncoeff++;
-                } else { // need to initialize the memory, since += is used later
-                        memset(gc+nf*i, 0, sizeof(double)*nf);
-                }
-        }
-
-        for (i = 0; i < ncoeff-1; i+=2) {
-                c0 = non0coeff[i  ];
-                c1 = non0coeff[i+1];
-                p0 = non0pgc[i  ];
-                p1 = non0pgc[i+1];
+        for (i = 0; i < nctr-1; i+=2) {
+                c0 = coeff[nprim* i];
+                c1 = coeff[nprim*(i+1)];
+                p0 = gc + nf * i;
+                p1 = p0 + nf;
                 for (n = 0; n < nf; n++) {
                         p0[n] = c0 * gp[n];
                         p1[n] = c1 * gp[n];
                 }
         }
-        if (i < ncoeff) {
-                c0 = non0coeff[i];
-                p0 = non0pgc[i];
+        if (i < nctr) {
+                c0 = coeff[nprim* i];
+                p0 = gc + nf * i;
                 for (n = 0; n < nf; n++) {
                         p0[n] = c0 * gp[n];
                 }
         }
 }
 
-/* optimized
- * CINTprim_to_ctr(gc, nf, gp, 1, nprim, nprim, nctr, coeff);
- * with opt->non0coeff, opt->non0idx, opt->non0ctr */
-void CINTprim_to_ctr_opt(double *gc, FINT nf, double *gp,
-                         double *non0coeff, FINT *non0idx, FINT non0ctr)
+void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, FINT nf,
+                       FINT nprim, FINT nctr, int non0ctr, int *sortedidx)
 {
-        FINT n, i;
+        FINT n, i, k;
         double c0, c1;
         double *p0, *p1;
 
         for (i = 0; i < non0ctr-1; i+=2) {
-                c0 = non0coeff[i  ];
-                c1 = non0coeff[i+1];
-                p0 = gc + nf*non0idx[i  ];
-                p1 = gc + nf*non0idx[i+1];
+                c0 = coeff[nprim*sortedidx[i]];
+                c1 = coeff[nprim*sortedidx[i+1]];
+                p0 = gc + nf * sortedidx[i];
+                p1 = gc + nf * sortedidx[i+1];
                 for (n = 0; n < nf; n++) {
                         p0[n] += c0 * gp[n];
                         p1[n] += c1 * gp[n];
                 }
         }
         if (i < non0ctr) {
-                c0 = non0coeff[i];
-                p0 = gc + nf*non0idx[i];
+                c0 = coeff[nprim*sortedidx[i]];
+                p0 = gc + nf * sortedidx[i];
                 for (n = 0; n < nf; n++) {
                         p0[n] += c0 * gp[n];
                 }
         }
-}
-
-/* optimized
- * CINTprim_to_ctr(gc, nf, gp, 1, nprim, nprim, nctr, coeff); */
-void CINTprim_to_ctr_1(double *gc, FINT nf, double *gp,
-                       FINT nprim, FINT nctr, double *coeff)
-{
-        FINT i;
-        double non0coeff[32];
-        FINT non0idx[32];
-        FINT non0ctr = 0;
-
-        for (i = 0; i < nctr; i++) {
-                if (coeff[nprim*i] != 0) {
-                        non0coeff[non0ctr] = coeff[nprim*i];
-                        non0idx[non0ctr] = i;
-                        non0ctr++;
-                }
-        }
-        CINTprim_to_ctr_opt(gc, nf, gp, non0coeff, non0idx, non0ctr);
 }
 
 /*

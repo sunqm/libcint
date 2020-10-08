@@ -32,6 +32,9 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
 void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
                            FINT *bas, FINT nbas, double *env);
 
+void CINTOpt_non0coeff_byshell(int *sortedidx, int *non0ctr, double *ci,
+                               int iprim, int ictr);
+
 void CINTOpt_4cindex_xyz(CINTOpt *opt, FINT *ng,
                          FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTOpt_3cindex_xyz(CINTOpt *opt, FINT *ng,

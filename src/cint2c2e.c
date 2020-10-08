@@ -21,11 +21,15 @@ FINT int1e_cache_size(CINTEnvVars *envs);
 #define PRIM2CTR0(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
-                        CINTprim_to_ctr_0(gctr##ctrsymb, ngp, gp, ctrsymb##_prim, \
-                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
+                        CINTprim_to_ctr_0(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
+                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
+                                          non0ctr##ctrsymb[ctrsymb##p], \
+                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
                 } else { \
-                        CINTprim_to_ctr_1(gctr##ctrsymb, ngp, gp, ctrsymb##_prim, \
-                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
+                        CINTprim_to_ctr_1(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
+                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
+                                          non0ctr##ctrsymb[ctrsymb##p], \
+                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
                 } \
         } \
         *ctrsymb##empty = 0
@@ -87,6 +91,16 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
 
         envs->idx = (FINT *)malloc(sizeof(FINT) * envs->nf * 3);
         CINTg1e_index_xyz(envs->idx, envs);
+        FINT non0idxi[i_prim*i_ctr];
+        FINT non0idxk[k_prim*k_ctr];
+        FINT non0ctri[i_prim];
+        FINT non0ctrk[k_prim];
+        if (i_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
+        }
+        if (k_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
+        }
 
         *kempty = 1;
         for (kp = 0; kp < k_prim; kp++) {
@@ -144,7 +158,17 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT empty[3] = {1, 1, 1}; \
         FINT *iempty = empty + 0; \
         FINT *kempty = empty + 1; \
-        FINT *gempty = empty + 2;
+        FINT *gempty = empty + 2; \
+        FINT non0idxi[i_prim*i_ctr]; \
+        FINT non0idxk[k_prim*k_ctr]; \
+        FINT non0ctri[i_prim]; \
+        FINT non0ctrk[k_prim]; \
+        if (i_ctr > 1) { \
+                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr); \
+        } \
+        if (k_ctr > 1) { \
+                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr); \
+        }
 
 #define USE_OPT \
         FINT off; \
@@ -155,14 +179,15 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
 #define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
-                        CINTprim_to_ctr_0(gctr##ctrsymb, ngp, gp, ctrsymb##_prim, \
-                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
+                        CINTprim_to_ctr_0(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
+                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
+                                          non0ctr##ctrsymb[ctrsymb##p], \
+                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
                 } else { \
-                        off = ctrsymb##o + ctrsymb##p; \
-                        CINTprim_to_ctr_opt(gctr##ctrsymb, ngp, gp, \
-                                            opt->non0coeff[off], \
-                                            opt->non0idx[off], \
-                                            opt->non0ctr[off]); \
+                        CINTprim_to_ctr_1(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
+                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
+                                          non0ctr##ctrsymb[ctrsymb##p], \
+                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
                 } \
         } \
         *ctrsymb##empty = 0

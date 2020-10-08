@@ -22,11 +22,15 @@
 #define PRIM2CTR0(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
-                        CINTprim_to_ctr_0(gctr##ctrsymb, ngp, gp, ctrsymb##_prim, \
-                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
+                        CINTprim_to_ctr_0(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
+                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
+                                          non0ctr##ctrsymb[ctrsymb##p], \
+                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
                 } else { \
-                        CINTprim_to_ctr_1(gctr##ctrsymb, ngp, gp, ctrsymb##_prim, \
-                                          ctrsymb##_ctr, c##ctrsymb+ctrsymb##p); \
+                        CINTprim_to_ctr_1(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
+                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
+                                          non0ctr##ctrsymb[ctrsymb##p], \
+                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
                 } \
         } \
         *ctrsymb##empty = 0
@@ -118,6 +122,21 @@ FINT CINT3c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         const double rr_jk = SQUARE(      rjrk);
         envs->idx = malloc(sizeof(FINT) * envs->nf * 3);
         CINTg2e_index_xyz(envs->idx, envs);
+        FINT non0idxi[i_prim*i_ctr];
+        FINT non0idxj[j_prim*j_ctr];
+        FINT non0idxk[k_prim*k_ctr];
+        FINT non0ctri[i_prim];
+        FINT non0ctrj[j_prim];
+        FINT non0ctrk[k_prim];
+        if (i_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
+        }
+        if (j_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr);
+        }
+        if (k_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
+        }
 
         *kempty = 1;
         for (kp = 0; kp < k_prim; kp++) {
@@ -274,6 +293,22 @@ FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
         envs->idx = malloc(sizeof(FINT) * envs->nf * 3);
         CINTg2e_index_xyz(envs->idx, envs);
         fac *= envs->common_factor;
+
+        FINT non0idxi[i_prim*i_ctr];
+        FINT non0idxj[j_prim*j_ctr];
+        FINT non0idxk[k_prim*k_ctr];
+        FINT non0ctri[i_prim];
+        FINT non0ctrj[j_prim];
+        FINT non0ctrk[k_prim];
+        if (i_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
+        }
+        if (j_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr);
+        }
+        if (k_ctr > 1) {
+                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
+        }
 
         *kempty = 1;
         for (kp = 0; kp < k_prim; kp++) {
