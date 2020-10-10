@@ -111,14 +111,13 @@ void CINTx1k_1e(double *f, double *g, double rk[3],
 void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
                      FINT inc, FINT nprim,
                      FINT nctr, double *pcoeff);
-void CINTprim_to_ctr_0(double *gc, FINT nf, double *gp,
-                       FINT nprim, FINT nctr, double *coeff);
-void CINTprim_to_ctr_1(double *gc, FINT nf, double *gp,
-                       FINT nprim, FINT nctr, double *coeff);
-void CINTprim_to_ctr_opt(double *gc, FINT nf, double *gp,
-                         double *non0coeff, FINT *non0idx, FINT non0ctr);
 
 double CINTcommon_fac_sp(FINT l);
+
+void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, FINT nf,
+                       FINT nprim, FINT nctr, int non0ctr, int *sortedidx);
+void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, FINT nf,
+                       FINT nprim, FINT nctr, int non0ctr, int *sortedidx);
 
 #define G1E_D_I(f, g, li, lj, lk)   CINTnabla1i_1e(f, g, li, lj, lk, envs)
 #define G1E_D_J(f, g, li, lj, lk)   CINTnabla1j_1e(f, g, li, lj, lk, envs)

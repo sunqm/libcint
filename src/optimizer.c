@@ -21,14 +21,11 @@ void CINTinit_2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
 {
         CINTOpt *opt0 = (CINTOpt *)malloc(sizeof(CINTOpt));
         opt0->index_xyz_array = NULL;
-        opt0->prim_offset = NULL;
         opt0->non0ctr = NULL;
-        opt0->non0idx = NULL;
-        opt0->non0coeff = NULL;
-        opt0->expij = NULL;
-        opt0->rij = NULL;
-        opt0->cceij = NULL;
-        opt0->tot_prim = 0;
+        opt0->sortedidx = NULL;
+        opt0->nbas = nbas;
+        opt0->log_max_coeff = NULL;
+        opt0->pairdata = NULL;
         *opt = opt0;
 }
 void CINTinit_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
@@ -44,39 +41,24 @@ void CINTdel_2e_optimizer(CINTOpt **opt)
                 return;
         }
 
-        FINT i;
-
         if (opt0->index_xyz_array != NULL) {
                 free(opt0->index_xyz_array[0]);
                 free(opt0->index_xyz_array);
         }
 
-        if (opt0->expij != NULL) {
-                for (i = 0; i < opt0->tot_prim; i++) {
-                        free(opt0->expij[i]);
-                        free(opt0->rij[i]);
-                        free(opt0->cceij[i]);
-                }
-                free(opt0->expij);
-                free(opt0->rij);
-                free(opt0->cceij);
-        }
-
         if (opt0->non0ctr != NULL) {
+                free(opt0->sortedidx[0]);
+                free(opt0->sortedidx);
+                free(opt0->non0ctr[0]);
                 free(opt0->non0ctr);
-                for (i = 0; i < opt0->tot_prim; i++) {
-                        free(opt0->non0idx[i]);
-                        free(opt0->non0coeff[i]);
-                }
-                free(opt0->non0idx);
-                free(opt0->non0coeff);
         }
 
-        if (opt0->prim_offset != NULL) {
-                free(opt0->prim_offset);
+        if (opt0->log_max_coeff != NULL) {
+                free(opt0->log_max_coeff[0]);
+                free(opt0->log_max_coeff);
         }
 
-        opt0->tot_prim = 0;
+        CINTdel_pairdata_optimizer(opt0);
 
         free(opt0);
         *opt = NULL;
@@ -192,6 +174,7 @@ void CINTall_1e_optimizer(CINTOpt **opt, FINT *ng,
                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_log_maxc(*opt, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int1e_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
@@ -221,6 +204,7 @@ void CINTall_2c2e_optimizer(CINTOpt **opt, FINT *ng,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_log_maxc(*opt, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2c2e_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
@@ -276,6 +260,7 @@ void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
                                 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_log_maxc(*opt, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2c2e_gtg_EnvVars, &CINTg1e_index_xyz,
                 2, 0, ng, atm, natm, bas, nbas, env);
@@ -283,31 +268,123 @@ void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
 #endif
 
 
-// for the coeffs of the pGTO, find the maximum abs(coeff)
-static double max_pgto_coeff(double *coeff, FINT nprim, FINT nctr,
-                             FINT prim_id)
+// little endian on x86
+typedef union {
+    double d;
+    unsigned short s[4];
+} type_IEEE754;
+// ~4 times faster than built-in log
+static inline double approx_log(double x)
 {
-        FINT i;
-        double maxc = 0;
-        for (i = 0; i < nctr; i++) {
-                maxc = MAX(maxc, fabs(coeff[i*nprim+prim_id]));
+        type_IEEE754 y;
+        y.d = x;
+        return ((y.s[3] >> 4) - 1023 + 1) * 0.693145751953125;
+}
+
+void CINTOpt_log_max_pgto_coeff(double *log_maxc, double *coeff, FINT nprim, FINT nctr)
+{
+        FINT i, ip;
+        double maxc;
+        for (ip = 0; ip < nprim; ip++) {
+                maxc = 0;
+                for (i = 0; i < nctr; i++) {
+                        maxc = MAX(maxc, fabs(coeff[i*nprim+ip]));
+                }
+                log_maxc[ip] = approx_log(maxc);
         }
-        return maxc;
+}
+
+
+void CINTOpt_set_log_maxc(CINTOpt *opt, FINT *atm, FINT natm,
+                          FINT *bas, FINT nbas, double *env)
+{
+        FINT i, iprim, ictr;
+        double *ci;
+        size_t tot_prim = 0;
+        for (i = 0; i < nbas; i++) {
+                tot_prim += bas(NPRIM_OF, i);
+        }
+        if (tot_prim == 0) {
+                return;
+        }
+
+        opt->log_max_coeff = malloc(sizeof(double *) * MAX(nbas, 1));
+        double *plog_maxc = malloc(sizeof(double) * tot_prim);
+        opt->log_max_coeff[0] = plog_maxc;
+        for (i = 0; i < nbas; i++) {
+                iprim = bas(NPRIM_OF, i);
+                ictr = bas(NCTR_OF, i);
+                ci = env + bas(PTR_COEFF, i);
+                opt->log_max_coeff[i] = plog_maxc;
+                CINTOpt_log_max_pgto_coeff(plog_maxc, ci, iprim, ictr);
+                plog_maxc += iprim;
+        }
+}
+
+FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, double *rj,
+                     double *log_maxci, double *log_maxcj,
+                     FINT li_ceil, FINT lj_ceil, FINT iprim, FINT jprim,
+                     double rr_ij, double expcutoff)
+{
+        FINT ip, jp, n;
+        double aij, eij, cceij;
+        double log_rr_ij = (li_ceil+lj_ceil+1) * approx_log(rr_ij+1) / 2;
+        PairData *pdata;
+
+        FINT empty = 1;
+        for (n = 0, jp = 0; jp < jprim; jp++) {
+                for (ip = 0; ip < iprim; ip++, n++) {
+                        aij = 1/(ai[ip] + aj[jp]);
+                        eij = rr_ij * ai[ip] * aj[jp] * aij;
+                        cceij = eij - log_rr_ij - log_maxci[ip] - log_maxcj[jp];
+                        pdata = pairdata + n;
+                        pdata->cceij = cceij;
+                        if (cceij < expcutoff) {
+                                empty = 0;
+                                pdata->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) * aij;
+                                pdata->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) * aij;
+                                pdata->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) * aij;
+                                pdata->eij = exp(-eij);
+                        } else {
+                                pdata->rij[0] = 0;
+                                pdata->rij[1] = 0;
+                                pdata->rij[2] = 0;
+                                pdata->eij = 0;
+                        }
+                }
+        }
+        return empty;
 }
 
 void CINTOpt_setij(CINTOpt *opt, FINT *ng,
-                   FINT *atm, FINT natm,
-                   FINT *bas, FINT nbas, double *env)
+                   FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
-        FINT i, j, ip, jp, io, jo, off;
-        if (opt->prim_offset == NULL) {
-                opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
-                opt->tot_prim = 0;
-                for (i = 0; i < nbas; i++) {
-                        opt->prim_offset[i] = opt->tot_prim;
-                        opt->tot_prim += bas(NPRIM_OF, i);
-                }
+        FINT i, j, ip, jp;
+        FINT iprim, ictr, jprim, jctr, li, lj;
+        double *ai, *aj, *ri, *rj, *ci, *cj;
+        double expcutoff;
+        if (env[PTR_EXPCUTOFF] == 0) {
+                expcutoff = EXPCUTOFF;
+        } else {
+                expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
         }
+
+        if (opt->log_max_coeff == NULL) {
+                CINTOpt_set_log_maxc(opt, atm, natm, bas, nbas, env);
+        }
+        double **log_max_coeff = opt->log_max_coeff;
+        double *log_maxci, *log_maxcj;
+
+        size_t tot_prim = 0;
+        for (i = 0; i < nbas; i++) {
+                tot_prim += bas(NPRIM_OF, i);
+        }
+        if (tot_prim == 0 || tot_prim > MAX_PGTO_FOR_PAIRDATA) {
+                return;
+        }
+        opt->pairdata = malloc(sizeof(PairData *) * MAX(nbas * nbas, 1));
+        PairData *pdata = malloc(sizeof(PairData) * tot_prim * tot_prim);
+        opt->pairdata[0] = pdata;
 
         FINT ijkl_inc;
         if ((ng[IINC]+ng[JINC]) > (ng[KINC]+ng[LINC])) {
@@ -316,132 +393,118 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                 ijkl_inc = ng[KINC] + ng[LINC];
         }
 
-        FINT iprim, ictr, jprim, jctr, il, jl;
-        double eij, aij, rr, maxci, maxcj, rirj_g4d;
-        double *ai, *aj, *ri, *rj, *ci, *cj;
-        double *expij, *rij;
-        FINT *cceij;
-        opt->expij = (double **)malloc(sizeof(double *) * opt->tot_prim);
-        opt->rij = (double **)malloc(sizeof(double *) * opt->tot_prim);
-        opt->cceij = (FINT **)malloc(sizeof(FINT *) * opt->tot_prim);
+        FINT empty;
+        double rr;
+        PairData *pdata0;
         for (i = 0; i < nbas; i++) {
                 ri = env + atm(PTR_COORD,bas(ATOM_OF,i));
                 ai = env + bas(PTR_EXP,i);
-                io = opt->prim_offset[i];
                 iprim = bas(NPRIM_OF,i);
                 ictr = bas(NCTR_OF,i);
                 ci = env + bas(PTR_COEFF,i);
-// For derivative/dipole operator, the l-value in g2e is virtually increased
-                il = bas(ANG_OF,i);
-                for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
-                        maxci = max_pgto_coeff(ci, iprim, ictr, ip);
-                        maxci = maxci / CINTgto_norm(bas(ANG_OF,i), ai[ip]);
-                        expij = (double *)malloc(sizeof(double)*opt->tot_prim);
-                        rij = (double *)malloc(sizeof(double)*opt->tot_prim*3);
-                        cceij = (FINT *)malloc(sizeof(FINT) * opt->tot_prim);
-                        opt->expij[io+ip] = expij;
-                        opt->rij[io+ip] = rij;
-                        opt->cceij[io+ip] = cceij;
+                li = bas(ANG_OF,i);
+                log_maxci = log_max_coeff[i];
 
-                        for (j = 0; j < nbas; j++) {
-                                rj = env + atm(PTR_COORD,bas(ATOM_OF,j));
-                                aj = env + bas(PTR_EXP,j);
-                                jo = opt->prim_offset[j];
-                                jprim = bas(NPRIM_OF,j);
-                                jctr = bas(NCTR_OF,j);
-                                cj = env + bas(PTR_COEFF,j);
-                                jl = bas(ANG_OF,j);
-                                rr = (ri[0]-rj[0])*(ri[0]-rj[0])
-                                   + (ri[1]-rj[1])*(ri[1]-rj[1])
-                                   + (ri[2]-rj[2])*(ri[2]-rj[2]);
-                                for (jp = 0; jp < bas(NPRIM_OF,j); jp++) {
-                                        maxcj = max_pgto_coeff(cj, jprim, jctr, jp);
-                                        maxcj = maxcj / CINTgto_norm(bas(ANG_OF,j), aj[jp]);
-                                        aij = ai[ip] + aj[jp];
-                                        off = jo + jp;
-                                        eij = rr * ai[ip] * aj[jp] / aij;
-                                        expij[off] = exp(-eij);
-                                        rij[off*3+0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / aij;
-                                        rij[off*3+1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / aij;
-                                        rij[off*3+2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / aij;
+                for (j = 0; j <= i; j++) {
+                        rj = env + atm(PTR_COORD,bas(ATOM_OF,j));
+                        aj = env + bas(PTR_EXP,j);
+                        jprim = bas(NPRIM_OF,j);
+                        jctr = bas(NCTR_OF,j);
+                        cj = env + bas(PTR_COEFF,j);
+                        lj = bas(ANG_OF,j);
+                        log_maxcj = log_max_coeff[j];
+                        rr = (ri[0]-rj[0])*(ri[0]-rj[0])
+                           + (ri[1]-rj[1])*(ri[1]-rj[1])
+                           + (ri[2]-rj[2])*(ri[2]-rj[2]);
 
-        if (maxci*maxcj == 0) {
-                cceij[off] = 750;
-        } else if (rr > 1e-12) {
-/* value estimation based on g0_2e_2d and g0_xx2d_4d,
- * value/exp(-eij) ~< (il+jl+2)!*(aij/2)^(il+jl)*(ri_or_rj-rij)^(ij+jl)*rirj^max(il,jl)
- *                 ~< (il+jl+2)!*(aij/2)^(il+jl)*|rirj|^((il+jl)+max(il,jl))
- * But in practice, |rirj|^((il+jl)/2) is large enough to cover all other factors */
-                rirj_g4d = pow(rr+0.5, (il+jl+ijkl_inc+1)/2);
-                cceij[off] = eij - log(maxci*maxcj*rirj_g4d);
-        } else {
-/* If basis on the same center, include the (ss|ss)^{1/2} contribution
- * (ss|ss) = 2\sqrt{aij/pi} */
-                cceij[off] = -log(maxci*maxcj) - log(aij)/4;
-        }
+                        empty = CINTset_pairdata(pdata, ai, aj, ri, rj, log_maxci, log_maxcj,
+                                                 li+ijkl_inc, lj, iprim, jprim, rr, expcutoff);
+                        if (i == 0 && j == 0) {
+                                opt->pairdata[0] = pdata;
+                                pdata += iprim * jprim;
+                        } else if (!empty) {
+                                opt->pairdata[i*nbas+j] = pdata;
+                                pdata += iprim * jprim;
+                                if (i != j) {
+                                        opt->pairdata[j*nbas+i] = pdata;
+                                        pdata0 = opt->pairdata[i*nbas+j];
+                                        // transpose pairdata
+                                        for (ip = 0; ip < iprim; ip++) {
+                                        for (jp = 0; jp < jprim; jp++, pdata++) {
+                                                memcpy(pdata, pdata0+jp*iprim+ip,
+                                                       sizeof(PairData));
+                                        } }
                                 }
+                        } else {
+                                opt->pairdata[i*nbas+j] = NOVALUE;
+                                opt->pairdata[j*nbas+i] = NOVALUE;
                         }
-                }
-        }
-}
-
-void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
-                           FINT *bas, FINT nbas, double *env)
-{
-        FINT i, j, k, ip, io;
-        if (opt->prim_offset == NULL) {
-                opt->prim_offset = (FINT *)malloc(sizeof(FINT) * nbas);
-                opt->tot_prim = 0;
-                for (i = 0; i < nbas; i++) {
-                        opt->prim_offset[i] = opt->tot_prim;
-                        opt->tot_prim += bas(NPRIM_OF, i);
-                }
-        }
-
-        FINT iprim, ictr;
-        double *ci;
-        double *non0coeff;
-        FINT *non0idx;
-        opt->non0ctr = (FINT *)malloc(sizeof(FINT) * opt->tot_prim);
-        opt->non0idx = (FINT **)malloc(sizeof(FINT *) * opt->tot_prim);
-        opt->non0coeff = (double **)malloc(sizeof(double *) * opt->tot_prim);
-        for (i = 0; i < nbas; i++) {
-                io = opt->prim_offset[i];
-                iprim = bas(NPRIM_OF,i);
-                ictr = bas(NCTR_OF,i);
-                ci = env + bas(PTR_COEFF,i);
-                for (ip = 0; ip < bas(NPRIM_OF,i); ip++) {
-                        non0idx = (FINT *)malloc(sizeof(FINT) * ictr);
-                        non0coeff = (double *)malloc(sizeof(double) * ictr);
-                        opt->non0idx[io+ip] = non0idx;
-                        opt->non0coeff[io+ip] = non0coeff;
-
-                        for (j = 0, k = 0; j < ictr; j++) {
-                                if (ci[iprim*j+ip] != 0) {
-                                        non0coeff[k] = ci[iprim*j+ip];
-                                        non0idx[k] = j;
-                                        k++;
-                                }
-                        }
-                        opt->non0ctr[io+ip] = k;
                 }
         }
 }
 
 void CINTdel_pairdata_optimizer(CINTOpt *cintopt)
 {
-        if (cintopt != NULL && cintopt->expij != NULL) {
-                FINT i;
-                for (i = 0; i < cintopt->tot_prim; i++) {
-                        free(cintopt->expij[i]);
-                        free(cintopt->rij[i]);
-                        free(cintopt->cceij[i]);
+        if (cintopt != NULL && cintopt->pairdata != NULL) {
+                free(cintopt->pairdata[0]);
+                free(cintopt->pairdata);
+                cintopt->pairdata = NULL;
+        }
+}
+
+void CINTOpt_non0coeff_byshell(FINT *sortedidx, FINT *non0ctr, double *ci,
+                               FINT iprim, FINT ictr)
+{
+        FINT ip, j, k, kp;
+        FINT zeroidx[ictr];
+        for (ip = 0; ip < iprim; ip++) {
+                for (j = 0, k = 0, kp = 0; j < ictr; j++) {
+                        if (ci[iprim*j+ip] != 0) {
+                                sortedidx[k] = j;
+                                k++;
+                        } else {
+                                zeroidx[kp] = j;
+                                kp++;
+                        }
                 }
-                free(cintopt->expij);
-                free(cintopt->rij);
-                free(cintopt->cceij);
-                cintopt->expij = NULL;
-                cintopt->rij = NULL;
-                cintopt->cceij = NULL;
+// Append the index of zero-coeff to sortedidx for function CINTprim_to_ctr_0
+                for (j = 0; j < kp; j++) {
+                        sortedidx[k+j] = zeroidx[j];
+                }
+                non0ctr[ip] = k;
+                sortedidx += ictr;
+        }
+}
+
+void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env)
+{
+        FINT i, iprim, ictr;
+        double *ci;
+        size_t tot_prim = 0;
+        size_t tot_prim_ctr = 0;
+        for (i = 0; i < nbas; i++) {
+                tot_prim += bas(NPRIM_OF, i);
+                tot_prim_ctr += bas(NPRIM_OF, i) * bas(NCTR_OF,i);
+        }
+        if (tot_prim == 0) {
+                return;
+        }
+
+        opt->non0ctr = malloc(sizeof(FINT *) * MAX(nbas, 1));
+        opt->sortedidx = malloc(sizeof(FINT *) * MAX(nbas, 1));
+        FINT *pnon0ctr = malloc(sizeof(FINT) * tot_prim);
+        FINT *psortedidx = malloc(sizeof(FINT) * tot_prim_ctr);
+        opt->non0ctr[0] = pnon0ctr;
+        opt->sortedidx[0] = psortedidx;
+        for (i = 0; i < nbas; i++) {
+                iprim = bas(NPRIM_OF, i);
+                ictr = bas(NCTR_OF, i);
+                ci = env + bas(PTR_COEFF, i);
+                opt->non0ctr[i] = pnon0ctr;
+                opt->sortedidx[i] = psortedidx;
+                CINTOpt_non0coeff_byshell(psortedidx, pnon0ctr, ci, iprim, ictr);
+                pnon0ctr += iprim;
+                psortedidx += iprim * ictr;
         }
 }
