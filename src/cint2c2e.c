@@ -65,7 +65,7 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         const FINT len0 = envs->nf * n_comp; // gout
         const FINT len = leng + lenk + leni + len0;
         double *g;
-        MALLOC_INSTACK(g, double, len);
+        MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctri, *gctrk;
 
@@ -198,7 +198,7 @@ FINT CINT2c2e_11_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doubl
         const FINT len0 = envs->nf * n_comp;
         const FINT len = leng + len0;
         double *g;
-        MALLOC_INSTACK(g, double, len);
+        MALLOC_INSTACK(g, len);
         double *gout;
         if (n_comp == 1) {
                 gout = gctr;
@@ -240,7 +240,7 @@ FINT CINT2c2e_n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doubl
         const FINT len0 = envs->nf * n_comp; // gout
         const FINT len = leng + leni + len0;
         double *g;
-        MALLOC_INSTACK(g, double, len);
+        MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctri;
         if (n_comp == 1) {
@@ -285,7 +285,7 @@ FINT CINT2c2e_1n_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doubl
         const FINT len0 = envs->nf * n_comp; // gout
         const FINT len = leng + lenk + len0;
         double *g;
-        MALLOC_INSTACK(g, double, len);
+        MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctrk;
         if (n_comp == 1) {
@@ -334,7 +334,7 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
         const FINT len0 = envs->nf * n_comp; // gout
         const FINT len = leng + lenk + leni + len0;
         double *g;
-        MALLOC_INSTACK(g, double, len);
+        MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctri, *gctrk;
 
@@ -424,7 +424,7 @@ FINT CINT2c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*n_comp);
+        MALLOC_INSTACK(gctr, nc*n_comp);
 
         FINT n;
         FINT has_value;
@@ -480,7 +480,7 @@ FINT CINT2c2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*n_comp);
+        MALLOC_INSTACK(gctr, nc*n_comp);
 
         FINT n;
         FINT has_value;
@@ -541,7 +541,7 @@ FINT CINT2c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*n_comp);
+        MALLOC_INSTACK(gctr, nc*n_comp);
 
         FINT n, has_value;
 

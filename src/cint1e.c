@@ -45,9 +45,9 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache)
         FINT *idx = malloc(sizeof(FINT) * nf * 3);
         double aij, dij, eij, rrij;
         double *g, *gout, *gctri;
-        MALLOC_INSTACK(g, double, envs->g_size * 3 * ((1<<envs->gbits)+1)); // +1 as buffer
-        MALLOC_INSTACK(gout, double, nf * n_comp);
-        MALLOC_INSTACK(gctri, double, nf * i_ctr * n_comp);
+        MALLOC_INSTACK(g, envs->g_size * 3 * ((1<<envs->gbits)+1)); // +1 as buffer
+        MALLOC_INSTACK(gout, nf * n_comp);
+        MALLOC_INSTACK(gctri, nf * i_ctr * n_comp);
         CINTg1e_index_xyz(idx, envs);
 
         rrij = CINTsquare_dist(ri, rj);
@@ -139,9 +139,9 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
         FINT *idx = malloc(sizeof(FINT) * nf * 3);
         double rij[3], aij, dij, eij, rrij, t2;
         double *g, *gout, *gctri;
-        MALLOC_INSTACK(g, double, envs->g_size * 3 * ((1<<envs->gbits)+1)); // +1 as buffer
-        MALLOC_INSTACK(gout, double, nf * n_comp);
-        MALLOC_INSTACK(gctri, double, nf * i_ctr * n_comp);
+        MALLOC_INSTACK(g, envs->g_size * 3 * ((1<<envs->gbits)+1)); // +1 as buffer
+        MALLOC_INSTACK(gout, nf * n_comp);
+        MALLOC_INSTACK(gctri, nf * i_ctr * n_comp);
         double expcutoff = envs->expcutoff;
 
         if (nuc_id < 0) {
@@ -226,7 +226,7 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*n_comp);
+        MALLOC_INSTACK(gctr, nc*n_comp);
 
         FINT nout;
         FINT n;
@@ -298,7 +298,7 @@ FINT CINT1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*envs->ncomp_tensor);
+        MALLOC_INSTACK(gctr, nc*envs->ncomp_tensor);
 
         FINT nout;
         FINT n;

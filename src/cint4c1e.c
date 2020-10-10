@@ -78,6 +78,26 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT *lempty = empty + 3;
         FINT *gempty = empty + 4;
         /* COMMON_ENVS_AND_DECLARE end */
+
+        FINT *idx;
+        MALLOC_INSTACK(idx, envs->nf * 3);
+        CINTg4c1e_index_xyz(idx, envs);
+
+        FINT *non0ctri, *non0ctrj, *non0ctrk, *non0ctrl;
+        FINT *non0idxi, *non0idxj, *non0idxk, *non0idxl;
+        MALLOC_INSTACK(non0ctri, i_prim+j_prim+k_prim+l_prim+i_prim*i_ctr+j_prim*j_ctr+k_prim*k_ctr+l_prim*l_ctr);
+        non0ctrj = non0ctri + i_prim;
+        non0ctrk = non0ctrj + j_prim;
+        non0ctrl = non0ctrk + k_prim;
+        non0idxi = non0ctrl + l_prim;
+        non0idxj = non0idxi + i_prim*i_ctr;
+        non0idxk = non0idxj + j_prim*j_ctr;
+        non0idxl = non0idxk + k_prim*k_ctr;
+        CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
+        CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr);
+        CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
+        CINTOpt_non0coeff_byshell(non0idxl, non0ctrl, cl, l_prim, l_ctr);
+
         FINT nc = i_ctr * j_ctr * k_ctr * l_ctr;
         // (irys,i,j,k,l,coord,0:1); +1 for nabla-r12
         FINT leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
@@ -88,7 +108,7 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT len0 = envs->nf * n_comp; // gout
         FINT len = leng + lenl + lenk + lenj + leni + len0;
         double *g;
-        MALLOC_INSTACK(g, double, len);
+        MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctri, *gctrj, *gctrk, *gctrl;
 
@@ -130,32 +150,9 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         double rijrkl[3];
         double dist_ij = SQUARE(envs->rirj);
         double dist_kl = SQUARE(envs->rkrl);
-        envs->idx = (FINT *)malloc(sizeof(FINT) * envs->nf * 3);
-        CINTg4c1e_index_xyz(envs->idx, envs);
         double common_fac = envs->common_factor * SQRTPI * M_PI *
                 CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l) *
                 CINTcommon_fac_sp(envs->k_l) * CINTcommon_fac_sp(envs->l_l);
-
-        FINT non0idxi[i_prim*i_ctr];
-        FINT non0idxj[j_prim*j_ctr];
-        FINT non0idxk[k_prim*k_ctr];
-        FINT non0idxl[l_prim*l_ctr];
-        FINT non0ctri[i_prim];
-        FINT non0ctrj[j_prim];
-        FINT non0ctrk[k_prim];
-        FINT non0ctrl[l_prim];
-        if (i_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
-        }
-        if (j_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr);
-        }
-        if (k_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
-        }
-        if (l_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxl, non0ctrl, cl, l_prim, l_ctr);
-        }
 
         *lempty = 1;
         for (lp = 0; lp < l_prim; lp++) {
@@ -223,7 +220,7 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                                 fac1i = fac1j*expijkl;
                                         }
                                         CINTg4c1e_ovlp(g, fac1i, envs);
-                                        (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
+                                        (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                         PRIM2CTR0(i, gout, envs->nf*n_comp);
 i_contracted: ;
                                 } // end loop i_prim
@@ -244,10 +241,23 @@ k_contracted: ;
         if (n_comp > 1 && !*lempty) {
                 CINTdmat_transpose(gctr, gctrl, envs->nf*nc, n_comp);
         }
-        free(envs->idx);
         return !*lempty;
 }
 
+
+#define PAIRDATA_NON0IDX_SIZE(ps) \
+                FINT *bas = envs->bas; \
+                FINT *shls  = envs->shls; \
+                FINT i_prim = bas(NPRIM_OF, shls[0]); \
+                FINT j_prim = bas(NPRIM_OF, shls[1]); \
+                FINT k_prim = bas(NPRIM_OF, shls[2]); \
+                FINT l_prim = bas(NPRIM_OF, shls[3]); \
+                FINT ps = ((i_prim*j_prim + k_prim*l_prim) * 5 \
+                           + i_prim * x_ctr[0] \
+                           + j_prim * x_ctr[1] \
+                           + k_prim * x_ctr[2] \
+                           + l_prim * x_ctr[3] \
+                           +(i_prim+j_prim+k_prim+l_prim)*2 + envs->nf*3);
 
 FINT CINT4c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                        double *cache)
@@ -256,21 +266,23 @@ FINT CINT4c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1] * x_ctr[2] * x_ctr[3];
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
         if (out == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng + len0 + nc*n_comp*3;
+                FINT cache_size = leng + len0 + nc*n_comp*3 + pdata_size;
                 return cache_size;
         }
         double *stack = NULL;
         if (cache == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng + len0 + nc*n_comp*3;
+                FINT cache_size = leng + len0 + nc*n_comp*3 + pdata_size;
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*n_comp);
+        MALLOC_INSTACK(gctr, nc*n_comp);
 
         FINT n, has_value;
         has_value = CINT4c1e_loop_nopt(gctr, envs, cache);
@@ -305,21 +317,25 @@ FINT CINT4c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1] * x_ctr[2] * x_ctr[3];
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
         if (out == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*3, nc*n_comp+envs->nf*4);
+                FINT cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
+                                      nc*n_comp+envs->nf*4);
                 return cache_size;
         }
         double *stack = NULL;
         if (cache == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*3, nc*n_comp+envs->nf*4);
+                FINT cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
+                                      nc*n_comp+envs->nf*4);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, double, nc*n_comp);
+        MALLOC_INSTACK(gctr, nc*n_comp);
 
         FINT n, has_value;
         has_value = CINT4c1e_loop_nopt(gctr, envs, cache);
