@@ -54,6 +54,19 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         double *ci = env + bas(PTR_COEFF, i_sh);
         double *cj = env + bas(PTR_COEFF, j_sh);
         double *ck = env + bas(PTR_COEFF, k_sh);
+
+        double expcutoff = envs->expcutoff;
+        PairData pdata_buf[i_prim*j_prim];
+        double log_maxci[i_prim];
+        double log_maxcj[j_prim];
+        CINTOpt_log_max_pgto_coeff(log_maxci, ci, i_prim, i_ctr);
+        CINTOpt_log_max_pgto_coeff(log_maxcj, cj, j_prim, j_ctr);
+        if (CINTset_pairdata(pdata_buf, ai, aj, envs->ri, envs->rj,
+                             log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil,
+                             i_prim, j_prim, SQUARE(envs->rirj), expcutoff)) {
+                return 0;
+        }
+
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         double fac1i, fac1j, fac1k;
         FINT ip, jp, kp;
@@ -104,6 +117,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         }
 
         double eij, expij;
+        double *rij;
         const double dist_ij = SQUARE(envs->rirj);
         FINT *idx = malloc(sizeof(FINT) * envs->nf * 3);
         CINTg2e_index_xyz(idx, envs);
@@ -113,16 +127,11 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT non0ctri[i_prim];
         FINT non0ctrj[j_prim];
         FINT non0ctrk[k_prim];
-        if (i_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
-        }
-        if (j_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr);
-        }
-        if (k_ctr > 1) {
-                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
-        }
+        CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr);
+        CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr);
+        CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
 
+        PairData *pdata_ij;
         *kempty = 1;
         for (kp = 0; kp < k_prim; kp++) {
                 envs->ak = ak[kp];
@@ -134,6 +143,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                         *jempty = 1;
                 }
 
+                pdata_ij = pdata_buf;
                 for (jp = 0; jp < j_prim; jp++) {
                         envs->aj = aj[jp];
                         if (j_ctr == 1) {
@@ -142,20 +152,20 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                 fac1j = fac1k;
                                 *iempty = 1;
                         }
-                        for (ip = 0; ip < i_prim; ip++) {
-                                envs->ai = ai[ip];
-                                envs->aij = ai[ip] + aj[jp];
-                                eij = dist_ij * ai[ip] * aj[jp] / envs->aij;
-                                if (eij > EXPCUTOFF) {
+                        for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
+                                if (pdata_ij->cceij > expcutoff) {
                                         goto i_contracted;
                                 }
-                                expij = exp(-eij);
-                                envs->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / envs->aij;
-                                envs->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / envs->aij;
-                                envs->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / envs->aij;
-                                envs->rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
-                                envs->rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
-                                envs->rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
+                                envs->ai = ai[ip];
+                                envs->aij = ai[ip] + aj[jp];
+                                expij = pdata_ij->eij;
+                                rij = pdata_ij->rij;
+                                envs->rij[0] = rij[0];
+                                envs->rij[1] = rij[1];
+                                envs->rij[2] = rij[2];
+                                envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
+                                envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
+                                envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
                                 if (i_ctr == 1) {
                                         fac1i = fac1j*ci[ip]*expij;
                                 } else {
@@ -205,6 +215,21 @@ i_contracted: ;
         double *ci = env + bas(PTR_COEFF, i_sh); \
         double *cj = env + bas(PTR_COEFF, j_sh); \
         double *ck = env + bas(PTR_COEFF, k_sh); \
+        double expcutoff = envs->expcutoff; \
+        PairData pdata_buf[i_prim*j_prim]; \
+        PairData *pdata_base, *pdata_ij; \
+        if (opt->pairdata != NULL) { \
+                pdata_base = opt->pairdata[i_sh*opt->nbas+j_sh]; \
+        } else { \
+                double *log_maxci = opt->log_max_coeff[i_sh]; \
+                double *log_maxcj = opt->log_max_coeff[j_sh]; \
+                pdata_base = pdata_buf; \
+                if (CINTset_pairdata(pdata_buf, ai, aj, envs->ri, envs->rj, \
+                                     log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil, \
+                                     i_prim, j_prim, SQUARE(envs->rirj), expcutoff)) { \
+                        return 0; \
+                } \
+        } \
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor; \
         double fac1i, fac1j, fac1k; \
         FINT ip, jp, kp; \
@@ -219,21 +244,13 @@ i_contracted: ;
         FINT non0ctri[i_prim]; \
         FINT non0ctrj[j_prim]; \
         FINT non0ctrk[k_prim]; \
-        if (i_ctr > 1) { \
-                CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr); \
-        } \
-        if (j_ctr > 1) { \
-                CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr); \
-        } \
-        if (k_ctr > 1) { \
-                CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr); \
-        }
+        CINTOpt_non0coeff_byshell(non0idxi, non0ctri, ci, i_prim, i_ctr); \
+        CINTOpt_non0coeff_byshell(non0idxj, non0ctrj, cj, j_prim, j_ctr); \
+        CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr);
 
 #define USE_OPT \
-        FINT off; \
-        const FINT io = opt->prim_offset[i_sh]; \
-        const FINT jo = opt->prim_offset[j_sh]; \
         double eij, expij; \
+        double *rij; \
         const double dist_ij = SQUARE(envs->rirj); \
         FINT *idx = opt->index_xyz_array[envs->i_l*LMAX1*LMAX1 \
                                         +envs->j_l*LMAX1+envs->k_l]; \
@@ -245,19 +262,19 @@ i_contracted: ;
         }
 
 #define SET_RIJ    \
-        envs->ai  = ai[ip]; \
-        envs->aij = ai[ip] + aj[jp]; \
-        eij = dist_ij * ai[ip] * aj[jp] / envs->aij; \
-        if (eij > EXPCUTOFF) { \
+        if (pdata_ij->cceij > expcutoff) { \
                 goto i_contracted; \
         } \
-        expij = exp(-eij); \
-        envs->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / envs->aij; \
-        envs->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / envs->aij; \
-        envs->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / envs->aij; \
-        envs->rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0]; \
-        envs->rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1]; \
-        envs->rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2]
+        envs->ai  = ai[ip]; \
+        envs->aij = ai[ip] + aj[jp]; \
+        expij = pdata_ij->eij; \
+        rij = pdata_ij->rij; \
+        envs->rij[0] = rij[0]; \
+        envs->rij[1] = rij[1]; \
+        envs->rij[2] = rij[2]; \
+        envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0]; \
+        envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1]; \
+        envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2]
 
 #define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
@@ -300,10 +317,11 @@ FINT CINT3c2e_111_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doub
                 envs->akl = ak[kp];
                 fac1k = envs->common_factor * ck[kp];
 
+                pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
                         envs->aj = aj[jp];
                         fac1j = fac1k * cj[jp];
-                        for (ip = 0; ip < i_prim; ip++) {
+                        for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 fac1i = fac1j*ci[ip]*expij;
                                 if ((*envs->f_g0_2e)(g, fac1i, envs)) {
@@ -352,11 +370,11 @@ FINT CINT3c2e_n11_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doub
                 envs->ak = ak[kp];
                 envs->akl = ak[kp];
                 fac1k = envs->common_factor * ck[kp];
-
+                pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
                         envs->aj = aj[jp];
                         fac1j = fac1k * cj[jp];
-                        for (ip = 0; ip < i_prim; ip++) {
+                        for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 fac1i = fac1j*expij;
                                 if ((*envs->f_g0_2e)(g, fac1i, envs)) {
@@ -405,12 +423,12 @@ FINT CINT3c2e_1n1_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, doub
                 envs->ak = ak[kp];
                 envs->akl = ak[kp];
                 fac1k = envs->common_factor * ck[kp];
-
+                pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
                         envs->aj = aj[jp];
                         fac1j = fac1k;
                         *iempty = 1;
-                        for (ip = 0; ip < i_prim; ip++) {
+                        for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 fac1i = fac1j*ci[ip]*expij;
                                 if ((*envs->f_g0_2e)(g, fac1i, envs)) {
@@ -490,7 +508,7 @@ FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
                         fac1k = envs->common_factor;
                         *jempty = 1;
                 }
-
+                pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
                         envs->aj = aj[jp];
                         if (j_ctr == 1) {
@@ -499,7 +517,7 @@ FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
                                 fac1j = fac1k;
                                 *iempty = 1;
                         }
-                        for (ip = 0; ip < i_prim; ip++) {
+                        for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 if (i_ctr == 1) {
                                         fac1i = fac1j*ci[ip]*expij;
@@ -567,7 +585,7 @@ FINT CINT3c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         FINT n;
         FINT has_value;
 
-        if (opt != NULL && opt->expij != NULL) {
+        if (opt != NULL) {
                 n = ((envs->x_ctr[0]==1) << 2) + ((envs->x_ctr[1]==1) << 1) + (envs->x_ctr[2]==1);
                 has_value = CINTf_3c2e_loop[n](gctr, envs, opt, cache);
         } else {
@@ -623,7 +641,7 @@ FINT CINT3c2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         FINT n;
         FINT has_value;
 
-        if (opt != NULL && opt->expij != NULL) {
+        if (opt != NULL) {
                 n = ((envs->x_ctr[0]==1) << 2) + ((envs->x_ctr[1]==1) << 1) + (envs->x_ctr[2]==1);
                 has_value = CINTf_3c2e_loop[n](gctr, envs, opt, cache);
         } else {
@@ -694,7 +712,7 @@ FINT CINT3c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
         FINT n;
         FINT has_value;
 
-        if (opt != NULL && opt->expij != NULL) {
+        if (opt != NULL) {
                 n = ((envs->x_ctr[0]==1) << 2) + ((envs->x_ctr[1]==1) << 1) + (envs->x_ctr[2]==1);
                 has_value = CINTf_3c2e_loop[n](gctr, envs, opt, cache);
         } else {

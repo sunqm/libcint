@@ -171,9 +171,6 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         }
 
 #define USE_OPT \
-        FINT off; \
-        const FINT io = opt->prim_offset[i_sh]; \
-        const FINT ko = opt->prim_offset[k_sh]; \
         envs->idx = opt->index_xyz_array[envs->i_l*LMAX1+envs->k_l]
 
 #define PRIM2CTR(ctrsymb, gp, ngp) \
@@ -362,9 +359,6 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, const CINTOpt *opt, double *
         }
 
         /* USE_OPT */
-        FINT off;
-        const FINT io = opt->prim_offset[i_sh];
-        const FINT ko = opt->prim_offset[k_sh];
         envs->idx = opt->index_xyz_array[envs->i_l*LMAX1+envs->k_l];
         /* USE_OPT end */
 

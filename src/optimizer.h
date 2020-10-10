@@ -7,17 +7,22 @@
 #if !defined HAVE_DEFINED_CINTOPT_H
 #define HAVE_DEFINED_CINTOPT_H
 typedef struct {
+    double rij[3];
+    double eij;
+    double cceij;
+} PairData;
+typedef struct {
     FINT **index_xyz_array; // LMAX1**4 pointers to index_xyz
-    FINT *prim_offset;
-    FINT *non0ctr;
-    FINT **non0idx;
-    double **non0coeff;
-    double **expij;
-    double **rij;
-    FINT **cceij;
-    FINT tot_prim;
+    FINT **non0ctr;
+    FINT **sortedidx;
+    FINT nbas;
+    double **log_max_coeff;
+    PairData **pairdata;  // NULL indicates not-initialized, NO_VALUE can be skipped
 } CINTOpt;
 #endif
+
+#define NOVALUE                 ((void *)0xffffffffffffffffuL)
+#define MAX_PGTO_FOR_PAIRDATA   2048
 
 void CINTinit_2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                            FINT *bas, FINT nbas, double *env);
@@ -25,15 +30,20 @@ void CINTinit_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                         FINT *bas, FINT nbas, double *env);
 void CINTdel_2e_optimizer(CINTOpt **opt);
 void CINTdel_optimizer(CINTOpt **opt);
-void CINTOpt_set_index_xyz(CINTOpt *opt, FINT *ng,
-                           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTdel_pairdata_optimizer(CINTOpt *cintopt);
+void CINTOpt_log_max_pgto_coeff(double *log_maxc, double *coeff, FINT nprim, FINT nctr);
+void CINTOpt_set_log_maxc(CINTOpt *opt, FINT *atm, FINT natm,
+                          FINT *bas, FINT nbas, double *env);
 void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                    FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTOpt_non0coeff_byshell(FINT *sortedidx, FINT *non0ctr, double *ci,
+                               FINT iprim, FINT ictr);
 void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
                            FINT *bas, FINT nbas, double *env);
-
-void CINTOpt_non0coeff_byshell(int *sortedidx, int *non0ctr, double *ci,
-                               int iprim, int ictr);
+FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, double *rj,
+                      double *log_maxci, double *log_maxcj,
+                      FINT li_ceil, FINT lj_ceil, FINT iprim, FINT jprim,
+                      double rr_ij, double expcutoff);
 
 void CINTOpt_4cindex_xyz(CINTOpt *opt, FINT *ng,
                          FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
