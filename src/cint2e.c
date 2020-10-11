@@ -299,7 +299,7 @@ k_contracted: ;
                 } \
                 double *log_maxck = opt->log_max_coeff[k_sh]; \
                 double *log_maxcl = opt->log_max_coeff[l_sh]; \
-                _pdata_kl = pdata_ij + i_prim*j_prim; \
+                _pdata_kl = _pdata_ij + i_prim*j_prim; \
                 if (CINTset_pairdata(_pdata_kl, ak, al, envs->rk, envs->rl, \
                                      log_maxck, log_maxcl, envs->lk_ceil, envs->ll_ceil, \
                                      k_prim, l_prim, SQUARE(envs->rkrl), expcutoff)) { \
