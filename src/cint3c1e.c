@@ -71,7 +71,7 @@ FINT CINT3c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
 
         FINT *idx;
         MALLOC_INSTACK(idx, envs->nf * 3);
-        CINTg2e_index_xyz(envs->idx, envs);
+        CINTg2e_index_xyz(idx, envs);
 
         FINT *non0ctri, *non0ctrj, *non0ctrk;
         FINT *non0idxi, *non0idxj, *non0idxk;
@@ -174,7 +174,7 @@ FINT CINT3c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                 }
                                 dijk = fac1i / (aijk * sqrt(aijk));
                                 CINTg3c1e_ovlp(g, ai[ip], aj[jp], ak[kp], dijk, envs);
-                                (*envs->f_gout)(gout, g, envs->idx, envs, *gempty);
+                                (*envs->f_gout)(gout, g, idx, envs, *gempty);
 
                                 PRIM2CTR0(i, gout, envs->nf*n_comp);
                         } // end loop i_prim
@@ -230,7 +230,7 @@ FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
 
         FINT *idx;
         MALLOC_INSTACK(idx, envs->nf * 3);
-        CINTg2e_index_xyz(envs->idx, envs);
+        CINTg2e_index_xyz(idx, envs);
 
         FINT *non0ctri, *non0ctrj, *non0ctrk;
         FINT *non0idxi, *non0idxj, *non0idxk;
@@ -356,7 +356,7 @@ FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
                                         CINTg3c1e_nuc(g, ai[ip], aj[jp], ak[kp], rijk, cr, t2,
                                                       dijk * w[i] * tau, envs);
 
-                                        (*envs->f_gout)(gout, g, envs->idx, envs, rys_empty);
+                                        (*envs->f_gout)(gout, g, idx, envs, rys_empty);
                                         rys_empty = 0;
                                 }
 

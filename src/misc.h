@@ -4,6 +4,7 @@
  * basic functions
  */
 
+#include <stdint.h>
 #include "config.h"
 #include "fblas.h"
 
@@ -24,7 +25,7 @@ double CINTgto_norm(FINT n, double a);
 
 #define MALLOC_INSTACK(var, n) \
         var = (void *)cache; \
-        cache = (double *)(var + n);
+        cache = (void *)(((uintptr_t)(var + (n)) + 7) & (-(uintptr_t)8));
 
 #ifdef WITH_CINT2_INTERFACE
 #define ALL_CINT(NAME) \
