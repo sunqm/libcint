@@ -1,3 +1,5 @@
+Version 4.0.4  (2020-10-29):
+	* Fix cache size bug in int3c1e
 Version 4.0.3  (2020-10-27):
 	* Fix memory allocation in int3c1e
 	* Improve macro MALLOC_INSTACK

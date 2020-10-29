@@ -377,6 +377,16 @@ FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
         return !*kempty;
 }
 
+#define PAIRDATA_NON0IDX_SIZE(ps) \
+                FINT *bas = envs->bas; \
+                FINT *shls  = envs->shls; \
+                FINT i_prim = bas(NPRIM_OF, shls[0]); \
+                FINT j_prim = bas(NPRIM_OF, shls[1]); \
+                FINT k_prim = bas(NPRIM_OF, shls[2]); \
+                FINT ps = (i_prim * x_ctr[0] \
+                           + j_prim * x_ctr[1] \
+                           + k_prim * x_ctr[2] \
+                           + envs->nf*3);
 
 FINT CINT3c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                        double *cache, FINT int_type)
@@ -385,16 +395,18 @@ FINT CINT3c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1] * x_ctr[2];
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         if (out == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng + len0 + nc*n_comp*4;
+                FINT cache_size = leng + len0 + nc*n_comp*4 + pdata_size;
                 return cache_size;
         }
         double *stack = NULL;
         if (cache == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng + len0 + nc*n_comp*4;
+                FINT cache_size = leng + len0 + nc*n_comp*4 + pdata_size;
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
@@ -472,16 +484,20 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1] * x_ctr[2];
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         if (out == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*4, nc*n_comp+envs->nf*3);
+                FINT cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
+                                      nc*n_comp+envs->nf*3);
                 return cache_size;
         }
         double *stack = NULL;
         if (cache == NULL) {
+                PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*4, nc*n_comp+envs->nf*3);
+                FINT cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
+                                      nc*n_comp+envs->nf*3);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }

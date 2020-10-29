@@ -252,12 +252,11 @@ k_contracted: ;
                 FINT j_prim = bas(NPRIM_OF, shls[1]); \
                 FINT k_prim = bas(NPRIM_OF, shls[2]); \
                 FINT l_prim = bas(NPRIM_OF, shls[3]); \
-                FINT ps = ((i_prim*j_prim + k_prim*l_prim) * 5 \
-                           + i_prim * x_ctr[0] \
+                FINT ps = (i_prim * x_ctr[0] \
                            + j_prim * x_ctr[1] \
                            + k_prim * x_ctr[2] \
                            + l_prim * x_ctr[3] \
-                           +(i_prim+j_prim+k_prim+l_prim)*2 + envs->nf*3);
+                           + envs->nf*3);
 
 FINT CINT4c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                        double *cache)
