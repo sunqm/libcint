@@ -206,6 +206,10 @@ i_contracted: ;
         double *env = envs->env; \
         FINT i_sh = shls[0]; \
         FINT j_sh = shls[1]; \
+        if (opt->pairdata != NULL && \
+            opt->pairdata[i_sh*opt->nbas+j_sh] == NOVALUE) { \
+                return 0; \
+        } \
         FINT k_sh = shls[2]; \
         FINT i_ctr = envs->x_ctr[0]; \
         FINT j_ctr = envs->x_ctr[1]; \
