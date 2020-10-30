@@ -1,3 +1,5 @@
+Version 4.0.5  (2020-10-30):
+	* Fix prescreening bug in int3c2e
 Version 4.0.4  (2020-10-29):
 	* Fix cache size bug in int3c1e
 Version 4.0.3  (2020-10-27):
