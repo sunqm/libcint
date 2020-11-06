@@ -15,7 +15,7 @@
 #include "cart2sph.h"
 #include "c2f.h"
 
-#define PRIM2CTR0(ctrsymb, gp, ngp) \
+#define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
                         CINTprim_to_ctr_0(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
@@ -229,21 +229,21 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                         }
                                         if ((*envs->f_g0_2e)(g, fac1i, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
-                                                PRIM2CTR0(i, gout, envs->nf*n_comp);
+                                                PRIM2CTR(i, gout, envs->nf*n_comp);
                                         }
 i_contracted: ;
                                 } // end loop i_prim
                                 if (!*iempty) {
-                                        PRIM2CTR0(j, gctri, envs->nf*i_ctr*n_comp);
+                                        PRIM2CTR(j, gctri, envs->nf*i_ctr*n_comp);
                                 }
                         } // end loop j_prim
                         if (!*jempty) {
-                                PRIM2CTR0(k, gctrj,envs->nf*i_ctr*j_ctr*n_comp);
+                                PRIM2CTR(k, gctrj,envs->nf*i_ctr*j_ctr*n_comp);
                         }
 k_contracted: ;
                 } // end loop k_prim
                 if (!*kempty) {
-                        PRIM2CTR0(l, gctrk, envs->nf*i_ctr*j_ctr*k_ctr*n_comp);
+                        PRIM2CTR(l, gctrk, envs->nf*i_ctr*j_ctr*k_ctr*n_comp);
                 }
         } // end loop l_prim
 
@@ -348,22 +348,6 @@ k_contracted: ;
         envs->r##I##J##rx[0] = r##I##J[0] - envs->rx_in_r##I##J##rx[0]; \
         envs->r##I##J##rx[1] = r##I##J[1] - envs->rx_in_r##I##J##rx[1]; \
         envs->r##I##J##rx[2] = r##I##J[2] - envs->rx_in_r##I##J##rx[2];
-
-#define PRIM2CTR(ctrsymb, gp, ngp) \
-        if (ctrsymb##_ctr > 1) {\
-                if (*ctrsymb##empty) { \
-                        CINTprim_to_ctr_0(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
-                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
-                                          non0ctr##ctrsymb[ctrsymb##p], \
-                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
-                } else { \
-                        CINTprim_to_ctr_1(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
-                                          ngp, ctrsymb##_prim, ctrsymb##_ctr, \
-                                          non0ctr##ctrsymb[ctrsymb##p], \
-                                          non0idx##ctrsymb+ctrsymb##p*ctrsymb##_ctr); \
-                } \
-        } \
-        *ctrsymb##empty = 0
 
 // i_ctr = j_ctr = k_ctr = l_ctr = 1;
 FINT CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cache)
