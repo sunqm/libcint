@@ -2147,6 +2147,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
                         cs[k + j * MXROOTS1] = fac * v[k];
                 }
         }
+        return 0;
 }
 
 static int R_qroot(FINT nroots, double x, double *roots, double *weights)
