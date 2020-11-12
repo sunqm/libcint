@@ -1,3 +1,6 @@
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, '../../scripts')))
+
 import ctypes
 import numpy
 from rys_roots import *
