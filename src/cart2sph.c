@@ -7,6 +7,7 @@
  *
  * Cartesian to real-spheric coefficients
  * ref: H. B. Schlegel and M. J.  Frisch, Int. J. Quant. Chem., 54(1995), 83-87.
+ * See also the python implementation xyz2sph_real in testsuit/cart2sph.py
  */
 
 #include <stdlib.h>
