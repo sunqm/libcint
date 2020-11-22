@@ -1521,11 +1521,10 @@ for (i = 1; i <= order; i++) { \
         p = p * x + a[order-i]; \
 }
 
-static int R_dnode(double *a, double *rt, FINT order)
+static int R_dnode(double *a, double *roots, FINT order)
 {
         const double accrt = 1e-15;
         double x0, x1, xi, x1init, p0, p1, pi, p1init;
-        double roots[order];
         FINT i, m, n;
 
         x1init = 0;
@@ -1533,12 +1532,13 @@ static int R_dnode(double *a, double *rt, FINT order)
         for (m = 0; m < order; ++m) {
                 x0 = x1init;
                 p0 = p1init;
-                x1init = rt[m];
+                x1init = roots[m];
                 POLYNOMIAL_VALUE1(p1init, a, order, x1init);
 
                 // When all coefficients a are 0, short-circuit the rest code to
                 // ensure the roots from the lower order polynomials are preserved
                 if (p1init == 0) {
+                        // roots[m] = x1init;
                         continue;
                 }
                 if (p0 * p1init > 0) {
@@ -1597,9 +1597,6 @@ static int R_dnode(double *a, double *rt, FINT order)
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
                 roots[m] = xi;
-        }
-        for (m = 0; m < order; ++m) {
-                rt[m] = roots[m];
         }
         return 0;
 }
@@ -1674,7 +1671,7 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
         double cs[MXROOTS1*MXROOTS1];
-        double rt[nroots1];
+        double rt[MXROOTS1];
         double *a;
         double root, poly, wsum, dum;
 
@@ -1751,7 +1748,7 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
 
 static int R_droot(FINT nroots, double x, double *roots, double *weights)
 {
-        double fmt_ints[nroots*2+1];
+        double fmt_ints[MXROOTS*2+1];
         gamma_inc_like(fmt_ints, x, nroots*2);
         return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
 }
@@ -1759,7 +1756,7 @@ static int R_droot(FINT nroots, double x, double *roots, double *weights)
 #ifdef WITH_RANGE_COULOMB
 static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights)
 {
-        double fmt_ints[nroots*2+1];
+        double fmt_ints[MXROOTS*2+1];
         fmt_erfc_like(fmt_ints, x, lower, nroots*2);
         return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
 }
@@ -1797,7 +1794,7 @@ static long double c99_expl(long double x)
 #define EXPL    c99_expl
 #endif
 
-static int R_lnode(long double *a, long double *rt, FINT order)
+static int R_lnode(long double *a, long double *roots, FINT order)
 {
 #ifdef LDBL_MANT_DIG
         const long double accrt = LDBL_EPSILON*10;
@@ -1805,7 +1802,6 @@ static int R_lnode(long double *a, long double *rt, FINT order)
         const long double accrt = 1e-15;
 #endif
         long double x0, x1, xi, x1init, p0, p1, pi, p1init;
-        long double roots[order];
         FINT i, m, n;
 
         x1init = 0;
@@ -1813,9 +1809,10 @@ static int R_lnode(long double *a, long double *rt, FINT order)
         for (m = 0; m < order; ++m) {
                 x0 = x1init;
                 p0 = p1init;
-                x1init = rt[m];
+                x1init = roots[m];
                 POLYNOMIAL_VALUE1(p1init, a, order, x1init);
                 if (p1init == 0) {
+                        // roots[m] = x1init;
                         continue;
                 }
                 if (p0 * p1init > 0) {
@@ -1875,9 +1872,6 @@ static int R_lnode(long double *a, long double *rt, FINT order)
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
                 roots[m] = xi;
-        }
-        for (m = 0; m < order; ++m) {
-                rt[m] = roots[m];
         }
         return 0;
 }
@@ -2013,11 +2007,10 @@ static int R_lroot(FINT nroots, double x,
 }
 #else // defined HAVE_QUADMATH_H
 
-static int R_qnode(__float128 *a, __float128 *rt, FINT order)
+static int R_qnode(__float128 *a, __float128 *roots, FINT order)
 {
         const __float128 accrt = 1e-20q;
         __float128 x0, x1, xi, x1init, p0, p1, pi, p1init;
-        __float128 roots[order];
         FINT i, m, n;
 
         x1init = 0;
@@ -2025,12 +2018,13 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
         for (m = 0; m < order; ++m) {
                 x0 = x1init;
                 p0 = p1init;
-                x1init = rt[m];
+                x1init = roots[m];
                 POLYNOMIAL_VALUE1(p1init, a, order, x1init);
 
                 // When all coefficients a are 0, short-circuit the rest code to
                 // ensure the roots from the lower order polynomials are preserved
                 if (p1init == 0) {
+                        // roots[m] = x1init;
                         continue;
                 }
                 if (p0 * p1init > 0) {
@@ -2090,9 +2084,6 @@ static int R_qnode(__float128 *a, __float128 *rt, FINT order)
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
                 roots[m] = xi;
-        }
-        for (m = 0; m < order; ++m) {
-                rt[m] = roots[m];
         }
         return 0;
 }
