@@ -1,3 +1,5 @@
+Version 4.0.7  (2020-11-23):
+        Fix bug in rys_roots R_dnode function when R_dsmit fails to find all roots
 Version 4.0.6  (2020-11-13):
 	* Fix return value bug in rysroots
 Version 4.0.5  (2020-10-30):
