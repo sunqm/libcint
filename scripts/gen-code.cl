@@ -332,10 +332,10 @@ iz = idx[2];~%")
 (defun write-functype-header (fout intname &optional doc)
   (if doc
       (format fout "~a~%" doc))
-  (format fout "CINTOptimizerFunction ~a_optimizer;
-CINTIntegralFunction ~a_cart;
-CINTIntegralFunction ~a_sph;
-CINTIntegralFunction ~a_spinor;~%~%" intname intname intname intname))
+  (format fout "extern CINTOptimizerFunction ~a_optimizer;
+extern CINTIntegralFunction ~a_cart;
+extern CINTIntegralFunction ~a_sph;
+extern CINTIntegralFunction ~a_spinor;~%~%" intname intname intname intname))
 
 ;!!! Be very cautious of the reverse on i-operators and k operators!
 ;!!! When multiple tensor components (>= rank 2) provided by the operators
