@@ -239,7 +239,7 @@ void _CINT_clenshaw_dc(double *rr, const double *x, double u, FINT nroot)
 void _CINT_clenshaw_d1(double *rr, const double *x, double u, FINT nroot)
 {
         FINT i;
-        double d0, d1, g0, g1;
+        double d0, g0;
         double u2 = u * 2.;
 
         for (i = 0; i < nroot; i++) {

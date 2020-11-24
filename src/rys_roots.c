@@ -110,7 +110,7 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
 static void erfc_rys_aug_polyfits(FINT nroots, double x, double lower,
                                   double *u, double *w, double turnover_point)
 {
-        int error;
+        int error = 0;
         if (lower < turnover_point) {
                 error = erfc_rys_roots(nroots, x, lower, u, w);
         }
@@ -1668,12 +1668,12 @@ static int R_dsmit(double *cs, double *fmt_ints, FINT n)
 static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
                           double *roots, double *weights)
 {
-        FINT i, k, j, m, order;
+        FINT i, k, j, order;
         FINT nroots1 = nroots + 1;
         double cs[MXROOTS1*MXROOTS1];
         double rt[MXROOTS1];
         double *a;
-        double root, poly, wsum, dum;
+        double root, poly, dum;
 
         // to avoid numerical instability for very small fmt integrals
         if (fmt_ints[0] == 0) {
@@ -1684,8 +1684,8 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
                 return 0;
         }
         if (nroots == 1) {
-                roots[k] = fmt_ints[1] / (fmt_ints[0] - fmt_ints[1]);
-                weights[k] = fmt_ints[0];
+                roots[0] = fmt_ints[1] / (fmt_ints[0] - fmt_ints[1]);
+                weights[0] = fmt_ints[0];
                 return 0;
         }
 
@@ -2143,13 +2143,13 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
 
 static int R_qroot(FINT nroots, double x, double *roots, double *weights)
 {
-        FINT i, k, j, m, order;
+        FINT i, k, j, order;
         FINT nroots1 = nroots + 1;
         __float128 cs[MXROOTS1*MXROOTS1];
         __float128 rt[MXROOTS1];
         __float128 fmt_ints[MXROOTS*2+1];
         __float128 *a;
-        __float128 root, poly, wsum, dum;
+        __float128 root, poly, dum;
 
         qgamma_inc_like(fmt_ints, x, nroots*2);
         if (fmt_ints[0] == 0) {

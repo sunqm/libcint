@@ -433,7 +433,7 @@ void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, FINT nf,
 void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, FINT nf,
                        FINT nprim, FINT nctr, int non0ctr, int *sortedidx)
 {
-        FINT n, i, k;
+        FINT n, i;
         double c0, c1;
         double *p0, *p1;
 

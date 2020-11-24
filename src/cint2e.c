@@ -49,8 +49,8 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT j_prim = bas(NPRIM_OF, j_sh);
         FINT k_prim = bas(NPRIM_OF, k_sh);
         FINT l_prim = bas(NPRIM_OF, l_sh);
-        double *ri = envs->ri;
-        double *rj = envs->rj;
+        //double *ri = envs->ri;
+        //double *rj = envs->rj;
         double *rk = envs->rk;
         double *rl = envs->rl;
         double *ai = env + bas(PTR_EXP, i_sh);
@@ -94,7 +94,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         double log_rr_kl = (envs->lk_ceil+envs->ll_ceil+1)*log(rr_kl+1)/2;
         double akl, ekl, expijkl, ccekl;
         double *rij;
-        const double dist_ij = SQUARE(envs->rirj);
+        //const double dist_ij = SQUARE(envs->rirj);
         const double dist_kl = SQUARE(envs->rkrl);
 
         FINT *idx;

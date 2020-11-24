@@ -46,8 +46,8 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT i_prim = bas(NPRIM_OF, i_sh);
         FINT j_prim = bas(NPRIM_OF, j_sh);
         FINT k_prim = bas(NPRIM_OF, k_sh);
-        double *ri = envs->ri;
-        double *rj = envs->rj;
+        //double *ri = envs->ri;
+        //double *rj = envs->rj;
         double *ai = env + bas(PTR_EXP, i_sh);
         double *aj = env + bas(PTR_EXP, j_sh);
         double *ak = env + bas(PTR_EXP, k_sh);
@@ -79,9 +79,9 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT *gempty = empty + 3;
         /* COMMON_ENVS_AND_DECLARE end */
 
-        double eij, expij;
+        double expij;
         double *rij;
-        const double dist_ij = SQUARE(envs->rirj);
+        //const double dist_ij = SQUARE(envs->rirj);
 
         FINT *idx;
         MALLOC_INSTACK(idx, envs->nf * 3);
@@ -217,8 +217,6 @@ i_contracted: ;
         FINT i_prim = bas(NPRIM_OF, i_sh); \
         FINT j_prim = bas(NPRIM_OF, j_sh); \
         FINT k_prim = bas(NPRIM_OF, k_sh); \
-        double *ri = envs->ri; \
-        double *rj = envs->rj; \
         double *ai = env + bas(PTR_EXP, i_sh); \
         double *aj = env + bas(PTR_EXP, j_sh); \
         double *ak = env + bas(PTR_EXP, k_sh); \
@@ -255,9 +253,8 @@ i_contracted: ;
         MALLOC_INSTACK(non0ctrk, k_prim+k_prim*k_ctr); \
         non0idxk = non0ctrk + k_prim; \
         CINTOpt_non0coeff_byshell(non0idxk, non0ctrk, ck, k_prim, k_ctr); \
-        double eij, expij; \
+        double expij; \
         double *rij; \
-        const double dist_ij = SQUARE(envs->rirj); \
         FINT *idx = opt->index_xyz_array[envs->i_l*LMAX1*LMAX1 \
                                         +envs->j_l*LMAX1+envs->k_l]; \
         if (idx == NULL) { \
