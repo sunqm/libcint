@@ -6,14 +6,9 @@ virtualenv:
   system_site_packages: true
 os:
 - linux
-- osx
 compiler:
 - gcc
 - clang
-matrix:
-  allow_failures:
-  - os: osx
-    compiler: clang
 addons:
   apt:
     sources:
@@ -23,22 +18,16 @@ addons:
     packages:
     - cmake
     - python-numpy
-    - gcc-5
-    - g++-5
-    - gfortran-5
+    - gcc
+    - g++
+    - gfortran
     # This should provide OpenMP
-    - clang-3.8
+    - clang
     - libblas-dev
 script:
 - env
 - mkdir build
 - cd build
-- if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${CC}" = "gcc" ]; then brew install gcc6 && export CC=gcc-6 CXX=g++-6 ; fi
-- if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${CC}" = "clang" ]; then brew install llvm38 && export CC=clang-3.8 CXX=clang-3.8 ; fi
-- export CMAKE_C_COMPILER=$CC
-- export CMAKE_CXX_COMPILER=$CXX
-- export CMAKE_C_FLAGS="-O3 -fopenmp"
-- export CMAKE_CXX_FLAGS="-O3 -fopenmp"
 - echo 'if the following fails, use `cmake --debug-output ..` instead'
 - cmake -DWITH_RANGE_COULOMB=1 .. -DENABLE_TEST=1 -DQUICK_TEST=1
 - make

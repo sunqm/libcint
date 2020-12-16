@@ -1,0 +1,17 @@
+name: cint pipeline
+
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile
+      - run: |
+          env
+          mkdir build
+          cd build
+          cmake -DWITH_RANGE_COULOMB=1 .. -DENABLE_TEST=1 -DQUICK_TEST=1
+          make
