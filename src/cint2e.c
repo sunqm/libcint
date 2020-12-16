@@ -178,6 +178,16 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                         akl = ak[kp] + al[lp];
                         ekl = dist_kl * ak[kp] * al[lp] / akl;
                         ccekl = ekl - log_rr_kl - log_maxck[kp] - log_maxcl[lp];
+                        // ccekl is almost the overlap of |k> |l>. For typical
+                        // chemistry systems, use overlap to prescreen eri
+                        // almost 100% works.
+                        // The largest error may appear for two Gaussians with
+                        // dist_kl ~4^2 and ak=al ~2.5. If in the middle of |k>
+                        // and |l> it happens to exist steep functions |i>, |j>.
+                        // The error ~ 2*\sqrt{2*ak/pi} ~ 3. So in the worst case,
+                        // an integral ~= 3*cutoff may be incorrectly dropped.
+                        // Increasing expcutoff by ln(3) can guarantee to get
+                        // the required accuracy in any circumstance.
                         if (ccekl > expcutoff) {
                                 goto k_contracted;
                         }
