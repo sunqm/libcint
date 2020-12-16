@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Compile
-      - run: |
+        run: |
           env
           mkdir build
           cd build
