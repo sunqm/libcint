@@ -182,8 +182,8 @@ def test_rys_roots_vs_polyfit():
 
     es = 2**numpy.arange(-6, 6, .5)
     for i in range(6, 12):
-        for low in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-            for x in es:
+        for x in es:
+            for low in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
                 diffs = check(i, x, low)
                 print(i, x, low, diffs, abs(diffs[0])>abs(diffs[1]), abs(diffs[2])>abs(diffs[3]))
 

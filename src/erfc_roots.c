@@ -18,8 +18,7 @@ void CINTerfc_rys_polyfits(FINT nroots, double x, double lower, double* u, doubl
         double ll, t, tt;
         FINT k, it;
         FINT offset;
-        double im [14*nroots];
-        double imc[14*nroots];
+        double im[14*nroots];
 
         t = x;
         if (t > 19682.99) t = 19682.99;
