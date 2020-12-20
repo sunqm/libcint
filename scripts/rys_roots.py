@@ -6,7 +6,7 @@ import numpy as np
 import scipy.linalg
 import scipy.special
 
-def fmt(t, m, low=None):
+def fmt(t, m, low=None, factor=mpmath.mpf(1)):
 #             _ 1           2
 #            /     2 m  -t u
 # F (t)  =   |    u    e      du,
@@ -14,11 +14,11 @@ def fmt(t, m, low=None):
 #
     # fmt1 is alaways more accurate than fmt2 and ~3 times slower than fmt2
     if (t < m + 1.5):
-        return fmt1(t, m, low)
+        return fmt1(t, m, low, factor)
     else:
-        return fmt2(t, m, low)
+        return fmt2(t, m, low, factor)
 
-def fmt1(t, m, low=None):
+def fmt1(t, m, low=None, factor=mpmath.mpf(1)):
 #
 # F[m] = int u^{2m} e^{-t u^2} du
 #      = 1/(2m+1) int e^{-t u^2} d u^{2m+1}
@@ -49,7 +49,7 @@ def fmt1(t, m, low=None):
 #      = -1/2t [e^{-t u^2} * u^{2m-1}]_0^1 + (2m-1)/2t int u^{2m-2} e^{-t u^2} du
 #      = 1/2t (-e^{-t} + (2m-1) F[m-1])
 #
-def fmt2(t, m, low=None):
+def fmt2(t, m, low=None, factor=mpmath.mpf(1)):
     tt = mpmath.sqrt(t)
     f = mpmath.pi**.5/2. / tt * mpmath.erf(tt)
     e = mpmath.exp(-t)
@@ -60,18 +60,18 @@ def fmt2(t, m, low=None):
         out.append(f)
     return np.array(out)
 
-def fmt_erfc(t, m, low=0):
+def fmt_erfc(t, m, low=0, factor=mpmath.mpf(1)):
     if m > 3:
         turnover = 4
     else:
         turnover = m + 0.5
     turnover = m + 1.5
     if t < turnover:
-        return fmt1_erfc(t, m, low)
+        return fmt1_erfc(t, m, low, factor)
     else:
-        return fmt2_erfc(t, m, low)
+        return fmt2_erfc(t, m, low, factor)
 
-def fmt1_erfc(t, m, low=0):
+def fmt1_erfc(t, m, low=0, factor=mpmath.mpf(1)):
 #             _ 1           2
 #            /     2 m  -t u
 # F (t)  =   |    u    e      du,
@@ -87,6 +87,8 @@ def fmt1_erfc(t, m, low=0):
     b = mpmath.mpf(m + 0.5)
     e = .5 * mpmath.exp(-t)
     e1 = .5 * mpmath.exp(-t * low*low) * mpmath.power(low, 2*m+1)
+    e *= factor
+    e1 *= factor
     x = e
     x1 = e1
     s = e - e1
@@ -115,13 +117,15 @@ def fmt1_erfc(t, m, low=0):
 #      = 1/2t (-e^{-t} + e{-t s^2} s^{2m-1} + (2m-1)/ F[m-1])
 # F[0] = int_s^1 e^{-t u^2} du
 #
-def fmt2_erfc(t, m, low=0):
+def fmt2_erfc(t, m, low=0, factor=mpmath.mpf(1)):
     tt = mpmath.sqrt(t)
     low = mpmath.mpf(low)
     low2 = low * low
-    f = mpmath.sqrt(mpmath.pi)/2. / tt * (mpmath.erf(tt) - mpmath.erf(low*tt))
+    f = factor * mpmath.sqrt(mpmath.pi)/2. / tt * (mpmath.erf(tt) - mpmath.erf(low*tt))
     e = mpmath.exp(-t)
     e1 = mpmath.exp(-t*low2) * low
+    e *= factor
+    e1 *= factor
     b = mpmath.mpf('.5') / t
     out = [f]
     for i in range(m):
@@ -229,11 +233,13 @@ def R_dsmit(s, n):
 def rys_roots_weights_partial(nroots, x, low=None):
     if low is None:
         ff = fmt(x, nroots*2)
+        if ff[0] < .1**(DECIMALS/4):
+            return zeros(nroots), zeros(nroots)
     else:
-        ff = fmt_erfc(x, nroots*2, low)
-
-    if ff[0] < .1**(DECIMALS/4):
-        return zeros(nroots), zeros(nroots)
+        if x * low**2 > DECIMALS*.7:
+            return zeros(nroots), zeros(nroots)
+        factor = mpmath.exp(x * low**2)
+        ff = fmt_erfc(x, nroots*2, low, factor)
 
     nroots1 = nroots + 1
     s = zeros((nroots1, nroots1))
@@ -267,4 +273,6 @@ def rys_roots_weights_partial(nroots, x, low=None):
 def rys_roots_weights(nroots, x, low=None):
     rt, weights = rys_roots_weights_partial(nroots, x, low)
     roots = rt / (1 - rt)
+    if low is not None and x * low**2 < DECIMALS*.7:
+        weights *= mpmath.exp(-x * low**2)
     return roots, weights

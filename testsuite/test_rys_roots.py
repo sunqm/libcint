@@ -173,7 +173,7 @@ def test_polyfit():
 def test_rys_roots_vs_polyfit():
     def check(nroots, x, low):
         r_ref, w_ref = rys_roots_weights(nroots, x, low)
-        r0, w0 = cint_call('erfc_rys_roots', nroots, x, low)
+        r0, w0 = cint_call('CINTerfc_rys_roots', nroots, x, low)
         r1, w1 = cint_call('CINTerfc_roots', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),

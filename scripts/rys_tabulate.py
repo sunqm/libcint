@@ -134,6 +134,9 @@ def polyfit_erfc(nroots, x, low):
 
     im = clenshaw_d1(tab_ws.astype(float), u, nroots)
     ww = clenshaw_d1(im, tt, nroots)
+    if x * low**2 < DECIMALS*.7:
+        factor = mpmath.exp(-x * low**2)
+        ww = [w * factor for w in ww]
     return rr, ww
 
 def generate_table(path):

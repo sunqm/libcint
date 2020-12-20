@@ -258,17 +258,17 @@ inline double _pow(double base, FINT exponent)
 
 /* This function evaluates the auxiliary integral,
  *
- *    _ 1           2
- *   /     2 m  -t u
- *   |    u    e      du,
- *  _/  s
+ *     2  _ 1           2
+ *  t s  /     2 m  -t u
+ * e     |    u    e      du,
+ *      _/  s
  *
  * by a power series expansion
  *
- * F[m] = int_l^1 u^{2m} e^{-t u^2} du
- *      = 1/(2m+1) int e^{-t u^2} d u^{2m+1}
- *      = 1/(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
- *      = 1/(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
+ * F[m] = e^{t s^2} int_l^1 u^{2m} e^{-t u^2} du
+ *      = e^{t s^2} /(2m+1) int e^{-t u^2} d u^{2m+1}
+ *      = e^{t s^2} /(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
+ *      = e^{t s^2} /(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
  */
 void fmt_erfc_like(double *f, double t, double lower, FINT m)
 {
@@ -294,8 +294,8 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
         if (t < turnover_point) {
                 double b = m + 0.5;
                 double bi;
-                double e = .5 * exp(-t);
-                double e1 = .5 * exp(-t * lower2) * lower;
+                double e = .5 * exp(-t * (1 - lower2));
+                double e1 = .5 * lower;
                 e1 *= _pow(lower2, m);
                 double x = e;
                 double x1 = e1;
@@ -321,10 +321,13 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
                 double tt = sqrt(t);
                 // erfc(a) - erfc(b) is more accurate than erf(b) - erf(a)
                 double val = pi2 / tt * (erfc(lower * tt) - erfc(tt));
+                if (val != 0) {
+                        val *= exp(t * lower2);
+                }
                 f[0] = val;
                 if (m > 0) {
-                        double e = exp(-t);
-                        double e1 = exp(-t*lower2) * lower;
+                        double e = exp(-t * (1 - lower2));
+                        double e1 = lower;
                         double b = .5 / t;
                         for (i = 0; i < m; i++) {
                                 val = b * ((2*i+1) * val - e + e1);

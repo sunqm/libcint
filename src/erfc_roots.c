@@ -36,13 +36,14 @@ void CINTerfc_rys_polyfits(FINT nroots, double x, double lower, double* u, doubl
 
         offset = nroots * 196 * it;
         _CINT_clenshaw_dc(im, dx+offset, ll, nroots);
-        _CINT_matmul_14_14(imc, im, nroots);
-        _CINT_clenshaw_d1(u, imc, tt, nroots);
-        _CINT_clenshaw_dc(im, dw+offset, ll, nroots);
-        _CINT_matmul_14_14(imc, im, nroots);
-        _CINT_clenshaw_d1(w, imc, tt, nroots);
+        _CINT_clenshaw_d1(u, im, tt, nroots);
 
+        _CINT_clenshaw_dc(im, dw+offset, ll, nroots);
+        _CINT_clenshaw_d1(w, im, tt, nroots);
+
+        double fac = exp(-x * lower * lower);
         for (k = 0; k < nroots; k++) {
                 u[k] = u[k] / (1 - u[k]);
+                w[k] *= fac;
         }
 }
