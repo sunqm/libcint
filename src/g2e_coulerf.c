@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
  *
- * Attenuated coulomb operator exp(-w r_{12}^2) / r_{12}
+ * Attenuated coulomb operator erf(-w r_{12}) / r_{12}
  */
 
 #include <stdio.h>

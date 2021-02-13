@@ -126,32 +126,60 @@ void CINTerfc_rys_roots(FINT nroots, double x, double lower, double *u, double *
         FINT error;
         switch (nroots) {
         case 1: case 2: case 3: case 4:
-                error = erfc_rys_roots(nroots, x, lower, u, w);
-                if (error == 1) {
-                        CINTerfc_rys_polyfits(nroots, x, lower, u, w);
-                }
+                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
                 break;
         case 5:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.8);
+                if (x < 3.5) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
+                } else if (x < 6.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.8);
+                } else {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
+                }
                 break;
         case 6:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                if (x < 8.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                } else if (x < 11.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
+                } else {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                }
                 break;
         case 7:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
+                if (x < 8.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
+                } else if (x < 12.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                } else {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                }
                 break;
         case 8:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.3);
+                if (x < 1.0) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.2);
+                } else if (x < 6.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
+                } else if (x < 14.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                } else {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                }
                 break;
-        case 9: case 10: case 11: case 12: case 13:
-                CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+        case 9:
+                if (x < 15.) {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.0);
+                } else {
+                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                }
+                break;
+        case 10: case 11: case 12: case 13:
+                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.);
                 break;
         default:
                 fprintf(stderr, "libcint erfc_rys_roots does not support nroots=%d\n", nroots);
 #ifndef KEEP_GOING
                 exit(1);
-#else
-                erfc_rys_roots(nroots, x, lower, u, w);
 #endif
         }
 }

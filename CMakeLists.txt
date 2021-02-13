@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project (cint C)
 set(cint_VERSION_MAJOR "4")
 set(cint_VERSION_MINOR "0")
-set(cint_VERSION_PATCH "7")
+set(cint_VERSION_PATCH "8")
 set(cint_VERSION_TWEAK "0")
 set(cint_VERSION "${cint_VERSION_MAJOR}.${cint_VERSION_MINOR}.${cint_VERSION_PATCH}")
 set(cint_SOVERSION "${cint_VERSION_MAJOR}")
@@ -57,7 +57,7 @@ configure_file(
 set(cintSrc 
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
-  src/rys_roots.c
+  src/rys_roots.c src/rys_wheeler.c src/eigh.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c
   src/cint3c1e.c src/g3c1e.c src/breit.c src/cint4c1e.c src/g4c1e.c
   src/cint1e_a.c src/cint3c1e_a.c

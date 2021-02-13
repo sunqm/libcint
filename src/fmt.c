@@ -153,9 +153,8 @@ void gamma_inc_like(double *f, double t, FINT m)
                         f[i-1] = (e + t * f[i]) / b;
                 }
         } else {
-                double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
-                f[0] = pi2 / tt * erf(tt);
+                f[0] = SQRTPIE4 / tt * erf(tt);
                 if (m > 0) {
                         double e = exp(-t);
                         double b = .5 / t;
@@ -191,9 +190,8 @@ void lgamma_inc_like(long double *f, long double t, FINT m)
                         f[i-1] = (e + t * f[i]) / b;
                 }
         } else {
-                long double pi2 = SQRTPIE4l;
                 long double tt = sqrtl(t);
-                f[0] = pi2 / tt * erfl(tt);
+                f[0] = SQRTPIE4l / tt * erfl(tt);
                 if (m > 0) {
                         long double e = expl(-t);
                         long double b = .5l / t;
@@ -230,9 +228,8 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
                         f[i-1] = (e + t * f[i]) / b;
                 }
         } else {
-                __float128 pi2 = SQRTPIE4q;
                 __float128 tt = sqrtq(t);
-                f[0] = pi2 / tt * erfq(tt);
+                f[0] = SQRTPIE4q / tt * erfq(tt);
                 if (m > 0) {
                         __float128 e = expq(-t);
                         __float128 b = .5q / t;
@@ -258,17 +255,17 @@ inline double _pow(double base, FINT exponent)
 
 /* This function evaluates the auxiliary integral,
  *
- *    _ 1           2
- *   /     2 m  -t u
- *   |    u    e      du,
- *  _/  s
+ *     2  _ 1           2
+ *  t s  /     2 m  -t u
+ * e     |    u    e      du,
+ *      _/  s
  *
  * by a power series expansion
  *
- * F[m] = int_l^1 u^{2m} e^{-t u^2} du
- *      = 1/(2m+1) int e^{-t u^2} d u^{2m+1}
- *      = 1/(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
- *      = 1/(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
+ * F[m] = e^{t s^2} int_l^1 u^{2m} e^{-t u^2} du
+ *      = e^{t s^2} /(2m+1) int e^{-t u^2} d u^{2m+1}
+ *      = e^{t s^2} /(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
+ *      = e^{t s^2} /(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
  */
 void fmt_erfc_like(double *f, double t, double lower, FINT m)
 {
@@ -317,10 +314,9 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
                         f[i-1] = val;
                 }
         } else {
-                double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
                 // erfc(a) - erfc(b) is more accurate than erf(b) - erf(a)
-                double val = pi2 / tt * (erfc(lower * tt) - erfc(tt));
+                double val = SQRTPIE4 / tt * (erfc(lower * tt) - erfc(tt));
                 f[0] = val;
                 if (m > 0) {
                         double e = exp(-t);
