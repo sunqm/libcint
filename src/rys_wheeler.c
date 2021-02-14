@@ -15,9 +15,6 @@
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #endif
-#define MXROOTS   MXRYSROOTS
-//#define MXROOTS1  (MXROOTS+1)
-#define MXROOTS1  MXROOTS
 #define PIE4    0.785398163397448279
 #define PIE2    1.570796326794896619
 #define SQRTPIE4        .886226925452758013
@@ -128,61 +125,6 @@ static double JACOBI_BETA[] = {
 0.062503901799501381,
 0.062503733070517678,
 0.062503575054691758,
-};
-
-// g0 = 0
-// g1 = 1
-// g2 = (1 - jacobi_alpha(i-1)) * g1 - jacobi_beta(i-1) * g0
-static double JACOBI_G1[] = {
-1.,
-6.6666666666666666e-01,
-2.2857142857142857e-01,
-6.9264069264069264e-02,
-1.9891219891219891e-02,
-5.5424451709281430e-03,
-1.5147055125517906e-03,
-4.0840948634729762e-04,
-1.0903034118281582e-04,
-2.8885960521161596e-05,
-7.6068364504791452e-06,
-1.9933967329105871e-06,
-5.2026240972418160e-07,
-1.3532235547047540e-07,
-3.5095609171759659e-08,
-9.0791495627210538e-09,
-2.3436160203537042e-09,
-6.0379728469273390e-10,
-1.5529385154375274e-10,
-3.9880028359911664e-11,
-1.0227329318011211e-11,
-2.6195836807400424e-12,
-6.7021667666804061e-13,
-1.7129874314147969e-13,
-4.3740799606924527e-14,
-1.1159529213471320e-14,
-2.8448593169399156e-15,
-7.2469847486266475e-16,
-1.8448394929969480e-16,
-4.6933738852234784e-17,
-1.1933163509079303e-17,
-3.0324010207174578e-18,
-7.7018210491545133e-19,
-1.9551933428530008e-19,
-4.9612146310433149e-20,
-1.2583451487653842e-20,
-3.1903290187415781e-21,
-8.0854597040778818e-22,
-2.0484074986996722e-22,
-5.1877442282058746e-23,
-1.3134055811505479e-23,
-3.3241778264687495e-24,
-8.4108756327853825e-25,
-2.1275303946732117e-25,
-5.3801396206831078e-26,
-1.3601905868027552e-26,
-3.4379481305173646e-27,
-8.6875394007754882e-28,
-2.1948075939796796e-28,
 };
 
 // ((n + .5) * (n + 1)) / ((2 * n + .5 + 1) * (2*n + .5))
@@ -393,73 +335,6 @@ static double JACOBI_SN[] = {
 0.06315450422703073,
 };
 
-static void jacobi_gs(int n, double x, double *gs)
-{
-        int i;
-        double g0 = 0.;
-        double g1 = 1.;
-        double g2;
-        gs[0] = g1;
-        for (i = 1; i < n; i++) {
-                g2 = x - JACOBI_ALPHA[i - 1] * g1 - JACOBI_BETA[i - 1] * g0;
-                gs[i] = g2;
-                g0 = g1;
-                g1 = g2;
-        }
-}
-
-//static void jacobi_zs(int n, double t, double lower, double *zs)
-//{
-//        int i;
-//        if (lower == 0) {
-//                for (i = 0; i < n; i++) {
-//                        zs[i] = 0.;
-//                }
-//        } else {
-//                double et = exp(-t * lower) * sqrt(lower) / (2 * t);
-//                double g0 = 0.
-//                double g1 = 1.;
-//                double g2;
-//                for (i = 0; i < n; i++) {
-//                        g2 = x - JACOBI_ALPHA[i - 1] * g1 - JACOBI_BETA[i - 1] * g0;
-//                        zs[i] = et * (JACOBI_XS[i] * g1 - g2)
-//                        g0 = g1;
-//                        g1 = g2;
-//                }
-//        }
-//}
-
-
-static void jacobi_us(int n, double t, double lower, double *us)
-{
-        int i;
-        if (lower == 0) {
-                for (i = 0; i < n; i++) {
-                        us[i] = 0.;
-                }
-        } else {
-                double lower2 = lower * lower;
-                double t_inv = .5 / t;
-                double e0 = exp(-t) * t_inv; 
-                double et = exp(-t * lower2) * lower * t_inv;
-                double u0 = (lower2 - 1) * et;
-                double g0 = 1.;
-                double g1 = lower2 - JACOBI_ALPHA[0];
-                double g2, u1, z;
-                us[0] = u0;
-                for (i = 1; i < n; i++) {
-                        g2 = (lower2 - JACOBI_ALPHA[i]) * g1 - JACOBI_BETA[i] * g0;
-                        z = et * (JACOBI_XS[i] * g1 - g2);
-                        u1 = -z - u0 * JACOBI_CS[i];
-                        printf("        z %g g1 %g g2 %g u1 %g\n", z, g1, g2, u1);
-                        us[i] = u1;
-                        g0 = g1;
-                        g1 = g2;
-                        u0 = u1;
-                }
-        }
-}
-
 static void shifted_jacobi_moments(int n, double t, double lower, double *mus)
 {
         double t_inv = .5 / t;
@@ -480,7 +355,7 @@ static void shifted_jacobi_moments(int n, double t, double lower, double *mus)
                 }
         } else {
                 double lower2 = lower * lower;
-                double e0 = exp(-t) * t_inv; 
+                double e0 = exp(-t) * t_inv;
                 double et = exp(-t * lower2) * lower * t_inv;
                 double u0 = (lower2 - 1) * et;
                 double g0 = 1.;
@@ -488,7 +363,7 @@ static void shifted_jacobi_moments(int n, double t, double lower, double *mus)
                 double g2, u1, z;
 
                 mu0 = SQRTPIE4 / tt * (erfc(lower * tt) - erfc(tt));
-                mu1 = t_inv * (mu0 - exp(-t) + exp(-t * lower2) * lower) - JACOBI_ALPHA[0] * mu0;
+                mu1 = t_inv * mu0 - e0 + et - JACOBI_ALPHA[0] * mu0;
                 mus[0] = mu0;
                 mus[1] = mu1;
                 for (i = 1; i < n; i++) {
@@ -583,7 +458,7 @@ static void wheeler_recursion(int n, double *alpha, double *beta, double *moment
         double a1, b1;
         a[0] = a0;
         b[0] = b0;
-        double buf[MXROOTS * 2];
+        double buf[MXRYSROOTS * 2];
         double *s0 = moments;
         double *sm = buf;
         double *sk = buf + n;
@@ -611,17 +486,17 @@ static void wheeler_recursion(int n, double *alpha, double *beta, double *moment
         }
 }
 
-double roots_and_weights(int n, double x, double lower,
-                         double *roots, double *weights)
+double CINTrys_wheeler(int n, double x, double lower,
+                       double *roots, double *weights)
 {
         int i;
-        double a[MXROOTS];
-        double b[MXROOTS];
-        double c0[MXROOTS*MXROOTS];
-        double moments[MXROOTS*2];
-        double buf[MXROOTS*4];
+        double a[MXRYSROOTS];
+        double b[MXRYSROOTS];
+        double c0[MXRYSROOTS*MXRYSROOTS];
+        double moments[MXRYSROOTS*2];
+        double buf[MXRYSROOTS*4];
         double *alpha, *beta;
-        double mu0;
+
         if (x < 20.) {
                 alpha = JACOBI_ALPHA;
                 beta = JACOBI_BETA;
@@ -632,7 +507,7 @@ double roots_and_weights(int n, double x, double lower,
                 laguerre_moments(n * 2, x, lower, alpha, beta, moments);
         }
 
-        mu0 = moments[0];
+        double mu0 = moments[0];
         wheeler_recursion(n, alpha, beta, moments, a, b);
         for (i = 1; i < n; i++) {
                 b[i] = sqrt(b[i]);
@@ -641,6 +516,7 @@ double roots_and_weights(int n, double x, double lower,
         _CINTdiagonalize(n, a, b+1, roots, c0);
 
         for (i = 0; i < n; i++) {
+                roots[i] = roots[i] / (1 - roots[i]);
                 weights[i] = c0[i * n] * c0[i * n] * mu0;
         }
 }

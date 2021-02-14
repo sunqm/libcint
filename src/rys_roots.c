@@ -20,12 +20,7 @@
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #endif
-#define MXROOTS   MXRYSROOTS
-//#define MXROOTS1  (MXROOTS+1)
-#define MXROOTS1  MXROOTS
 #define PIE4        0.78539816339744827900
-
-#include "fmt.c"
 
 static void rys_root1(double x, double *roots, double *weights);
 static void rys_root2(double x, double *roots, double *weights);

@@ -3,15 +3,17 @@ sys.path.insert(0, os.path.abspath(os.path.join(__file__, '../../scripts')))
 
 import ctypes
 import numpy
-from rys_roots import *
+import numpy as np
+import rys_roots
 import rys_tabulate
+import rys_wheeler
 
 def fp(a):
     a = numpy.asarray(a)
     return a.ravel().dot(numpy.cos(numpy.arange(a.size)))
 
+cint = ctypes.CDLL('../build/libcint.so')
 def cint_call(fname, nroots, x, low=None):
-    cint = ctypes.CDLL('../build/libcint.so')
     r = numpy.zeros(nroots)
     w = numpy.zeros(nroots)
     fun = getattr(cint, fname)
@@ -42,50 +44,50 @@ def test_turnover_point():
     import functools
     import mpmath
     mpmath.mp.dps = 15
-    print(check_turnover_point(fmt1, fmt2))
+    print(check_turnover_point(rys_roots.fmt1, rys_roots.fmt2))
     tps = []
     for low in 2**numpy.arange(-4, 5, .5):
-        tp = check_turnover_point(functools.partial(fmt1_erfc, low=low),
-                                  functools.partial(fmt2_erfc, low=low))
+        tp = check_turnover_point(functools.partial(rys_roots.fmt1_erfc, low=low),
+                                  functools.partial(rys_roots.fmt2_erfc, low=low))
         print(low, tp)
         tps.append(tp)
     print(numpy.array(tps).max(axis=0))
-    print(fmt1_erfc(0.9, 2, .6))
-    print(fmt1_erfc(1.1, 2, .2))
-    print(fmt2_erfc(1.1, 2, .2))
-    print(fmt1_erfc(8.1, 2, .2))
-    print(fmt2_erfc(8.1, 2, .2))
-    print(fmt1(1.1, 2))
-    print(fmt2(1.1, 2))
-    print(fmt1(8.1, 2))
-    print(fmt2(8.1, 2))
+    print(rys_roots.fmt1_erfc(0.9, 2, .6))
+    print(rys_roots.fmt1_erfc(1.1, 2, .2))
+    print(rys_roots.fmt2_erfc(1.1, 2, .2))
+    print(rys_roots.fmt1_erfc(8.1, 2, .2))
+    print(rys_roots.fmt2_erfc(8.1, 2, .2))
+    print(rys_roots.fmt1(1.1, 2))
+    print(rys_roots.fmt2(1.1, 2))
+    print(rys_roots.fmt1(8.1, 2))
+    print(rys_roots.fmt2(8.1, 2))
 
-    print(abs(fmt(1, 2) - [0.746824132812427, 0.18947234582049235, 0.10026879814501737]).max())
-    print(abs(fmt(7, 2) - [0.3349010581765593, 0.023856369729357483, 0.005046944801608424]).max())
+    print(abs(rys_roots.fmt(1, 2) - [0.746824132812427, 0.18947234582049235, 0.10026879814501737]).max())
+    print(abs(rys_roots.fmt(7, 2) - [0.3349010581765593, 0.023856369729357483, 0.005046944801608424]).max())
 
 def test_rys_roots_mpmath():
     numpy.random.seed(4)
     a = numpy.random.rand(4,4)
     a = a.T.dot(a)
-    cs = R_dsmit(a, 4)
+    cs = rys_roots.R_dsmit(a, 4)
     print(fp(cs) - -1.1566333099933561)
-    r, w = rys_roots_weights(6, .4)
+    r, w = rys_roots.rys_roots_weights(6, .4)
     print(fp(r) - 2.898038115730877)
     print(fp(w) - 0.1193288112731978)
 
-    print(fp(rys_roots_weights(1, .3)) - 0.93475892362307533)
-    print(fp(rys_roots_weights(2, .8)) - 0.94983728587499205)
-    print(fp(rys_roots_weights(3, .5)) - -2.7165192846520481)
-    print(fp(rys_roots_weights(4, .5)) - -11.442155925744938)
+    print(fp(rys_roots.rys_roots_weights(1, .3)) - 0.93475892362307533)
+    print(fp(rys_roots.rys_roots_weights(2, .8)) - 0.94983728587499205)
+    print(fp(rys_roots.rys_roots_weights(3, .5)) - -2.7165192846520481)
+    print(fp(rys_roots.rys_roots_weights(4, .5)) - -11.442155925744938)
 
-    ff = fmt_erfc(.4, 6*2, 0.2)
-    r, w = rys_roots_weights(6, .4, ff)
+    ff = rys_roots.fmt_erfc(.4, 6*2, 0.2)
+    r, w = rys_roots.rys_roots_weights(6, .4, ff)
     print(fp(r) - 3.0557596858378053)
     print(fp(w) - 0.00070334763896715)
 
 def test_rys_roots_weights():
     def check(nroots, x):
-        r_ref, w_ref = rys_roots_weights(nroots, x)
+        r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
         r, w = cint_call('CINTrys_roots', nroots, x)
         return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
 
@@ -112,7 +114,7 @@ def test_rys_roots_weights():
 
 def test_rys_roots_weights_erfc():
     def check(nroots, x, lower):
-        r_ref, w_ref = rys_roots_weights(nroots, x, lower)
+        r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, lower)
         # Needs to remove keyword "static" for erfc_rys_roots
         # r, w = cint_call('erfc_rys_roots', nroots, x, lower)
         r, w = cint_call('CINTerfc_rys_roots', nroots, x, lower)
@@ -132,6 +134,35 @@ def test_rys_roots_weights_erfc():
     else:
         print('test_rys_roots_weights_erfc .. pass')
 
+
+def test_rys_wheeler():
+    def check(nroots, x):
+        r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
+        r, w = cint_call('CINTrys_wheeler', nroots, x)
+        return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
+
+    failed = False
+    es = 2**numpy.arange(-3, 7, .25)
+    for i in range(1, 12):
+        for x in es:
+            diffs = check(i, x)
+            if any(s > 1e-8 for s in diffs):
+                print(i, x, diffs)
+                failed |= any(s > 1e-5 for s in diffs)
+
+    es = [50, 40, 36, 24, 20, 16, 12, 8, 4, 2, 0.5, 6e-8]
+    for i in range(1, 5):
+        for x in es:
+            diffs = check(i, x)
+            if any(s > 1e-8 for s in diffs):
+                print(i, x, diffs)
+                failed |= any(s > 1e-5 for s in diffs)
+    if failed:
+        print('test_rys_roots_weights .. failed')
+    else:
+        print('test_rys_roots_weights .. pass')
+
+
 def test_stg_roots():
     def stg(nroots, t, u):
         r = numpy.zeros(nroots)
@@ -149,7 +180,7 @@ def test_stg_roots():
 
 def test_polyfit():
     def check(nroots, x, low=None):
-        r0, w0 = rys_roots_weights(nroots, x, low)
+        r0, w0 = rys_roots.rys_roots_weights(nroots, x, low)
         if low is None:
             r1, w1 = rys_tabulate.polyfit_erf(nroots, x)
         else:
@@ -172,7 +203,7 @@ def test_polyfit():
 
 def test_rys_roots_vs_polyfit():
     def check(nroots, x, low):
-        r_ref, w_ref = rys_roots_weights(nroots, x, low)
+        r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
         r0, w0 = cint_call('CINTerfc_rys_roots', nroots, x, low)
         r1, w1 = cint_call('CINTerfc_roots', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
@@ -189,8 +220,28 @@ def test_rys_roots_vs_polyfit():
 
 
 if __name__ == '__main__':
+    #test_rys_wheeler()
     # test_rys_roots_mpmath()
-    test_polyfit()
+    #test_polyfit()
     # test_rys_roots_vs_polyfit()
     #test_rys_roots_weights()
     #test_rys_roots_weights_erfc()
+
+
+    r_ref, w_ref = rys_roots.rys_roots_weights(9, 2.5, .8)
+    r, w = rys_wheeler.roots_and_weights(9, 2.5, .8)
+    #r, w = cint_call('CINTerfc_rys_roots', 5, 2.5, .8)
+    #r, w = cint_call('CINTrys_roots', 4, .125)
+    print(abs(r-r_ref.astype(float)))
+    print(abs(w-w_ref.astype(float)))
+    exit()
+    es = 2**numpy.arange(3, 7, .25)
+    for i in range(1, 12):
+        for x in es:
+            r_ref, w_ref = rys_roots.rys_roots_weights(i, x)
+            r, w = rys_wheeler.roots_and_weights(i, x)
+            diffs = np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
+            if any(s > 1e-8 for s in diffs):
+                print(i, x, diffs)
+                exit()
+

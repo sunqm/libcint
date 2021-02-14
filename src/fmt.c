@@ -13,7 +13,9 @@
  *
  */
 
+#include <float.h>
 #include <math.h>
+#include "cint_const.h"
 #define SML_FLOAT64   1.0e-16
 #define SML_FLOAT80   1.0e-20
 #define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264
