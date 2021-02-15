@@ -3618,7 +3618,7 @@ static int lrys_wheeler_partial(int n, long double *alpha, long double *beta, lo
         return error;
 }
 
-int CINTrys_lagurre(int n, double x, double lower, double *roots, double *weights)
+int CINTrys_laguerre(int n, double x, double lower, double *roots, double *weights)
 {
         assert(n <= PRECOMPUTING_UPPER_BOUND);
         double moments[MXRYSROOTS * 2];
@@ -3645,7 +3645,7 @@ int CINTrys_jacobi(int n, double x, double lower, double *roots, double *weights
         return rys_wheeler_partial(n, alpha, beta, moments, roots, weights);
 }
 
-int CINTlrys_lagurre(int n, double x, double lower, double *roots, double *weights)
+int CINTlrys_laguerre(int n, double x, double lower, double *roots, double *weights)
 {
         assert(n <= PRECOMPUTING_UPPER_BOUND);
         long double moments[MXRYSROOTS * 2];
@@ -5365,7 +5365,7 @@ static int qrys_wheeler_partial(int n, __float128 *alpha, __float128 *beta, __fl
         return error;
 }
 
-int CINTqrys_lagurre(int n, double x, double lower, double *roots, double *weights)
+int CINTqrys_laguerre(int n, double x, double lower, double *roots, double *weights)
 {
         assert(n <= PRECOMPUTING_UPPER_BOUND);
         __float128 moments[MXRYSROOTS * 2];

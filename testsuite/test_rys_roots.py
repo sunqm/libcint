@@ -115,9 +115,7 @@ def test_rys_roots_weights():
 def test_rys_roots_weights_erfc():
     def check(nroots, x, lower):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, lower)
-        # Needs to remove keyword "static" for erfc_rys_roots
-        # r, w = cint_call('erfc_rys_roots', nroots, x, lower)
-        r, w = cint_call('CINTsr_rys_roots', nroots, x, lower)
+        r, w = cint_call('CINTrys_schmidt', nroots, x, lower)
         return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
 
     es = 2**numpy.arange(-3, 6, .25)
@@ -176,8 +174,8 @@ def test_polyfit():
 def test_rys_roots_vs_polyfit():
     def check(nroots, x, low):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
-        r0, w0 = cint_call('CINTsr_rys_roots', nroots, x, low)
-        r1, w1 = cint_call('CINTsr_roots', nroots, x, low)
+        r0, w0 = cint_call('CINTrys_schmidt', nroots, x, low)
+        r1, w1 = cint_call('CINTsr_rys_polyfits', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
                          abs(w0 - w_ref).max(),
@@ -188,7 +186,7 @@ def test_rys_roots_vs_polyfit():
         for x in es:
             for low in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
                 diffs = check(i, x, low)
-                print(i, x, low, diffs, abs(diffs[0])>abs(diffs[1]), abs(diffs[0])>abs(diffs[2]))
+                print(i, x, low, diffs)
 
 
 if __name__ == '__main__':
