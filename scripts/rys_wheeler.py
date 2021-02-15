@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.special
 import mpmath
 DECIMALS = 60
 mpmath.mp.dps = DECIMALS
@@ -222,11 +223,12 @@ def laguerre_moments(n, T, low=0):
     beta = (idx - 1) * (idx * 2 - 3) / (2 * T**2)
     return alpha, beta, moments
 
-def dble_jacobi_moments_0(n, T):
+def flocke_jacobi_moments(n, T):
+    # Flocke's recipe JCP, 131, 064107 
     mu1 = 1
     mu2 = 0
     moments = [mu2, mu1]
-    additive_for_dp = 24
+    additive_for_dp = 20
     # Miller algorithm
     for i in reversed(range(1, n+1+additive_for_dp)):
         r = (2 * i + 1) / (2*T) + (2 * i + 1) / ((4 * i - 1) * (4 * i + 3))
@@ -283,7 +285,7 @@ def roots_and_weights(n, x, low=0):
     if x > 20:
         alpha, beta, moments = laguerre_moments(n*2, x, low)
     #elif low == 0:
-    #    alpha, beta, moments = dble_jacobi_moments_0(n*2, x)
+    #    alpha, beta, moments = flocke_jacobi_moments(n*2, x)
     else:
         alpha, beta, moments = shifted_jacobi_moments(n*2, x, low)
     roots, weights = roots_and_weights_partial(n, alpha, beta, moments)
@@ -292,15 +294,23 @@ def roots_and_weights(n, x, low=0):
 
 if __name__ == '__main__':
     #for i in range(48):
-    #    mpmath.nprint(jacobi_alpha(i), 17)
-    #    mpmath.nprint(jacobi_beta(i), 17)
+    #    mpmath.nprint(jacobi_alpha(i), 36)
+    #    mpmath.nprint(jacobi_beta(i), 36)
     #    mpmath.nprint(jacobi_x(i), 17)
     #    mpmath.nprint(2*i / (2*i + 1) * jacobi_x(i), 17)
-    #    mpmath.nprint(jacobi_rn_part(i+1), 17)
-    #    mpmath.nprint(jacobi_sn(i+1), 17)
+    #    mpmath.nprint(jacobi_rn_part(i+1), 36)
+    #    mpmath.nprint(jacobi_sn(i+1), 36)
     #gs = jacobi_gs(49, 1)
     #for i in gs:
     #    mpmath.nprint(i, 17)
+    #for i in range(51):
+    #    print(f'// n = {i}')
+    #    for c in jacobi_coefs(i):
+    #        mpmath.nprint(c, 36)
+    #for i in range(51):
+    #    cs = jacobi_coefs(i)
+    #    print(', '.join([str(i) for i in abs(cs.astype(float)).argsort()]))
+
     print(roots_and_weights_partial(2, *laguerre_moments(2*2, 5.7, 0)))
     print(roots_and_weights_partial(2, *jacobi_moments(2*2, 5.7)))
     print(roots_and_weights_partial(2, *laguerre_moments(2*2, 5.7, 0.1)))

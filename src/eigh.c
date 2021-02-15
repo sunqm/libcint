@@ -8,9 +8,48 @@
 #include <assert.h>
 #include <math.h>
 #include <float.h>
+#include "rys_roots.h"
+
+#ifdef LAPACK_FOUND
+
+void dstemr_(
+    char const* jobz, char const* range,
+    int const* n,
+    double* D,
+    double* E,
+    double const* vl,
+    double const* vu, int const* il, int const* iu, int* m,
+    double* W,
+    double* Z, int const* ldz, int const* nzc, int* ISUPPZ, int* tryrac,
+    double* work, int const* lwork,
+    int* iwork, int const* liwork,
+    int* info);
+
+int _CINTdiagonalize(int n, double *diag, double *diag_off1, double *eig, double *vec)
+{
+        const char JOBZ = 'V';
+        const char RANGE = 'A';
+        double VL, VU;
+        int IL, IU, M;
+        int LDZ = n;
+        int NZC = n;
+        int ISUPPZ[MXRYSROOTS * 2];
+        int TRYRAC = 1;
+        double WORK[MXRYSROOTS * 18];
+        int LWORK = MXRYSROOTS * 18;
+        int IWORK[MXRYSROOTS * 10];
+        int LIWORK = MXRYSROOTS * 10;
+        int INFO = 0;
+        dstemr_(&JOBZ, &RANGE, &n, diag, diag_off1, &VL, &VU, &IL, &IU, &M,
+                eig, vec, &LDZ, &NZC, ISUPPZ, &TRYRAC,
+                WORK, &LWORK, IWORK, &LIWORK, &INFO);
+        return INFO;
+}
+
+#else
+
 #define MAX(x, y)       ((x) > (y) ? (x) : (y))
 #define MIN(x, y)       ((x) < (y) ? (x) : (y))
-#define MAXROOTS        16
 #define MAXTRY          6
 #define MAXRQITER       6
 #define ITMAX           1000
@@ -1420,14 +1459,16 @@ int _CINTdiagonalize(int n, double *diag, double *diag_off1, double *eig, double
         return _dlaev2(eig, vec, diag, diag_off1);
     }
 
-    int iwork[MAXROOTS * 5];
-    double work[MAXROOTS * 9 + 1];
+    int iwork[MXRYSROOTS * 5];
+    double work[MXRYSROOTS * 9 + 1];
     double *buf_err = work + n;
     double *buf_gp  = work + n * 2 + 1;
     double *buf_wrk = work + n * 3 + 1;
-    int info = 0;
+    int info;
 
     info = _compute_eigenvalues(n, diag, diag_off1, eig, buf_err, buf_gp, buf_wrk);
     info = _compute_eigenvectors(n, diag, diag_off1, eig, buf_err, buf_gp, vec, buf_wrk, iwork);
     return info;
 }
+
+#endif  // LAPACK_FOUND

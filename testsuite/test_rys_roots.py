@@ -96,16 +96,16 @@ def test_rys_roots_weights():
     for i in range(1, 12):
         for x in es:
             diffs = check(i, x)
-            if any(s > 1e-8 for s in diffs):
+            if not all(s < 1e-8 for s in diffs):
                 print(i, x, diffs)
-                failed |= any(s > 1e-5 for s in diffs)
+                failed |= not all(s < 1e-5 for s in diffs)
     es = [50, 40, 36, 24, 20, 16, 12, 8, 4, 2, 0.5, 6e-8]
     for i in range(1, 5):
         for x in es:
             diffs = check(i, x)
-            if any(s > 1e-8 for s in diffs):
+            if not all(s < 1e-8 for s in diffs):
                 print(i, x, diffs)
-                failed |= any(s > 1e-5 for s in diffs)
+                failed |= not all(s < 1e-5 for s in diffs)
     if failed:
         print('test_rys_roots_weights .. failed')
     else:
@@ -117,7 +117,7 @@ def test_rys_roots_weights_erfc():
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, lower)
         # Needs to remove keyword "static" for erfc_rys_roots
         # r, w = cint_call('erfc_rys_roots', nroots, x, lower)
-        r, w = cint_call('CINTerfc_rys_roots', nroots, x, lower)
+        r, w = cint_call('CINTsr_rys_roots', nroots, x, lower)
         return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
 
     es = 2**numpy.arange(-3, 6, .25)
@@ -126,41 +126,13 @@ def test_rys_roots_weights_erfc():
         for x in es:
             for low in [.1, .2, .3, .4, .5, .6, .7, .8, .9]:
                 diffs = check(i, x, low)
-                if any(s > 1e-7 for s in diffs):
+                if not all(s < 1e-7 for s in diffs):
                     print(i, x, low, diffs)
-                    failed |= any(s > 1e-4 for s in diffs)
+                    failed |= not all(s < 1e-4 for s in diffs)
     if failed:
         print('test_rys_roots_weights_erfc .. failed')
     else:
         print('test_rys_roots_weights_erfc .. pass')
-
-
-def test_rys_wheeler():
-    def check(nroots, x):
-        r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
-        r, w = cint_call('CINTrys_wheeler', nroots, x)
-        return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
-
-    failed = False
-    es = 2**numpy.arange(-3, 7, .25)
-    for i in range(1, 12):
-        for x in es:
-            diffs = check(i, x)
-            if any(s > 1e-8 for s in diffs):
-                print(i, x, diffs)
-                failed |= any(s > 1e-5 for s in diffs)
-
-    es = [50, 40, 36, 24, 20, 16, 12, 8, 4, 2, 0.5, 6e-8]
-    for i in range(1, 5):
-        for x in es:
-            diffs = check(i, x)
-            if any(s > 1e-8 for s in diffs):
-                print(i, x, diffs)
-                failed |= any(s > 1e-5 for s in diffs)
-    if failed:
-        print('test_rys_roots_weights .. failed')
-    else:
-        print('test_rys_roots_weights .. pass')
 
 
 def test_stg_roots():
@@ -189,13 +161,13 @@ def test_polyfit():
 
     es = 2**numpy.arange(-3, 6, .25)
     failed = False
-    for i in range(1, 12):
+    for i in range(6, 12):
         for low in [None, 0.2, 0.5, 0.8]:
             for x in es:
                 diffs = check(i, x, low)
-                if any(s > 1e-8 for s in diffs):
+                if not all(s < 1e-8 for s in diffs):
                     print(i, x, low, diffs)
-                    failed |= any(s > 1e-5 for s in diffs)
+                    failed |= not all(s < 1e-5 for s in diffs)
     if failed:
         print('test_polyfit .. failed')
     else:
@@ -204,8 +176,8 @@ def test_polyfit():
 def test_rys_roots_vs_polyfit():
     def check(nroots, x, low):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
-        r0, w0 = cint_call('CINTerfc_rys_roots', nroots, x, low)
-        r1, w1 = cint_call('CINTerfc_roots', nroots, x, low)
+        r0, w0 = cint_call('CINTsr_rys_roots', nroots, x, low)
+        r1, w1 = cint_call('CINTsr_roots', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
                          abs(w0 - w_ref).max(),
@@ -216,32 +188,12 @@ def test_rys_roots_vs_polyfit():
         for x in es:
             for low in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
                 diffs = check(i, x, low)
-                print(i, x, low, diffs, abs(diffs[0])>abs(diffs[1]), abs(diffs[2])>abs(diffs[3]))
+                print(i, x, low, diffs, abs(diffs[0])>abs(diffs[1]), abs(diffs[0])>abs(diffs[2]))
 
 
 if __name__ == '__main__':
-    #test_rys_wheeler()
     # test_rys_roots_mpmath()
-    #test_polyfit()
+    test_polyfit()
     # test_rys_roots_vs_polyfit()
     #test_rys_roots_weights()
     #test_rys_roots_weights_erfc()
-
-
-    r_ref, w_ref = rys_roots.rys_roots_weights(9, 2.5, .8)
-    r, w = rys_wheeler.roots_and_weights(9, 2.5, .8)
-    #r, w = cint_call('CINTerfc_rys_roots', 5, 2.5, .8)
-    #r, w = cint_call('CINTrys_roots', 4, .125)
-    print(abs(r-r_ref.astype(float)))
-    print(abs(w-w_ref.astype(float)))
-    exit()
-    es = 2**numpy.arange(3, 7, .25)
-    for i in range(1, 12):
-        for x in es:
-            r_ref, w_ref = rys_roots.rys_roots_weights(i, x)
-            r, w = rys_wheeler.roots_and_weights(i, x)
-            diffs = np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
-            if any(s > 1e-8 for s in diffs):
-                print(i, x, diffs)
-                exit()
-

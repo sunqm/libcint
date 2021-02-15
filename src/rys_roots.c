@@ -27,16 +27,34 @@ static void rys_root2(double x, double *roots, double *weights);
 static void rys_root3(double x, double *roots, double *weights);
 static void rys_root4(double x, double *roots, double *weights);
 static void rys_root5(double x, double *roots, double *weights);
-static int R_droot(FINT nroots, double x, double *roots, double *weights);
-#ifdef HAVE_QUADMATH_H
-static int R_qroot(FINT nroots, double x, double *roots, double *weights);
-#else
-static int R_lroot(FINT nroots, double x, double *roots, double *weights);
-#endif
 #ifdef WITH_RANGE_COULOMB
-static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights);
+static int sr_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights);
 #endif
 
+static int regular_rys_roots(int nroots, double x, double *u, double *w)
+{
+        int error = CINTR_droot(nroots, x, u, w);
+        if (error) {
+                error = CINTrys_wheeler(nroots, x, 0., u, w);
+        } else {
+                return 0;
+        }
+        if (error) {
+#ifdef HAVE_QUADMATH_H
+                error = CINTR_qroot(nroots, x, u, w);
+#else
+                error = CINTR_lroot(nroots, x, u, w);
+#endif
+        } else {
+                return 0;
+        }
+#ifndef KEEP_GOING
+        exit(1);
+#else
+        fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", nroots);
+#endif
+        return error;
+}
 
 // FIXME: R_dsmit causes big errors for nroots > 13
 void CINTrys_roots(FINT nroots, double x, double *u, double *w)
@@ -58,15 +76,11 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
         case 5:
                 rys_root5(x, u, w);
                 break;
-#ifdef HAVE_QUADMATH_H
         case 6: case 7: case 8: case 9:
-                error = R_droot(nroots, x, u, w);
-                if (error == 1) {
-                        R_qroot(nroots, x, u, w);
-                }
+                regular_rys_roots(nroots, x, u, w);
                 break;
         default:
-                error = R_qroot(nroots, x, u, w);
+                error = CINTR_qroot(nroots, x, u, w);
                 if (error == 1) {
 #ifndef KEEP_GOING
                         exit(1);
@@ -74,105 +88,84 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
                         fprintf(stderr, "libcint R_lroot fails. nroots=%d\n", nroots);
 #endif
                 }
-#else // QUADMATH
-        case 6: case 7: case 8: case 9:
-                error = R_droot(nroots, x, u, w);
-                if (error == 1) {
-                        R_lroot(nroots, x, u, w);
-                }
-                break;
-        case 10: case 11: case 12: case 13:
-                R_lroot(nroots, x, u, w);
-                break;
-        default:
-                fprintf(stderr, "libcint needs quadmath library to support nroots=%d\n", nroots);
-#ifndef KEEP_GOING
-                exit(1);
-#else
-                error = R_lroot(nroots, x, u, w);
-                if (error == 1) {
-                        fprintf(stderr, "libcint R_lroot fails. nroots=%d\n", nroots);
-                }
-#endif
-#endif
         }
 }
 
 #ifdef WITH_RANGE_COULOMB
 /*
- * lower is the lower bound of the erfc integral
+ * lower is the lower bound of the sr integral
  */
-static void erfc_rys_aug_polyfits(FINT nroots, double x, double lower,
+void sr_rys_aug_polyfits(FINT nroots, double x, double lower,
                                   double *u, double *w, double turnover_point)
 {
         int error = 0;
         if (lower < turnover_point) {
-                error = erfc_rys_roots(nroots, x, lower, u, w);
+                error = sr_rys_roots(nroots, x, lower, u, w);
         }
         if (error == 1 || lower >= turnover_point) {
                 // call polyfits for erfc roots and weights. It has
                 // on average errors ~1e-7
-                CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+                CINTsr_rys_polyfits(nroots, x, lower, u, w);
         }
 
 }
-void CINTerfc_rys_roots(FINT nroots, double x, double lower, double *u, double *w)
+void CINTsr_rys_roots(FINT nroots, double x, double lower, double *u, double *w)
 {
         FINT error;
         switch (nroots) {
         case 1: case 2: case 3: case 4:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
+                sr_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
                 break;
         case 5:
                 if (x < 3.5) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
                 } else if (x < 6.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.8);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.8);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
                 }
                 break;
         case 6:
                 if (x < 8.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
                 } else if (x < 11.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
                 }
                 break;
         case 7:
                 if (x < 8.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
                 } else if (x < 12.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
                 }
                 break;
         case 8:
                 if (x < 1.0) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.2);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.2);
                 } else if (x < 6.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
                 } else if (x < 14.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
                 }
                 break;
         case 9:
                 if (x < 15.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.0);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.0);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                        sr_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
                 }
                 break;
         case 10: case 11: case 12: case 13:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.);
+                sr_rys_aug_polyfits(nroots, x, lower, u, w, 0.);
                 break;
         default:
-                fprintf(stderr, "libcint erfc_rys_roots does not support nroots=%d\n", nroots);
+                fprintf(stderr, "libcint sr_rys_roots does not support nroots=%d\n", nroots);
 #ifndef KEEP_GOING
                 exit(1);
 #endif
@@ -1769,7 +1762,7 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
         return 0;
 }
 
-static int R_droot(FINT nroots, double x, double *roots, double *weights)
+int CINTR_droot(FINT nroots, double x, double *roots, double *weights)
 {
         double fmt_ints[MXROOTS*2+1];
         gamma_inc_like(fmt_ints, x, nroots*2);
@@ -1777,15 +1770,13 @@ static int R_droot(FINT nroots, double x, double *roots, double *weights)
 }
 
 #ifdef WITH_RANGE_COULOMB
-static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights)
+static int sr_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights)
 {
         double fmt_ints[MXROOTS*2+1];
         fmt_erfc_like(fmt_ints, x, lower, nroots*2);
         return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
 }
 #endif
-
-#ifndef HAVE_QUADMATH_H
 
 /*
  ******************************************************
@@ -1952,8 +1943,7 @@ static FINT R_lsmit(long double *cs, long double *fmt_ints, FINT n)
         return 0;
 }
 
-static int R_lroot(FINT nroots, double x,
-                   double roots[], double weights[])
+int CINTR_lroot(FINT nroots, double x, double *roots, double *weights)
 {
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
@@ -2028,7 +2018,8 @@ static int R_lroot(FINT nroots, double x,
         }
         return 0;
 }
-#else // defined HAVE_QUADMATH_H
+
+#ifdef HAVE_QUADMATH_H
 
 static int R_qnode(__float128 *a, __float128 *roots, FINT order)
 {
@@ -2164,7 +2155,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
         return 0;
 }
 
-static int R_qroot(FINT nroots, double x, double *roots, double *weights)
+int CINTR_qroot(FINT nroots, double x, double *roots, double *weights)
 {
         FINT i, k, j, order;
         FINT nroots1 = nroots + 1;
