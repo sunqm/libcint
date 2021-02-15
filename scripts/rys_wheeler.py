@@ -293,7 +293,7 @@ def roots_and_weights(n, x, low=0):
     return roots, weights
 
 if __name__ == '__main__':
-    #for i in range(48):
+    #for i in range(64):
     #    mpmath.nprint(jacobi_alpha(i), 36)
     #    mpmath.nprint(jacobi_beta(i), 36)
     #    mpmath.nprint(jacobi_x(i), 17)
@@ -303,11 +303,11 @@ if __name__ == '__main__':
     #gs = jacobi_gs(49, 1)
     #for i in gs:
     #    mpmath.nprint(i, 17)
-    #for i in range(51):
+    #for i in range(64):
     #    print(f'// n = {i}')
     #    for c in jacobi_coefs(i):
     #        mpmath.nprint(c, 36)
-    #for i in range(51):
+    #for i in range(64):
     #    cs = jacobi_coefs(i)
     #    print(', '.join([str(i) for i in abs(cs.astype(float)).argsort()]))
 

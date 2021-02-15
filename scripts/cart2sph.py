@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import mpmath
+import numpy
 DECIMALS = 24
 mpmath.mp.dps = DECIMALS
 
@@ -183,6 +184,73 @@ def xyz2sph_pure(lx, ly, lz, m):
 
     return c
 
+def cg_spin(l, jdouble, mjdouble, spin):
+    '''Clebsch Gordon coefficient of <l,m,1/2,spin|j,mj>'''
+    ll1 = 2 * l + 1
+    half = mpmath.mpf('.5')
+    if jdouble == 2*l+1:
+        if spin > 0:
+            c = mpmath.sqrt(half*(ll1+mjdouble)/ll1)
+        else:
+            c = mpmath.sqrt(half*(ll1-mjdouble)/ll1)
+    elif jdouble == 2*l-1:
+        if spin > 0:
+            c =-mpmath.sqrt(half*(ll1-mjdouble)/ll1)
+        else:
+            c = mpmath.sqrt(half*(ll1+mjdouble)/ll1)
+    else:
+        c = 0
+    return c
+
+# |spinor> = (|real_sph>, |real_sph>) * / u_alpha \
+#                                       \ u_beta  /
+# Return 2D array U_{sph,spinor}
+def sph2spinor(l):
+    if l == 0:
+        return numpy.array([[0., 1.],
+                            [1., 0.]])
+    else:
+        u1 = []
+        for m in range(-l,l+1):
+            for lx in range(l, -1, -1):
+                for ly in range(l-lx, -1, -1):
+                    lz = l - lx - ly
+                    u1.append(xyz2sph_pure(lx, ly, lz, m))
+        ncart = (l + 1) * (l + 2) // 2
+        u1 = numpy.array(u1).reshape(2*l+1, ncart).T
+
+        ua = []
+        ub = []
+        j = l * 2 - 1
+        mla = l + (-j-1)//2
+        mlb = l + (-j+1)//2
+        for k, mj in enumerate(range(-j, j+1, 2)):
+            ua.append(u1[:,mla] * cg_spin(l, j, mj, 1))
+            ub.append(u1[:,mlb] * cg_spin(l, j, mj,-1))
+            mla += 1
+            mlb += 1
+        j = l * 2 + 1
+        mla = l + (-j-1)//2
+        mlb = l + (-j+1)//2
+        for k, mj in enumerate(range(-j, j+1, 2)):
+            if mla < 0:
+                ua.append(numpy.zeros(ncart))
+            else:
+                ua.append(u1[:,mla] * cg_spin(l, j, mj, 1))
+            if mlb >= 2*l+1:
+                ub.append(numpy.zeros(ncart))
+            else:
+                ub.append(u1[:,mlb] * cg_spin(l, j, mj,-1))
+            mla += 1
+            mlb += 1
+        ua = numpy.array(ua).reshape(l * 4 + 2, ncart).T
+        ub = numpy.array(ub).reshape(l * 4 + 2, ncart).T
+        if l == 1:
+            norm = mpmath.sqrt(3 / (4 * mpmath.pi))
+            ua /= norm
+            ub /= norm
+    return ua, ub
+
 
 if __name__ == '__main__':
     l = 6
@@ -190,4 +258,20 @@ if __name__ == '__main__':
         for lx in range(l, -1, -1):
             for ly in range(l-lx, -1, -1):
                 lz = l - lx - ly
-                print(xyz2sph_real(lx, ly, lz, m))
+                mpmath.nprint(xyz2sph_real(lx, ly, lz, m), 16)
+
+    l = 4
+    ncart = (l + 1) * (l + 2) // 2
+    ua, ub = sph2spinor(l)
+    for k in range(l * 2):
+        print(f'// j = {l*2-1}/2, mj = {k*2+1-l*2}/2')
+        ca = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]
+        cb = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ub[:,k]]
+        print(f'{", ".join(ca)},')
+        print(f'{", ".join(cb)},')
+    for k in range(l * 2, l * 4 + 2):
+        print(f'// j = {l*2+1}/2, mj = {k*2-1-l*6}/2')
+        ca = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]
+        cb = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ub[:,k]]
+        print(f'{", ".join(ca)},')
+        print(f'{", ".join(cb)},')
