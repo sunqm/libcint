@@ -44,6 +44,9 @@ static int segment_solve(int n, double x, double lower, double *u, double *w,
                 error = fn2(n, x, lower, u, w);
         }
         if (error) {
+                error = CINTqrys_schmidt(n, x, lower, u, w);
+        }
+        if (error) {
                 fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", n);
 #ifndef KEEP_GOING
                 exit(1);
@@ -112,9 +115,9 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
         } else {
                 fprintf(stderr, "libcint SR-rys_roots does not support nroots=%d x=%g lower=%g\n",
                         n, x, lower);
-#ifndef KEEP_GOING
-                exit(1);
-#endif
+        }
+        if (error) {
+                error = CINTqrys_schmidt(n, x, lower, u, w);
         }
         if (error) {
                 // TODO: remove sr-rys-polyfits. Mostly it has large errors.
@@ -138,29 +141,36 @@ void CINTsr_rys_roots(FINT nroots, double x, double lower, double *u, double *w)
         case 4:
                 if (lower < 0.85) {
                         CINTrys_schmidt(nroots, x, lower, u, w);
-                } else {
+                } else if (lower < 0.9) {
                         segment_solve(nroots, x, lower, u, w, 6, CINTlrys_jacobi, CINTrys_schmidt);
+                } else {
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 5:
                 if (lower < 0.45) {
                         CINTrys_schmidt(nroots, x, lower, u, w);
-                } else {
+                } else if (lower < 0.8) {
                         segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                } else {
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 6:
                 if (lower < 0.35) {
                         CINTrys_schmidt(nroots, x, lower, u, w);
-                } else {
+                } else if (lower < 0.8) {
                         segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                } else {
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 7:
                 segment_solve1(nroots, x, lower, u, w, 0.55, 1., 60, CINTlrys_jacobi, CINTlrys_laguerre, CINTqrys_jacobi);
                 break;
         case 8: case 9: case 10:
-                CINTqrys_jacobi(nroots, x, lower, u, w);
+                //CINTqrys_jacobi(nroots, x, lower, u, w);
+                segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 11: case 12:
                 segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
@@ -1962,11 +1972,6 @@ static FINT R_lsmit(long double *cs, long double *fmt_ints, FINT n)
 
 int CINTlrys_schmidt(FINT nroots, double x, double lower, double *roots, double *weights)
 {
-        if (lower != 0) {
-                fprintf(stderr, "SR-lrys_schmidt not implemented");
-                return 1;
-        }
-
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
         long double cs[MXROOTS1*MXROOTS1];
@@ -1975,7 +1980,12 @@ int CINTlrys_schmidt(FINT nroots, double x, double lower, double *roots, double 
         long double *a;
         long double root, poly, wsum, dum;
 
-        lgamma_inc_like(fmt_ints, x, nroots*2);
+        if (lower == 0) {
+                lgamma_inc_like(fmt_ints, x, nroots*2);
+        } else {
+                fmt1_lerfc_like(fmt_ints, x, lower, nroots*2);
+        }
+
         if (fmt_ints[0] == 0) {
                 for (k = 0; k < nroots; ++k) {
                         roots[k] = 0;
@@ -2179,11 +2189,6 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
 
 int CINTqrys_schmidt(FINT nroots, double x, double lower, double *roots, double *weights)
 {
-        if (lower != 0) {
-                fprintf(stderr, "SR-lrys_schmidt not implemented");
-                return 1;
-        }
-
         FINT i, k, j, order;
         FINT nroots1 = nroots + 1;
         __float128 cs[MXROOTS1*MXROOTS1];
@@ -2192,7 +2197,12 @@ int CINTqrys_schmidt(FINT nroots, double x, double lower, double *roots, double 
         __float128 *a;
         __float128 root, poly, dum;
 
-        qgamma_inc_like(fmt_ints, x, nroots*2);
+        if (lower == 0) {
+                qgamma_inc_like(fmt_ints, x, nroots*2);
+        } else {
+                fmt1_qerfc_like(fmt_ints, x, lower, nroots*2);
+        }
+
         if (fmt_ints[0] == 0) {
                 for (k = 0; k < nroots; ++k) {
                         roots[k] = 0;

@@ -98,7 +98,7 @@ def dble_fmt1_erfc(t, m, low=0):
 def naive_jacobi_mus(n, t, low):
     fmt = fmt1_erfc(t, n, low)
     mus = []
-    for i in range(n+1):
+    for i in range(n):
         coefs = jacobi_coefs(i)
         mus.append((coefs * fmt[:i+1])[::-1].sum())
     return np.array(mus)
@@ -106,7 +106,7 @@ def naive_jacobi_mus(n, t, low):
 def dble_naive_jacobi_mus(n, t, low):
     fmt = dble_fmt1_erfc(t, n, low)
     mus = []
-    for i in range(n+1):
+    for i in range(n):
         coefs = jacobi_coefs(i).astype(float)
         order = abs(coefs).argsort()
         mus.append((coefs[order] * fmt[:i+1][order]).sum())
@@ -190,7 +190,7 @@ def jacobi_mus(n, t, low):
 def shifted_jacobi_moments(n, t, low=0):
     if 0:
         mus = jacobi_mus(n, t, low)
-    elif 1: 
+    elif 1:
         mus = naive_jacobi_mus(n, t, low)
     else:
         mus = dble_naive_jacobi_mus(n, t, low)
@@ -224,7 +224,7 @@ def laguerre_moments(n, T, low=0):
     return alpha, beta, moments
 
 def flocke_jacobi_moments(n, T):
-    # Flocke's recipe JCP, 131, 064107 
+    # Flocke's recipe JCP, 131, 064107
     mu1 = 1
     mu2 = 0
     moments = [mu2, mu1]
@@ -312,26 +312,26 @@ if __name__ == '__main__':
     #    print(', '.join([str(i) for i in abs(cs.astype(float)).argsort()]))
 
     print(roots_and_weights_partial(2, *laguerre_moments(2*2, 5.7, 0)))
-    print(roots_and_weights_partial(2, *jacobi_moments(2*2, 5.7)))
+    print(roots_and_weights_partial(2, *flocke_jacobi_moments(2*2, 5.7)))
     print(roots_and_weights_partial(2, *laguerre_moments(2*2, 5.7, 0.1)))
     print(roots_and_weights_partial(2, *shifted_jacobi_moments(2*2, 5.7, 0.1)))
 
     print(roots_and_weights_partial(3, *laguerre_moments(3*2, 11.7, 0)))
-    print(roots_and_weights_partial(3, *jacobi_moments(3*2, 11.7)))
+    print(roots_and_weights_partial(3, *flocke_jacobi_moments(3*2, 11.7)))
     print(roots_and_weights_partial(3, *laguerre_moments(3*2, 11.7, 0.2)))
     print(roots_and_weights_partial(3, *shifted_jacobi_moments(3*2, 11.7, 0.2)))
 
     print(roots_and_weights_partial(4, *laguerre_moments(4*2, 2.7, 0)))
-    print(roots_and_weights_partial(4, *jacobi_moments(4*2, 2.7)))
+    print(roots_and_weights_partial(4, *flocke_jacobi_moments(4*2, 2.7)))
     print(roots_and_weights_partial(4, *laguerre_moments(4*2, 2.7, 0.2)))
     print(roots_and_weights_partial(4, *shifted_jacobi_moments(4*2, 2.7, 0.2)))
 
     print(roots_and_weights_partial(5, *laguerre_moments(5*2, 1.7, 0)))
-    print(roots_and_weights_partial(5, *jacobi_moments(5*2, 1.7)))
+    print(roots_and_weights_partial(5, *flocke_jacobi_moments(5*2, 1.7)))
     print(roots_and_weights_partial(5, *laguerre_moments(5*2, 1.7, 0.2)))
     print(roots_and_weights_partial(5, *shifted_jacobi_moments(5*2, 1.7, 0.2)))
 
     print(roots_and_weights_partial(6, *laguerre_moments(6*2, 1.1, 0)))
-    print(roots_and_weights_partial(6, *jacobi_moments(6*2, 1.1)))
+    print(roots_and_weights_partial(6, *flocke_jacobi_moments(6*2, 1.1)))
     print(roots_and_weights_partial(6, *laguerre_moments(6*2, 1.1, 0.2)))
     print(roots_and_weights_partial(6, *shifted_jacobi_moments(6*2, 1.1, 0.2)))

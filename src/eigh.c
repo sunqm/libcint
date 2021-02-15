@@ -782,7 +782,7 @@ static int _compute_eigenvalues(int n, double *diag, double *diag_off1,
             } else if (idum == MAXTRY) {
 /*        if the program reaches this point, no base representation could be */
 /*        found in MAXTRY iterations. */
-                return 2;
+                return -2;
             } else {
                 sigma -= sgndef * tau;
                 tau *= 2.;
@@ -1467,7 +1467,10 @@ int _CINTdiagonalize(int n, double *diag, double *diag_off1, double *eig, double
     int info;
 
     info = _compute_eigenvalues(n, diag, diag_off1, eig, buf_err, buf_gp, buf_wrk);
-    info = _compute_eigenvectors(n, diag, diag_off1, eig, buf_err, buf_gp, vec, buf_wrk, iwork);
+    if (info == 0) {
+            info = _compute_eigenvectors(n, diag, diag_off1, eig, buf_err, buf_gp,
+                                         vec, buf_wrk, iwork);
+    }
     return info;
 }
 

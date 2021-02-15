@@ -115,12 +115,12 @@ def test_rys_roots_weights():
 def test_rys_roots_weights_erfc():
     def check(nroots, x, lower):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, lower)
-        r, w = cint_call('CINTrys_schmidt', nroots, x, lower)
+        r, w = cint_call('CINTsr_rys_roots', nroots, x, lower)
         return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
 
     es = 2**numpy.arange(-3, 6, .25)
     failed = False
-    for i in range(1, 12):
+    for i in range(8, 12):
         for x in es:
             for low in [.1, .2, .3, .4, .5, .6, .7, .8, .9]:
                 diffs = check(i, x, low)
@@ -191,7 +191,7 @@ def test_rys_roots_vs_polyfit():
 
 if __name__ == '__main__':
     # test_rys_roots_mpmath()
-    test_polyfit()
+    #test_polyfit()
     # test_rys_roots_vs_polyfit()
     #test_rys_roots_weights()
-    #test_rys_roots_weights_erfc()
+    test_rys_roots_weights_erfc()

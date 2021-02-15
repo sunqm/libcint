@@ -3274,7 +3274,7 @@ static void laguerre_moments(int n, double t, double lower,
         double tt = sqrt(t);
         double t_inv = .5 / t;
         double t2_inv = .5 / (t * t);
-        double e0 = exp(-t) * t_inv; 
+        double e0 = exp(-t) * t_inv;
         double l00 = 0.;
         double l01 = 1.;
         double fac0, fac1, l02;
@@ -3318,7 +3318,7 @@ static void laguerre_moments(int n, double t, double lower,
         }
 }
 
-// Flocke's recipe JCP, 131, 064107 
+// Flocke's recipe JCP, 131, 064107
 static void flocke_jacobi_moments(int n, double t, double *mus)
 {
         double t_inv = .5 / t;
@@ -3371,6 +3371,15 @@ static void naive_jacobi_moments(int n, double t, double lower, double *mus)
         }
 }
 
+/*
+ * This recursion may cause large errors if "b" of the three-term is small.
+ * It hapens when the lower limit of SR integrals is closed to 1. For example
+ *  nroots = 12
+ *  x = 0.4
+ *  lower = 0.93
+ * In this case, sigma_{kk} decays as ~ b^n. Wheeler recursion formula here is
+ * not a proper choice.
+ */
 static void wheeler_recursion(int n, double *alpha, double *beta, double *moments,
                               double *a, double *b)
 {
@@ -3424,7 +3433,7 @@ static int rys_wheeler_partial(int n, double *alpha, double *beta, double *momen
                 if (b[i] < 1e-14) {
                         // very likely we will get numerical issues
                         if (!first_seen || b[i] < 0.) {
-                                return 1;
+                                return i;
                         }
                         first_seen = 0;
                 }
@@ -3447,7 +3456,7 @@ static void llaguerre_moments(int n, double t, double lower,
         long double tt = sqrtl(t);
         long double t_inv = .5l / t;
         long double t2_inv = .5l / (t * t);
-        long double e0 = expl(-t) * t_inv; 
+        long double e0 = expl(-t) * t_inv;
         long double l00 = 0.l;
         long double l01 = 1.l;
         long double fac0, fac1, l02;
@@ -3491,7 +3500,7 @@ static void llaguerre_moments(int n, double t, double lower,
         }
 }
 
-// Flocke's recipe JCP, 131, 064107 
+// Flocke's recipe JCP, 131, 064107
 static void lflocke_jacobi_moments(int n, double t, long double *mus)
 {
         long double t_inv = .5l / t;
@@ -3601,7 +3610,7 @@ static int lrys_wheeler_partial(int n, long double *alpha, long double *beta, lo
                 if (b[i] < 1e-19) {
                         // very likely we will get numerical issues
                         if (!first_seen || b[i] < 0.) {
-                                return 1;
+                                return i;
                         }
                         first_seen = 0;
                 }
@@ -5195,7 +5204,7 @@ static void qlaguerre_moments(int n, double t, double lower,
         __float128 tt = sqrtq(t);
         __float128 t_inv = .5q / t;
         __float128 t2_inv = .5q / (t * t);
-        __float128 e0 = expq(-t) * t_inv; 
+        __float128 e0 = expq(-t) * t_inv;
         __float128 l00 = 0.q;
         __float128 l01 = 1.q;
         __float128 fac0, fac1, l02;
@@ -5239,7 +5248,7 @@ static void qlaguerre_moments(int n, double t, double lower,
         }
 }
 
-// Flocke's recipe JCP, 131, 064107 
+// Flocke's recipe JCP, 131, 064107
 static void qflocke_jacobi_moments(int n, double t, __float128 *mus)
 {
         __float128 t_inv = .5q / t;
@@ -5313,8 +5322,7 @@ static void qwheeler_recursion(int n, __float128 *alpha, __float128 *beta, __flo
         for (i = 1; i < n; i++) {
                 nc = 2 * (n - i);
                 for (j = 0; j < nc; j++) {
-                        sk[j] = (s0[2+j] - (a0 - alpha[i+j]) * s0[1+j]
-                                 - b0 * sm[2+j] + beta[i+j] * s0[j]);
+                        sk[j] = beta[i+j] * s0[j] - (a0 - alpha[i+j]) * s0[1+j] - b0 * sm[2+j] + s0[2+j];
                 }
                 a1 = alpha[i] - s0[1] / s0[0] + sk[1] / sk[0];
                 b1 = sk[0] / s0[0];
@@ -5348,7 +5356,7 @@ static int qrys_wheeler_partial(int n, __float128 *alpha, __float128 *beta, __fl
                 if (b[i] < 1e-32) {
                         // very likely we will get numerical issues
                         if (!first_seen || b[i] < 0.) {
-                                return 1;
+                                return i;
                         }
                         first_seen = 0;
                 }
