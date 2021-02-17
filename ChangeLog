@@ -1,77 +1,113 @@
+Version 4.1.0  (2021-02-15):
+	* Add new Rys roots and weights algorithm
+        * Improve integral accuracy for high angular momentum basis
+        * Improve integral accuracy for short-range Coulomb integrals
+	* Add supports of 2-e integrals up to l=15
+
 Version 4.0.7  (2020-11-23):
-        Fix bug in rys_roots R_dnode function when R_dsmit fails to find all roots
+        * Fix bug in rys_roots R_dnode function when R_dsmit fails to find all roots
+
 Version 4.0.6  (2020-11-13):
 	* Fix return value bug in rysroots
+
 Version 4.0.5  (2020-10-30):
 	* Fix prescreening bug in int3c2e
+
 Version 4.0.4  (2020-10-29):
 	* Fix cache size bug in int3c1e
+
 Version 4.0.3  (2020-10-27):
 	* Fix memory allocation in int3c1e
 	* Improve macro MALLOC_INSTACK
+
 Version 4.0.2  (2020-10-03):
 	* Fix typedef Function in cint_funcs.h
+
 Version 4.0.1  (2020-10-02):
 	* Update docs
+
 Version 4.0.0  (2020-09-23):
 	* API Change. PTR_LIGHT_SPEED is replaced with PTR_EXPCUTOFF.
 	  Integral screening parameter can be passed through env[PTR_EXPCUTOFF]
 	* Add short-range integrals for range-separation
 	* Handle linear dependency in Rys polynomial
 	* Avoid calling exit function (issue #41)
+
 Version 3.1.1  (2020-08-25):
 	* Fix bug in (py, pz, px) order
+
 Version 3.1.0  (2020-08-25):
 	* Add convention py, pz, px
+
 Version 3.0.20  (2020-05-13):
 	* Fix integral ggkin
+
 Version 3.0.19  (2019-11-30):
 	* support fractional nuclear charges
+
 Version 3.0.18  (2019-07-02):
 	* Fix undefined varialbe in nabla-rinv integral
 	* Add integral < i | nabla-rinv | j >
+
 Version 3.0.17  (2019-04-29):
 	* 3c2e and 2c2e integrals for Gaussian type geminals
+
 Version 3.0.16  (2019-03-23):
 	* New 2nd order 3c2e integral ( i j | nabla nabla k )
+
 Version 3.0.15  (2019-03-18):
 	* F12 second derivatives
 	* Add integrals for Gaussian type geminals
 	* Add 4th order derivatives of 2e integrals
+
 Version 3.0.14  (2018-11-22):
 	* F12 derivative integrals
 	* New 2c2e integral ( nabla nabla i | j )
+
 Version 3.0.13  (2018-06-11):
 	* New integral < | r r r r | >
+
 Version 3.0.12  (2018-05-01):
 	* New integrals < sigma dot p i | r | sigma dot p j >
 	* Fix the undefined int64_t type in Fortran interface
+
 Version 3.0.11  (2018-03-23):
 	* Fix breit integrals
+
 Version 3.0.10  (2018-03-20):
 	* New integrals
 	  <i | r p | j>,
 	  <i | r r p | j>,
 	  <i | r p r | j> and
 	  <i | r r r | j>
+
 Version 3.0.9  (2018-03-08):
 	* New integrals (i |nabla j) and  -1/2 *(i | nabla^2 j)
+
 Version 3.0.8  (2018-02-14):
 	* Fix Fortran APIs
+
 Version 3.0.7  (2018-01-15):
 	* Add 3-center SOC integrals
+
 Version 3.0.6  (2017-12-20):
 	* Add integrals for X2C graidents and hessian
+
 Version 3.0.5  (2017-12-11):
 	* Use cmake policy for OSX rpath
+
 Version 3.0.4  (2017-10-07):
 	* Update tests to pass ppc64 architecture
+
 Version 3.0.3  (2017-10-04):
 	* Fix the long double precision issue in rys_roots for armv7
+
 Version 3.0.2  (2017-10-02):
 	* Update root-finding code in rys_roots
+
 Version 3.0.1  (2017-09-27):
 	* Fix typo in rys_roots output message
+
 Version 3.0.0  (2017-09-20):
 	* Change github master branch to the 3.0 version
 
