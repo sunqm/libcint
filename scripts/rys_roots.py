@@ -26,8 +26,9 @@ def fmt1(t, m, low=None, factor=mpmath.mpf(1)):
 #      = 1/(2m+1) e^{-t} + (2t)/(2m+1) F[m+1]
 #      = 1/(2m+1) e^{-t} + (2t)/(2m+1)(2m+3) e^{-t} + (2t)^2/(2m+1)(2m+3) F[m+2]
 #
-    b = mpmath.mpf(m + 0.5)
-    e = .5 * mpmath.exp(-t)
+    half = mpmath.mpf('.5')
+    b = m + half
+    e = half * mpmath.exp(-t)
     x = e
     s = e
     bi = b + 1
@@ -49,11 +50,12 @@ def fmt1(t, m, low=None, factor=mpmath.mpf(1)):
 #      = -1/2t [e^{-t u^2} * u^{2m-1}]_0^1 + (2m-1)/2t int u^{2m-2} e^{-t u^2} du
 #      = 1/2t (-e^{-t} + (2m-1) F[m-1])
 #
-def fmt2(t, m, low=None, factor=mpmath.mpf(1)):
+def fmt2(t, m, low=None):
+    half = mpmath.mpf('.5')
     tt = mpmath.sqrt(t)
-    f = mpmath.pi**.5/2. / tt * mpmath.erf(tt)
+    f = mpmath.pi**half/2 / tt * mpmath.erf(tt)
     e = mpmath.exp(-t)
-    b = mpmath.mpf('.5') / t
+    b = half / t
     out = [f]
     for i in range(m):
         f = b * ((2*i+1) * f - e)
@@ -83,12 +85,11 @@ def fmt1_erfc(t, m, low=0, factor=mpmath.mpf(1)):
 #      = 1/(2m+1) [e^{-t u^2} u^{2m+1}]_s^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
 #      = 1/(m+.5) (.5*e^{-t} - .5*e^{-t s^2} s^{2m+1}) + t F[m+1])
 #
+    half = mpmath.mpf('.5')
     low = mpmath.mpf(low)
-    b = mpmath.mpf(m + 0.5)
-    e = .5 * mpmath.exp(-t)
-    e1 = .5 * mpmath.exp(-t * low*low) * mpmath.power(low, 2*m+1)
-    e *= factor
-    e1 *= factor
+    b = m + half
+    e = half * mpmath.exp(-t)
+    e1 = half * mpmath.exp(-t * low*low) * mpmath.power(low, 2*m+1)
     x = e
     x1 = e1
     s = e - e1
@@ -117,16 +118,15 @@ def fmt1_erfc(t, m, low=0, factor=mpmath.mpf(1)):
 #      = 1/2t (-e^{-t} + e{-t s^2} s^{2m-1} + (2m-1)/ F[m-1])
 # F[0] = int_s^1 e^{-t u^2} du
 #
-def fmt2_erfc(t, m, low=0, factor=mpmath.mpf(1)):
+def fmt2_erfc(t, m, low=0):
+    half = mpmath.mpf('.5')
     tt = mpmath.sqrt(t)
     low = mpmath.mpf(low)
     low2 = low * low
-    f = factor * mpmath.sqrt(mpmath.pi)/2. / tt * (mpmath.erf(tt) - mpmath.erf(low*tt))
+    f = mpmath.sqrt(mpmath.pi)/2 / tt * (mpmath.erf(tt) - mpmath.erf(low*tt))
     e = mpmath.exp(-t)
     e1 = mpmath.exp(-t*low2) * low
-    e *= factor
-    e1 *= factor
-    b = mpmath.mpf('.5') / t
+    b = half / t
     out = [f]
     for i in range(m):
         f = b * ((2*i+1) * f - e + e1)
@@ -149,9 +149,11 @@ def zeros(shape):
         size = np.prod(shape)
     return np.array([mpmath.mpf(0)] * size).reshape(shape)
 
-ACCRT = mpmath.power(.1, DECIMALS)
+ACCRT = min(mpmath.power(.1, DECIMALS/2), mpmath.mpf('1e-35'))
 def R_dnode(a, rt):
     order = a.size - 1
+    quat1 = mpmath.mpf('.25')
+    quat3 = mpmath.mpf('.75')
 
     x1init = mpmath.mpf(0)
     p1init = mpmath.mpf(a[0])
@@ -193,11 +195,11 @@ def R_dnode(a, rt):
             elif (p0 * pi <= 0):
                 x1 = xi
                 p1 = pi
-                xi = x0 * .25 + xi * .75
+                xi = x0 * quat1 + xi * quat3
             else:
                 x0 = xi
                 p0 = pi
-                xi = xi * .75 + x1 * .25
+                xi = xi * quat3 + x1 * quat1
 
             pi = poly_value1(a, order, xi)
             if (-ACCRT < pi < ACCRT):
@@ -250,12 +252,13 @@ def rys_roots_weights_partial(nroots, x, low=None):
     cs = R_dsmit(s, nroots1)
     rt = np.array([mpmath.mpf(1)] * nroots1)
 
+    half = mpmath.mpf('.5')
     if nroots == 1:
         rt[0] = ff[1] / ff[0]
     else:
         dum = mpmath.sqrt(cs[1,2] * cs[1,2] - 4 * cs[0,2] * cs[2,2])
-        rt[0] = .5 * (-cs[1,2] - dum) / cs[2,2]
-        rt[1] = .5 * (-cs[1,2] + dum) / cs[2,2]
+        rt[0] = half * (-cs[1,2] - dum) / cs[2,2]
+        rt[1] = half * (-cs[1,2] + dum) / cs[2,2]
 
     for k in range(2, nroots):
         R_dnode(cs[:k+2,k+1], rt)

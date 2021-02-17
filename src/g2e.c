@@ -1750,7 +1750,7 @@ int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
                 if (theta * x > envs->expcutoff) {
                         return 0;
                 }
-                CINTerfc_rys_roots(envs->nrys_roots, x, sqrt(theta), u, w);
+                CINTsr_rys_roots(envs->nrys_roots, x, sqrt(theta), u, w);
         } else {
                 CINTrys_roots(envs->nrys_roots, x, u, w);
                 if (omega > 0) {

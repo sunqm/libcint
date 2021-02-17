@@ -11,7 +11,7 @@ void _CINT_clenshaw_d1(double *rr, const double *x, double u, FINT nroot);
 void _CINT_clenshaw_dc(double *rr, const double *x, double u, FINT nroot);
 void _CINT_matmul_14_14(double *imc, double *im, FINT nroot);
 
-void CINTerfc_rys_polyfits(FINT nroots, double x, double lower, double* u, double* w)
+void CINTsr_rys_polyfits(FINT nroots, double x, double lower, double* u, double* w)
 {
         const double* dx = DATA_X + (nroots-1)*nroots/2 * 1960;
         const double* dw = DATA_W + (nroots-1)*nroots/2 * 1960;

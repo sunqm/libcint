@@ -11,6 +11,7 @@
 FINT int2e_gtg_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                   FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
+        sprintf(stderr, "Don't use this function. GTG integrals have bugs");
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_gtg_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);

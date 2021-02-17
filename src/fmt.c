@@ -13,9 +13,12 @@
  *
  */
 
+#include <float.h>
 #include <math.h>
-#define SML_FLOAT64   1.0e-16
-#define SML_FLOAT80   1.0e-20
+#include "cint_const.h"
+#include "rys_roots.h"
+#define SML_FLOAT64   DBL_EPSILON
+#define SML_FLOAT80   5.0e-20
 #define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264
 #define SQRTPIE4l     .8862269254527580136490837416705725913987747280611935641069038949264l
 #define ERFC_bound    705
@@ -127,6 +130,26 @@
  * F_m(t), see the Description section.
  *
  */
+static void fmt1_gamma_inc_like(double *f, double t, FINT m)
+{
+        int i;
+        double b = m + 0.5;
+        double bi;
+        double e = .5 * exp(-t);
+        double x = e;
+        double s = e;
+        double tol = SML_FLOAT64 * e;
+        for (bi = b + 1.; x > tol; bi += 1.) {
+                x *= t / bi;
+                s += x;
+        }
+        f[m] = s / b;
+        for (i = m; i > 0; i--) {
+                b -= 1.;
+                f[i-1] = (e + t * f[i]) / b;
+        }
+}
+
 void gamma_inc_like(double *f, double t, FINT m)
 {
         FINT i;
@@ -138,30 +161,36 @@ void gamma_inc_like(double *f, double t, FINT m)
         }
 
         if (t < turnover_point) {
-                double b = m + 0.5;
-                double bi;
-                double e = .5 * exp(-t);
-                double x = e;
-                double s = e;
-                for (bi = b + 1.; x > SML_FLOAT64; bi += 1.) {
-                        x *= t / bi;
-                        s += x;
-                }
-                f[m] = s / b;
-                for (i = m; i > 0; i--) {
-                        b -= 1.;
-                        f[i-1] = (e + t * f[i]) / b;
-                }
+                fmt1_gamma_inc_like(f, t, m);
         } else {
-                double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
-                f[0] = pi2 / tt * erf(tt);
+                f[0] = SQRTPIE4 / tt * erf(tt);
                 if (m > 0) {
                         double e = exp(-t);
                         double b = .5 / t;
                         for (i = 1; i <= m; i++)
                                 f[i] = b * ((2*i-1) * f[i-1] - e);
                 }
+        }
+}
+
+static void fmt1_lgamma_inc_like(long double *f, long double t, FINT m)
+{
+        long double b = m + 0.5l;
+        long double bi;
+        long double e = .5l * expl(-t);
+        long double x = e;
+        long double s = e;
+        long double tol = SML_FLOAT80 * e;
+        int i;
+        for (bi = b + 1.; x > tol; bi += 1.) {
+                x *= t / bi;
+                s += x;
+        }
+        f[m] = s / b;
+        for (i = m; i > 0; i--) {
+                b -= 1;
+                f[i-1] = (e + t * f[i]) / b;
         }
 }
 
@@ -176,24 +205,10 @@ void lgamma_inc_like(long double *f, long double t, FINT m)
         }
 
         if (t < turnover_point) {
-                long double b = m + 0.5l;
-                long double bi;
-                long double e = .5l * expl(-t);
-                long double x = e;
-                long double s = e;
-                for (bi = b + 1.; x > SML_FLOAT80; bi += 1.) {
-                        x *= t / bi;
-                        s += x;
-                }
-                f[m] = s / b;
-                for (i = m; i > 0; i--) {
-                        b -= 1;
-                        f[i-1] = (e + t * f[i]) / b;
-                }
+                fmt1_lgamma_inc_like(f, t, m);
         } else {
-                long double pi2 = SQRTPIE4l;
                 long double tt = sqrtl(t);
-                f[0] = pi2 / tt * erfl(tt);
+                f[0] = SQRTPIE4l / tt * erfl(tt);
                 if (m > 0) {
                         long double e = expl(-t);
                         long double b = .5l / t;
@@ -203,50 +218,23 @@ void lgamma_inc_like(long double *f, long double t, FINT m)
         }
 }
 
-#ifdef HAVE_QUADMATH_H
-void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
-{
-        FINT i;
-        __float128 turnover_point;
-        if (m < 3) {
-                turnover_point = m + 1.5;
-        } else {
-                turnover_point = 5;
-        }
-
-        if (t < turnover_point) {
-                __float128 b = m + .5q;
-                __float128 bi;
-                __float128 e = .5q * expq(-t);
-                __float128 x = e;
-                __float128 s = e;
-                for (bi = b + 1.; x > SML_FLOAT128; bi += 1.) {
-                        x *= t / bi;
-                        s += x;
-                }
-                f[m] = s / b;
-                for (i = m; i > 0; i--) {
-                        b -= 1;
-                        f[i-1] = (e + t * f[i]) / b;
-                }
-        } else {
-                __float128 pi2 = SQRTPIE4q;
-                __float128 tt = sqrtq(t);
-                f[0] = pi2 / tt * erfq(tt);
-                if (m > 0) {
-                        __float128 e = expq(-t);
-                        __float128 b = .5q / t;
-                        for (i = 1; i <= m; i++)
-                                f[i] = b * ((2*i-1) * f[i-1] - e);
-                }
-        }
-}
-#endif
-
 inline double _pow(double base, FINT exponent)
 {
         FINT i;
         double result = 1;
+        for (i = 1; i <= exponent; i <<= 1) {
+                if (i & exponent) {
+                        result *= base;
+                }
+                base *= base;
+        }
+        return result;
+}
+
+inline long double _powl(long double base, FINT exponent)
+{
+        FINT i;
+        long double result = 1.l;
         for (i = 1; i <= exponent; i <<= 1) {
                 if (i & exponent) {
                         result *= base;
@@ -270,6 +258,36 @@ inline double _pow(double base, FINT exponent)
  *      = e^{t s^2} /(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
  *      = e^{t s^2} /(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
  */
+void fmt1_erfc_like(double *f, double t, double lower, FINT m)
+{
+        int i;
+        double lower2 = lower * lower;
+        double b = m + 0.5;
+        double bi;
+        double e = .5 * exp(-t);
+        double e1 = .5 * exp(-t * lower2) * lower;
+        e1 *= _pow(lower2, m);
+        double x = e;
+        double x1 = e1;
+        double s = e - e1;
+        double div = 1.;
+        double delta = s;
+        double tol = SML_FLOAT64 * fabs(delta);
+        for (bi = b + 1.; fabs(delta) > tol; bi += 1.) {
+                div *= t / bi;
+                x1 *= lower2;
+                delta = (x - x1) * div;
+                s += delta;
+        }
+        double val = s / b;
+        f[m] = val;
+        for (i = m; i > 0; i--) {
+                b -= 1.;
+                e1 /= lower2;
+                val = (e - e1 + t * val) / b;
+                f[i-1] = val;
+        }
+}
 void fmt_erfc_like(double *f, double t, double lower, FINT m)
 {
         FINT i;
@@ -292,38 +310,11 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
         }
 
         if (t < turnover_point) {
-                double b = m + 0.5;
-                double bi;
-                double e = .5 * exp(-t * (1 - lower2));
-                double e1 = .5 * lower;
-                e1 *= _pow(lower2, m);
-                double x = e;
-                double x1 = e1;
-                double s = e - e1;
-                double div = 1;
-                double delta = s;
-                for (bi = b + 1.; fabs(delta) > SML_FLOAT64; bi += 1.) {
-                        div *= t / bi;
-                        x1 *= lower2;
-                        delta = (x - x1) * div;
-                        s += delta;
-                }
-                double val = s / b;
-                f[m] = val;
-                for (i = m; i > 0; i--) {
-                        b -= 1.;
-                        e1 /= lower2;
-                        val = (e - e1 + t * val) / b;
-                        f[i-1] = val;
-                }
+                fmt1_erfc_like(f, t, lower, m);
         } else {
-                double pi2 = SQRTPIE4;
                 double tt = sqrt(t);
                 // erfc(a) - erfc(b) is more accurate than erf(b) - erf(a)
-                double val = pi2 / tt * (erfc(lower * tt) - erfc(tt));
-                if (val != 0) {
-                        val *= exp(t * lower2);
-                }
+                double val = SQRTPIE4 / tt * (erfc(lower * tt) - erfc(tt));
                 f[0] = val;
                 if (m > 0) {
                         double e = exp(-t * (1 - lower2));
@@ -338,3 +329,123 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
         }
 }
 
+void fmt1_lerfc_like(long double *f, long double t, long double lower, FINT m)
+{
+        int i;
+        long double lower2 = lower * lower;
+        long double b = m + 0.5l;
+        long double bi;
+        long double e = .5l * expl(-t);
+        long double e1 = .5l * expl(-t * lower2) * lower;
+        e1 *= _powl(lower2, m);
+        long double x = e;
+        long double x1 = e1;
+        long double s = e - e1;
+        long double div = 1.l;
+        long double delta = s;
+        long double tol = SML_FLOAT80 * fabsl(delta);
+        for (bi = b + 1.l; fabsl(delta) > tol; bi += 1.l) {
+                div *= t / bi;
+                x1 *= lower2;
+                delta = (x - x1) * div;
+                s += delta;
+        }
+        long double val = s / b;
+        f[m] = val;
+        for (i = m; i > 0; i--) {
+                b -= 1.l;
+                e1 /= lower2;
+                val = (e - e1 + t * val) / b;
+                f[i-1] = val;
+        }
+}
+
+#ifdef HAVE_QUADMATH_H
+static void fmt1_qgamma_inc_like(__float128 *f, __float128 t, FINT m)
+{
+        __float128 b = m + .5q;
+        __float128 bi;
+        __float128 e = .5q * expq(-t);
+        __float128 x = e;
+        __float128 s = e;
+        __float128 tol = SML_FLOAT128 * e;
+        int i;
+        for (bi = b + 1.; x > tol; bi += 1.) {
+                x *= t / bi;
+                s += x;
+        }
+        f[m] = s / b;
+        for (i = m; i > 0; i--) {
+                b -= 1;
+                f[i-1] = (e + t * f[i]) / b;
+        }
+}
+
+void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
+{
+        FINT i;
+        __float128 turnover_point;
+        if (m < 3) {
+                turnover_point = m + 1.5;
+        } else {
+                turnover_point = 5;
+        }
+
+        if (t < turnover_point) {
+                fmt1_qgamma_inc_like(f, t, m);
+        } else {
+                __float128 tt = sqrtq(t);
+                f[0] = SQRTPIE4q / tt * erfq(tt);
+                if (m > 0) {
+                        __float128 e = expq(-t);
+                        __float128 b = .5q / t;
+                        for (i = 1; i <= m; i++)
+                                f[i] = b * ((2*i-1) * f[i-1] - e);
+                }
+        }
+}
+
+inline __float128 _powq(__float128 base, FINT exponent)
+{
+        FINT i;
+        __float128 result = 1.q;
+        for (i = 1; i <= exponent; i <<= 1) {
+                if (i & exponent) {
+                        result *= base;
+                }
+                base *= base;
+        }
+        return result;
+}
+
+void fmt1_qerfc_like(__float128 *f, __float128 t, __float128 lower, FINT m)
+{
+        int i;
+        __float128 lower2 = lower * lower;
+        __float128 b = m + .5q;
+        __float128 bi;
+        __float128 e = .5q * expq(-t);
+        __float128 e1 = .5q * expq(-t * lower2) * lower;
+        e1 *= _powq(lower2, m);
+        __float128 x = e;
+        __float128 x1 = e1;
+        __float128 s = e - e1;
+        __float128 div = 1.q;
+        __float128 delta = s;
+        __float128 tol = SML_FLOAT128 * fabsq(delta);
+        for (bi = b + 1.q; fabsq(delta) > tol; bi += 1.q) {
+                div *= t / bi;
+                x1 *= lower2;
+                delta = (x - x1) * div;
+                s += delta;
+        }
+        __float128 val = s / b;
+        f[m] = val;
+        for (i = m; i > 0; i--) {
+                b -= 1.q;
+                e1 /= lower2;
+                val = (e - e1 + t * val) / b;
+                f[i-1] = val;
+        }
+}
+#endif

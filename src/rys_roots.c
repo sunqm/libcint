@@ -20,33 +20,44 @@
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #endif
-#define MXROOTS   MXRYSROOTS
-//#define MXROOTS1  (MXROOTS+1)
-#define MXROOTS1  MXROOTS
 #define PIE4        0.78539816339744827900
-
-#include "fmt.c"
 
 static void rys_root1(double x, double *roots, double *weights);
 static void rys_root2(double x, double *roots, double *weights);
 static void rys_root3(double x, double *roots, double *weights);
 static void rys_root4(double x, double *roots, double *weights);
 static void rys_root5(double x, double *roots, double *weights);
-static int R_droot(FINT nroots, double x, double *roots, double *weights);
-#ifdef HAVE_QUADMATH_H
-static int R_qroot(FINT nroots, double x, double *roots, double *weights);
-#else
-static int R_lroot(FINT nroots, double x, double *roots, double *weights);
-#endif
-#ifdef WITH_RANGE_COULOMB
-static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights);
+typedef int QuadratureFunction(int n, double x, double lower, double *roots, double *weights);
+#ifndef HAVE_QUADMATH_H
+#define CINTqrys_schmidt        CINTlrys_schmidt
+#define CINTqrys_laguerre       CINTlrys_laguerre
+#define CINTqrys_jacobi         CINTlrys_jacobi
 #endif
 
+static int segment_solve(int n, double x, double lower, double *u, double *w,
+                         double breakpoint, QuadratureFunction fn1, QuadratureFunction fn2)
+{
+        int error;
+        if (x <= breakpoint) {
+                error = fn1(n, x, lower, u, w);
+        } else {
+                error = fn2(n, x, lower, u, w);
+        }
+        if (error) {
+                error = CINTqrys_schmidt(n, x, lower, u, w);
+        }
+        if (error) {
+                fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", n);
+#ifndef KEEP_GOING
+                exit(1);
+#endif
+        }
+        return error;
+}
 
 // FIXME: R_dsmit causes big errors for nroots > 13
 void CINTrys_roots(FINT nroots, double x, double *u, double *w)
 {
-        FINT error;
         switch (nroots) {
         case 1:
                 rys_root1(x, u, w);
@@ -63,128 +74,130 @@ void CINTrys_roots(FINT nroots, double x, double *u, double *w)
         case 5:
                 rys_root5(x, u, w);
                 break;
-#ifdef HAVE_QUADMATH_H
-        case 6: case 7: case 8: case 9:
-                error = R_droot(nroots, x, u, w);
-                if (error == 1) {
-                        R_qroot(nroots, x, u, w);
-                }
+        case 6: case 7:
+                segment_solve(nroots, x, 0., u, w, 11, CINTrys_jacobi, CINTrys_schmidt);
+                break;
+        case 8:
+                segment_solve(nroots, x, 0., u, w, 11, CINTrys_jacobi, CINTlrys_schmidt);
+                break;
+        case 9:
+                segment_solve(nroots, x, 0., u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                break;
+        case 10: case 11:
+                segment_solve(nroots, x, 0., u, w, 18, CINTlrys_jacobi, CINTlrys_laguerre);
+                break;
+        case 12:
+                segment_solve(nroots, x, 0., u, w, 22, CINTlrys_jacobi, CINTlrys_laguerre);
                 break;
         default:
-                error = R_qroot(nroots, x, u, w);
-                if (error == 1) {
-#ifndef KEEP_GOING
-                        exit(1);
-#else
-                        fprintf(stderr, "libcint R_lroot fails. nroots=%d\n", nroots);
-#endif
-                }
-#else // QUADMATH
-        case 6: case 7: case 8: case 9:
-                error = R_droot(nroots, x, u, w);
-                if (error == 1) {
-                        R_lroot(nroots, x, u, w);
-                }
+                segment_solve(nroots, x, 0., u, w, 50, CINTqrys_jacobi, CINTqrys_laguerre);
                 break;
-        case 10: case 11: case 12: case 13:
-                R_lroot(nroots, x, u, w);
-                break;
-        default:
-                fprintf(stderr, "libcint needs quadmath library to support nroots=%d\n", nroots);
-#ifndef KEEP_GOING
-                exit(1);
-#else
-                error = R_lroot(nroots, x, u, w);
-                if (error == 1) {
-                        fprintf(stderr, "libcint R_lroot fails. nroots=%d\n", nroots);
-                }
-#endif
-#endif
         }
 }
 
 #ifdef WITH_RANGE_COULOMB
 /*
- * lower is the lower bound of the erfc integral
+ * lower is the lower bound of the sr integral
  */
-static void erfc_rys_aug_polyfits(FINT nroots, double x, double lower,
-                                  double *u, double *w, double turnover_point)
+static int segment_solve1(int n, double x, double lower, double *u, double *w,
+                          double lower_bp1, double lower_bp2, double breakpoint,
+                          QuadratureFunction fn1, QuadratureFunction fn2, QuadratureFunction fn3)
 {
-        int error = 0;
-        int i;
-        if (lower < turnover_point) {
-                error = erfc_rys_roots(nroots, x, lower, u, w);
-                if (error == 0) {
-                        double fac = exp(-x * lower * lower);
-                        for (i = 0; i < nroots; i++) {
-                                w[i] *= fac;
-                        }
+        int error;
+        if (lower < lower_bp1) {
+                if (x <= breakpoint) {
+                        error = fn1(n, x, lower, u, w);
                 } else {
-                        CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+                        error = fn2(n, x, lower, u, w);
                 }
+        } else if (lower < lower_bp2) {
+                error = fn3(n, x, lower, u, w);
         } else {
-                // call polyfits for erfc roots and weights. It has
-                // on average errors ~1e-7
-                CINTerfc_rys_polyfits(nroots, x, lower, u, w);
+                fprintf(stderr, "libcint SR-rys_roots does not support nroots=%d x=%g lower=%g\n",
+                        n, x, lower);
         }
+        if (error) {
+                error = CINTqrys_schmidt(n, x, lower, u, w);
+        }
+        if (error) {
+                // TODO: remove sr-rys-polyfits. Mostly it has large errors.
+                if (n < 14) {
+                        CINTsr_rys_polyfits(n, x, lower, u, w);
+                }
+                fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", n);
+#ifndef KEEP_GOING
+                exit(1);
+#endif
+        }
+        return error;
 }
-void CINTerfc_rys_roots(FINT nroots, double x, double lower, double *u, double *w)
+
+void CINTsr_rys_roots(FINT nroots, double x, double lower, double *u, double *w)
 {
-        FINT error;
         switch (nroots) {
-        case 1: case 2: case 3: case 4:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
+        case 1: case 2: case 3:
+                CINTrys_schmidt(nroots, x, lower, u, w);
+                break;
+        case 4:
+                if (lower < 0.85) {
+                        CINTrys_schmidt(nroots, x, lower, u, w);
+                } else if (lower < 0.9) {
+                        segment_solve(nroots, x, lower, u, w, 6, CINTlrys_jacobi, CINTrys_schmidt);
+                } else {
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                }
                 break;
         case 5:
-                if (x < 3.5) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
-                } else if (x < 6.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.8);
+                if (lower < 0.45) {
+                        CINTrys_schmidt(nroots, x, lower, u, w);
+                } else if (lower < 0.8) {
+                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.);
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 6:
-                if (x < 8.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
-                } else if (x < 11.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.7);
+                if (lower < 0.35) {
+                        CINTrys_schmidt(nroots, x, lower, u, w);
+                } else if (lower < 0.8) {
+                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 7:
-                if (x < 8.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
-                } else if (x < 12.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
-                } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
-                }
+                segment_solve1(nroots, x, lower, u, w, 0.55, 1., 60, CINTlrys_jacobi, CINTlrys_laguerre, CINTqrys_jacobi);
                 break;
-        case 8:
-                if (x < 1.0) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.2);
-                } else if (x < 6.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.4);
-                } else if (x < 14.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.6);
-                } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
-                }
+        case 8: case 9: case 10:
+                //CINTqrys_jacobi(nroots, x, lower, u, w);
+                segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
-        case 9:
-                if (x < 15.) {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.0);
-                } else {
-                        erfc_rys_aug_polyfits(nroots, x, lower, u, w, 1.0);
-                }
+        case 11: case 12:
+                segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
-        case 10: case 11: case 12: case 13:
-                erfc_rys_aug_polyfits(nroots, x, lower, u, w, 0.);
+        case 13: case 14:
+                segment_solve1(nroots, x, lower, u, w, 0.25, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                break;
+        case 15: case 16:
+                segment_solve1(nroots, x, lower, u, w, 0.25, 0.75, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                break;
+        case 17:
+                segment_solve1(nroots, x, lower, u, w, 0.25, 0.65, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                break;
+        case 18:
+                segment_solve1(nroots, x, lower, u, w, 0.15, 0.65, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                break;
+        case 19:
+                segment_solve1(nroots, x, lower, u, w, 0.15, 0.55, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                break;
+        case 20: case 21:
+                segment_solve1(nroots, x, lower, u, w, 0.25, 0.45, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                break;
+        case 22: case 23: case 24:
+                segment_solve1(nroots, x, lower, u, w, 0.25, 0.35, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         default:
-                fprintf(stderr, "libcint erfc_rys_roots does not support nroots=%d\n", nroots);
+                fprintf(stderr, "libcint SR-rys_roots does not support nroots=%d\n", nroots);
 #ifndef KEEP_GOING
                 exit(1);
 #endif
@@ -1781,23 +1794,16 @@ static int _rdk_rys_roots(FINT nroots, double *fmt_ints,
         return 0;
 }
 
-static int R_droot(FINT nroots, double x, double *roots, double *weights)
+int CINTrys_schmidt(FINT nroots, double x, double lower, double *roots, double *weights)
 {
-        double fmt_ints[MXROOTS*2+1];
-        gamma_inc_like(fmt_ints, x, nroots*2);
+        double fmt_ints[MXRYSROOTS*2];
+        if (lower == 0) {
+                gamma_inc_like(fmt_ints, x, nroots*2);
+        } else {
+                fmt_erfc_like(fmt_ints, x, lower, nroots*2);
+        }
         return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
 }
-
-#ifdef WITH_RANGE_COULOMB
-static int erfc_rys_roots(FINT nroots, double x, double lower, double *roots, double *weights)
-{
-        double fmt_ints[MXROOTS*2+1];
-        fmt_erfc_like(fmt_ints, x, lower, nroots*2);
-        return _rdk_rys_roots(nroots, fmt_ints, roots, weights);
-}
-#endif
-
-#ifndef HAVE_QUADMATH_H
 
 /*
  ******************************************************
@@ -1964,8 +1970,7 @@ static FINT R_lsmit(long double *cs, long double *fmt_ints, FINT n)
         return 0;
 }
 
-static int R_lroot(FINT nroots, double x,
-                   double roots[], double weights[])
+int CINTlrys_schmidt(FINT nroots, double x, double lower, double *roots, double *weights)
 {
         FINT i, k, j, m, order;
         FINT nroots1 = nroots + 1;
@@ -1975,7 +1980,12 @@ static int R_lroot(FINT nroots, double x,
         long double *a;
         long double root, poly, wsum, dum;
 
-        lgamma_inc_like(fmt_ints, x, nroots*2);
+        if (lower == 0) {
+                lgamma_inc_like(fmt_ints, x, nroots*2);
+        } else {
+                fmt1_lerfc_like(fmt_ints, x, lower, nroots*2);
+        }
+
         if (fmt_ints[0] == 0) {
                 for (k = 0; k < nroots; ++k) {
                         roots[k] = 0;
@@ -2040,7 +2050,8 @@ static int R_lroot(FINT nroots, double x,
         }
         return 0;
 }
-#else // defined HAVE_QUADMATH_H
+
+#ifdef HAVE_QUADMATH_H
 
 static int R_qnode(__float128 *a, __float128 *roots, FINT order)
 {
@@ -2176,7 +2187,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, FINT n)
         return 0;
 }
 
-static int R_qroot(FINT nroots, double x, double *roots, double *weights)
+int CINTqrys_schmidt(FINT nroots, double x, double lower, double *roots, double *weights)
 {
         FINT i, k, j, order;
         FINT nroots1 = nroots + 1;
@@ -2186,7 +2197,12 @@ static int R_qroot(FINT nroots, double x, double *roots, double *weights)
         __float128 *a;
         __float128 root, poly, dum;
 
-        qgamma_inc_like(fmt_ints, x, nroots*2);
+        if (lower == 0) {
+                qgamma_inc_like(fmt_ints, x, nroots*2);
+        } else {
+                fmt1_qerfc_like(fmt_ints, x, lower, nroots*2);
+        }
+
         if (fmt_ints[0] == 0) {
                 for (k = 0; k < nroots; ++k) {
                         roots[k] = 0;
