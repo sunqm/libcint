@@ -36,7 +36,7 @@
  *
  * Synopsis
  *
- * double fmtpse(FINT m, double t)
+ * double fmtpse(int m, double t)
  *
  * Description
  *
@@ -59,7 +59,7 @@
  *
  * Argument(s)
  *
- * FINT m:
+ * int m:
  * F_m(t), see the Description section.
  *
  * double t:
@@ -78,7 +78,7 @@
  *
  * Synopsis
  *
- * double fmt(FINT m, double t)
+ * double fmt(int m, double t)
  *
  * Description
  *
@@ -118,7 +118,7 @@
  *
  * Argument(s)
  *
- * FINT m:
+ * int m:
  * F_m(t), see the Description section.
  *
  * double t:
@@ -130,7 +130,7 @@
  * F_m(t), see the Description section.
  *
  */
-static void fmt1_gamma_inc_like(double *f, double t, FINT m)
+static void fmt1_gamma_inc_like(double *f, double t, int m)
 {
         int i;
         double b = m + 0.5;
@@ -150,9 +150,9 @@ static void fmt1_gamma_inc_like(double *f, double t, FINT m)
         }
 }
 
-void gamma_inc_like(double *f, double t, FINT m)
+void gamma_inc_like(double *f, double t, int m)
 {
-        FINT i;
+        int i;
         double turnover_point;
         if (m < 3) {
                 turnover_point = m + 1.5;
@@ -174,7 +174,7 @@ void gamma_inc_like(double *f, double t, FINT m)
         }
 }
 
-static void fmt1_lgamma_inc_like(long double *f, long double t, FINT m)
+static void fmt1_lgamma_inc_like(long double *f, long double t, int m)
 {
         long double b = m + 0.5l;
         long double bi;
@@ -194,9 +194,9 @@ static void fmt1_lgamma_inc_like(long double *f, long double t, FINT m)
         }
 }
 
-void lgamma_inc_like(long double *f, long double t, FINT m)
+void lgamma_inc_like(long double *f, long double t, int m)
 {
-        FINT i;
+        int i;
         long double turnover_point;
         if (m < 3) {
                 turnover_point = m + 1.5;
@@ -218,9 +218,9 @@ void lgamma_inc_like(long double *f, long double t, FINT m)
         }
 }
 
-inline double _pow(double base, FINT exponent)
+inline double _pow(double base, int exponent)
 {
-        FINT i;
+        int i;
         double result = 1;
         for (i = 1; i <= exponent; i <<= 1) {
                 if (i & exponent) {
@@ -231,9 +231,9 @@ inline double _pow(double base, FINT exponent)
         return result;
 }
 
-inline long double _powl(long double base, FINT exponent)
+inline long double _powl(long double base, int exponent)
 {
-        FINT i;
+        int i;
         long double result = 1.l;
         for (i = 1; i <= exponent; i <<= 1) {
                 if (i & exponent) {
@@ -258,7 +258,7 @@ inline long double _powl(long double base, FINT exponent)
  *      = e^{t s^2} /(2m+1) [e^{-t u^2} u^{2m+1}]_l^1 + (2t)/(2m+1) int u^{2m+2} e^{-t u^2} du
  *      = e^{t s^2} /(m+.5) (.5*e^{-t} - .5*e^{-t l^2} l^{2m+1}) + t F[m+1])
  */
-void fmt1_erfc_like(double *f, double t, double lower, FINT m)
+void fmt1_erfc_like(double *f, double t, double lower, int m)
 {
         int i;
         double lower2 = lower * lower;
@@ -288,9 +288,9 @@ void fmt1_erfc_like(double *f, double t, double lower, FINT m)
                 f[i-1] = val;
         }
 }
-void fmt_erfc_like(double *f, double t, double lower, FINT m)
+void fmt_erfc_like(double *f, double t, double lower, int m)
 {
-        FINT i;
+        int i;
         double lower2 = lower * lower;
 #ifdef WITH_RANGE_COULOMB
         // F[m] < .5*sqrt(pi/t) * erfc(low*tt)
@@ -329,7 +329,7 @@ void fmt_erfc_like(double *f, double t, double lower, FINT m)
         }
 }
 
-void fmt1_lerfc_like(long double *f, long double t, long double lower, FINT m)
+void fmt1_lerfc_like(long double *f, long double t, long double lower, int m)
 {
         int i;
         long double lower2 = lower * lower;
@@ -361,7 +361,7 @@ void fmt1_lerfc_like(long double *f, long double t, long double lower, FINT m)
 }
 
 #ifdef HAVE_QUADMATH_H
-static void fmt1_qgamma_inc_like(__float128 *f, __float128 t, FINT m)
+static void fmt1_qgamma_inc_like(__float128 *f, __float128 t, int m)
 {
         __float128 b = m + .5q;
         __float128 bi;
@@ -381,9 +381,9 @@ static void fmt1_qgamma_inc_like(__float128 *f, __float128 t, FINT m)
         }
 }
 
-void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
+void qgamma_inc_like(__float128 *f, __float128 t, int m)
 {
-        FINT i;
+        int i;
         __float128 turnover_point;
         if (m < 3) {
                 turnover_point = m + 1.5;
@@ -405,9 +405,9 @@ void qgamma_inc_like(__float128 *f, __float128 t, FINT m)
         }
 }
 
-inline __float128 _powq(__float128 base, FINT exponent)
+inline __float128 _powq(__float128 base, int exponent)
 {
-        FINT i;
+        int i;
         __float128 result = 1.q;
         for (i = 1; i <= exponent; i <<= 1) {
                 if (i & exponent) {
@@ -418,7 +418,7 @@ inline __float128 _powq(__float128 base, FINT exponent)
         return result;
 }
 
-void fmt1_qerfc_like(__float128 *f, __float128 t, __float128 lower, FINT m)
+void fmt1_qerfc_like(__float128 *f, __float128 t, __float128 lower, int m)
 {
         int i;
         __float128 lower2 = lower * lower;

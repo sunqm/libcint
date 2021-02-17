@@ -145,7 +145,7 @@ _cint.CINTlen_spinor.restype = ctypes.c_int
 
 
 def close(v1, vref, count, place):
-    return round(abs(v1-vref)/count, place) == 0
+    return round(abs(v1-vref)/count**.5, place) == 0
 
 def test_int1e_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
@@ -425,8 +425,8 @@ if __name__ == "__main__":
         test_int1e_spinor(*f)
 
     for f in (# rys_roots for i,j,k,l=3,3,3,3 has round-off error ~ 1e-5
-              ('cint2e_sph'    , 56243.88328768107 , 1, 8 ),
-              ('cint2e_ip1_sph', 115489.8643866550 , 3, 8 ),
+              ('cint2e_sph'    , 56243.88080655417, 1, 8 ),
+              ('cint2e_ip1_sph', 115489.8647398112, 3, 8 ),
              ):
         test_int2e_sph(*f)
 
@@ -436,27 +436,27 @@ if __name__ == "__main__":
 
     if "--quick" not in sys.argv:
         # Four tests marked with "# *" may fail in quadmath mode
-        for f in (('cint2e_ip1_sph', 115489.8643866550 , 3, 8 ),
-                  ('cint2e_p1vxp1_sph', 89014.88169743448, 3, 9),
+        for f in (('cint2e_ip1_sph', 115489.8647398112, 3, 8 ),
+                  ('cint2e_p1vxp1_sph', 89014.88690617065, 3, 9),
                  ):
             test_int2e_sph(*f)
-        for f in (('cint2e'             , 37737.11365710611, 1, 8),
-                  ('cint2e_spsp1'       , 221528.4764668166, 1, 8),
-                  ('cint2e_spsp1spsp2'  , 1391716.876869147, 1, 7),  # *
-                  ('cint2e_srsr1'       , 178572.7398308939, 1, 8),
-                  ('cint2e_srsr1srsr2'  , 860883.6288270953, 1, 8),  # *
-                  ('cint2e_cg_sa10sp1'  , 241519.2143647713, 3, 8),
-                  ('cint2e_cg_sa10sp1spsp2'  , 1419443.469767018, 3, 7),  # *
-                  ('cint2e_giao_sa10sp1'     , 153861.920807804 , 3, 8),
-                  ('cint2e_giao_sa10sp1spsp2', 918284.9464686266, 3, 8),  # *
-                  ('cint2e_g1'          , 3755.251591892025, 3, 10),
-                  ('cint2e_spgsp1'      , 16626.99103794526, 3, 9 ),
-                  ('cint2e_g1spsp2'     , 22186.56654833549, 3, 9 ),
-                  ('cint2e_spgsp1spsp2' , 107110.2340526177, 3, 8 ),
-                  ('cint2e_ip1'         , 34912.85433806438, 3, 9 ),
-                  ('cint2e_ipspsp1'     , 221092.5556043494, 3, 8 ),
-                  ('cint2e_ip1spsp2'    , 212447.1029358293, 3, 8 ),
-                  ('cint2e_ipspsp1spsp2', 1443972.936563201, 3, 7 ),
+        for f in (('cint2e'             , 37737.11178943688, 1, 8),
+                  ('cint2e_spsp1'       , 221528.4801800184, 1, 8),
+                  ('cint2e_spsp1spsp2'  , 1391716.710120983, 1, 7),
+                  ('cint2e_srsr1'       , 178572.7403565846, 1, 8),
+                  ('cint2e_srsr1srsr2'  , 860883.5184736011, 1, 8),
+                  ('cint2e_cg_sa10sp1'  , 241519.2142324595, 3, 8),
+                  ('cint2e_cg_sa10sp1spsp2'  , 1419443.36668730, 3, 7),
+                  ('cint2e_giao_sa10sp1'     , 153861.923093945, 3, 8),
+                  ('cint2e_giao_sa10sp1spsp2', 918284.847389833, 3, 8),
+                  ('cint2e_g1'          , 3755.251962011825, 3, 10),
+                  ('cint2e_spgsp1'      , 16626.99245038913, 3, 9 ),
+                  ('cint2e_g1spsp2'     , 22186.56802347518, 3, 9 ),
+                  ('cint2e_spgsp1spsp2' , 107110.2316610047, 3, 8 ),
+                  ('cint2e_ip1'         , 34912.85673865274, 3, 9 ),
+                  ('cint2e_ipspsp1'     , 221092.5698965603, 3, 8 ),
+                  ('cint2e_ip1spsp2'    , 212447.11625827  , 3, 8 ),
+                  ('cint2e_ipspsp1spsp2', 1443972.847900875, 3, 7 ),
                  ):
             test_int2e_spinor(*f)
 
@@ -496,3 +496,4 @@ if __name__ == "__main__":
             v1 += abs(opr2-oprr[:,:,0]-oprr[:,:,4]-oprr[:,:,8]).sum()
             if round(v1/(di*dj), 13):
                 print("* FAIL: ", i, j, v1)
+

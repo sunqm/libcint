@@ -3,8 +3,9 @@
 import ctypes
 import numpy
 
-_cint2 = ctypes.cdll.LoadLibrary('libcint.so.2.8')
-_cint3 = ctypes.cdll.LoadLibrary('libcint.so.3.0')
+#_cint2 = ctypes.cdll.LoadLibrary('libcint.so.2.8')
+_cint3 = ctypes.cdll.LoadLibrary('libcint.so.3')
+#_cint4 = ctypes.cdll.LoadLibrary('libcint.so.4')
 
 from pyscf import gto, lib
 
@@ -54,7 +55,7 @@ def run(intor, comp=1, suffix='_sph', thr=1e-9):
         intor = intor = 'c%s'%intor
     else:
         intor = intor = 'c%s%s'%(intor,suffix)
-    print intor
+    print(intor)
     fn1 = getattr(_cint3, intor)
     #fn2 = getattr(_cint2, intor)
     #cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
@@ -77,13 +78,11 @@ def run(intor, comp=1, suffix='_sph', thr=1e-9):
                 mol._bas.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.nbas),
                 mol._env.ctypes.data_as(ctypes.c_void_p))
             if numpy.linalg.norm(ref-buf) > thr:
-                print intor, '| nopt', i, j, numpy.linalg.norm(ref-buf)#, ref, buf
-                exit()
+                print(intor, '| nopt', i, j, numpy.linalg.norm(ref-buf))#, ref, buf
             #fn(buf.ctypes.data_as(ctypes.c_void_p),
             #   (ctypes.c_int*2)(i,j), *args)
             #if numpy.linalg.norm(ref-buf) > 1e-7:
-            #    print '|', i, j, numpy.linalg.norm(ref-buf)
-            #    exit()
+            #    print('|', i, j, numpy.linalg.norm(ref-buf))
 
 run('int1e_ovlp')
 run('int1e_nuc')

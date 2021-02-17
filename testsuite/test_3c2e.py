@@ -170,7 +170,7 @@ _cint.CINTlen_spinor.restype = ctypes.c_int
 
 
 def close(v1, vref, count, place):
-    return round(abs(v1-vref)/count, place) == 0
+    return round(abs(v1-vref)/count**.5, place) == 0
 
 def test_int3c2e_sph(name, fnref, vref, dim, place):
     intor = getattr(_cint, name)
@@ -302,13 +302,13 @@ if __name__ == "__main__":
         def close(v1, vref, count, place):
             return round(abs(v1-vref), place) == 0
 
-    for f in (('cint3c2e_sph', 'cint2e_sph', 1586.350797432699, 1, 10),
-              ('cint3c2e_ip1_sph', 'cint2e_ip1_sph', 2242.052249267909, 3, 10),
-              ('cint3c2e_ip2_sph', 'cint2e_ip2_sph', 1970.982483860059, 3, 10),
+    for f in (('cint3c2e_sph', 'cint2e_sph', 1586.350797347553, 1, 10),
+              ('cint3c2e_ip1_sph', 'cint2e_ip1_sph', 2242.052249221302, 3, 10),
+              ('cint3c2e_ip2_sph', 'cint2e_ip2_sph', 1970.982483824248, 3, 10),
              ):
         test_int3c2e_sph(*f)
     if "--quick" not in sys.argv:
-        for f in (('cint3c2e', 'cint3c2e_sph', 4412.363002831547, 1, 10),
+        for f in (('cint3c2e', 'cint3c2e_sph', 4412.363002589966, 1, 10),
                  ):
             test_int3c2e_spinor(*f)
 

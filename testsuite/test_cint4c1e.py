@@ -188,9 +188,9 @@ def test_int2c1e_sph():
                 ref = by_pp(shls, (di,dj))
                 dd = abs(ref - buf).sum()
                 if dd > 1e-8:
-                    print "* FAIL: cint2c1e", "  shell:", i, j, "err:", dd
+                    print("* FAIL: cint2c1e", "  shell:", i, j, "err:", dd)
                     return
-    print 'cint1e_ipiprinv_sph cint1e_iprinvip_sph pass'
+    print('cint1e_ipiprinv_sph cint1e_iprinvip_sph pass')
 
 def test_int4c1e_sph():
     fnpp1 = _cint.cint2e_ipip1_sph
@@ -228,9 +228,9 @@ def test_int4c1e_sph():
                     ref = by_pp(shls, (di,dj,dk,dl))
                     dd = abs(ref - buf).max()
                     if dd > 1e-6:
-                        print "* FAIL: cint4c1e", "  shell:", i, j, k, l, "err:", dd
+                        print("* FAIL: cint4c1e", "  shell:", i, j, k, l, "err:", dd)
                         return
-    print 'cint4c1e_sph pass'
+    print('cint4c1e_sph pass')
 
 test_int2c1e_sph()
 test_int4c1e_sph()
