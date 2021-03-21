@@ -1,3 +1,5 @@
+Version 4.1.1  (2021-03-21):
+	* Fix bug in short-range Coulomb core integrals
 Version 4.1.0  (2021-02-15):
 	* Add new Rys roots and weights algorithm
         * Improve integral accuracy for high angular momentum basis
