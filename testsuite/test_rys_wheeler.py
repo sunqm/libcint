@@ -25,9 +25,9 @@ def cint_call(fname, nroots, x, low=None):
 def check_rys_wheeler():
     def check(nroots, x):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
-        r0, w0 = cint_call('CINTR_droot', nroots, x)
+        r0, w0 = cint_call('CINTrys_schmidt', nroots, x, 0.)
         #r0, w0 = rys_tabulate.polyfit_erf(nroots, x)
-        r1, w1 = cint_call('CINTrys_lagurre', nroots, x, 0.)
+        r1, w1 = cint_call('CINTrys_laguerre', nroots, x, 0.)
         r2, w2 = cint_call('CINTrys_jacobi', nroots, x, 0.)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
@@ -46,7 +46,7 @@ def check_rys_wheeler():
 def check_rys_wheeler1():
     def check(nroots, x):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
-        r0, w0 = cint_call('CINTlrys_lagurre', nroots, x, 0.)
+        r0, w0 = cint_call('CINTlrys_laguerre', nroots, x, 0.)
         r1, w1 = cint_call('CINTlrys_jacobi', nroots, x, 0.)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
@@ -63,7 +63,7 @@ def check_rys_wheeler1():
 def check_rys_wheeler2():
     def check(nroots, x):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
-        r0, w0 = cint_call('CINTqrys_lagurre', nroots, x, 0.)
+        r0, w0 = cint_call('CINTqrys_laguerre', nroots, x, 0.)
         r1, w1 = cint_call('CINTqrys_jacobi', nroots, x, 0.)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
@@ -83,7 +83,7 @@ def check_rys_wheeler_sr():
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
         r0, w0 = cint_call('sr_rys_roots', nroots, x, low)
         #r0, w0 = cint_call('CINTsr_rys_polyfits', nroots, x, low)
-        r1, w1 = cint_call('CINTrys_lagurre', nroots, x, low)
+        r1, w1 = cint_call('CINTrys_laguerre', nroots, x, low)
         r2, w2 = cint_call('CINTrys_jacobi', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
@@ -103,7 +103,7 @@ def check_rys_wheeler_sr():
 def check_rys_wheeler_sr1():
     def check(nroots, x, low):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
-        r0, w0 = cint_call('CINTlrys_lagurre', nroots, x, low)
+        r0, w0 = cint_call('CINTlrys_laguerre', nroots, x, low)
         r1, w1 = cint_call('CINTlrys_jacobi', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
@@ -121,7 +121,7 @@ def check_rys_wheeler_sr1():
 def check_rys_wheeler_sr2():
     def check(nroots, x, low):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
-        r0, w0 = cint_call('CINTqrys_lagurre', nroots, x, low)
+        r0, w0 = cint_call('CINTqrys_laguerre', nroots, x, low)
         r1, w1 = cint_call('CINTqrys_jacobi', nroots, x, low)
         return np.array([abs(r0 - r_ref).max(),
                          abs(r1 - r_ref).max(),
@@ -172,7 +172,7 @@ def test_rys_wheeler1():
 
 if __name__ == '__main__':
     np.set_printoptions(3)
-    test_rys_wheeler()
+    check_rys_wheeler()
 
     #check_rys_wheeler()
     #check_rys_wheeler1()

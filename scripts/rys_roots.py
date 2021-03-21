@@ -6,7 +6,7 @@ import numpy as np
 import scipy.linalg
 import scipy.special
 
-def fmt(t, m, low=None, factor=mpmath.mpf(1)):
+def fmt(t, m, low=None):
 #             _ 1           2
 #            /     2 m  -t u
 # F (t)  =   |    u    e      du,
@@ -14,11 +14,11 @@ def fmt(t, m, low=None, factor=mpmath.mpf(1)):
 #
     # fmt1 is alaways more accurate than fmt2 and ~3 times slower than fmt2
     if (t < m + 1.5):
-        return fmt1(t, m, low, factor)
+        return fmt1(t, m, low)
     else:
-        return fmt2(t, m, low, factor)
+        return fmt2(t, m, low)
 
-def fmt1(t, m, low=None, factor=mpmath.mpf(1)):
+def fmt1(t, m, low=None):
 #
 # F[m] = int u^{2m} e^{-t u^2} du
 #      = 1/(2m+1) int e^{-t u^2} d u^{2m+1}
@@ -62,18 +62,18 @@ def fmt2(t, m, low=None):
         out.append(f)
     return np.array(out)
 
-def fmt_erfc(t, m, low=0, factor=mpmath.mpf(1)):
+def fmt_erfc(t, m, low=0):
     if m > 3:
         turnover = 4
     else:
         turnover = m + 0.5
     turnover = m + 1.5
     if t < turnover:
-        return fmt1_erfc(t, m, low, factor)
+        return fmt1_erfc(t, m, low)
     else:
-        return fmt2_erfc(t, m, low, factor)
+        return fmt2_erfc(t, m, low)
 
-def fmt1_erfc(t, m, low=0, factor=mpmath.mpf(1)):
+def fmt1_erfc(t, m, low=0):
 #             _ 1           2
 #            /     2 m  -t u
 # F (t)  =   |    u    e      du,
@@ -240,8 +240,7 @@ def rys_roots_weights_partial(nroots, x, low=None):
     else:
         if x * low**2 > DECIMALS*.7:
             return zeros(nroots), zeros(nroots)
-        factor = mpmath.exp(x * low**2)
-        ff = fmt_erfc(x, nroots*2, low, factor)
+        ff = fmt_erfc(x, nroots*2, low)
 
     nroots1 = nroots + 1
     s = zeros((nroots1, nroots1))
@@ -276,6 +275,4 @@ def rys_roots_weights_partial(nroots, x, low=None):
 def rys_roots_weights(nroots, x, low=None):
     rt, weights = rys_roots_weights_partial(nroots, x, low)
     roots = rt / (1 - rt)
-    if low is not None and x * low**2 < DECIMALS*.7:
-        weights *= mpmath.exp(-x * low**2)
     return roots, weights

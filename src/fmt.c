@@ -317,8 +317,8 @@ void fmt_erfc_like(double *f, double t, double lower, int m)
                 double val = SQRTPIE4 / tt * (erfc(lower * tt) - erfc(tt));
                 f[0] = val;
                 if (m > 0) {
-                        double e = exp(-t * (1 - lower2));
-                        double e1 = lower;
+                        double e = exp(-t);
+                        double e1 = exp(-t * lower2) * lower;
                         double b = .5 / t;
                         for (i = 0; i < m; i++) {
                                 val = b * ((2*i+1) * val - e + e1);
