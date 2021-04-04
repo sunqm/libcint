@@ -57,7 +57,7 @@ configure_file(
 set(cintSrc 
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
-  src/rys_roots.c src/rys_wheeler.c src/eigh.c src/fmt.c
+  src/fmt.c src/rys_wheeler.c src/eigh.c src/rys_roots.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c
   src/cint3c1e.c src/g3c1e.c src/breit.c src/cint4c1e.c src/g4c1e.c
   src/cint1e_a.c src/cint3c1e_a.c
@@ -72,7 +72,6 @@ if(WITH_RANGE_COULOMB)
 # defined in config.h
 #  add_definitions(-DWITH_RANGE_COULOMB)
   message("Enabled WITH_RANGE_COULOMB")
-  set(cintSrc ${cintSrc} src/erfc_roots.c src/polyfits.c)
 endif(WITH_RANGE_COULOMB)
 
 if(WITH_COULOMB_ERF)

@@ -12,7 +12,10 @@
 
 void CINTdset0(const FINT n, double *x)
 {
-        memset(x, 0, sizeof(double) * n);
+        size_t i;
+        for (i = 0; i < n; i++) {
+                x[i] = 0;
+        }
 }
 
 

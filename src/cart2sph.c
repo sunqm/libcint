@@ -16,7 +16,6 @@
 #include "cint_const.h"
 #include "cint_bas.h"
 #include "cart2sph.h"
-#include "g1e.h"
 #include "misc.h"
 
 
@@ -2238,7 +2237,9 @@ static void c2s_dgemm(const char transa, const char transb,
         double btmp[k];
         for (j = 0; j < n; j++) {
                 if (beta == 0) {
-                        memset(c, 0, sizeof(double)*m);
+                        for (i = 0; i < m; i++) {
+                                c[i] = 0;
+                        }
                 } else {
                         for (i = 0; i < m; i++) {
                                 c[i] *= beta;
@@ -2285,7 +2286,9 @@ static void c2s_zgemm(const char transa, const char transb,
         double complex btmp[k];
         for (j = 0; j < n; j++) {
                 if (beta == 0) {
-                        memset(c, 0, sizeof(double complex)*m);
+                        for (i = 0; i < m; i++) {
+                                c[i] = 0;
+                        }
                 } else {
                         for (i = 0; i < m; i++) {
                                 c[i] *= beta;

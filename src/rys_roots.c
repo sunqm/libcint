@@ -55,7 +55,6 @@ static int segment_solve(int n, double x, double lower, double *u, double *w,
         return error;
 }
 
-// FIXME: R_dsmit causes big errors for nroots > 13
 void CINTrys_roots(int nroots, double x, double *u, double *w)
 {
         switch (nroots) {
@@ -120,10 +119,6 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
                 error = CINTqrys_schmidt(n, x, lower, u, w);
         }
         if (error) {
-                // TODO: remove sr-rys-polyfits. Mostly it has large errors.
-                if (n < 14) {
-                        CINTsr_rys_polyfits(n, x, lower, u, w);
-                }
                 fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", n);
 #ifndef KEEP_GOING
                 exit(1);
