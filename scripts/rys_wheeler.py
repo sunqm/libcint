@@ -1,5 +1,4 @@
 import numpy as np
-import scipy.special
 import mpmath
 DECIMALS = 60
 mpmath.mp.dps = DECIMALS
@@ -224,6 +223,7 @@ def laguerre_moments(n, T, low=0):
     return alpha, beta, moments
 
 def flocke_jacobi_moments(n, T):
+    import scipy.special
     # Flocke's recipe JCP, 131, 064107
     mu1 = 1
     mu2 = 0

@@ -11,10 +11,24 @@ jobs:
         os: [macos-latest, ubuntu-18.04]
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
       - name: Compile
         run: |
           env
-          mkdir build
-          cd build
-          cmake -DWITH_RANGE_COULOMB=1 .. -DENABLE_TEST=1 -DQUICK_TEST=1
-          make
+          cmake -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -Bbuild .
+          cmake --build build
+      - name: Test for rys-roots
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          cd ${{ github.workspace }}/testsuite
+          pip install numpy mpmath
+          python test_rys_roots.py
+      - name: Unittest
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          cd ${{ github.workspace }}/testsuite
+          python test_cint.py --quick
+          python test_3c2e.py --quick

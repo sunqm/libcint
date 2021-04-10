@@ -5,7 +5,6 @@ import ctypes
 import numpy
 import numpy as np
 import rys_roots
-import rys_tabulate
 import rys_wheeler
 
 def fp(a):
@@ -86,33 +85,44 @@ def test_rys_roots_mpmath():
     print(fp(w) - 0.00070334763896715)
 
 def test_rys_roots_weights():
+    print('test rys_roots_weights')
     def check(nroots, x):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x)
         r, w = cint_call('CINTrys_roots', nroots, x)
         return np.array([abs(r-r_ref).max(), abs(w-w_ref).max()]).astype(float)
 
     failed = False
+    max_r_error = 0
+    max_w_error = 0
     es = 2**numpy.arange(-3, 7, .25)
     for i in range(1, 12):
         for x in es:
             diffs = check(i, x)
-            if not all(s < 1e-8 for s in diffs):
-                print(i, x, diffs)
-                failed |= not all(s < 1e-5 for s in diffs)
+            if diffs[0] > 1e-5 or diffs[1] > 1e-8:
+                print('Errors for root', i, x, diffs)
+                #failed |= diffs[0] < 1e-4 and diffs[1] < 1e-7
+                max_r_error = max(max_r_error, diffs[0])
+                max_w_error = max(max_w_error, diffs[1])
     es = [50, 40, 36, 24, 20, 16, 12, 8, 4, 2, 0.5, 6e-8]
     for i in range(1, 5):
         for x in es:
             diffs = check(i, x)
-            if not all(s < 1e-8 for s in diffs):
-                print(i, x, diffs)
-                failed |= not all(s < 1e-5 for s in diffs)
-    if failed:
-        print('test_rys_roots_weights .. failed')
-    else:
-        print('test_rys_roots_weights .. pass')
+            if diffs[0] > 1e-5 or diffs[1] > 1e-8:
+                print('Errors for root', i, x, diffs)
+                #failed |= diffs[0] < 1e-4 and diffs[1] < 1e-7
+                max_r_error = max(max_r_error, diffs[0])
+                max_w_error = max(max_w_error, diffs[1])
+    #if failed:
+    #    print('test_rys_roots_weights .. failed')
+    #else:
+    #    print('test_rys_roots_weights .. pass')
+    assert max_r_error < 1e-3
+    assert max_w_error < 1e-7
+    print('test_rys_roots_weights .. pass')
 
 
 def test_rys_roots_weights_erfc():
+    print('test sr-rys_roots_weights')
     def check(nroots, x, lower):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, lower)
         r, w = cint_call('CINTsr_rys_roots', nroots, x, lower)
@@ -120,35 +130,46 @@ def test_rys_roots_weights_erfc():
 
     es = 2**numpy.arange(-3, 6, .25)
     failed = False
-    for i in range(8, 12):
+    max_r_error = 0
+    max_w_error = 0
+    max_rw_error = 0
+    for i in range(1, 10):
         for x in es:
             for low in [.1, .2, .3, .4, .5, .6, .7, .8, .9]:
                 diffs = check(i, x, low)
-                if not all(s < 1e-7 for s in diffs):
-                    print(i, x, low, diffs)
-                    failed |= not all(s < 1e-4 for s in diffs)
-    if failed:
-        print('test_rys_roots_weights_erfc .. failed')
-    else:
-        print('test_rys_roots_weights_erfc .. pass')
+                if diffs[0] > 1e-4 or diffs[1] > 1e-7:
+                    print('Errors for root', i, x, low, diffs)
+                    #failed |= not all(s < 1e-4 for s in diffs)
+                    max_r_error = max(max_r_error, diffs[0])
+                    max_w_error = max(max_w_error, diffs[1])
+                    max_rw_error = max(max_rw_error, diffs[0]*diffs[1])
+    #if failed:
+    #    print('test_rys_roots_weights_erfc .. failed')
+    #else:
+    #    print('test_rys_roots_weights_erfc .. pass')
+    #assert max_r_error < 1e-2
+    assert max_w_error < 1e-10
+    assert max_rw_error < 1e-12
 
-
-def test_stg_roots():
-    def stg(nroots, t, u):
-        r = numpy.zeros(nroots)
-        w = numpy.zeros(nroots)
-        cint.CINTstg_roots(ctypes.c_int(nroots),
-                           ctypes.c_double(t), ctypes.c_double(u),
-                           r.ctypes.data_as(ctypes.c_void_p),
-                           w.ctypes.data_as(ctypes.c_void_p))
-        return r, w
-
-    print(fp(stg(1, 2.2, 1.5)) - 0.653262713484748 )
-    print(fp(stg(2, 0.2, 8.5)) - 1.2362174210548105)
-    print(fp(stg(4, 1.0, 0.5)) - -0.6907781084439245)
+    for i in range(10, 12):
+        for x in es:
+            for low in [.1, .2, .3, .4, .5, .6, .7, .8, .9]:
+                diffs = check(i, x, low)
+                if diffs[0] > 1e-4 or diffs[1] > 1e-7:
+                    print('Errors for root', i, x, low, diffs)
+                    #failed |= not all(s < 1e-4 for s in diffs)
+                    max_r_error = max(max_r_error, diffs[0])
+                    max_w_error = max(max_w_error, diffs[1])
+                    max_rw_error = max(max_rw_error, diffs[0]*diffs[1])
+    #assert max_r_error < 1e-2
+    #assert max_w_error < 1e-7
+    # Errors for high-angular basis are slightly larger
+    #assert max_rw_error < 1e-7
+    print('test_rys_roots_weights_erfc .. pass')
 
 
 def test_polyfit():
+    import rys_tabulate
     def check(nroots, x, low=None):
         r0, w0 = rys_roots.rys_roots_weights(nroots, x, low)
         if low is None:
@@ -188,10 +209,27 @@ def test_rys_roots_vs_polyfit():
                 diffs = check(i, x, low)
                 print(i, x, low, diffs)
 
+def test_stg_roots():
+    print('test stg roots')
+    def stg(nroots, t, u):
+        r = numpy.zeros(nroots)
+        w = numpy.zeros(nroots)
+        cint.CINTstg_roots(ctypes.c_int(nroots),
+                           ctypes.c_double(t), ctypes.c_double(u),
+                           r.ctypes.data_as(ctypes.c_void_p),
+                           w.ctypes.data_as(ctypes.c_void_p))
+        return r, w
+
+    assert abs(fp(stg(1, 2.2, 1.5)) - 0.653262713484748 ) < 1e-14
+    assert abs(fp(stg(2, 0.2, 8.5)) - 1.2362174210548105) < 1e-14
+    assert abs(fp(stg(4, 1.0, 0.5)) - -0.6907781084439245) < 1e-14
+    print('test_stg_roots .. pass')
 
 if __name__ == '__main__':
     # test_rys_roots_mpmath()
     #test_polyfit()
     # test_rys_roots_vs_polyfit()
     #test_rys_roots_weights()
+    test_stg_roots()
+    test_rys_roots_weights()
     test_rys_roots_weights_erfc()

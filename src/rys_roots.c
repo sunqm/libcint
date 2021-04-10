@@ -1660,9 +1660,7 @@ static int R_dsmit(double *cs, double *fmt_ints, int n)
         fac = -fmt_ints[1] / fmt_ints[0];
         tmp = fmt_ints[2] + fac * fmt_ints[1];
         if (tmp <= 0) {
-#ifndef KEEP_GOING
                 fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
-#endif
                 SET_ZERO(cs, n, 1);
                 return 1;
         }
@@ -1688,9 +1686,7 @@ static int R_dsmit(double *cs, double *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-#ifndef KEEP_GOING
                         fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
-#endif
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
                         return j;
@@ -1921,9 +1917,7 @@ static int R_lsmit(long double *cs, long double *fmt_ints, int n)
         fac = -fmt_ints[1] / fmt_ints[0];
         tmp = fmt_ints[2] + fac * fmt_ints[1];
         if (tmp <= 0) {
-#ifndef KEEP_GOING
                 fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
-#endif
                 SET_ZERO(cs, n, 1);
                 return 1;
         }
@@ -1949,9 +1943,7 @@ static int R_lsmit(long double *cs, long double *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-#ifndef KEEP_GOING
                         fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
-#endif
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
                         return j;
@@ -2138,9 +2130,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, int n)
         fac = -fmt_ints[1] / fmt_ints[0];
         tmp = fmt_ints[2] + fac * fmt_ints[1];
         if (tmp <= 0) {
-#ifndef KEEP_GOING
                 fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
-#endif
                 SET_ZERO(cs, n, 1);
                 return 1;
         }
@@ -2166,9 +2156,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-#ifndef KEEP_GOING
                         fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
-#endif
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
                         return j;

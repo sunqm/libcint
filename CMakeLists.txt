@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.5)
 project (cint C)
 set(cint_VERSION_MAJOR "4")
 set(cint_VERSION_MINOR "1")
