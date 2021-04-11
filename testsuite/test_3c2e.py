@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # $Id$
 # -*- coding: utf-8
-from __future__ import print_function
 
 '''
 test libcint
@@ -14,7 +13,7 @@ import os
 import ctypes
 import numpy
 
-_cint = numpy.ctypeslib.load_library('libcint', '.')
+_cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
 
 
 PTR_LIGHT_SPEED    = 0

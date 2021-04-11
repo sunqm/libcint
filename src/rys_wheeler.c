@@ -3445,6 +3445,8 @@ static int rys_wheeler_partial(int n, double *alpha, double *beta, double *momen
                 if (b[i] < 1e-14) {
                         // very likely we will get numerical issues
                         if (!first_seen || b[i] < 0.) {
+                                fprintf(stderr, "libcint rys_wheeler singlur value n=%d i=%d b=%g\n",
+                                        n, i, b[i]);
                                 return i;
                         }
                         first_seen = 0;
@@ -3622,6 +3624,8 @@ static int lrys_wheeler_partial(int n, long double *alpha, long double *beta, lo
                 if (b[i] < 1e-19) {
                         // very likely we will get numerical issues
                         if (!first_seen || b[i] < 0.) {
+                                fprintf(stderr, "libcint rys_wheeler singlur value n=%d i=%d b=%g\n",
+                                        n, i, (double)b[i]);
                                 return i;
                         }
                         first_seen = 0;
@@ -6268,6 +6272,8 @@ static int qrys_wheeler_partial(int n, __float128 *alpha, __float128 *beta, __fl
                 if (b[i] < 1e-32) {
                         // very likely we will get numerical issues
                         if (!first_seen || b[i] < 0.) {
+                                fprintf(stderr, "libcint rys_wheeler singlur value n=%d i=%d b=%g\n",
+                                        n, i, (double)b[i]);
                                 return i;
                         }
                         first_seen = 0;

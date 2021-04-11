@@ -114,15 +114,19 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
         } else {
                 fprintf(stderr, "libcint SR-rys_roots does not support nroots=%d x=%g lower=%g\n",
                         n, x, lower);
-        }
-        if (error) {
-                error = CINTqrys_schmidt(n, x, lower, u, w);
-        }
-        if (error) {
-                fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", n);
 #ifndef KEEP_GOING
                 exit(1);
 #endif
+                return 1;
+        }
+        if (error) {
+                error = CINTqrys_schmidt(n, x, lower, u, w);
+                if (error) {
+                        fprintf(stderr, "libcint SR-rys_roots failed. nroots=%d\n", n);
+#ifndef KEEP_GOING
+                        exit(1);
+#endif
+                }
         }
         return error;
 }
