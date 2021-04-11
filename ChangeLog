@@ -1,3 +1,5 @@
+Version 4.1.2  (2021-04-10):
+	* Fix a bug of siginficant digits of float128 in the core Fmt integrals
 Version 4.1.1  (2021-03-21):
 	* Fix bug in short-range Coulomb core integrals
 Version 4.1.0  (2021-02-15):

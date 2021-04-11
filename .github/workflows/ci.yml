@@ -18,7 +18,7 @@ jobs:
       - name: Compile
         run: |
           env
-          cmake -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -Bbuild .
+          cmake -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -Bbuild -DKEEP_GOING=1 .
           cmake --build build
       - name: Test for rys-roots
         if: startsWith(matrix.os, 'ubuntu')
