@@ -841,7 +841,7 @@ FINT CINT2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         if (cache == NULL) {
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = nf*n_comp;
+                size_t len0 = nf*n_comp;
                 size_t cache_size = leng + len0 + nc*n_comp*3 + pdata_size;
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
@@ -891,7 +891,7 @@ FINT CINT2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt
         if (out == NULL) {
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = nf*n_comp;
+                size_t len0 = nf*n_comp;
                 size_t cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
                                         nc*n_comp+nf*4);
                 if (cache_size >= INT32_MAX) {
@@ -906,7 +906,7 @@ FINT CINT2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt
         if (cache == NULL) {
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = nf*n_comp;
+                size_t len0 = nf*n_comp;
                 size_t cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
                                         nc*n_comp+nf*4);
                 stack = malloc(sizeof(double)*cache_size);
@@ -966,7 +966,7 @@ FINT CINT2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTO
         if (out == NULL) {
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = nf*n_comp;
+                size_t len0 = nf*n_comp;
                 size_t cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
                                      nc*n_comp + n1*envs->ncomp_e2*OF_CMPLX
                                      + nf*32*OF_CMPLX);
@@ -982,7 +982,7 @@ FINT CINT2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTO
         if (cache == NULL) {
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = nf*n_comp;
+                size_t len0 = nf*n_comp;
                 size_t cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
                                      nc*n_comp + n1*envs->ncomp_e2*OF_CMPLX
                                      + nf*32*OF_CMPLX);
