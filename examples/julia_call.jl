@@ -35,6 +35,7 @@ i = 0
 atm =           Int32[1         ptr_env  0 0 0 0]
 ptr_env += 3
 atm = vcat(atm, Int32[1         ptr_env  0 0 0 0])
+ptr_env += 3
 #             x  y   z (Bohr)
 append!(env, [0, 0, -0.8])
 append!(env, [0, 0,  0.8])
@@ -42,14 +43,19 @@ append!(env, [0, 0,  0.8])
 # basis for atom #0
 # 3s -> 2s
 append!(env, [6., 2., .8])
-append!(env, [.7, .6, .5, .4, .3, .2])
+append!(env, [.7 * gto_norm(0, 6.),
+              .6 * gto_norm(0, 2.),
+              .5 * gto_norm(0, .8),
+              .4 * gto_norm(0, 6.),
+              .3 * gto_norm(0, 2.),
+              .2 * gto_norm(0, .8)])
 #                     ATOM_OF, ANG_OF, NPRIM_OF, NCTR_OF, KAPPA_OF, PTR_EXP, PTR_COEFF
 bas =           Int32[0        0       3         2         0        ptr_env  ptr_env+3  0]
 ptr_env += 9
 bas = vcat(bas, Int32[0        1       1         1        0         ptr_env  ptr_env+1  0])
 append!(env, [.9])
-append!(env, [1.])
-ptr_env += 1
+append!(env, [1. * gto_norm(1, 0.9)])
+ptr_env += 2
 
 # basis functions for atom #1, they are the same to thoes of atom #0
 bas = vcat(bas, bas)

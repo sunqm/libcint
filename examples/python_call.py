@@ -62,7 +62,7 @@ env.append(1. * gto_norm(1, 0.9))
 bas.append([0,       1,      1,        1,       0,        ptr_env, ptr_env+1, 0])
 ptr_env += 2
 
-# basis functions for atom #1, they are the same to thoes of atom #0
+# basis functions for atom #1, they are the same to the parameters for atom #0
 bas.extend(bas[-2:])
 
 # note the integer type
