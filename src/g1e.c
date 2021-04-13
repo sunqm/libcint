@@ -404,10 +404,11 @@ void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
         }
 }
 
-void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, FINT nf,
+void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, size_t nf,
                        FINT nprim, FINT nctr, int non0ctr, int *sortedidx)
 {
-        FINT n, i;
+        FINT i;
+        size_t n;
         double c0, c1;
         double *p0, *p1;
 
@@ -430,10 +431,11 @@ void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, FINT nf,
         }
 }
 
-void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, FINT nf,
+void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, size_t nf,
                        FINT nprim, FINT nctr, int non0ctr, int *sortedidx)
 {
-        FINT n, i;
+        FINT i;
+        size_t n;
         double c0, c1;
         double *p0, *p1;
 

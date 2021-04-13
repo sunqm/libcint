@@ -114,9 +114,9 @@ void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
 
 double CINTcommon_fac_sp(FINT l);
 
-void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, FINT nf,
+void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, size_t nf,
                        FINT nprim, FINT nctr, int non0ctr, int *sortedidx);
-void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, FINT nf,
+void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, size_t nf,
                        FINT nprim, FINT nctr, int non0ctr, int *sortedidx);
 
 #define G1E_D_I(f, g, li, lj, lk)   CINTnabla1i_1e(f, g, li, lj, lk, envs)
