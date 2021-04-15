@@ -426,7 +426,7 @@ iz = idx[2+n*3];~%")
       (format fout ngdef)
       (format fout "CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_cart(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -446,7 +446,7 @@ return 0; }~%")))
       (format fout "return CINT1e_drv(out, dims, &envs, cache, &c2s_cart_1e, ~d);
 } // ~a_cart~%" int1e-type intname)
 ;;; _sph
-      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_sph(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -466,7 +466,7 @@ return 0; }~%")))
       (format fout "return CINT1e_drv(out, dims, &envs, cache, &c2s_sph_1e, ~d);
 } // ~a_sph~%" int1e-type intname)
 ;;; _spinor
-      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -671,7 +671,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout ngdef)
       (format fout "CINTall_2e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_cart(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (and (eql sf1 'si) (eql ts1 'tas)
@@ -704,7 +704,7 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
       (format fout "return CINT2e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
 ;;; _sph
-      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_sph(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (and (eql sf1 'si) (eql ts1 'tas)
@@ -737,7 +737,7 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
       (format fout "return CINT2e_spheric_drv(out, dims, &envs, opt, cache);~%} // ~a_sph~%" intname)
 ;;; _spinor
-      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -866,7 +866,7 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout ngdef)
       (format fout "CINTall_3c2e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_cart(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -885,7 +885,7 @@ c2s_dset0(out+nout*i, dims, counts); }
 return 0; }~%")))
       (format fout "return CINT3c2e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
 ;;; _sph
-      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_sph(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -905,7 +905,7 @@ return 0; }~%")))
       (format fout "return CINT3c2e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c2e1, 0);
 } // ~a_sph~%" intname)
 ;;; _spinor
-      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -1015,17 +1015,17 @@ for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
       (format fout ngdef)
       (format fout "CINTall_2c2e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_cart(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (format fout "return CINT2c2e_cart_drv(out, dims, &envs, opt, cache);~%} // ~a_cart~%" intname)
 ;;; _sph
-      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_sph(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (format fout "return CINT2c2e_spheric_drv(out, dims, &envs, opt, cache);~%} // ~a_sph~%" intname)
 ;;; _spinor
-      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       ; c2s_ function is incorrect if e1/e2 are spin-included operators
@@ -1138,7 +1138,7 @@ iz = idx[2+n*3];~%")
       (format fout ngdef)
       (format fout "CINTall_3c1e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
 ;;; _cart
-      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_cart(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -1158,7 +1158,7 @@ return 0; }~%")))
       (format fout "return CINT3c1e_cart_drv(out, dims, &envs, opt, cache, ~d);~%}
 // ~a_cart~%" int1e-type intname)
 ;;; _sph
-      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_sph(double *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)
@@ -1178,7 +1178,7 @@ return 0; }~%")))
       (format fout "return CINT3c1e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, ~d, 0);
 } // ~a_sph~%" int1e-type intname)
 ;;; _spinor
-      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+      (format fout "size_t ~a_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
       (format fout envs-common)
       (when (member 'g raw-infix)

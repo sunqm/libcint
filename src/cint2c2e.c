@@ -573,7 +573,7 @@ FINT CINT2c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
 }
 
 
-FINT int2c2e_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+size_t int2c2e_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                 FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
@@ -589,7 +589,7 @@ void int2c2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
         CINTall_2c2e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 
-FINT int2c2e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+size_t int2c2e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                  FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
@@ -599,7 +599,7 @@ FINT int2c2e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
         return CINT2c2e_cart_drv(out, dims, &envs, opt, cache);
 }
  
-FINT int2c2e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+size_t int2c2e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                    FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};

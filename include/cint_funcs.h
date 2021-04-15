@@ -11,7 +11,7 @@
 #define HAVE_DEFINED_CINTINTEGRALFUNCTION
 typedef void CINTOptimizerFunction(CINTOpt **opt,
                                    FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
-typedef FINT CINTIntegralFunction(double *out, FINT *dims, FINT *shls,
+typedef size_t CINTIntegralFunction(double *out, FINT *dims, FINT *shls,
                                   FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env,
                                   CINTOpt *opt, double *cache);
 #endif

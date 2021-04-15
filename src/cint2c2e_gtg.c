@@ -8,7 +8,7 @@
 #include "optimizer.h"
 #include "cint2e.h"
 
-FINT int2c2e_gtg_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+size_t int2c2e_gtg_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                   FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};

@@ -14,7 +14,7 @@ FINT CINT2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt
                        double *cache);
 void CINTgout2e(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty);
 
-FINT int2e_coulerf_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+size_t int2e_coulerf_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                       FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
