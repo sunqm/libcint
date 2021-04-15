@@ -10,8 +10,6 @@
 
 FINT CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
-FINT CINT2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                       double *cache);
 void CINTgout2e(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty);
 
 size_t int2e_coulerf_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
@@ -31,7 +29,7 @@ void int2e_coulerf_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
 }
 
 #define ALL_CINT(NAME) \
-FINT c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
+size_t c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env, CINTOpt *opt) { \
         return NAME##_sph(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
 } \
