@@ -218,7 +218,7 @@ void lgamma_inc_like(long double *f, long double t, int m)
         }
 }
 
-inline double _pow(double base, int exponent)
+static inline double _pow(double base, int exponent)
 {
         int i;
         double result = 1;
@@ -231,7 +231,7 @@ inline double _pow(double base, int exponent)
         return result;
 }
 
-inline long double _powl(long double base, int exponent)
+static inline long double _powl(long double base, int exponent)
 {
         int i;
         long double result = 1.l;
@@ -405,7 +405,7 @@ void qgamma_inc_like(__float128 *f, __float128 t, int m)
         }
 }
 
-inline __float128 _powq(__float128 base, int exponent)
+static inline __float128 _powq(__float128 base, int exponent)
 {
         int i;
         __float128 result = 1.q;
