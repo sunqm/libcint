@@ -7540,8 +7540,8 @@ void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = i_l * 2 + 1;
         FINT dj = j_l * 2 + 1;
-        FINT ni = dims[0];
-        FINT nj = dims[1];
+        FINT ni = dims[1];
+        FINT nj = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nf = envs->nf;
@@ -7563,8 +7563,8 @@ void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims,
                         // call (c2s_bra_sph[i_l]) for all grids
                         tmp1 = sph2e_inner(buf2, tmp1, i_l, bgrids, dj, bgrids, bgrids);
 
-                        pij = out + ((size_t)ngrids) * (ofj * jc + ni * ic) + grids_offset;
-                        dcopy_grids_ij(pij, tmp1, ngrids, ni, nj, bgrids, di, dj);
+                        pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
+                        dcopy_grids_ij(pij, tmp1, dims[0], ni, nj, bgrids, di, dj);
                         gctr += bgrids * nf;
                 } }
         }

@@ -32,6 +32,16 @@ void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         if (ibase) {
                 dli = envs->li_ceil + envs->lj_ceil + 1;
                 dlj = envs->lj_ceil + 1;
+        } else {
+                dli = envs->li_ceil + 1;
+                dlj = envs->li_ceil + envs->lj_ceil + 1;
+        }
+        envs->g_stride_i = GRID_BLKSIZE * nroots;
+        envs->g_stride_j = GRID_BLKSIZE * nroots * dli;
+        envs->g_size     = GRID_BLKSIZE * nroots * dli * dlj;
+        envs->f_g0_2e = &CINTg0_1e_grids;
+
+        if (ibase) {
                 envs->g2d_ijmax = envs->g_stride_i;
                 envs->rx_in_rijrx = envs->ri;
                 envs->rirj[0] = envs->ri[0] - envs->rj[0];
@@ -39,8 +49,6 @@ void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                 envs->rirj[2] = envs->ri[2] - envs->rj[2];
                 envs->f_g0_2d4d = &CINTg0_1e_grids_igtj;
         } else {
-                dli = envs->li_ceil + 1;
-                dlj = envs->li_ceil + envs->lj_ceil + 1;
                 envs->g2d_ijmax = envs->g_stride_j;
                 envs->rx_in_rijrx = envs->rj;
                 envs->rirj[0] = envs->rj[0] - envs->ri[0];
@@ -48,10 +56,6 @@ void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                 envs->rirj[2] = envs->rj[2] - envs->ri[2];
                 envs->f_g0_2d4d = &CINTg0_1e_grids_iltj;
         }
-        envs->g_stride_i = GRID_BLKSIZE * nroots;
-        envs->g_stride_j = GRID_BLKSIZE * nroots * dli;
-        envs->g_size     = GRID_BLKSIZE * nroots * dli * dlj;
-        envs->f_g0_2e = &CINTg0_1e_grids;
 }
 
 int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
@@ -71,13 +75,11 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         double *w = gz;
         MALLOC_INSTACK(u, GRID_BLKSIZE*nroots);
         double aij = envs->aij;
-        double fac1 = fac;
+        double fac1;
 
-        for (ig = 0; ig < bgrids; ig++) {
-                for (i = 0; i < nroots; i++) {
-                        gx[ig*GRID_BLKSIZE+i] = 1;
-                        gy[ig*GRID_BLKSIZE+i] = 1;
-                }
+        for (i = 0; i < bgrids * nroots; i++) {
+                gx[i] = 1;
+                gy[i] = 1;
         }
 
 
@@ -86,6 +88,7 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         double theta, sqrt_theta;
 
         if (omega == 0) {
+                fac1 = fac / aij;
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * CINTsquare_dist(rij, grids+ig*3);
                         CINTrys_roots(nroots, x, u+ig*nroots, w+ig*nroots);
@@ -97,7 +100,7 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         } else if (omega < 0) { // short-range part of range-separated Coulomb
                 theta = omega * omega / (omega * omega + aij);
                 sqrt_theta = sqrt(theta);
-                fac1 *= sqrt_theta;
+                fac1 = fac * sqrt_theta / aij;
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * CINTsquare_dist(rij, grids+ig*3);
                         if (theta * x > envs->expcutoff) {
@@ -117,8 +120,8 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
                 }
         } else {  // long-range part of range-separated Coulomb
                 theta = omega * omega / (omega * omega + aij);
-                fac1 *= sqrt(theta);
                 aij *= theta;
+                fac1 = fac * sqrt(theta) / aij;
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * CINTsquare_dist(rij, grids+ig*3);
                         CINTrys_roots(nroots, x, u+ig*nroots, w+ig*nroots);
@@ -139,11 +142,11 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
                 }
         }
 #endif
-        if (envs->g_size == 1) {
+        FINT nmax = envs->li_ceil + envs->lj_ceil;
+        if (nmax == 0) {
                 return 1;
         }
 
-        FINT nmax = envs->li_ceil + envs->lj_ceil;
         FINT lj = envs->lj_ceil;
         FINT di = envs->g2d_ijmax;
         FINT dj = envs->g_stride_j;
@@ -154,11 +157,12 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         double *p1x, *p1y, *p1z;
         double *p2x, *p2y, *p2z;
         double rirg[3];
+        double rijrg[3];
 
         for (ig = 0; ig < bgrids; ig++) {
                 p0x = gx + ig*nroots;
-                p0y = gx + ig*nroots;
-                p0z = gx + ig*nroots;
+                p0y = gy + ig*nroots;
+                p0z = gz + ig*nroots;
                 p1x = p0x + di;
                 p1y = p0y + di;
                 p1z = p0z + di;
@@ -166,21 +170,24 @@ int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
                 p2y = p0y - di;
                 p2z = p0z - di;
                 rg = grids + ig * 3;
+                rijrg[0] = rg[0] - rij[0];
+                rijrg[1] = rg[1] - rij[1];
+                rijrg[2] = rg[2] - rij[2];
                 for (n = 0; n < nroots; n++) {
                         t2 = u[ig*nroots+n];
-                        rirg[0] = rijrx[0] + t2 * (rg[0] - rij[0]);
-                        rirg[1] = rijrx[1] + t2 * (rg[1] - rij[1]);
-                        rirg[2] = rijrx[2] + t2 * (rg[2] - rij[2]);
+                        rirg[0] = rijrx[0] + t2 * rijrg[0];
+                        rirg[1] = rijrx[1] + t2 * rijrg[1];
+                        rirg[2] = rijrx[2] + t2 * rijrg[2];
 
-                        p1x[ig*nroots+1] = rirg[0] * p2x[ig*nroots+0];
-                        p1y[ig*nroots+1] = rirg[1] * p2y[ig*nroots+0];
-                        p1z[ig*nroots+1] = rirg[2] * p2z[ig*nroots+0];
+                        p1x[n] = rirg[0] * p0x[n];
+                        p1y[n] = rirg[1] * p0y[n];
+                        p1z[n] = rirg[2] * p0z[n];
 
                         tmp = 0.5 * (1 - t2) / aij;
                         for (i = 1; i < nmax; i++) {
-                                p1x[i*di+n] = i * tmp * p2x[i*di+n] + rirg[0] * p0x[i*di];
-                                p1y[i*di+n] = i * tmp * p2y[i*di+n] + rirg[1] * p0y[i*di];
-                                p1z[i*di+n] = i * tmp * p2z[i*di+n] + rirg[2] * p0z[i*di];
+                                p1x[i*di+n] = i * tmp * p2x[i*di+n] + rirg[0] * p0x[i*di+n];
+                                p1y[i*di+n] = i * tmp * p2y[i*di+n] + rirg[1] * p0y[i*di+n];
+                                p1z[i*di+n] = i * tmp * p2z[i*di+n] + rirg[2] * p0z[i*di+n];
                         }
                 }
         }
@@ -207,10 +214,10 @@ void CINTg0_1e_grids_igtj(double *g, CINTEnvVars *envs)
         FINT i, j, ig, n;
 
 //        for (ig = 0; ig < bgrids; ig++) {
-//                p0x = gx + ig*nroots;
-//                p0y = gx + ig*nroots;
-//                p0z = gx + ig*nroots;
 //                for (j = 1; j <= lj; j++) {
+//                      p0x = gx + ig*nroots + j * dj;
+//                      p0y = gy + ig*nroots + j * dj;
+//                      p0z = gz + ig*nroots + j * dj;
 //                        for (i = 0; i <= nmax - j; i++) {
 //                                for (n = 0; n < nroots; n++) {
 //                                        p0x[i*di+n] = p0x[(i+1)*di-dj+n] + rirj[0] * p0x[i*di-dj+n];
@@ -222,15 +229,15 @@ void CINTg0_1e_grids_igtj(double *g, CINTEnvVars *envs)
 //        }
         for (j = 1; j <= lj; j++) {
         for (i = 0; i <= nmax - j; i++) {
-                p0x = gx + i*di;
-                p0y = gx + i*di;
-                p0z = gx + i*di;
+                p0x = gx + j * dj + i * di;
+                p0y = gy + j * dj + i * di;
+                p0z = gz + j * dj + i * di;
                 p1x = p0x - dj;
-                p1y = p0x - dj;
-                p1z = p0x - dj;
+                p1y = p0y - dj;
+                p1z = p0z - dj;
                 p2x = p1x + di;
-                p2y = p1x + di;
-                p2z = p1x + di;
+                p2y = p1y + di;
+                p2z = p1z + di;
                 for (ig = 0; ig < bgrids; ig++) {
                         for (n = 0; n < nroots; n++) {
                                 p0x[ig*nroots+n] = p2x[ig*nroots+n] + rirj[0] * p1x[ig*nroots+n];
@@ -261,15 +268,15 @@ void CINTg0_1e_grids_iltj(double *g, CINTEnvVars *envs)
 
         for (i = 1; i <= li; i++) {
         for (j = 0; j <= nmax-i; j++) {
-                p0x = gx + j*dj;
-                p0y = gx + j*dj;
-                p0z = gx + j*dj;
+                p0x = gx + j * dj + i * di;
+                p0y = gy + j * dj + i * di;
+                p0z = gz + j * dj + i * di;
                 p1x = p0x - di;
-                p1y = p0x - di;
-                p1z = p0x - di;
+                p1y = p0y - di;
+                p1z = p0z - di;
                 p2x = p1x + dj;
-                p2y = p1x + dj;
-                p2z = p1x + dj;
+                p2y = p1y + dj;
+                p2z = p1z + dj;
                 for (ig = 0; ig < bgrids; ig++) {
                         for (n = 0; n < nroots; n++) {
                                 p0x[ig*nroots+n] = p2x[ig*nroots+n] + rirj[0] * p1x[ig*nroots+n];

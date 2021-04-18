@@ -148,9 +148,7 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
                                 envs->aij = ai[ip] + aj[jp];
                                 expij = pdata_ij->eij;
                                 rij = pdata_ij->rij;
-                                envs->rij[0] = rij[0];
-                                envs->rij[1] = rij[1];
-                                envs->rij[2] = rij[2];
+                                envs->rij = rij;
                                 envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
                                 envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
                                 envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
@@ -186,13 +184,16 @@ static void _transpose_comps(double *out, double *gij,
 FINT int1e_grids_cache_size(CINTEnvVars *envs)
 {
         FINT *x_ctr = envs->x_ctr;
-        FINT ngrids_nf = envs->ngrids * envs->nf;
-        FINT nc = ngrids_nf * x_ctr[0] * x_ctr[1];
+        FINT ngrids = envs->ngrids;
+        FINT nroots = envs->nrys_roots;
+        FINT nf = envs->nf;
+        FINT nc = nf * x_ctr[0] * x_ctr[1];
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-        FINT len0 = ngrids_nf * n_comp;
-        FINT cache_size = MAX(leng + len0*2 + nc*n_comp*3,
-                              nc*n_comp + ngrids_nf*8*OF_CMPLX);
+        FINT len0 = GRID_BLKSIZE * nf * n_comp;
+        FINT leni = GRID_BLKSIZE * nf * x_ctr[0] * n_comp;
+        FINT cache_size = MAX(leng + len0 + leni + ngrids*nc*n_comp*2 + GRID_BLKSIZE*nroots,
+                              ngrids*nc*n_comp + GRID_BLKSIZE * nf*8*OF_CMPLX);
         return cache_size + 10000;
 }
 
