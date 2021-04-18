@@ -95,6 +95,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         double log_rr_kl = (envs->lk_ceil+envs->ll_ceil+1)*log(rr_kl+1)/2;
         double akl, ekl, expijkl, ccekl;
         double *rij;
+        double rkl[3];
         //const double dist_ij = SQUARE(envs->rirj);
         const double dist_kl = SQUARE(envs->rkrl);
 
@@ -195,12 +196,13 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                         }
                         envs->ak = ak[kp];
                         envs->akl = akl;
-                        envs->rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / envs->akl;
-                        envs->rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / envs->akl;
-                        envs->rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / envs->akl;
-                        envs->rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
-                        envs->rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
-                        envs->rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
+                        rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / envs->akl;
+                        rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / envs->akl;
+                        rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / envs->akl;
+                        envs->rkl = rkl;
+                        envs->rklrx[0] = rkl[0] - envs->rx_in_rklrx[0];
+                        envs->rklrx[1] = rkl[1] - envs->rx_in_rklrx[1];
+                        envs->rklrx[2] = rkl[2] - envs->rx_in_rklrx[2];
                         eijcutoff = expcutoff - MAX(ccekl, 0);
                         ekl = exp(-ekl);
 
@@ -227,9 +229,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                         envs->ai = ai[ip];
                                         envs->aij = ai[ip] + aj[jp];
                                         rij = pdata_ij->rij;
-                                        envs->rij[0] = rij[0];
-                                        envs->rij[1] = rij[1];
-                                        envs->rij[2] = rij[2];
+                                        envs->rij = rij;
                                         envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
                                         envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
                                         envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
@@ -711,9 +711,7 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cache)
                         envs->akl = ak[kp] + al[lp];
                         expkl = pdata_kl->eij;
                         rkl = pdata_kl->rij;
-                        envs->rkl[0] = rkl[0];
-                        envs->rkl[1] = rkl[1];
-                        envs->rkl[2] = rkl[2];
+                        envs->rkl = rkl;
                         envs->rklrx[0] = rkl[0] - envs->rx_in_rklrx[0];
                         envs->rklrx[1] = rkl[1] - envs->rx_in_rklrx[1];
                         envs->rklrx[2] = rkl[2] - envs->rx_in_rklrx[2];
@@ -744,9 +742,7 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, CINTOpt *opt, double *cache)
                                         envs->aij = ai[ip] + aj[jp];
                                         expij = pdata_ij->eij;
                                         rij = pdata_ij->rij;
-                                        envs->rij[0] = rij[0];
-                                        envs->rij[1] = rij[1];
-                                        envs->rij[2] = rij[2];
+                                        envs->rij = rij;
                                         envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
                                         envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
                                         envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];

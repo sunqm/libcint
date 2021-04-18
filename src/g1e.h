@@ -19,7 +19,7 @@ typedef struct {
         FINT i_l;
         FINT j_l;
         FINT k_l;
-        FINT {FINT l_l; FINT ngrids_offset;};
+        union {FINT l_l; FINT grids_offset;};
         FINT nfi;  // number of cartesian components
         FINT nfj;
         FINT nfk;
@@ -73,12 +73,12 @@ typedef struct {
         double aj;
         double ak;
         double al;
-        double rij[3];
-        double rijrx[3];
         double aij;
-        double rkl[3];
-        double rklrx[3];
         double akl;
+        double *rij;
+        double *rkl;
+        double rijrx[3];
+        double rklrx[3];
 } CINTEnvVars;
 #endif
 

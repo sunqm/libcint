@@ -68,12 +68,8 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 
         envs->aj = 0;
         envs->al = 0;
-        envs->rij[0] = envs->ri[0];
-        envs->rij[1] = envs->ri[1];
-        envs->rij[2] = envs->ri[2];
-        envs->rkl[0] = envs->rk[0];
-        envs->rkl[1] = envs->rk[1];
-        envs->rkl[2] = envs->rk[2];
+        envs->rij = envs->ri;
+        envs->rkl = envs->rk;
         envs->g2d_ijmax = envs->g_stride_i;
         envs->g2d_klmax = envs->g_stride_k;
         envs->rkrl[0] = envs->rk[0];
@@ -161,12 +157,8 @@ void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 
         envs->aj = 0;
         envs->al = 0;
-        envs->rij[0] = envs->ri[0];
-        envs->rij[1] = envs->ri[1];
-        envs->rij[2] = envs->ri[2];
-        envs->rkl[0] = envs->rk[0];
-        envs->rkl[1] = envs->rk[1];
-        envs->rkl[2] = envs->rk[2];
+        envs->rij = envs->ri;
+        envs->rkl = envs->rk;
         envs->g2d_ijmax = envs->g_stride_i;
         envs->g2d_klmax = envs->g_stride_k;
         envs->rkrl[0] = envs->rk[0];

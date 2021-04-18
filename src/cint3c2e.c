@@ -167,9 +167,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                 envs->aij = ai[ip] + aj[jp];
                                 expij = pdata_ij->eij;
                                 rij = pdata_ij->rij;
-                                envs->rij[0] = rij[0];
-                                envs->rij[1] = rij[1];
-                                envs->rij[2] = rij[2];
+                                envs->rij = rij;
                                 envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
                                 envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
                                 envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
@@ -270,9 +268,7 @@ i_contracted: ;
         envs->aij = ai[ip] + aj[jp]; \
         expij = pdata_ij->eij; \
         rij = pdata_ij->rij; \
-        envs->rij[0] = rij[0]; \
-        envs->rij[1] = rij[1]; \
-        envs->rij[2] = rij[2]; \
+        envs->rij = rij; \
         envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0]; \
         envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1]; \
         envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2]

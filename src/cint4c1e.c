@@ -79,6 +79,8 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
         FINT *gempty = empty + 4;
         /* COMMON_ENVS_AND_DECLARE end */
 
+        double rij[3];
+        double rkl[3];
         FINT *idx;
         MALLOC_INSTACK(idx, envs->nf * 3);
         CINTg4c1e_index_xyz(idx, envs);
@@ -170,12 +172,13 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                         if (ekl > EXPCUTOFF) {
                                 goto k_contracted;
                         }
-                        envs->rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / envs->akl;
-                        envs->rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / envs->akl;
-                        envs->rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / envs->akl;
-                        envs->rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
-                        envs->rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
-                        envs->rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
+                        rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / envs->akl;
+                        rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / envs->akl;
+                        rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / envs->akl;
+                        envs->rkl = rkl;
+                        envs->rklrx[0] = rkl[0] - envs->rx_in_rklrx[0];
+                        envs->rklrx[1] = rkl[1] - envs->rx_in_rklrx[1];
+                        envs->rklrx[2] = rkl[2] - envs->rx_in_rklrx[2];
                         if (k_ctr == 1) {
                                 fac1k = fac1l * ck[kp];
                         } else {
@@ -198,15 +201,16 @@ FINT CINT4c1e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache)
                                         if (eij+ekl > EXPCUTOFF) {
                                                 goto i_contracted;
                                         }
-                                        envs->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / envs->aij;
-                                        envs->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / envs->aij;
-                                        envs->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / envs->aij;
-                                        envs->rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
-                                        envs->rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
-                                        envs->rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
-                                        rijrkl[0] = envs->rij[0] - envs->rkl[0];
-                                        rijrkl[1] = envs->rij[1] - envs->rkl[1];
-                                        rijrkl[2] = envs->rij[2] - envs->rkl[2];
+                                        rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) / envs->aij;
+                                        rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) / envs->aij;
+                                        rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) / envs->aij;
+                                        envs->rij = rij;
+                                        envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
+                                        envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
+                                        envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
+                                        rijrkl[0] = rij[0] - rkl[0];
+                                        rijrkl[1] = rij[1] - rkl[1];
+                                        rijrkl[2] = rij[2] - rkl[2];
                                         a0 = envs->aij * envs->akl / (envs->aij + envs->akl);
                                         eijkl = a0 * SQUARE(rijrkl);
                                         eijkl += eij + ekl;
