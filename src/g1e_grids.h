@@ -1,0 +1,34 @@
+void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
+                                  FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+
+int CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs, double *cache);
+void CINTg0_1e_grids_igtj(double *g, CINTEnvVars *envs);
+void CINTg0_1e_grids_iltj(double *g, CINTEnvVars *envs);
+
+void CINTgout1e_grids(double *gout, double *g, FINT *idx,
+                      CINTEnvVars *envs, FINT gout_empty);
+
+void CINTnabla1i_3c1e(double *f, const double *g,
+                      const FINT li, const FINT lj, const CINTEnvVars *envs);
+
+void CINTnabla1j_3c1e(double *f, const double *g,
+                      const FINT li, const FINT lj, const CINTEnvVars *envs);
+
+void CINTx1i_3c1e(double *f, const double *g, const double *ri,
+                  const FINT li, const FINT lj, const CINTEnvVars *envs);
+
+void CINTx1j_3c1e(double *f, const double *g, const double *rj,
+                  const FINT li, const FINT lj, const CINTEnvVars *envs);
+
+
+#define G1E_GRIDS_D_I(f, g, li, lj)   CINTnabla1i_1e_grids(f, g, li, lj, envs)
+#define G1E_GRIDS_D_J(f, g, li, lj)   CINTnabla1j_1e_grids(f, g, li, lj, envs)
+/* r-R_0, R_0 is (0,0,0) */
+#define G1E_GRIDS_R0I(f, g, li, lj)   CINTx1i_1e_grids(f, g, ri, li, lj, envs)
+#define G1E_GRIDS_R0J(f, g, li, lj)   CINTx1j_1e_grids(f, g, rj, li, lj, envs)
+/* r-R_C, R_C is common origin */
+#define G1E_GRIDS_RCI(f, g, li, lj)   CINTx1i_1e_grids(f, g, dri, li, lj, envs)
+#define G1E_GRIDS_RCJ(f, g, li, lj)   CINTx1j_1e_grids(f, g, drj, li, lj, envs)
+/* origin from center of each basis */
+#define G1E_GRIDS_R_I(f, g, li, lj)   f = g + envs->g_stride_i
+#define G1E_GRIDS_R_J(f, g, li, lj)   f = g + envs->g_stride_j

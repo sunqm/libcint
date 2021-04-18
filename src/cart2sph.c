@@ -2171,6 +2171,8 @@ static const double complex g_trans_cart2j[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+static double *sph2e_inner(double *gsph, double *gcart,
+                           FINT l, FINT nbra, FINT ncall, FINT sizsph, FINT sizcart);
 
 static FINT _len_spinor(FINT kappa, FINT l)
 {
@@ -2363,8 +2365,8 @@ static double *s_ket_cart2spheric(double *gsph, double *gcart,
         }*/
         return gcart;
 }
-static double *s_ket_cart2spheric1(double *gsph, double *gcart,
-                                   FINT lds, FINT nbra, FINT l)
+static double *s_ket_cart2spheric_copy(double *gsph, double *gcart,
+                                       FINT lds, FINT nbra, FINT l)
 {
         FINT i;
         for (i = 0; i < nbra; i++) {
@@ -2403,8 +2405,8 @@ static double *p_ket_cart2spheric(double *gsph, double *gcart,
         return gcart;
 #endif
 }
-static double *p_ket_cart2spheric1(double *gsph, double *gcart,
-                                   FINT lds, FINT nbra, FINT l)
+static double *p_ket_cart2spheric_copy(double *gsph, double *gcart,
+                                       FINT lds, FINT nbra, FINT l)
 {
         FINT i;
 #ifdef PYPZPX
@@ -2639,8 +2641,8 @@ double *(*c2s_ket_sph[])(double *gsph, double *gcart,
 
 double *(*c2s_ket_sph1[])(double *gsph, double *gcart,
                           FINT lds, FINT nbra, FINT l) = {
-        s_ket_cart2spheric1,
-        p_ket_cart2spheric1,
+        s_ket_cart2spheric_copy,
+        p_ket_cart2spheric_copy,
         d_ket_cart2spheric,
         f_ket_cart2spheric,
         g_ket_cart2spheric,
@@ -7081,6 +7083,26 @@ static void zcopy_ij(double complex *opij, const double complex *gctr,
         }
 }
 
+static void dcopy_grids_ij(double *out, const double *gctr,
+                           const FINT ngrids, const FINT ni, const FINT nj,
+                           const FINT mgrids, const FINT mi, const FINT mj)
+{
+        const size_t ngi = ngrids * ni;
+        const size_t mgi = mgrids * mi;
+        FINT i, j, m;
+        double *pijkl;
+        const double *pgctr;
+
+        for (j = 0; j < mj; j++) {
+                for (i = 0; i < mi; i++) {
+                for (m = 0; m < mgrids; m++) {
+                        out[i*ngrids+m] = gctr[i*mgrids+m];
+                } }
+                out += ngi;
+                gctr += mgi;
+        }
+}
+
 /*
  * gctr(i,k,l,j) -> fijkl(i,j,k,l)
  * fijkl(ic:ic-1+di,jc:jc-1+dj,kc:kc-1+dk,lc:lc-1+dl)
@@ -7090,10 +7112,10 @@ static void dcopy_iklj(double *fijkl, const double *gctr,
                        const FINT ni, const FINT nj, const FINT nk, const FINT nl,
                        const FINT mi, const FINT mj, const FINT mk, const FINT ml)
 {
-        const FINT nij = ni * nj;
-        const FINT nijk = nij * nk;
-        const FINT mik = mi * mk;
-        const FINT mikl = mik * ml;
+        const size_t nij = ni * nj;
+        const size_t nijk = nij * nk;
+        const size_t mik = mi * mk;
+        const size_t mikl = mik * ml;
         FINT i, j, k, l;
         double *pijkl;
         const double *pgctr;
@@ -7206,10 +7228,10 @@ static void zcopy_iklj(double complex *fijkl, const double complex *gctr,
                        const FINT ni, const FINT nj, const FINT nk, const FINT nl,
                        const FINT mi, const FINT mj, const FINT mk, const FINT ml)
 {
-        const FINT nij = ni * nj;
-        const FINT nijk = nij * nk;
-        const FINT mik = mi * mk;
-        const FINT mikl = mik * ml;
+        const size_t nij = ni * nj;
+        const size_t nijk = nij * nk;
+        const size_t mik = mi * mk;
+        const size_t mikl = mik * ml;
         FINT i, j, k, l;
         double complex *pijkl;
         const double complex *pgctr;
@@ -7318,10 +7340,9 @@ void c2s_sph_1e(double *opij, double *gctr, FINT *dims,
 
         for (jc = 0; jc < j_ctr; jc++) {
         for (ic = 0; ic < i_ctr; ic++) {
-                pij = opij + ofj * jc + di * ic;
                 tmp1 = (c2s_ket_sph[j_l])(buf1, gctr, nfi, nfi, j_l);
-                //tmp1 = (c2s_ket_sph[i_l])(buf1, gctr, nfi, nfi, j_l);
                 tmp1 = (c2s_bra_sph[i_l])(buf2, dj, tmp1, i_l);
+                pij = opij + ofj * jc + di * ic;
                 dcopy_ij(pij, tmp1, ni, nj, di, dj);
                 gctr += nf;
         } }
@@ -7509,14 +7530,79 @@ void c2s_si_1ei(double complex *opij, double *gctr, FINT *dims,
         } }
 }
 
+void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims,
+                      CINTEnvVars *envs, double *cache)
+{
+        FINT ngrids = envs->ngrids;
+        FINT i_l = envs->i_l;
+        FINT j_l = envs->j_l;
+        FINT i_ctr = envs->x_ctr[0];
+        FINT j_ctr = envs->x_ctr[1];
+        FINT di = i_l * 2 + 1;
+        FINT dj = j_l * 2 + 1;
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        FINT ofj = ni * dj;
+        FINT nfi = envs->nfi;
+        FINT nf = envs->nf;
+        FINT ic, jc, grids_offset;
+        FINT bgrids, bgrids_nfi;
+        FINT buflen = GRID_BLKSIZE * nfi * dj;
+        double *buf1, *buf2;
+        MALLOC_INSTACK(buf1, buflen);
+        MALLOC_INSTACK(buf2, buflen);
+        double *pij;
+        double *tmp1;
+
+        for (grids_offset = 0; grids_offset < ngrids; grids_offset += GRID_BLKSIZE) {
+                bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
+                bgrids_nfi = bgrids * nfi;
+                for (jc = 0; jc < j_ctr; jc++) {
+                for (ic = 0; ic < i_ctr; ic++) {
+                        tmp1 = (c2s_ket_sph[j_l])(buf1, gctr, bgrids_nfi, bgrids_nfi, j_l);
+                        // call (c2s_bra_sph[i_l]) for all grids
+                        tmp1 = sph2e_inner(buf2, tmp1, i_l, bgrids, dj, bgrids, bgrids);
+
+                        pij = out + ((size_t)ngrids) * (ofj * jc + ni * ic) + grids_offset;
+                        dcopy_grids_ij(pij, tmp1, ngrids, ni, nj, bgrids, di, dj);
+                        gctr += bgrids * nf;
+                } }
+        }
+}
+
+void c2s_cart_1e_grids(double *out, double *gctr, FINT *dims,
+                       CINTEnvVars *envs, double *cache)
+{
+        FINT ngrids = envs->ngrids;
+        FINT i_ctr = envs->x_ctr[0];
+        FINT j_ctr = envs->x_ctr[1];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        FINT nfi = envs->nfi;
+        FINT nfj = envs->nfj;
+        FINT nf = envs->nf;
+        FINT ofj = ni * nfj;
+        FINT ic, jc, grids_offset;
+        FINT bgrids;
+        double *pij;
+
+        for (grids_offset = 0; grids_offset < ngrids; grids_offset += GRID_BLKSIZE) {
+                bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
+                for (jc = 0; jc < j_ctr; jc++) {
+                for (ic = 0; ic < i_ctr; ic++) {
+                        pij = out + ((size_t)ngrids) * (ofj * jc + nfi * ic) + grids_offset;
+                        dcopy_grids_ij(pij, gctr, ngrids, ni, nj, bgrids, nfi, nfj);
+                        gctr += bgrids * nf;
+                } }
+        }
+}
+
 
 /*
- * 2e integrals, cartesian to real spheric.
+ * 2e integrals, cartesian to real spherical functions.
  *
  * gctr: Cartesian GTO integrals, ordered as <ik|lj>
  */
-static double *sph2e_inner(double *gsph, double *gcart,
-                           FINT l, FINT nbra, FINT ncall, FINT sizsph, FINT sizcart);
 void c2s_sph_2e1(double *out, double *gctr, FINT *dims,
                  CINTEnvVars *envs, double *cache)
 {

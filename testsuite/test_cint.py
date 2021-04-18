@@ -16,13 +16,15 @@ import numpy
 _cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
 
 
+PTR_EXPCUTOFF      = 0
 PTR_COMMON_ORIG    = 1
 PTR_SHIELDING_ORIG = 4
 PTR_RINV_ORIG      = 4
 PTR_RINV_ZETA      = 7
 PTR_RANGE_OMEGA    = 8
-PTR_EXPCUTOFF      = 11
 PTR_ENV_START      = 20
+NGRIDS             = 11
+PTR_GRIDS          = 12
 
 CHARGE_OF  = 0
 PTR_COORD  = 1
@@ -322,6 +324,32 @@ def test_int2e_spinor(name, vref, dim, place):
     else:
         print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
 
+def test_int1e_grids_sph(name, vref, dim, place):
+    intor = getattr(_cint, name)
+    intor.restype = ctypes.c_void_p
+    numpy.random.seed(12)
+    ngrids = 78
+    grids = numpy.ranodm.random((ngrids, 3)) - 4.2
+    op = (ctypes.c_double * (1000000 * dim))()
+    env_g = numpy.append(env, grids.ravel())
+    env_g[NGRIDS] = 78
+    env_g[PTR_GRIDS] = env.size
+    v1 = 0
+    cnt = 0
+    for j in range(nbas.value*2):
+        for i in range(j+1):
+            di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
+            dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
+            shls = (ctypes.c_int * 4)(i, j)
+            intor(op, shls, c_atm, natm, c_bas, nbas,
+                  env_g.ctypes.data_as(ctypes.c_void_p), opt)
+            v1 += abs(numpy.array(op[:ngrids*di*dj*dim])).sum()
+            cnt += ngrids*di*dj*dim
+    if close(v1, vref, cnt, place):
+        print("pass: ", name)
+    else:
+        print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
+
 def test_comp2e_spinor(name1, name_ref, shift, dim, place):
     intor     = getattr(_cint, name1)
     intor.restype = ctypes.c_void_p
@@ -429,12 +457,16 @@ if __name__ == "__main__":
              ):
         test_int2e_sph(*f)
 
+#    for f in (('cint1e_grids_sph', 0, 1, 9),
+#              ('cint1e_grids_ip1_sph', 0, 1, 8 ),
+#             ):
+#        test_int1e_grids_sph(*f)
+
     test_erf('cint2e_sph', 0.2, 9)
     test_erf('cint2e_sph', 0.5, 9)
     test_erf('cint2e_sph', 0.8, 9)
 
     if "--quick" not in sys.argv:
-        # Four tests marked with "# *" may fail in quadmath mode
         for f in (('cint2e_ip1_sph', 115489.8647398112, 3, 8 ),
                   ('cint2e_p1vxp1_sph', 89014.88690617065, 3, 9),
                  ):
