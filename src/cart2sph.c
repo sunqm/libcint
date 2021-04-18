@@ -5447,7 +5447,7 @@ static void d_ket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                         gspa[5*lds+i] = creal(coeff_c2s[60])*gcart[nbra*0+i]
                                       + creal(coeff_c2s[63])*gcart[nbra*3+i]
                                       + cimag(coeff_c2s[61])*gcart[nbra*1+i]*_Complex_I;
-                                      
+
                         gspb[0*lds+i] = creal(coeff_c2s[ 6])*gcart[nbra*0+i]
                                       + creal(coeff_c2s[ 9])*gcart[nbra*3+i]
                                       + cimag(coeff_c2s[ 7])*gcart[nbra*1+i]*_Complex_I;
@@ -5517,7 +5517,7 @@ static void d_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                         gspa[5*lds+i] = creal(coeff_c2s[60])*gcart[nbra*0+i]*_Complex_I
                                       + creal(coeff_c2s[63])*gcart[nbra*3+i]*_Complex_I
                                       - cimag(coeff_c2s[61])*gcart[nbra*1+i];
-                                     
+
                         gspb[0*lds+i] = creal(coeff_c2s[ 6])*gcart[nbra*0+i]*_Complex_I
                                       + creal(coeff_c2s[ 9])*gcart[nbra*3+i]*_Complex_I
                                       - cimag(coeff_c2s[ 7])*gcart[nbra*1+i];
@@ -7056,7 +7056,7 @@ static void zswap_ik_jl(double complex *new, const double complex *old,
 }
 
 
-static void dcopy_ij(double *opij, const double *gctr, 
+static void dcopy_ij(double *opij, const double *gctr,
                      const FINT ni, const FINT nj, const FINT mi, const FINT mj)
 {
         FINT i, j;
@@ -7069,7 +7069,7 @@ static void dcopy_ij(double *opij, const double *gctr,
                 gctr += mi;
         }
 }
-static void zcopy_ij(double complex *opij, const double complex *gctr, 
+static void zcopy_ij(double complex *opij, const double complex *gctr,
                      const FINT ni, const FINT nj, const FINT mi, const FINT mj)
 {
         FINT i, j;
@@ -7086,7 +7086,7 @@ static void zcopy_ij(double complex *opij, const double complex *gctr,
  * fijkl(ic:ic-1+di,jc:jc-1+dj,kc:kc-1+dk,lc:lc-1+dl)
  * fijkl(ni,nj,nk,nl), gctr(mi,mk,ml,mj)
  */
-static void dcopy_iklj(double *fijkl, const double *gctr, 
+static void dcopy_iklj(double *fijkl, const double *gctr,
                        const FINT ni, const FINT nj, const FINT nk, const FINT nl,
                        const FINT mi, const FINT mj, const FINT mk, const FINT ml)
 {
@@ -7202,7 +7202,7 @@ static void zcopy_kijl(double complex *fijkl, const double complex *gctr,
                 }
         }
 }
-static void zcopy_iklj(double complex *fijkl, const double complex *gctr, 
+static void zcopy_iklj(double complex *fijkl, const double complex *gctr,
                        const FINT ni, const FINT nj, const FINT nk, const FINT nl,
                        const FINT mi, const FINT mj, const FINT mk, const FINT ml)
 {
@@ -7320,6 +7320,7 @@ void c2s_sph_1e(double *opij, double *gctr, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 pij = opij + ofj * jc + di * ic;
                 tmp1 = (c2s_ket_sph[j_l])(buf1, gctr, nfi, nfi, j_l);
+                //tmp1 = (c2s_ket_sph[i_l])(buf1, gctr, nfi, nfi, j_l);
                 tmp1 = (c2s_bra_sph[i_l])(buf2, dj, tmp1, i_l);
                 dcopy_ij(pij, tmp1, ni, nj, di, dj);
                 gctr += nf;

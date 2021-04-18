@@ -21,6 +21,8 @@
 #define PTR_F12_ZETA            9
 // Gaussian type geminal e^{-zeta r^2}
 #define PTR_GTG_ZETA            10
+#define NGRIDS                  11
+#define PTR_GRIDS               12
 #define PTR_ENV_START           20
 
 // slots of atm
@@ -118,3 +120,5 @@
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
 #define FRAC_CHARGE_NUC 3
+
+#define GRID_BLKSIZE    128

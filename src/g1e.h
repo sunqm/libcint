@@ -19,11 +19,13 @@ typedef struct {
         FINT i_l;
         FINT j_l;
         FINT k_l;
-        FINT l_l;
-        FINT nfi;  // number of cartesion components
+        FINT {FINT l_l; FINT ngrids_offset;};
+        FINT nfi;  // number of cartesian components
         FINT nfj;
         FINT nfk;
-        FINT nfl;
+        // in int2e or int3c2e, the number of cartensian components of the fourth shell
+        // in int1e_grids, the number of grids
+        union {FINT nfl; FINT ngrids;};
         FINT nf;  // = nfi*nfj*nfk*nfl;
         FINT _padding;
         FINT x_ctr[4];
@@ -57,7 +59,9 @@ typedef struct {
         double *ri;
         double *rj;
         double *rk;
-        double *rl;
+        // in int2e or int3c2e, the coordinates of the fourth shell
+        // in int1e_grids, the pointer for the grids coordinates
+        union {double *rl; double *grids;};
 
         int (*f_g0_2e)();
         void (*f_g0_2d4d)();

@@ -236,9 +236,7 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
         double charge_fac;
 
         CINTdset0(nc*n_comp, gctr);
-        for (n = 0; n < nc*n_comp; n++) {
-                gctr[n] = 0;
-        }
+
         switch (int1e_type) {
         case INT1E_TYPE_OVLP:
                 has_value = CINT1e_loop(gctr, envs, cache);
