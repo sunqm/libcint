@@ -7546,23 +7546,22 @@ void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims,
         FINT nfi = envs->nfi;
         FINT nf = envs->nf;
         FINT ic, jc, grids_offset;
-        FINT bgrids, bgrids_nfi;
+        FINT bgrids, bgrids_di, bgrids_nfi;
         FINT buflen = GRID_BLKSIZE * nfi * dj;
         double *buf1, *buf2;
-        MALLOC_INSTACK(buf1, buflen);
-        MALLOC_INSTACK(buf2, buflen);
+        MALLOC_ALIGN8_INSTACK(buf1, buflen);
+        MALLOC_ALIGN8_INSTACK(buf2, buflen);
         double *pij;
         double *tmp1;
 
         for (grids_offset = 0; grids_offset < ngrids; grids_offset += GRID_BLKSIZE) {
                 bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
+                bgrids_di = bgrids * di;
                 bgrids_nfi = bgrids * nfi;
                 for (jc = 0; jc < j_ctr; jc++) {
                 for (ic = 0; ic < i_ctr; ic++) {
                         tmp1 = (c2s_ket_sph[j_l])(buf1, gctr, bgrids_nfi, bgrids_nfi, j_l);
-                        // call (c2s_bra_sph[i_l]) for all grids
-                        tmp1 = sph2e_inner(buf2, tmp1, i_l, bgrids, dj, bgrids, bgrids);
-
+                        tmp1 = sph2e_inner(buf2, tmp1, i_l, bgrids, dj, bgrids_di, bgrids_nfi);
                         pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
                         dcopy_grids_ij(pij, tmp1, dims[0], ni, nj, bgrids, di, dj);
                         gctr += bgrids * nf;

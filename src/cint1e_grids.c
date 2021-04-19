@@ -101,36 +101,35 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
         const FINT len0 = GRID_BLKSIZE * nf * n_comp; // gout
         const FINT len = leng + lenj + leni + len0;
         double *g;
-        MALLOC_INSTACK(g, len);  // must be allocated last in this function
+        MALLOC_ALIGN8_INSTACK(g, len);  // must be allocated last in this function
         double *g1 = g + leng;
         double *gout, *gctri, *gctrj;
 
-        if (n_comp == 1) {
-                gctrj = gctr;
-        } else {
-                gctrj = g1;
-                g1 += lenj;
-        }
-        if (j_ctr == 1) {
-                gctri = gctrj;
-                iempty = jempty;
-        } else {
-                gctri = g1;
-                g1 += leni;
-        }
-        if (i_ctr == 1) {
-                gout = gctri;
-                gempty = iempty;
-        } else {
-                gout = g1;
-        }
-
         for (grids_offset = 0; grids_offset < ngrids; grids_offset += GRID_BLKSIZE) {
-                envs->grids_offset = grids_offset;
                 ngrids_nf = MIN(ngrids - grids_offset, GRID_BLKSIZE) * nf;
                 empty[0] = 1;
                 empty[1] = 1;
                 empty[2] = 1;
+                envs->grids_offset = grids_offset;
+                if (n_comp == 1) {
+                        gctrj = gctr + grids_offset * nf * nc;
+                } else {
+                        gctrj = g1 + grids_offset * n_comp * nf * nc;
+                        g1 += lenj;
+                }
+                if (j_ctr == 1) {
+                        gctri = gctrj;
+                        iempty = jempty;
+                } else {
+                        gctri = g1;
+                        g1 += leni;
+                }
+                if (i_ctr == 1) {
+                        gout = gctri;
+                        gempty = iempty;
+                } else {
+                        gout = g1;
+                }
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
                         envs->aj = aj[jp];
@@ -140,7 +139,7 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
                                 fac1j = envs->common_factor;
                                 *iempty = 1;
                         }
-                        for (ip = 0; ip < i_prim; ip++) {
+                        for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 if (pdata_ij->cceij > expcutoff) {
                                         continue;
                                 }
@@ -166,10 +165,10 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
                                 PRIM2CTR0(j, gctri, ngrids_nf * i_ctr * n_comp);
                         }
                 }
+                if (n_comp > 1 && !*jempty) {
+                        _transpose_comps(gctr, gctrj, nf*nc, ngrids, n_comp);
+                }
                 all_empty &= *jempty;
-        }
-        if (n_comp > 1 && !all_empty) {
-                _transpose_comps(gctr, gctrj, nf*nc, ngrids, n_comp);
         }
         return !all_empty;
 }
@@ -187,13 +186,14 @@ FINT int1e_grids_cache_size(CINTEnvVars *envs)
         FINT ngrids = envs->ngrids;
         FINT nroots = envs->nrys_roots;
         FINT nf = envs->nf;
-        FINT nc = nf * x_ctr[0] * x_ctr[1];
+        FINT nc = ngrids * nf * x_ctr[0] * x_ctr[1];
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
         FINT len0 = GRID_BLKSIZE * nf * n_comp;
-        FINT leni = GRID_BLKSIZE * nf * x_ctr[0] * n_comp;
-        FINT cache_size = MAX(leng + len0 + leni + ngrids*nc*n_comp*2 + GRID_BLKSIZE*nroots,
-                              ngrids*nc*n_comp + GRID_BLKSIZE * nf*8*OF_CMPLX);
+        FINT leni = len0 * x_ctr[0];
+        FINT lenj = leni * x_ctr[1];
+        FINT cache_size = MAX(nc*n_comp + leng + len0 + leni + lenj + GRID_BLKSIZE*nroots*4 + 32,
+                              nc*n_comp + GRID_BLKSIZE * nf*8*OF_CMPLX);
         return cache_size + 10000;
 }
 
@@ -218,7 +218,7 @@ FINT CINT1e_grids_drv(double *out, FINT *dims, CINTEnvVars *envs,
                 cache = stack;
         }
         double *gctr;
-        MALLOC_INSTACK(gctr, nc * n_comp);
+        MALLOC_ALIGN8_INSTACK(gctr, nc * n_comp);
 
         FINT has_value = CINT1e_grids_loop(gctr, envs, 1, cache);
 

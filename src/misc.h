@@ -24,8 +24,12 @@ double CINTsquare_dist(const double *r1, const double *r2);
 double CINTgto_norm(FINT n, double a);
 
 #define MALLOC_INSTACK(var, n) \
-        var = (void *)cache; \
-        cache = (void *)(((uintptr_t)(var + (n)) + 7) & (-(uintptr_t)8));
+        var = (void *)(((uintptr_t)cache + 7) & (-(uintptr_t)8)); \
+        cache = (double *)(var + (n));
+
+#define MALLOC_ALIGN8_INSTACK(var, n) \
+        var = (void *)(((uintptr_t)cache + 63) & (-(uintptr_t)64)); \
+        cache = (double *)(var + (n));
 
 #ifdef WITH_CINT2_INTERFACE
 #define ALL_CINT(NAME) \
