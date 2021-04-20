@@ -409,24 +409,12 @@ void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, size_t nf,
 {
         FINT i;
         size_t n;
-        double c0, c1;
-        double *p0, *p1;
+        double c0;
 
-        for (i = 0; i < nctr-1; i+=2) {
+        for (i = 0; i < nctr; i++) {
                 c0 = coeff[nprim* i];
-                c1 = coeff[nprim*(i+1)];
-                p0 = gc + nf * i;
-                p1 = p0 + nf;
                 for (n = 0; n < nf; n++) {
-                        p0[n] = c0 * gp[n];
-                        p1[n] = c1 * gp[n];
-                }
-        }
-        if (i < nctr) {
-                c0 = coeff[nprim* i];
-                p0 = gc + nf * i;
-                for (n = 0; n < nf; n++) {
-                        p0[n] = c0 * gp[n];
+                        gc[nf*i+n] = c0 * gp[n];
                 }
         }
 }
@@ -434,26 +422,15 @@ void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, size_t nf,
 void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, size_t nf,
                        FINT nprim, FINT nctr, int non0ctr, int *sortedidx)
 {
-        FINT i;
+        FINT i, j;
         size_t n;
-        double c0, c1;
-        double *p0, *p1;
+        double c0;
 
-        for (i = 0; i < non0ctr-1; i+=2) {
+        for (i = 0; i < non0ctr; i++) {
                 c0 = coeff[nprim*sortedidx[i]];
-                c1 = coeff[nprim*sortedidx[i+1]];
-                p0 = gc + nf * sortedidx[i];
-                p1 = gc + nf * sortedidx[i+1];
+                j = sortedidx[i];
                 for (n = 0; n < nf; n++) {
-                        p0[n] += c0 * gp[n];
-                        p1[n] += c1 * gp[n];
-                }
-        }
-        if (i < non0ctr) {
-                c0 = coeff[nprim*sortedidx[i]];
-                p0 = gc + nf * sortedidx[i];
-                for (n = 0; n < nf; n++) {
-                        p0[n] += c0 * gp[n];
+                        gc[nf*j+n] += c0 * gp[n];
                 }
         }
 }

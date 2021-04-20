@@ -121,4 +121,4 @@
 #define GAUSSIAN_NUC    2
 #define FRAC_CHARGE_NUC 3
 
-#define GRID_BLKSIZE    128
+#define GRID_BLKSIZE    136
