@@ -29,6 +29,11 @@ void c2s_si_1ei(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *env
 void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 void c2s_cart_1e_grids(double *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 
+void c2s_sf_1e_grids(double complex *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_sf_1e_gridsi(double complex *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_si_1e_grids(double complex *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_si_1e_gridsi(double complex *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+
 void c2s_sf_2e1(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 void c2s_sf_2e1i(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 

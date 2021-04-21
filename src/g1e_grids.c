@@ -402,8 +402,8 @@ void CINTgout1e_grids(double *gout, double *g, FINT *idx,
         }
 }
 
-void CINTnabla1i_1e_grids(double *f, double *g,
-                          FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
+void CINTnabla1i_grids(double *f, double *g,
+                       FINT li, FINT lj, CINTEnvVars *envs)
 {
         FINT ngrids = envs->ngrids;
         FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
@@ -464,8 +464,8 @@ void CINTnabla1i_1e_grids(double *f, double *g,
         }
 }
 
-void CINTnabla1j_1e_grids(double *f, double *g,
-                          FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
+void CINTnabla1j_grids(double *f, double *g,
+                       FINT li, FINT lj, CINTEnvVars *envs)
 {
         FINT ngrids = envs->ngrids;
         FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
@@ -533,8 +533,8 @@ void CINTnabla1j_1e_grids(double *f, double *g,
 }
 
 
-void CINTx1i_1e_grids(double *f, double *g, double ri[3],
-                      FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
+void CINTx1i_grids(double *f, double *g, double *ri,
+                   FINT li, FINT lj, CINTEnvVars *envs)
 {
         FINT ngrids = envs->ngrids;
         FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
@@ -576,8 +576,8 @@ void CINTx1i_1e_grids(double *f, double *g, double ri[3],
         }
 }
 
-void CINTx1j_1e_grids(double *f, double *g, double rj[3],
-                      FINT li, FINT lj, FINT lk, CINTEnvVars *envs)
+void CINTx1j_grids(double *f, double *g, double *rj,
+                   FINT li, FINT lj, CINTEnvVars *envs)
 {
         FINT ngrids = envs->ngrids;
         FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);

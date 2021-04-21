@@ -67,6 +67,8 @@ void CINTall_2c2e_optimizer(CINTOpt **opt, FINT *ng,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTall_3c1e_optimizer(CINTOpt **opt, FINT *ng,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
+void CINTall_1e_grids_optimizer(CINTOpt **opt, FINT *ng,
+                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 #ifdef WITH_F12
 void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,

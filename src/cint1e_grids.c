@@ -264,6 +264,53 @@ FINT CINT1e_grids_drv(double *out, FINT *dims, CINTEnvVars *envs,
         return has_value;
 }
 
+FINT CINT1e_grids_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
+                             double *cache, void (*f_c2s)())
+{
+        FINT ngrids = envs->ngrids;
+        if (out == NULL) {
+                return int1e_grids_cache_size(envs);
+        }
+        FINT *x_ctr = envs->x_ctr;
+        FINT ngrids_nf = envs->ngrids * envs->nf;
+        FINT nc = ngrids_nf * x_ctr[0] * x_ctr[1];
+        FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
+        double *stack = NULL;
+        if (cache == NULL) {
+                FINT cache_size = int1e_grids_cache_size(envs);
+                stack = malloc(sizeof(double)*cache_size);
+                cache = stack;
+        }
+        double *gctr;
+        MALLOC_ALIGN8_INSTACK(gctr, nc * n_comp);
+
+        FINT has_value = CINT1e_grids_loop(gctr, envs, 1, cache);
+
+        FINT counts[4];
+        if (dims == NULL) {
+                dims = counts;
+        }
+        counts[0] = envs->ngrids;
+        counts[1] = CINTcgto_spinor(envs->shls[0], envs->bas);
+        counts[2] = CINTcgto_spinor(envs->shls[1], envs->bas);
+        counts[3] = 1;
+        FINT nout = dims[0] * dims[1] * dims[2];
+        FINT n;
+        if (has_value) {
+                for (n = 0; n < n_comp; n++) {
+                        (*f_c2s)(out+nout*n, gctr+nc*n, dims, envs, cache);
+                }
+        } else {
+                for (n = 0; n < n_comp; n++) {
+                        c2s_zset0(out+nout*n, dims, counts);
+                }
+        }
+        if (stack != NULL) {
+                free(stack);
+        }
+        return has_value;
+}
+
 FINT int1e_grids_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                      FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {

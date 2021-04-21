@@ -40,10 +40,12 @@
                                        (remove-if (lambda (x) (eql x 's))
                                                   (scripts-of ops)))
                                3))))
-(defun cell-converter (cell fout)
+(defun cell-converter (cell fout &optional (with-grids nil))
   (let ((fac (realpart (phase-of cell)))
         (const@3 (ternary-subscript (consts-of cell)))
-        (op@3    (ternary-subscript (ops-of cell))))
+        (op@3    (if with-grids
+                    (format nil "ig+GRID_BLKSIZE*~a" (ternary-subscript (ops-of cell)))
+                    (ternary-subscript (ops-of cell)))))
     (cond ((equal fac 1)
            (cond ((null const@3)
                   (if (null op@3)
@@ -77,26 +79,30 @@
                    (format fout   " + ~a*c\[~a\]*s\[0\]" fac const@3))
                   (t (format fout " + ~a*c\[~a\]*s\[~a\]" fac const@3 op@3)))))))
 
-(defun to-c-code-string (fout c-converter flat-script)
+(defun to-c-code-string (fout c-converter flat-script &optional (with-grids nil))
   (flet ((c-streamer (cs)
            (with-output-to-string (tmpout)
              (cond ((null cs) (format tmpout " 0"))
-                   ((cell? cs) (funcall c-converter cs tmpout))
-                   (t (mapcar (lambda (c) (funcall c-converter c tmpout)) cs))))))
+                   ((cell? cs) (funcall c-converter cs tmpout with-grids))
+                   (t (mapcar (lambda (c) (funcall c-converter c tmpout with-grids)) cs))))))
     (mapcar #'c-streamer flat-script)))
 
-(defun gen-c-block (fout flat-script)
-  (let ((assemb (to-c-code-string fout #'cell-converter flat-script))
+(defun gen-c-block (fout flat-script &optional (with-grids nil))
+  (let ((assemb (to-c-code-string fout #'cell-converter flat-script with-grids))
         (comp (length flat-script)))
     (loop for s in assemb
           for gid from 0 do
-          (format fout "gout[n*~a+~a] =~a;~%" comp gid s))))
-(defun gen-c-block+ (fout flat-script)
-  (let ((assemb (to-c-code-string fout #'cell-converter flat-script))
+          (if with-grids
+             (format fout "gout[ig+bgrids*(n*~a+~a)] =~a;~%" comp gid s)
+             (format fout "gout[n*~a+~a] =~a;~%" comp gid s)))))
+(defun gen-c-block+ (fout flat-script &optional (with-grids nil))
+  (let ((assemb (to-c-code-string fout #'cell-converter flat-script with-grids))
         (comp (length flat-script)))
     (loop for s in assemb
           for gid from 0 do
-          (format fout "gout[n*~a+~a] +=~a;~%" comp gid s))))
+          (if with-grids
+            (format fout "gout[ig+bgrids*(n*~a+~a)] +=~a;~%" comp gid s)
+            (format fout "gout[n*~a+~a] +=~a;~%" comp gid s)))))
 (defun gen-c-block-with-empty (fout flat-script)
   (format fout "if (gout_empty) {~%")
   (gen-c-block fout flat-script)
@@ -133,6 +139,7 @@
 #include \"cint_bas.h\"
 #include \"cart2sph.h\"
 #include \"g1e.h\"
+#include \"g1e_grids.h\"
 #include \"g2e.h\"
 #include \"optimizer.h\"
 #include \"cint1e.h\"
@@ -337,7 +344,7 @@ extern CINTIntegralFunction ~a_cart;
 extern CINTIntegralFunction ~a_sph;
 extern CINTIntegralFunction ~a_spinor;~%~%" intname intname intname intname))
 
-;!!! Be very cautious of the reverse on i-operators and k operators!
+;!!! Be very cautious of the reverse order on i-operators and k operators!
 ;!!! When multiple tensor components (>= rank 2) provided by the operators
 ;!!! on bra functions, the ordering of the multiple tensor components are
 ;!!! also reversed in the generated integral code
@@ -533,14 +540,17 @@ return 0; }~%")))
         (format fout "+ g~a[ix+~a]*g~a[iy+~a]*g~a[iz+~a]"
                 xbin k ybin k zbin k))
       (format fout ";~%"))))
-(defun dump-s-loop (fout tot-bits )
+(defun dump-s-loop (fout tot-bits &optional (with-grids nil))
   (loop
     for i upto (1- (expt 3 tot-bits)) do
     (let* ((ybin (dec-to-ybin i))
            (zbin (dec-to-zbin i))
            (xbin (- (ash 1 tot-bits) 1 ybin zbin)))
-      (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
-              i xbin ybin zbin)))) ; end do i = 1, envs->nrys_roots
+      (if with-grids
+        (format fout "s[ig+GRID_BLKSIZE*~a] += g~a[ix+ig+i*GRID_BLKSIZE] * g~a[iy+ig+i*GRID_BLKSIZE] * g~a[iz+ig+i*GRID_BLKSIZE];~%"
+                i xbin ybin zbin)
+        (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
+                i xbin ybin zbin))))) ; end do i = 1, envs->nrys_roots
 (defun dump-s-2e (fout tot-bits &optional (deriv-max 2))
   (format fout "double s[~a];~%" (expt 3 tot-bits))
   (format fout "for (n = 0; n < nf; n++) {
@@ -1202,6 +1212,163 @@ return 0; }~%")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun gen-code-gout1e-grids (fout intname raw-infix flat-script)
+  (destructuring-bind (op bra-i ket-j bra-k ket-l)
+    (split-int-expression raw-infix)
+    (let* ((i-rev (effect-keys bra-i)) ;<i| already in reverse order
+           (j-rev (reverse (effect-keys ket-j)))
+           (op-rev (reverse (effect-keys op)))
+           (i-len (length i-rev))
+           (j-len (length j-rev))
+           (op-len (length op-rev))
+           (tot-bits (+ i-len j-len op-len))
+           (comp (expt 3 tot-bits))
+           (goutinc (length flat-script)))
+      (format fout "void CINTgout1e_~a" intname)
+      (format fout "(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT ngrids = envs->ngrids;
+FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
+FINT nrys_roots = envs->nrys_roots;
+FINT nf = envs->nf;
+FINT ix, iy, iz, n, i, ig;
+double *g0 = g;~%")
+      (loop
+        for i in (range (num-g-intermediates tot-bits op i-len j-len)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
+      (dump-declare-dri-for-rc fout bra-i "i")
+      (dump-declare-dri-for-rc fout (append op ket-j) "j")
+      (dump-declare-giao-ij fout bra-i (append op ket-j))
+      (format fout "double s[GRID_BLKSIZE * ~a];~%" comp)
+;;; generate g_(bin)
+;;; for the operators act on the |ket>, the reversed scan order and r_combinator
+;;; is required; for the operators acto on the <bra|, the normal scan order and
+      (let ((fmt-i "G1E_GRIDS_~aI(g~a, g~a, envs->i_l+~a, envs->j_l);~%")
+            (fmt-op (mkstr "G1E_GRIDS_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a);
+G1E_~aI(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);
+for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
+            (fmt-j (mkstr "G1E_GRIDS_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a);~%")))
+        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
+      (format fout "for (n = 0; n < nf; n++) {
+ix = idx[0+n*3];
+iy = idx[1+n*3];
+iz = idx[2+n*3];~%")
+      (format fout "for (i = 0; i < ~a; i++) {
+for (ig = 0; ig < bgrids; ig++) { s[ig+i*GRID_BLKSIZE] = 0; }}
+for (i = 0; i < nrys_roots; i++) {
+for (ig = 0; ig < bgrids; ig++) {~%" comp)
+      (dump-s-loop fout tot-bits t)
+      (format fout "}};~%")
+
+      ; (gen-c-block-with-empty fout flat-script)
+      (format fout "if (gout_empty) {
+for (ig = 0; ig < bgrids; ig++) {~%")
+      (gen-c-block fout flat-script t)
+      (format fout "}} else {
+for (ig = 0; ig < bgrids; ig++) {~%")
+      (gen-c-block+ fout flat-script t)
+      (format fout "}}}}~%")
+      goutinc)))
+
+(defun gen-code-int1e-grids (fout intname raw-infix)
+  (destructuring-bind (op bra-i ket-j bra-k ket-l)
+    (split-int-expression raw-infix)
+    (let* ((i-rev (effect-keys bra-i)) ;<i| already in reverse order
+           (j-rev (reverse (effect-keys ket-j)))
+           (op-rev (reverse (effect-keys op)))
+           (i-len (length i-rev))
+           (j-len (length j-rev))
+           (op-len (length op-rev))
+           (tot-bits (+ i-len j-len op-len))
+           (raw-script (eval-int raw-infix))
+           (flat-script (flatten-raw-script (last1 raw-script)))
+           (ts (car raw-script))
+           (sf (cadr raw-script))
+           (goutinc (length flat-script))
+           (e1comps (if (eql sf 'sf) 1 4))
+           (tensors (if (eql sf 'sf) goutinc (/ goutinc 4)))
+           (ngdef (with-output-to-string (tmpout)
+                    (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+                            i-len (+ op-len j-len) tot-bits e1comps tensors)))
+           (envs-common (with-output-to-string (tmpout)
+                          (format tmpout ngdef)
+                          (format tmpout "CINTEnvVars envs;~%")
+                          (format tmpout "CINTinit_int1e_grids_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);~%")
+                          (format tmpout "envs.f_gout = &CINTgout1e_~a;~%" intname)
+                          (unless (eql (factor-of raw-infix) 1)
+                            (format tmpout "envs.common_factor *= ~a;~%" (factor-of raw-infix))))))
+      (write-functype-header
+        t intname (format nil "/* <~{~a ~}i| 1/r_{grids} |~{~a ~}j> */" bra-i ket-j))
+      (format fout "/* <~{~a ~}i| 1/r_{grids} |~{~a ~}j> */~%" bra-i ket-j)
+      (gen-code-gout1e-grids fout intname raw-infix flat-script)
+      (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
+      (format fout ngdef)
+      (format fout "CINTall_1e_grids_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
+;;; _cart
+      (format fout "FINT ~a_cart(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout envs-common)
+      (when (member 'g raw-infix)
+        (when (or (member 'g bra-i) (member 'g ket-j))
+          (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
+counts[0] = envs.ngrids;
+counts[1] = envs.nfi * envs.x_ctr[0];
+counts[2] = envs.nfj * envs.x_ctr[1];
+counts[3] = 1;
+if (dims == NULL) { dims = counts; }
+nout = dims[0] * dims[1] * dims[2];
+for (i = 0; i < envs.ncomp_e1 * envs.ncomp_tensor; i++) {
+c2s_dset0(out+nout*i, dims, counts); }
+return 0; }~%")))
+      (format fout "return CINT1e_grids_drv(out, dims, &envs, cache, &c2s_cart_1e_grids);
+} // ~a_cart~%" intname)
+;;; _sph
+      (format fout "FINT ~a_sph(double *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout envs-common)
+      (when (member 'g raw-infix)
+        (when (or (member 'g bra-i) (member 'g ket-j))
+          (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
+counts[0] = envs.ngrids;
+counts[1] = (envs.i_l*2+1) * envs.x_ctr[0];
+counts[2] = (envs.j_l*2+1) * envs.x_ctr[1];
+counts[3] = 1;
+if (dims == NULL) { dims = counts; }
+nout = dims[0] * dims[1] * dims[2];
+for (i = 0; i < envs.ncomp_e1 * envs.ncomp_tensor; i++) {
+c2s_dset0(out+nout*i, dims, counts); }
+return 0; }~%")))
+      (format fout "return CINT1e_grids_drv(out, dims, &envs, cache, &c2s_sph_1e_grids);
+} // ~a_sph~%" intname)
+;;; _spinor
+      (format fout "FINT ~a_spinor(double complex *out, FINT *dims, FINT *shls,
+FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {~%" intname)
+      (format fout envs-common)
+      (when (member 'g raw-infix)
+        (when (or (member 'g bra-i) (member 'g ket-j))
+          (format fout "if (out != NULL && envs.shls[0] == envs.shls[1]) {
+FINT i, nout;
+FINT counts[4];
+counts[0] = envs.ngrids;
+counts[1] = CINTcgto_spinor(envs.shls[0], envs.bas);
+counts[2] = CINTcgto_spinor(envs.shls[1], envs.bas);
+counts[3] = 1;
+if (dims == NULL) { dims = counts; }
+nout = dims[0] * dims[1] * dims[2];
+for (i = 0; i < envs.ncomp_tensor; i++) {
+c2s_zset0(out+nout*i, dims, counts); }
+return 0; }~%")))
+      (format fout "return CINT1e_grids_spinor_drv(out, dims, &envs, cache, ~a);
+} // ~a_spinor~%" (name-c2sor "1e_grids" 'spinor sf ts) intname)))
+;;; int1e -> cint1e
+  (format fout "ALL_CINT1E(~a)~%" intname)
+  (format fout "ALL_CINT1E_FORTRAN_(~a)~%" intname))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun gen-cint (filename &rest items)
   "sp can be one of 'spinor 'spheric 'cart"
   (with-open-file (fout (mkstr filename)
@@ -1212,6 +1379,8 @@ return 0; }~%")))
                    (raw-infix (cadr item)))
                (cond ((int3c1e? raw-infix)
                       (gen-code-int3c1e fout intname raw-infix))
+                     ((int1e-grids? raw-infix)
+                      (gen-code-int1e-grids fout intname raw-infix))
                      ((one-electron-int? raw-infix)
                       (gen-code-int1e fout intname raw-infix))
                      ((int4c2e? raw-infix)

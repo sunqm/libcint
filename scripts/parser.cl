@@ -22,12 +22,13 @@
 ;;; nabla-rinv = \vec{r}/r^3 = -\nabla{1/r}
 ;;; rinv  = 1/r
 ;;; r12   = 1/r_12
+;;; grids = a list of 1/r_{grids}
 ;;; nabla-r12 = \vec{r}_{12}/r_{12}^3 = -\nabla_1{1/r_{12}}
 ;;; translate these keys in function dress-other combo-op
-(defparameter *one-electron-operator* '(ovlp rinv nuc nabla-rinv ccc1e))
+(defparameter *one-electron-operator* '(ovlp rinv nuc nabla-rinv ccc1e grids))
 (defparameter *two-electron-operator* '(r12 ccc2e nabla-r12 gaunt breit-r1 breit-r2))
-(defparameter *one-componet-operator* '(rinv nuc r12))
-(defparameter *nabla-not-comutable* '(rinv nuc nabla-rinv r12 nabla-r12 gaunt breit-r1 breit-r2))
+(defparameter *one-componet-operator* '(rinv nuc grids r12))
+(defparameter *nabla-not-comutable* '(rinv nuc grids nabla-rinv r12 nabla-r12 gaunt breit-r1 breit-r2))
 (defparameter *act-left-right* '(nabla-rinv nabla-r12 breit-r1 breit-r2))
 
 ;;; *operator*: precedence from high to low
@@ -177,7 +178,7 @@
     ;((ipx nablax*) (make-cell 1 '() '(nabla* x)))
     ;((ipy nablay*) (make-cell 1 '() '(nabla* y)))
     ;((ipz nablaz*) (make-cell 1 '() '(nabla* z)))
-    ((nuc rinv) ; *one-electron-operator*
+    ((nuc rinv grids) ; *one-electron-operator*
      (make-cell 1 '() (make-op item 'S)))
     ((nabla-rinv nabla-r12)
      (make-vec (make-cell 1 '() `(,item x))
@@ -264,6 +265,8 @@
       (intersection *two-electron-operator* expr)))
 (defun one-electron-int? (expr)
   (not (two-electron-int? expr)))
+(defun int1e-grids? (expr)
+  (member 'grids expr))
 
 ; split at key, and the first half part is in reversed order
 (defun braket-split-at (key lst)

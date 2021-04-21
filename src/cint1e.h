@@ -31,3 +31,7 @@ FINT CINT3c1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
 #define INT1E_TYPE_RINV 1
 #define INT1E_TYPE_NUC  2
 
+FINT CINT1e_grids_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
+                             double *cache, void (*f_c2s)());
+FINT CINT1e_grids_drv(double *out, FINT *dims, CINTEnvVars *envs,
+                      double *cache, void (*f_c2s)());

@@ -10,6 +10,8 @@
 #include <string.h>
 #include "cint_const.h"
 #include "cint_bas.h"
+#include "g1e.h"
+#include "g1e_grids.h"
 #include "g2e.h"
 #include "g3c1e.h"
 #include "optimizer.h"
@@ -219,6 +221,16 @@ void CINTall_3c1e_optimizer(CINTOpt **opt, FINT *ng,
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int3c1e_EnvVars, &CINTg3c1e_index_xyz,
                 3, 0, ng, atm, natm, bas, nbas, env);
+}
+
+void CINTall_1e_grids_optimizer(CINTOpt **opt, FINT *ng,
+                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
+{
+        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_log_maxc(*opt, atm, natm, bas, nbas, env);
+        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
+        gen_idx(*opt, &CINTinit_int1e_grids_EnvVars, &CINTg1e_index_xyz,
+                2, 0, ng, atm, natm, bas, nbas, env);
 }
 
 #ifdef WITH_F12

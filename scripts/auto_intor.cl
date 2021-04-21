@@ -220,3 +220,7 @@
   '("int1e_ipipnucip"           ( nabla nabla \| nuc \| nabla ))
   '("int1e_ipiprinvip"          ( nabla nabla \| rinv \| nabla ))
 )
+
+(gen-cint "int1e_grids1.c"
+  '("int1e_grids_ip"           ( nabla \| grids \| ))
+)

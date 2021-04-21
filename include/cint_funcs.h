@@ -1066,3 +1066,9 @@ extern CINTIntegralFunction int1e_ipiprinvip_cart;
 extern CINTIntegralFunction int1e_ipiprinvip_sph;
 extern CINTIntegralFunction int1e_ipiprinvip_spinor;
 
+/* <NABLA i| 1/r_{grids} |j> */
+extern CINTOptimizerFunction int1e_grids_ip_optimizer;
+extern CINTIntegralFunction int1e_grids_ip_cart;
+extern CINTIntegralFunction int1e_grids_ip_sph;
+extern CINTIntegralFunction int1e_grids_ip_spinor;
+
