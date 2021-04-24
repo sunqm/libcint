@@ -14,7 +14,7 @@
 #include "cart2sph.h"
 #include "c2f.h"
 
-#define PRIM2CTR0(ctrsymb, gp, ngp) \
+#define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
                         CINTprim_to_ctr_0(gctr##ctrsymb, gp, c##ctrsymb+ctrsymb##p, \
@@ -104,6 +104,25 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
         MALLOC_ALIGN8_INSTACK(g, len);  // must be allocated last in this function
         double *g1 = g + leng;
         double *gout, *gctri, *gctrj;
+        if (n_comp == 1) {
+                gctrj = gctr + grids_offset * nf * nc;
+        } else {
+                gctrj = g1;
+                g1 += lenj;
+        }
+        if (j_ctr == 1) {
+                gctri = gctrj;
+                iempty = jempty;
+        } else {
+                gctri = g1;
+                g1 += leni;
+        }
+        if (i_ctr == 1) {
+                gout = gctri;
+                gempty = iempty;
+        } else {
+                gout = g1;
+        }
 
         for (grids_offset = 0; grids_offset < ngrids; grids_offset += GRID_BLKSIZE) {
                 envs->grids_offset = grids_offset;
@@ -113,22 +132,12 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
                 empty[2] = 1;
                 if (n_comp == 1) {
                         gctrj = gctr + grids_offset * nf * nc;
-                } else {
-                        gctrj = g1;
-                        g1 += lenj;
-                }
-                if (j_ctr == 1) {
-                        gctri = gctrj;
-                        iempty = jempty;
-                } else {
-                        gctri = g1;
-                        g1 += leni;
-                }
-                if (i_ctr == 1) {
-                        gout = gctri;
-                        gempty = iempty;
-                } else {
-                        gout = g1;
+                        if (j_ctr == 1) {
+                                gctri = gctrj;
+                        }
+                        if (i_ctr == 1) {
+                                gout = gctri;
+                        }
                 }
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
@@ -159,10 +168,10 @@ FINT CINT1e_grids_loop(double *gctr, CINTEnvVars *envs, double fac, double *cach
 
                                 CINTg0_1e_grids(g, fac1i, envs, cache);
                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
-                                PRIM2CTR0(i, gout, bgrids * nf * n_comp);
+                                PRIM2CTR(i, gout, bgrids * nf * n_comp);
                         }
                         if (!*iempty) {
-                                PRIM2CTR0(j, gctri, bgrids * nf * i_ctr * n_comp);
+                                PRIM2CTR(j, gctri, bgrids * nf * i_ctr * n_comp);
                         }
                 }
                 if (n_comp > 1 && !*jempty) {
@@ -180,11 +189,11 @@ static void _transpose_comps(double *gctr, double *gctrj,
         FINT n, ic, ig;
         double *pgctr, *pgctrj;
         for (ic = 0; ic < n_comp; ic++) {
+                pgctr = gctr + ic * dij * ngrids;
                 for (n = 0; n < dij; n++) {
-                        pgctr = gctr + (ic * dij + n) * ngrids;
                         pgctrj = gctrj + (n * n_comp + ic) * bgrids;
                         for (ig = 0; ig < bgrids; ig++) {
-                                pgctr[ig] = pgctrj[ig];
+                                pgctr[ig + n * bgrids] = pgctrj[ig];
                         }
                 }
         } 
@@ -202,7 +211,7 @@ FINT int1e_grids_cache_size(CINTEnvVars *envs)
         FINT len0 = GRID_BLKSIZE * nf * n_comp;
         FINT leni = len0 * x_ctr[0];
         FINT lenj = leni * x_ctr[1];
-        FINT cache_size = MAX(nc*n_comp + leng + len0 + leni + lenj + GRID_BLKSIZE*nroots*3 + GRID_BLKSIZE*6 + 32,
+        FINT cache_size = MAX(nc*n_comp + leng + len0 + leni + lenj + GRID_BLKSIZE*MAX(n_comp, nroots+5) + 32,
                               nc*n_comp + GRID_BLKSIZE * nf*8*OF_CMPLX);
         return cache_size + 10000;
 }
@@ -341,10 +350,12 @@ FINT int1e_grids_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
 FINT int1e_grids_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                         FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
-        return -1;
+        FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
+        CINTEnvVars envs;
+        CINTinit_int1e_grids_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
+        envs.f_gout = &CINTgout1e_grids;
+        return CINT1e_grids_spinor_drv(out, dims, &envs, cache, &c2s_sf_1e_grids);
 }
-
-
 
 ALL_CINT(int1e_grids)
 

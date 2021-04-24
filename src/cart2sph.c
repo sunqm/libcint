@@ -9580,8 +9580,8 @@ void c2s_cart_1e_grids(double *out, double *gctr, FINT *dims,
         FINT ngrids = envs->ngrids;
         FINT i_ctr = envs->x_ctr[0];
         FINT j_ctr = envs->x_ctr[1];
-        FINT ni = dims[0];
-        FINT nj = dims[1];
+        FINT ni = dims[1];
+        FINT nj = dims[2];
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
         FINT nf = envs->nf;
@@ -9620,8 +9620,8 @@ void c2s_sf_1e_grids(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[0];
-        FINT nj = dims[1];
+        FINT ni = dims[1];
+        FINT nj = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9664,8 +9664,8 @@ void c2s_sf_1e_gridsi(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[0];
-        FINT nj = dims[1];
+        FINT ni = dims[1];
+        FINT nj = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9708,8 +9708,8 @@ void c2s_si_1e_grids(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[0];
-        FINT nj = dims[1];
+        FINT ni = dims[1];
+        FINT nj = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9769,8 +9769,8 @@ void c2s_si_1e_gridsi(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[0];
-        FINT nj = dims[1];
+        FINT ni = dims[1];
+        FINT nj = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
