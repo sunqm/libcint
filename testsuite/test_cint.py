@@ -327,20 +327,20 @@ def test_int2e_spinor(name, vref, dim, place):
 def test_int1e_grids_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
     intor.restype = ctypes.c_void_p
+    ngrids = 148
     numpy.random.seed(12)
-    ngrids = 78
-    grids = numpy.ranodm.random((ngrids, 3)) - 4.2
-    op = (ctypes.c_double * (1000000 * dim))()
+    grids = numpy.random.random((ngrids, 3)) - 5.2
     env_g = numpy.append(env, grids.ravel())
-    env_g[NGRIDS] = 78
+    env_g[NGRIDS] = ngrids
     env_g[PTR_GRIDS] = env.size
+    op = (ctypes.c_double * (1000000 * dim))()
     v1 = 0
     cnt = 0
     for j in range(nbas.value*2):
         for i in range(j+1):
             di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
             dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
-            shls = (ctypes.c_int * 4)(i, j)
+            shls = (ctypes.c_int * 2)(i, j)
             intor(op, shls, c_atm, natm, c_bas, nbas,
                   env_g.ctypes.data_as(ctypes.c_void_p), opt)
             v1 += abs(numpy.array(op[:ngrids*di*dj*dim])).sum()
@@ -457,10 +457,10 @@ if __name__ == "__main__":
              ):
         test_int2e_sph(*f)
 
-#    for f in (('cint1e_grids_sph', 12245.800398045478, 1, 9),
-#              ('cint1e_grids_ip1_sph', 0, 1, 8 ),
-#             ):
-#        test_int1e_grids_sph(*f)
+    for f in (('cint1e_grids_sph', 5528.379150052477, 1, 9),
+              ('cint1e_grids_ip1_sph', 3279.928611096705, 1, 9),
+             ):
+        test_int1e_grids_sph(*f)
 
     test_erf('cint2e_sph', 0.2, 9)
     test_erf('cint2e_sph', 0.5, 9)

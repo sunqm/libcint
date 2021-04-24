@@ -355,9 +355,7 @@ k_contracted: ;
         envs->a##I##J = a##I[I##p] + a##J[J##p]; \
         exp##I##J = pdata_##I##J->eij; \
         r##I##J = pdata_##I##J->rij; \
-        envs->r##I##J[0] = r##I##J[0]; \
-        envs->r##I##J[1] = r##I##J[1]; \
-        envs->r##I##J[2] = r##I##J[2]; \
+        envs->r##I##J = r##I##J; \
         envs->r##I##J##rx[0] = r##I##J[0] - envs->rx_in_r##I##J##rx[0]; \
         envs->r##I##J##rx[1] = r##I##J[1] - envs->rx_in_r##I##J##rx[1]; \
         envs->r##I##J##rx[2] = r##I##J[2] - envs->rx_in_r##I##J##rx[2];

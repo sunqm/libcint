@@ -211,9 +211,9 @@ FINT int1e_grids_cache_size(CINTEnvVars *envs)
         FINT len0 = GRID_BLKSIZE * nf * n_comp;
         FINT leni = len0 * x_ctr[0];
         FINT lenj = leni * x_ctr[1];
-        FINT cache_size = MAX(nc*n_comp + leng + len0 + leni + lenj + GRID_BLKSIZE*MAX(n_comp, nroots+5) + 32,
+        FINT cache_size = MAX(nc*n_comp + leng + len0 + leni + lenj + GRID_BLKSIZE*MAX(n_comp, nroots+5),
                               nc*n_comp + GRID_BLKSIZE * nf*8*OF_CMPLX);
-        return cache_size + 10000;
+        return cache_size + 32;
 }
 
 /*
