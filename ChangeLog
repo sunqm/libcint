@@ -1,3 +1,6 @@
+Version 4.3.0  (2021-04-24):
+	* Add int1e_grids
+	* Fix cache size type
 Version 4.1.3  (2021-04-13):
 	* Fix memory address int32 overflow for heavily contracted basis
 Version 4.1.2  (2021-04-10):
