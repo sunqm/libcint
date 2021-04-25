@@ -13,7 +13,7 @@
 #include "rys_roots.h"
 #include "g2e.h"
 
-int CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs);
+FINT CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs);
 
 void CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                     FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -25,7 +25,7 @@ void CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-int CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
+FINT CINTg0_2e_coulerf(double *g, double fac, CINTEnvVars *envs)
 {
         double aij = envs->aij;
         double akl = envs->akl;

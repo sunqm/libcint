@@ -195,7 +195,7 @@ FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, d
 }
 
 
-FINT int1e_cache_size(CINTEnvVars *envs)
+CACHE_SIZE_T int1e_cache_size(CINTEnvVars *envs)
 {
         FINT *x_ctr = envs->x_ctr;
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1];
@@ -210,7 +210,7 @@ FINT int1e_cache_size(CINTEnvVars *envs)
 /*
  * 1e integrals <i|O|j> without 1/r
  */
-FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
+CACHE_SIZE_T CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
                double *cache, void (*f_c2s)(), FINT int1e_type)
 {
         if (out == NULL) {
@@ -221,7 +221,7 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
         double *stack = NULL;
         if (cache == NULL) {
-                FINT cache_size = int1e_cache_size(envs);
+                size_t cache_size = int1e_cache_size(envs);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
@@ -281,7 +281,7 @@ FINT CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
         return has_value;
 }
 
-FINT CINT1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
+CACHE_SIZE_T CINT1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
                        double *cache, void (*f_c2s)(), FINT int1e_type)
 {
         if (out == NULL) {
@@ -291,7 +291,7 @@ FINT CINT1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs,
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1] * envs->ncomp_e1;
         double *stack = NULL;
         if (cache == NULL) {
-                FINT cache_size = int1e_cache_size(envs);
+                size_t cache_size = int1e_cache_size(envs);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }

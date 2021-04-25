@@ -13,7 +13,7 @@
 #include "g2e.h"
 
 void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs);
+FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs);
 
 void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -166,7 +166,7 @@ void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-void CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
+FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
 {
         const double aij = envs->aij;
         const double akl = envs->akl;
@@ -190,7 +190,7 @@ void CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
         if (envs->g_size == 1) {
                 g[0] = 1;
                 g[1] = 1;
-                return;
+                return 1;
         }
 
         double div, tmp1, tmp2, tmp3, tmp4;
@@ -219,5 +219,6 @@ void CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
         c0p[2] = rklrx[2] + tmp3 * rijrkl[2];
 
         (*envs->f_g0_2d4d)(g, &bc, envs);
+        return 1;
 }
 

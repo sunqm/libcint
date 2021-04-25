@@ -1,10 +1,17 @@
 #cmakedefine I8
-
 #ifdef I8
 #include <stdint.h>
 #define FINT int64_t
 #else
 #define FINT int
+#endif
+
+#cmakedefine RETURNI8
+#ifdef RETURNI8
+#include <stdint.h>
+#define CACHE_SIZE_T int64_t
+#else
+#define CACHE_SIZE_T FINT
 #endif
 
 #cmakedefine HAVE_EXPL

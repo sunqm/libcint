@@ -3,20 +3,22 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "cint_bas.h"
 #include "g2e.h"
 #include "optimizer.h"
 #include "cint2e.h"
+#include "cart2sph.h"
 
-FINT int2e_gtg_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int2e_gtg_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                   FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
-        sprintf(stderr, "Don't use this function. GTG integrals have bugs");
+        fprintf(stderr, "Don't use this function. GTG integrals have bugs");
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2e_gtg_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e;
-        return CINT2e_spheric_drv(out, dims, &envs, opt, cache);
+        return CINT2e_drv(out, dims, &envs, opt, cache, &c2s_sph_1e);
 }
 void int2e_gtg_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                          FINT *bas, FINT nbas, double *env)
@@ -26,7 +28,7 @@ void int2e_gtg_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
 }
 
 #define ALL_CINT(NAME) \
-FINT c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
+CACHE_SIZE_T c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env, CINTOpt *opt) { \
         return NAME##_sph(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
 } \

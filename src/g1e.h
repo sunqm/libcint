@@ -63,7 +63,7 @@ typedef struct {
         // in int1e_grids, the pointer for the grids coordinates
         union {double *rl; double *grids;};
 
-        int (*f_g0_2e)();
+        FINT (*f_g0_2e)();
         void (*f_g0_2d4d)();
         void (*f_gout)();
 
@@ -119,9 +119,9 @@ void CINTprim_to_ctr(double *gc, FINT nf, double *gp,
 double CINTcommon_fac_sp(FINT l);
 
 void CINTprim_to_ctr_0(double *gc, double *gp, double *coeff, size_t nf,
-                       FINT nprim, FINT nctr, int non0ctr, int *sortedidx);
+                       FINT nprim, FINT nctr, FINT non0ctr, FINT *sortedidx);
 void CINTprim_to_ctr_1(double *gc, double *gp, double *coeff, size_t nf,
-                       FINT nprim, FINT nctr, int non0ctr, int *sortedidx);
+                       FINT nprim, FINT nctr, FINT non0ctr, FINT *sortedidx);
 
 #define G1E_D_I(f, g, li, lj, lk)   CINTnabla1i_1e(f, g, li, lj, lk, envs)
 #define G1E_D_J(f, g, li, lj, lk)   CINTnabla1j_1e(f, g, li, lj, lk, envs)

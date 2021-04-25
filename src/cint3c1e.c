@@ -388,96 +388,7 @@ FINT CINT3c1e_nuc_loop_nopt(double *gctr, CINTEnvVars *envs,
                            + k_prim * x_ctr[2] \
                            + envs->nf*3);
 
-FINT CINT3c1e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                       double *cache, FINT int_type)
-{
-        FINT *x_ctr = envs->x_ctr;
-        FINT nc = envs->nf * x_ctr[0] * x_ctr[1] * x_ctr[2];
-        FINT n_comp = envs->ncomp_e1 * envs->ncomp_tensor;
-        if (out == NULL) {
-                PAIRDATA_NON0IDX_SIZE(pdata_size);
-                FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng + len0 + nc*n_comp*4 + pdata_size;
-                return cache_size;
-        }
-        double *stack = NULL;
-        if (cache == NULL) {
-                PAIRDATA_NON0IDX_SIZE(pdata_size);
-                FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng + len0 + nc*n_comp*4 + pdata_size;
-                stack = malloc(sizeof(double)*cache_size);
-                cache = stack;
-        }
-        double *gctr;
-        FINT n;
-        FINT has_value = 0;
-
-        if (int_type == INT1E_TYPE_OVLP) {
-                MALLOC_INSTACK(gctr, nc*n_comp);
-                has_value = CINT3c1e_loop_nopt(gctr, envs, cache);
-        } else if (int_type == INT1E_TYPE_RINV) {
-                MALLOC_INSTACK(gctr, nc*n_comp);
-                has_value = CINT3c1e_nuc_loop_nopt(gctr, envs, 1, -1, cache);
-        } else {
-                FINT *atm = envs->atm;
-                FINT i;
-                FINT buf_filled;
-                double fac;
-                double *buf;
-                double *env = envs->env;
-                MALLOC_INSTACK(gctr, nc*n_comp);
-                MALLOC_INSTACK(buf, nc*n_comp);
-                for (i = 0; i < nc*n_comp; i++) {
-                        gctr[i] = 0;
-                }
-                for (n = 0; n < envs->natm; n++) {
-                        if (atm(NUC_MOD_OF,n) == FRAC_CHARGE_NUC) {
-                                fac = -env[atm(PTR_FRAC_CHARGE,n)];
-                        } else if (atm(CHARGE_OF,n) != 0) {
-                                fac = -abs(atm(CHARGE_OF,n));
-                        } else {
-                                fac = 0;
-                        }
-
-                        if (fac != 0) {
-                                buf_filled = CINT3c1e_nuc_loop_nopt(buf, envs, fac, n, cache);
-                                if (buf_filled) {
-                                        for (i = 0; i < nc*n_comp; i++) {
-                                                gctr[i] += buf[i];
-                                        }
-                                }
-                                has_value |= buf_filled;
-                        }
-                }
-                cache = buf; // release memory for c2s function
-        }
-
-        FINT counts[4];
-        counts[0] = envs->nfi * x_ctr[0];
-        counts[1] = envs->nfj * x_ctr[1];
-        counts[2] = envs->nfk * x_ctr[2];
-        counts[3] = 1;
-        if (dims == NULL) {
-                dims = counts;
-        }
-        FINT nout = dims[0] * dims[1] * dims[2];
-        if (has_value) {
-                for (n = 0; n < n_comp; n++) {
-                        c2s_cart_3c2e1(out+nout*n, gctr+nc*n, dims, envs, cache);
-                }
-        } else {
-                for (n = 0; n < n_comp; n++) {
-                        c2s_dset0(out+nout*n, dims, counts);
-                }
-        }
-        if (stack != NULL) {
-                free(stack);
-        }
-        return has_value;
-}
-FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
+CACHE_SIZE_T CINT3c1e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                          double *cache, void (*f_e1_c2s)(), FINT int_type, FINT is_ssc)
 {
         FINT *x_ctr = envs->x_ctr;
@@ -487,7 +398,7 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
+                CACHE_SIZE_T cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
                                       nc*n_comp+envs->nf*3);
                 return cache_size;
         }
@@ -496,7 +407,7 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
+                size_t cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
                                       nc*n_comp+envs->nf*3);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
@@ -538,12 +449,18 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         }
 
         FINT counts[4];
-        counts[0] = (envs->i_l*2+1) * x_ctr[0];
-        counts[1] = (envs->j_l*2+1) * x_ctr[1];
-        if (is_ssc) {
-                counts[2] = envs->nfk * x_ctr[2];
+        if (f_e1_c2s == &c2s_sph_3c1e) {
+                counts[0] = (envs->i_l*2+1) * x_ctr[0];
+                counts[1] = (envs->j_l*2+1) * x_ctr[1];
+                if (is_ssc) {
+                        counts[2] = envs->nfk * x_ctr[2];
+                } else {
+                        counts[2] = (envs->k_l*2+1) * x_ctr[2];
+                }
         } else {
-                counts[2] = (envs->k_l*2+1) * x_ctr[2];
+                counts[0] = envs->nfi * x_ctr[0];
+                counts[1] = envs->nfj * x_ctr[1];
+                counts[2] = envs->nfk * x_ctr[2];
         }
         counts[3] = 1;
         if (dims == NULL) {
@@ -566,7 +483,7 @@ FINT CINT3c1e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
 }
 
 // TODO: ssc type c2s transformation
-FINT CINT3c1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
+CACHE_SIZE_T CINT3c1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                         double *cache, void (*f_e1_c2s)(), FINT int_type, FINT is_ssc)
 {
         fprintf(stderr, "CINT3c1e_spinor_drv not implemented");
@@ -594,14 +511,14 @@ void CINTgout3c1e(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT go
         }
 }
 
-FINT int3c1e_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int3c1e_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                  FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout3c1e;
-        return CINT3c1e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, 0, 0);
+        return CINT3c1e_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, 0, 0);
 }
 void int3c1e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                        FINT *bas, FINT nbas, double *env)
@@ -609,17 +526,17 @@ void int3c1e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
         *opt = NULL;
 }
 
-FINT int3c1e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int3c1e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                   FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout3c1e;
-        return CINT3c1e_cart_drv(out, dims, &envs, opt, cache, 0);
+        return CINT3c1e_drv(out, dims, &envs, opt, cache, &c2s_cart_1e, 0, 0);
 }
 
-FINT int3c1e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int3c1e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                    FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
@@ -629,14 +546,14 @@ FINT int3c1e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT
         return CINT3c1e_spinor_drv(out, dims, &envs, opt, cache, &c2s_sf_3c2e1, 0, 0);
 }
 
-FINT int3c1e_rinv_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int3c1e_rinv_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                       FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout3c1e;
-        return CINT3c1e_spheric_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, 1, 0);
+        return CINT3c1e_drv(out, dims, &envs, opt, cache, &c2s_sph_3c1e, 1, 0);
 }
 void int3c1e_rinv_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                        FINT *bas, FINT nbas, double *env)
@@ -644,17 +561,17 @@ void int3c1e_rinv_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
         *opt = NULL;
 }
 
-FINT int3c1e_rinv_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int3c1e_rinv_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                        FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int3c1e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout3c1e;
-        return CINT3c1e_cart_drv(out, dims, &envs, opt, cache, 1);
+        return CINT3c1e_drv(out, dims, &envs, opt, cache, &c2s_cart_3c1e, 1, 0);
 }
 
-FINT int3c1e_rinv_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int3c1e_rinv_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                          FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};

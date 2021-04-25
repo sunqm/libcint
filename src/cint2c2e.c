@@ -11,12 +11,11 @@
 #include "cint_bas.h"
 #include "g2e.h"
 #include "optimizer.h"
+#include "cint1e.h"
 #include "cint2e.h"
 #include "misc.h"
 #include "cart2sph.h"
 #include "c2f.h"
-
-FINT int1e_cache_size(CINTEnvVars *envs);
 
 #define PRIM2CTR0(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
@@ -403,8 +402,8 @@ static FINT (*CINTf_2c2e_loop[8])() = {
         CINT2c2e_11_loop,
 };
 
-FINT CINT2c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                       double *cache)
+CACHE_SIZE_T CINT2c2e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
+                          double *cache, void (*f_c2s)())
 {
         FINT *x_ctr = envs->x_ctr;
         FINT nc = envs->nf * x_ctr[0] * x_ctr[1];
@@ -412,14 +411,14 @@ FINT CINT2c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         if (out == NULL) {
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng+len0+nc*n_comp*3;
+                FINT cache_size = MAX(leng+len0+nc*n_comp*3, nc*n_comp+envs->nf*2);
                 return cache_size;
         }
         double *stack = NULL;
         if (cache == NULL) {
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                FINT cache_size = leng+len0+nc*n_comp*3;
+                size_t cache_size = MAX(leng+len0+nc*n_comp*3, nc*n_comp+envs->nf*2);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
@@ -437,8 +436,13 @@ FINT CINT2c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         }
 
         FINT counts[4];
-        counts[0] = envs->nfi * x_ctr[0];
-        counts[1] = envs->nfk * x_ctr[1];
+        if (f_c2s == &c2s_sph_1e) {
+                counts[0] = (envs->i_l*2+1) * x_ctr[0];
+                counts[1] = (envs->k_l*2+1) * x_ctr[1];
+        } else {
+                counts[0] = envs->nfi * x_ctr[0];
+                counts[1] = envs->nfk * x_ctr[1];
+        }
         counts[2] = 1;
         counts[3] = 1;
         if (dims == NULL) {
@@ -447,63 +451,7 @@ FINT CINT2c2e_cart_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
         FINT nout = dims[0] * dims[1];
         if (has_value) {
                 for (n = 0; n < n_comp; n++) {
-                        c2s_cart_1e(out+nout*n, gctr+nc*n, dims, envs, cache);
-                }
-        } else {
-                for (n = 0; n < n_comp; n++) {
-                        c2s_dset0(out+nout*n, dims, counts);
-                }
-        }
-        if (stack != NULL) {
-                free(stack);
-        }
-        return has_value;
-}
-FINT CINT2c2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
-                          double *cache)
-{
-        FINT *x_ctr = envs->x_ctr;
-        FINT nc = envs->nf * x_ctr[0] * x_ctr[1];
-        FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
-        if (out == NULL) {
-                FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*3, nc*n_comp+envs->nf*2);
-                return cache_size;
-        }
-        double *stack = NULL;
-        if (cache == NULL) {
-                FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
-                FINT len0 = envs->nf*n_comp;
-                FINT cache_size = MAX(leng+len0+nc*n_comp*3, nc*n_comp+envs->nf*2);
-                stack = malloc(sizeof(double)*cache_size);
-                cache = stack;
-        }
-        double *gctr;
-        MALLOC_INSTACK(gctr, nc*n_comp);
-
-        FINT n;
-        FINT has_value;
-
-        if (opt != NULL) {
-                n = ((envs->x_ctr[0]==1) << 1) + (envs->x_ctr[1]==1);
-                has_value = CINTf_2c2e_loop[n](gctr, envs, opt, cache);
-        } else {
-                has_value = CINT2c2e_loop_nopt(gctr, envs, cache);
-        }
-
-        FINT counts[4];
-        counts[0] = (envs->i_l*2+1) * x_ctr[0];
-        counts[1] = (envs->k_l*2+1) * x_ctr[1];
-        counts[2] = 1;
-        counts[3] = 1;
-        if (dims == NULL) {
-                dims = counts;
-        }
-        FINT nout = dims[0] * dims[1];
-        if (has_value) {
-                for (n = 0; n < n_comp; n++) {
-                        c2s_sph_1e(out+nout*n, gctr+nc*n, dims, envs, cache);
+                        (*f_c2s)(out+nout*n, gctr+nc*n, dims, envs, cache);
                 }
         } else {
                 for (n = 0; n < n_comp; n++) {
@@ -516,7 +464,7 @@ FINT CINT2c2e_spheric_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
         return has_value;
 }
 // (spinor|spinor)
-FINT CINT2c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
+CACHE_SIZE_T CINT2c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                         double *cache, void (*f_e1_c2s)())
 {
         if (envs->ncomp_e1 > 1 || envs->ncomp_e2 > 1) {
@@ -536,7 +484,7 @@ FINT CINT2c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
         FINT n_comp = envs->ncomp_e1 * envs->ncomp_e2 * envs->ncomp_tensor;
         double *stack = NULL;
         if (cache == NULL) {
-                FINT cache_size = int1e_cache_size(envs);
+                size_t cache_size = int1e_cache_size(envs);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
@@ -573,14 +521,14 @@ FINT CINT2c2e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *envs, CIN
 }
 
 
-FINT int2c2e_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int2c2e_sph(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                 FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e;
-        return CINT2c2e_spheric_drv(out, dims, &envs, opt, cache);
+        return CINT2c2e_drv(out, dims, &envs, opt, cache, &c2s_sph_1e);
 }
 void int2c2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                        FINT *bas, FINT nbas, double *env)
@@ -589,17 +537,17 @@ void int2c2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
         CINTall_2c2e_optimizer(opt, ng, atm, natm, bas, nbas, env);
 }
 
-FINT int2c2e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int2c2e_cart(double *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                  FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};
         CINTEnvVars envs;
         CINTinit_int2c2e_EnvVars(&envs, ng, shls, atm, natm, bas, nbas, env);
         envs.f_gout = &CINTgout2e;
-        return CINT2c2e_cart_drv(out, dims, &envs, opt, cache);
+        return CINT2c2e_drv(out, dims, &envs, opt, cache, &c2s_cart_1e);
 }
  
-FINT int2c2e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
+CACHE_SIZE_T int2c2e_spinor(double complex *out, FINT *dims, FINT *shls, FINT *atm, FINT natm,
                    FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache)
 {
         FINT ng[] = {0, 0, 0, 0, 0, 1, 1, 1};

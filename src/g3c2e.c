@@ -126,7 +126,7 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 
 #ifdef WITH_GTG
 void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs);
+FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs);
 
 void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                   FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)

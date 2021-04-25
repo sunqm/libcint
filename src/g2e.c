@@ -1687,8 +1687,8 @@ normal_end:
         return;
 error:
         fprintf(stderr, "Dimension error for CINTg0_2e_lj2d4d: iklj = %d %d %d %d",
-               (FINT)envs->li_ceil, (FINT)envs->lk_ceil,
-               (FINT)envs->ll_ceil, (FINT)envs->lj_ceil);
+               (int)envs->li_ceil, (int)envs->lk_ceil,
+               (int)envs->ll_ceil, (int)envs->lj_ceil);
 #ifdef DEBUG
         exit(1);
 #endif
@@ -1713,7 +1713,7 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-int CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
+FINT CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
         FINT irys;
         const double aij = envs->aij;

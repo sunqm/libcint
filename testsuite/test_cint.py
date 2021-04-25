@@ -458,7 +458,7 @@ if __name__ == "__main__":
         test_int2e_sph(*f)
 
     for f in (('cint1e_grids_sph', 5528.379150052477, 1, 9),
-              ('cint1e_grids_ip1_sph', 3279.928611096705, 1, 9),
+              ('cint1e_grids_ip_sph', 3279.928611096705, 1, 9),
              ):
         test_int1e_grids_sph(*f)
 

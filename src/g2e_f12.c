@@ -14,8 +14,8 @@
 #include "misc.h"
 #include "g2e.h"
 
-int CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
-int CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs);
+FINT CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
+FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs);
 void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
 void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
@@ -158,7 +158,7 @@ void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         CINTg0_lj2d_4d(g, envs);
 }
 
-int CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
+FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
         double ua = 0;
@@ -247,7 +247,7 @@ int CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 }
 
 
-int CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
+FINT CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
         double ua = 0;
