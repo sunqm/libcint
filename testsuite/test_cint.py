@@ -327,7 +327,7 @@ def test_int2e_spinor(name, vref, dim, place):
 def test_int1e_grids_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
     intor.restype = ctypes.c_void_p
-    ngrids = 148
+    ngrids = 141
     numpy.random.seed(12)
     grids = numpy.random.random((ngrids, 3)) - 5.2
     env_g = numpy.append(env, grids.ravel())
@@ -340,11 +340,36 @@ def test_int1e_grids_sph(name, vref, dim, place):
         for i in range(j+1):
             di = (bas[i,ANG_OF] * 2 + 1) * bas[i,NCTR_OF]
             dj = (bas[j,ANG_OF] * 2 + 1) * bas[j,NCTR_OF]
-            shls = (ctypes.c_int * 2)(i, j)
+            shls = (ctypes.c_int * 4)(i, j, 0, ngrids)
             intor(op, shls, c_atm, natm, c_bas, nbas,
                   env_g.ctypes.data_as(ctypes.c_void_p), opt)
             v1 += abs(numpy.array(op[:ngrids*di*dj*dim])).sum()
             cnt += ngrids*di*dj*dim
+    if close(v1, vref, cnt, place):
+        print("pass: ", name)
+    else:
+        print("* FAIL: ", name, ". err:", '%.16g' % abs(v1-vref), "/", vref)
+
+def test_int1e_grids_spinor(name, vref, dim, place):
+    intor = getattr(_cint, name)
+    intor.restype = ctypes.c_void_p
+    ngrids = 141
+    numpy.random.seed(12)
+    grids = numpy.random.random((ngrids, 3)) - 5.2
+    env_g = numpy.append(env, grids.ravel())
+    env_g[NGRIDS] = ngrids
+    env_g[PTR_GRIDS] = env.size
+    op = (ctypes.c_double * (1000000 * dim))()
+    v1 = 0
+    cnt = 0
+    for j in range(nbas.value*2):
+        for i in range(j+1):
+            di = _cint.CINTlen_spinor(i, c_bas, nbas) * bas[i,NCTR_OF]
+            dj = _cint.CINTlen_spinor(j, c_bas, nbas) * bas[j,NCTR_OF]
+            shls = (ctypes.c_int * 4)(i, j, 0, ngrids)
+            intor(op, shls, c_atm, natm, c_bas, nbas, c_env, opt)
+            v1 += abs(cdouble_to_cmplx(op[:ngrids*di*dj*dim*2])).sum()
+            cnt += ngrids*di*dj*dim*2
     if close(v1, vref, cnt, place):
         print("pass: ", name)
     else:
@@ -389,7 +414,6 @@ def test_comp2e_spinor(name1, name_ref, shift, dim, place):
                                 "/", op_ref[maxi*2]+op_ref[maxi*2+1]*1j)
                         return
     print("pass: ", name1, "/", name_ref)
-
 
 
 if __name__ == "__main__":
@@ -457,10 +481,14 @@ if __name__ == "__main__":
              ):
         test_int2e_sph(*f)
 
-    for f in (('cint1e_grids_sph', 5528.379150052477, 1, 9),
-              ('cint1e_grids_ip_sph', 3279.928611096705, 1, 9),
+    for f in (('cint1e_grids_sph', 5262.154357565998, 1, 9),
+              ('cint1e_grids_ip_sph', 3121.659392012421, 1, 9),
              ):
         test_int1e_grids_sph(*f)
+
+    for f in (('cint1e_grids_spvsp', 85792.74665645276, 1, 9),
+             ):
+        test_int1e_grids_spinor(*f)
 
     test_erf('cint2e_sph', 0.2, 9)
     test_erf('cint2e_sph', 0.5, 9)
@@ -527,4 +555,3 @@ if __name__ == "__main__":
             v1 += abs(opr2-oprr[:,:,0]-oprr[:,:,4]-oprr[:,:,8]).sum()
             if round(v1/(di*dj), 13):
                 print("* FAIL: ", i, j, v1)
-

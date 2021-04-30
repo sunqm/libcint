@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <float.h>
 #include <math.h>
-#include "cint_const.h"
+#include "config.h"
 #include "rys_roots.h"
 
 #define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264

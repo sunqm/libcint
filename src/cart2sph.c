@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <complex.h>
-#include "cint_const.h"
+#include "config.h"
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "misc.h"
@@ -2182,6 +2182,10 @@ static FINT _len_spinor(FINT kappa, FINT l)
         }
 }
 
+static int _len_cart[] = {
+        1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78, 91, 105, 120, 136
+};
+
 struct cart2sp_t {
         const double *cart2sph;
         const double complex *cart2j_lt_l; // j < kappa, l > 0
@@ -2325,7 +2329,7 @@ static void c2s_zgemm(const char transa, const char transb,
 // transform integrals from cartesian to spheric
 static double *a_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
 {
-        const FINT nf = (l+1)*(l+2)/2;
+        const FINT nf = _len_cart[l];
         const FINT nd = l * 2 + 1;
         c2s_dgemm('T', 'N', nd, nket, nf,
                   1, g_c2s[l].cart2sph, nf, gcart, nf, 0, gsph, nd);
@@ -2335,7 +2339,7 @@ static double *a_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l
 static double *a_ket_cart2spheric(double *gsph, double *gcart,
                                   FINT lds, FINT nbra, FINT l)
 {
-        const FINT nf = (l+1)*(l+2)/2;
+        const FINT nf = _len_cart[l];
         const FINT nd = l * 2 + 1;
         c2s_dgemm('N', 'N', nbra, nd, nf,
                   1, gcart, nbra, g_c2s[l].cart2sph, nf, 0, gsph, lds);
@@ -2700,7 +2704,7 @@ double *(*c2s_ket_sph1[])(double *gsph, double *gcart,
 static void a_bra_cart2spinor_sf(double complex *gsp, FINT nket,
                                  double complex *gcart, FINT kappa, FINT l)
 {
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
 
@@ -2728,7 +2732,7 @@ static void a_bra_cart2spinor_e1sf(double complex *gsp, FINT nket,
 static void a_bra_cart2spinor_si(double complex *gsp, FINT nket,
                                  double complex *gcart, FINT kappa, FINT l)
 {
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
 
@@ -2741,39 +2745,6 @@ static void a_bra_cart2spinor_si(double complex *gsp, FINT nket,
                   1, coeff_c2s, nf*2, gcart, nf, 0, gsp, nd);
         c2s_zgemm('C', 'N', nd, nket, nf,
                   1, coeff_c2s+nf, nf*2, gcart+nf*nket, nf, 1, gsp, nd);
-}
-
-static void a_ket_cart2spinor(double complex *gsp, FINT nbra,
-                              double complex *gcart, FINT kappa, FINT l)
-{
-        FINT nf = (l+1)*(l+2)/2;
-        FINT nd = _len_spinor(kappa, l);
-        const double complex *coeff_c2s;
-
-        if (kappa < 0) { // j = l + 1/2
-                coeff_c2s = g_c2s[l].cart2j_gt_l;
-        } else {
-                coeff_c2s = g_c2s[l].cart2j_lt_l;
-        }
-        c2s_zgemm('N', 'N', nbra, nd, nf*2,
-                  1, gcart, nbra, coeff_c2s, nf*2, 0, gsp, nbra);
-}
-// with phase "i"
-static void a_iket_cart2spinor(double complex *gsp, FINT nbra,
-                               double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex ZI = 0 + 1 * _Complex_I;
-        FINT nf = (l+1)*(l+2)/2;
-        FINT nd = _len_spinor(kappa, l);
-        const double complex *coeff_c2s;
-
-        if (kappa < 0) { // j = l + 1/2
-                coeff_c2s = g_c2s[l].cart2j_gt_l;
-        } else {
-                coeff_c2s = g_c2s[l].cart2j_lt_l;
-        }
-        c2s_zgemm('N', 'N', nbra, nd, nf*2,
-                  ZI, gcart, nbra, coeff_c2s, nf*2, 0, gsp, nbra);
 }
 
 static void s_bra_cart2spinor_sf(double complex *gsp, FINT nket,
@@ -2813,28 +2784,7 @@ static void s_bra_cart2spinor_si(double complex *gsp, FINT nket,
                 gsp[i*2+1] = gcart [i];
         }
 }
-static void s_ket_cart2spinor(double complex *gsp, FINT nbra,
-                              double complex *gcart, FINT kappa, FINT l)
-{
-        double complex *gsp1 = gsp + nbra;
-        double complex *gcart1 = gcart + nbra;
-        FINT i;
-        for (i = 0; i < nbra; i++) {
-                gsp [i] = gcart1[i];
-                gsp1[i] = gcart [i];
-        }
-}
-static void s_iket_cart2spinor(double complex *gsp, FINT nbra,
-                               double complex *gcart, FINT kappa, FINT l)
-{
-        double complex *gsp1 = gsp + nbra;
-        double complex *gcart1 = gcart + nbra;
-        FINT i;
-        for (i = 0; i < nbra; i++) {
-                gsp [i] = gcart1[i] * _Complex_I;
-                gsp1[i] = gcart [i] * _Complex_I;
-        }
-}
+
 static void p_bra_cart2spinor_sf(double complex *gsp, FINT nket,
                                  double complex *gcart, FINT kappa, FINT l)
 {
@@ -2955,74 +2905,6 @@ static void p_bra_cart2spinor_si(double complex *gsp, FINT nket,
                         gsp[i*nd+2]+= creal(coeff_c2s[15])*gcart1[3*i+0]
                                     - cimag(coeff_c2s[16])*gcart1[3*i+1]*_Complex_I;
                         gsp[i*nd+3]+= 0;
-                }
-        }
-}
-static void p_ket_cart2spinor(double complex *gsp, FINT nbra,
-                              double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[1].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[     i] = creal(coeff_c2s[0])*gcart[nbra*0+i]
-                                    + cimag(coeff_c2s[1])*gcart[nbra*1+i]*_Complex_I
-                                    + creal(coeff_c2s[5])*gcart[nbra*5+i];
-                        gsp[nbra+i] = creal(coeff_c2s[8])*gcart[nbra*2+i]
-                                    + creal(coeff_c2s[9])*gcart[nbra*3+i]
-                                    + cimag(coeff_c2s[10])*gcart[nbra*4+i]*_Complex_I;
-                }
-                gsp += nbra * 2;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[1].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[3])*gcart[nbra*3+i]
-                                      + cimag(coeff_c2s[4])*gcart[nbra*4+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[6])*gcart[nbra*0+i]
-                                      + cimag(coeff_c2s[7])*gcart[nbra*1+i]*_Complex_I
-                                      + creal(coeff_c2s[11])*gcart[nbra*5+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[14])*gcart[nbra*2+i]
-                                      + creal(coeff_c2s[15])*gcart[nbra*3+i]
-                                      + cimag(coeff_c2s[16])*gcart[nbra*4+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[18])*gcart[nbra*0+i]
-                                      + cimag(coeff_c2s[19])*gcart[nbra*1+i]*_Complex_I;
-                }
-        }
-}
-static void p_iket_cart2spinor(double complex *gsp, FINT nbra,
-                               double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[1].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[     i] = creal(coeff_c2s[0])*gcart[nbra*0+i]*_Complex_I
-                                    - cimag(coeff_c2s[1])*gcart[nbra*1+i]
-                                    + creal(coeff_c2s[5])*gcart[nbra*5+i]*_Complex_I;
-                        gsp[nbra+i] = creal(coeff_c2s[8])*gcart[nbra*2+i]*_Complex_I
-                                    + creal(coeff_c2s[9])*gcart[nbra*3+i]*_Complex_I
-                                    - cimag(coeff_c2s[10])*gcart[nbra*4+i];
-                }
-                gsp += nbra * 2;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[1].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[3])*gcart[nbra*3+i]*_Complex_I
-                                      - cimag(coeff_c2s[4])*gcart[nbra*4+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[6])*gcart[nbra*0+i]*_Complex_I
-                                      - cimag(coeff_c2s[7])*gcart[nbra*1+i]
-                                      + creal(coeff_c2s[11])*gcart[nbra*5+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[14])*gcart[nbra*2+i]*_Complex_I
-                                      + creal(coeff_c2s[15])*gcart[nbra*3+i]*_Complex_I
-                                      - cimag(coeff_c2s[16])*gcart[nbra*4+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[18])*gcart[nbra*0+i]*_Complex_I
-                                      - cimag(coeff_c2s[19])*gcart[nbra*1+i];
                 }
         }
 }
@@ -3239,134 +3121,6 @@ static void d_bra_cart2spinor_si(double complex *gsp, FINT nket,
                                     + creal(coeff_c2s[57])*gcart1[6*i+3]
                                     - cimag(coeff_c2s[55])*gcart1[6*i+1]*_Complex_I;
                         gsp[i*nd+5]+= 0;
-                }
-        }
-}
-static void d_ket_cart2spinor(double complex *gsp, FINT nbra,
-                              double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[2].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[0])*gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[3])*gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[1])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[8])*gcart[nbra* 8+i]
-                                      + cimag(coeff_c2s[10])*gcart[nbra*10+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[14])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[16])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[18])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[21])*gcart[nbra* 9+i]
-                                      + creal(coeff_c2s[23])*gcart[nbra*11+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[24])*gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[27])*gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[29])*gcart[nbra* 5+i]
-                                      + creal(coeff_c2s[32])*gcart[nbra* 8+i]
-                                      + cimag(coeff_c2s[34])*gcart[nbra*10+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[38])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[40])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[42])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[45])*gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[43])*gcart[nbra* 7+i]*_Complex_I;
-                }
-                gsp += nbra * 4;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[2].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[6])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[9])*gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[7])*gcart[nbra* 7+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[12])*gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[15])*gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[13])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[20])*gcart[nbra* 8+i]
-                                      + cimag(coeff_c2s[22])*gcart[nbra*10+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[26])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[28])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[30])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[33])*gcart[nbra* 9+i]
-                                      + creal(coeff_c2s[35])*gcart[nbra*11+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[36])*gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[39])*gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[41])*gcart[nbra* 5+i]
-                                      + creal(coeff_c2s[44])*gcart[nbra* 8+i]
-                                      + cimag(coeff_c2s[46])*gcart[nbra*10+i]*_Complex_I;
-                        gsp[4*nbra+i] = creal(coeff_c2s[50])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[52])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[54])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[57])*gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[55])*gcart[nbra* 7+i]*_Complex_I;
-                        gsp[5*nbra+i] = creal(coeff_c2s[60])*gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[63])*gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[61])*gcart[nbra* 1+i]*_Complex_I;
-                }
-        }
-}
-static void d_iket_cart2spinor(double complex *gsp, FINT nbra,
-                               double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[2].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[0])*gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[3])*gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[1])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[8])*gcart[nbra* 8+i]*_Complex_I
-                                      - cimag(coeff_c2s[10])*gcart[nbra*10+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[14])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[16])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[18])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[21])*gcart[nbra* 9+i]*_Complex_I
-                                      + creal(coeff_c2s[23])*gcart[nbra*11+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[24])*gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[27])*gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[29])*gcart[nbra* 5+i]*_Complex_I
-                                      + creal(coeff_c2s[32])*gcart[nbra* 8+i]*_Complex_I
-                                      - cimag(coeff_c2s[34])*gcart[nbra*10+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[38])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[40])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[42])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[45])*gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[43])*gcart[nbra* 7+i];
-                }
-                gsp += nbra * 4;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[2].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[6])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[9])*gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[7])*gcart[nbra* 7+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[12])*gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[15])*gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[13])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[20])*gcart[nbra* 8+i]*_Complex_I
-                                      - cimag(coeff_c2s[22])*gcart[nbra*10+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[26])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[28])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[30])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[33])*gcart[nbra* 9+i]*_Complex_I
-                                      + creal(coeff_c2s[35])*gcart[nbra*11+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[36])*gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[39])*gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[41])*gcart[nbra* 5+i]*_Complex_I
-                                      + creal(coeff_c2s[44])*gcart[nbra* 8+i]*_Complex_I
-                                      - cimag(coeff_c2s[46])*gcart[nbra*10+i];
-                        gsp[4*nbra+i] = creal(coeff_c2s[50])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[52])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[54])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[57])*gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[55])*gcart[nbra* 7+i];
-                        gsp[5*nbra+i] = creal(coeff_c2s[60])*gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[63])*gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[61])*gcart[nbra* 1+i];
                 }
         }
 }
@@ -3768,258 +3522,6 @@ static void f_bra_cart2spinor_si(double complex *gsp, FINT nket,
                                     + creal(coeff_c2s[133])*gcart1[10*i+3]
                                     - cimag(coeff_c2s[136])*gcart1[10*i+6]*_Complex_I;
                         gsp[i*nd+7]+= 0;
-                }
-        }
-}
-static void f_ket_cart2spinor(double complex *gsp, FINT nbra,
-                              double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[3].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[0])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[1])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[3])*gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[6])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[12])*gcart[nbra*12+i]
-                                      + cimag(coeff_c2s[14])*gcart[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[17])*gcart[nbra*17+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[22])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[24])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[27])*gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[30])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[31])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[33])*gcart[nbra*13+i]
-                                      + creal(coeff_c2s[35])*gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[36])*gcart[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[38])*gcart[nbra*18+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[40])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[41])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[43])*gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[45])*gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[46])*gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[48])*gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[52])*gcart[nbra*12+i]
-                                      + creal(coeff_c2s[57])*gcart[nbra*17+i]
-                                      + creal(coeff_c2s[59])*gcart[nbra*19+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[62])*gcart[nbra* 2+i]
-                                      + creal(coeff_c2s[67])*gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[69])*gcart[nbra* 9+i]
-                                      + creal(coeff_c2s[70])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[71])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[73])*gcart[nbra*13+i]
-                                      + creal(coeff_c2s[75])*gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[76])*gcart[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[78])*gcart[nbra*18+i]*_Complex_I;
-                        gsp[4*nbra+i] = creal(coeff_c2s[80])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[81])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[83])*gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[85])*gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[86])*gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[88])*gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[92])*gcart[nbra*12+i]
-                                      + cimag(coeff_c2s[94])*gcart[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[97])*gcart[nbra*17+i];
-                        gsp[5*nbra+i] = creal(coeff_c2s[102])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[104])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[107])*gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[110])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[111])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[113])*gcart[nbra*13+i]
-                                      + cimag(coeff_c2s[116])*gcart[nbra*16+i]*_Complex_I;
-                }
-                gsp += nbra * 6;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[3].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[10])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[11])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[13])*gcart[nbra*13+i]
-                                      + cimag(coeff_c2s[16])*gcart[nbra*16+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[20])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[21])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[23])*gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[26])*gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[32])*gcart[nbra*12+i]
-                                      + cimag(coeff_c2s[34])*gcart[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[37])*gcart[nbra*17+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[42])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[44])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[47])*gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[50])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[51])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[53])*gcart[nbra*13+i]
-                                      + creal(coeff_c2s[55])*gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[56])*gcart[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[58])*gcart[nbra*18+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[60])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[61])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[63])*gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[65])*gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[66])*gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[68])*gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[72])*gcart[nbra*12+i]
-                                      + creal(coeff_c2s[77])*gcart[nbra*17+i]
-                                      + creal(coeff_c2s[79])*gcart[nbra*19+i];
-                        gsp[4*nbra+i] = creal(coeff_c2s[82])*gcart[nbra* 2+i]
-                                      + creal(coeff_c2s[87])*gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[89])*gcart[nbra* 9+i]
-                                      + creal(coeff_c2s[90])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[91])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[93])*gcart[nbra*13+i]
-                                      + creal(coeff_c2s[95])*gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[96])*gcart[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[98])*gcart[nbra*18+i]*_Complex_I;
-                        gsp[5*nbra+i] = creal(coeff_c2s[100])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[101])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[103])*gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[105])*gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[106])*gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[108])*gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[112])*gcart[nbra*12+i]
-                                      + cimag(coeff_c2s[114])*gcart[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[117])*gcart[nbra*17+i];
-                        gsp[6*nbra+i] = creal(coeff_c2s[122])*gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[124])*gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127])*gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[130])*gcart[nbra*10+i]
-                                      + cimag(coeff_c2s[131])*gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[133])*gcart[nbra*13+i]
-                                      + cimag(coeff_c2s[136])*gcart[nbra*16+i]*_Complex_I;
-                        gsp[7*nbra+i] = creal(coeff_c2s[140])*gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[141])*gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[143])*gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[146])*gcart[nbra* 6+i]*_Complex_I;
-                }
-        }
-}
-static void f_iket_cart2spinor(double complex *gsp, FINT nbra,
-                               double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[3].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[0])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[1])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[3])*gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[6])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[12])*gcart[nbra*12+i]*_Complex_I
-                                      - cimag(coeff_c2s[14])*gcart[nbra*14+i]
-                                      + creal(coeff_c2s[17])*gcart[nbra*17+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[22])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[24])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[27])*gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[30])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[31])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[33])*gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[35])*gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[36])*gcart[nbra*16+i]
-                                      - cimag(coeff_c2s[38])*gcart[nbra*18+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[40])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[41])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[43])*gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[45])*gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[46])*gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[48])*gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[52])*gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[57])*gcart[nbra*17+i]*_Complex_I
-                                      + creal(coeff_c2s[59])*gcart[nbra*19+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[62])*gcart[nbra* 2+i]*_Complex_I
-                                      + creal(coeff_c2s[67])*gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[69])*gcart[nbra* 9+i]*_Complex_I
-                                      + creal(coeff_c2s[70])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[71])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[73])*gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[75])*gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[76])*gcart[nbra*16+i]
-                                      - cimag(coeff_c2s[78])*gcart[nbra*18+i];
-                        gsp[4*nbra+i] = creal(coeff_c2s[80])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[81])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[83])*gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[85])*gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[86])*gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[88])*gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[92])*gcart[nbra*12+i]*_Complex_I
-                                      - cimag(coeff_c2s[94])*gcart[nbra*14+i]
-                                      + creal(coeff_c2s[97])*gcart[nbra*17+i]*_Complex_I;
-                        gsp[5*nbra+i] = creal(coeff_c2s[102])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[104])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[107])*gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[110])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[111])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[113])*gcart[nbra*13+i]*_Complex_I
-                                      - cimag(coeff_c2s[116])*gcart[nbra*16+i];
-                }
-                gsp += nbra * 6;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[3].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[10])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[11])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[13])*gcart[nbra*13+i]*_Complex_I
-                                      - cimag(coeff_c2s[16])*gcart[nbra*16+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[20])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[21])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[23])*gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[26])*gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[32])*gcart[nbra*12+i]*_Complex_I
-                                      - cimag(coeff_c2s[34])*gcart[nbra*14+i]
-                                      + creal(coeff_c2s[37])*gcart[nbra*17+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[42])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[44])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[47])*gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[50])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[51])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[53])*gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[55])*gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[56])*gcart[nbra*16+i]
-                                      - cimag(coeff_c2s[58])*gcart[nbra*18+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[60])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[61])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[63])*gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[65])*gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[66])*gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[68])*gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[72])*gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[77])*gcart[nbra*17+i]*_Complex_I
-                                      + creal(coeff_c2s[79])*gcart[nbra*19+i]*_Complex_I;
-                        gsp[4*nbra+i] = creal(coeff_c2s[82])*gcart[nbra* 2+i]*_Complex_I
-                                      + creal(coeff_c2s[87])*gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[89])*gcart[nbra* 9+i]*_Complex_I
-                                      + creal(coeff_c2s[90])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[91])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[93])*gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[95])*gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[96])*gcart[nbra*16+i]
-                                      - cimag(coeff_c2s[98])*gcart[nbra*18+i];
-                        gsp[5*nbra+i] = creal(coeff_c2s[100])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[101])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[103])*gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[105])*gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[106])*gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[108])*gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[112])*gcart[nbra*12+i]*_Complex_I
-                                      - cimag(coeff_c2s[114])*gcart[nbra*14+i]
-                                      + creal(coeff_c2s[117])*gcart[nbra*17+i]*_Complex_I;
-                        gsp[6*nbra+i] = creal(coeff_c2s[122])*gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[124])*gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[127])*gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[130])*gcart[nbra*10+i]*_Complex_I
-                                      - cimag(coeff_c2s[131])*gcart[nbra*11+i]
-                                      + creal(coeff_c2s[133])*gcart[nbra*13+i]*_Complex_I
-                                      - cimag(coeff_c2s[136])*gcart[nbra*16+i];
-                        gsp[7*nbra+i] = creal(coeff_c2s[140])*gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[141])*gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[143])*gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[146])*gcart[nbra* 6+i];
                 }
         }
 }
@@ -4673,422 +4175,6 @@ static void g_bra_cart2spinor_si(double complex *gsp, FINT nket,
                 }
         }
 }
-static void g_ket_cart2spinor(double complex *gsp, FINT nbra,
-                              double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[4].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[ 0]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 1]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 3]) * gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[ 6]) * gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[10]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[17]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[19]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[22]) * gcart[nbra*22+i]
-                                      + cimag(coeff_c2s[26]) * gcart[nbra*26+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[32]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[34]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[37]) * gcart[nbra* 7+i]
-                                      + cimag(coeff_c2s[41]) * gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[45]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[46]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[50]) * gcart[nbra*20+i]
-                                      + cimag(coeff_c2s[51]) * gcart[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[53]) * gcart[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[55]) * gcart[nbra*25+i]
-                                      + creal(coeff_c2s[57]) * gcart[nbra*27+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[60]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[61]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[65]) * gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[66]) * gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[68]) * gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[70]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[72]) * gcart[nbra*12+i]
-                                      + creal(coeff_c2s[77]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[79]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[82]) * gcart[nbra*22+i]
-                                      + creal(coeff_c2s[84]) * gcart[nbra*24+i]
-                                      + cimag(coeff_c2s[86]) * gcart[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[88]) * gcart[nbra*28+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[92]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[94]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[97]) * gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[99]) * gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[101]) * gcart[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[103]) * gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[105]) * gcart[nbra*15+i]
-                                      + creal(coeff_c2s[108]) * gcart[nbra*18+i]
-                                      + creal(coeff_c2s[110]) * gcart[nbra*20+i]
-                                      + creal(coeff_c2s[115]) * gcart[nbra*25+i]
-                                      + creal(coeff_c2s[117]) * gcart[nbra*27+i]
-                                      + creal(coeff_c2s[119]) * gcart[nbra*29+i];
-                        gsp[4*nbra+i] = creal(coeff_c2s[120]) * gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[123]) * gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[125]) * gcart[nbra* 5+i]
-                                      + creal(coeff_c2s[130]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[132]) * gcart[nbra*12+i]
-                                      + creal(coeff_c2s[134]) * gcart[nbra*14+i]
-                                      + creal(coeff_c2s[137]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[139]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[142]) * gcart[nbra*22+i]
-                                      + creal(coeff_c2s[144]) * gcart[nbra*24+i]
-                                      + cimag(coeff_c2s[146]) * gcart[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[148]) * gcart[nbra*28+i]*_Complex_I;
-                        gsp[5*nbra+i] = creal(coeff_c2s[152]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[154]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[157]) * gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[159]) * gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[161]) * gcart[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[163]) * gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[165]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[166]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[170]) * gcart[nbra*20+i]
-                                      + cimag(coeff_c2s[171]) * gcart[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[173]) * gcart[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[175]) * gcart[nbra*25+i]
-                                      + creal(coeff_c2s[177]) * gcart[nbra*27+i];
-                        gsp[6*nbra+i] = creal(coeff_c2s[180]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[181]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[185]) * gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[186]) * gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[188]) * gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[190]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[192]) * gcart[nbra*12+i]
-                                      + creal(coeff_c2s[197]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[199]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[202]) * gcart[nbra*22+i]
-                                      + cimag(coeff_c2s[206]) * gcart[nbra*26+i]*_Complex_I;
-                        gsp[7*nbra+i] = creal(coeff_c2s[212]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[214]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[217]) * gcart[nbra* 7+i]
-                                      + cimag(coeff_c2s[221]) * gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[225]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[226]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[228]) * gcart[nbra*18+i]
-                                      + cimag(coeff_c2s[231]) * gcart[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[235]) * gcart[nbra*25+i];
-                };
-                gsp += nbra * 8;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[4].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[15]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[16]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[18]) * gcart[nbra*18+i]
-                                      + cimag(coeff_c2s[21]) * gcart[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[25]) * gcart[nbra*25+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[30]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[31]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[33]) * gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[36]) * gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[40]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[47]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[49]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[52]) * gcart[nbra*22+i]
-                                      + cimag(coeff_c2s[56]) * gcart[nbra*26+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[62]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[64]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[67]) * gcart[nbra* 7+i]
-                                      + cimag(coeff_c2s[71]) * gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[75]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[76]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[80]) * gcart[nbra*20+i]
-                                      + cimag(coeff_c2s[81]) * gcart[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[83]) * gcart[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[85]) * gcart[nbra*25+i]
-                                      + creal(coeff_c2s[87]) * gcart[nbra*27+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[90]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[91]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[95]) * gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[96]) * gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[98]) * gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[100]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[102]) * gcart[nbra*12+i]
-                                      + creal(coeff_c2s[107]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[109]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[112]) * gcart[nbra*22+i]
-                                      + creal(coeff_c2s[114]) * gcart[nbra*24+i]
-                                      + cimag(coeff_c2s[116]) * gcart[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[118]) * gcart[nbra*28+i]*_Complex_I;
-                        gsp[4*nbra+i] = creal(coeff_c2s[122]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[124]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127]) * gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[129]) * gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[131]) * gcart[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[133]) * gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[135]) * gcart[nbra*15+i]
-                                      + creal(coeff_c2s[138]) * gcart[nbra*18+i]
-                                      + creal(coeff_c2s[140]) * gcart[nbra*20+i]
-                                      + creal(coeff_c2s[145]) * gcart[nbra*25+i]
-                                      + creal(coeff_c2s[147]) * gcart[nbra*27+i]
-                                      + creal(coeff_c2s[149]) * gcart[nbra*29+i];
-                        gsp[5*nbra+i] = creal(coeff_c2s[150]) * gcart[nbra* 0+i]
-                                      + creal(coeff_c2s[153]) * gcart[nbra* 3+i]
-                                      + creal(coeff_c2s[155]) * gcart[nbra* 5+i]
-                                      + creal(coeff_c2s[160]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[162]) * gcart[nbra*12+i]
-                                      + creal(coeff_c2s[164]) * gcart[nbra*14+i]
-                                      + creal(coeff_c2s[167]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[169]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[172]) * gcart[nbra*22+i]
-                                      + creal(coeff_c2s[174]) * gcart[nbra*24+i]
-                                      + cimag(coeff_c2s[176]) * gcart[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[178]) * gcart[nbra*28+i]*_Complex_I;
-                        gsp[6*nbra+i] = creal(coeff_c2s[182]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[184]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[187]) * gcart[nbra* 7+i]
-                                      + creal(coeff_c2s[189]) * gcart[nbra* 9+i]
-                                      + cimag(coeff_c2s[191]) * gcart[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[193]) * gcart[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[195]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[196]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[200]) * gcart[nbra*20+i]
-                                      + cimag(coeff_c2s[201]) * gcart[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[203]) * gcart[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[205]) * gcart[nbra*25+i]
-                                      + creal(coeff_c2s[207]) * gcart[nbra*27+i];
-                        gsp[7*nbra+i] = creal(coeff_c2s[210]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[211]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[215]) * gcart[nbra* 5+i]
-                                      + cimag(coeff_c2s[216]) * gcart[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[218]) * gcart[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[220]) * gcart[nbra*10+i]
-                                      + creal(coeff_c2s[222]) * gcart[nbra*12+i]
-                                      + creal(coeff_c2s[227]) * gcart[nbra*17+i]
-                                      + cimag(coeff_c2s[229]) * gcart[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[232]) * gcart[nbra*22+i]
-                                      + cimag(coeff_c2s[236]) * gcart[nbra*26+i]*_Complex_I;
-                        gsp[8*nbra+i] = creal(coeff_c2s[242]) * gcart[nbra* 2+i]
-                                      + cimag(coeff_c2s[244]) * gcart[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[247]) * gcart[nbra* 7+i]
-                                      + cimag(coeff_c2s[251]) * gcart[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[255]) * gcart[nbra*15+i]
-                                      + cimag(coeff_c2s[256]) * gcart[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[258]) * gcart[nbra*18+i]
-                                      + cimag(coeff_c2s[261]) * gcart[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[265]) * gcart[nbra*25+i];
-                        gsp[9*nbra+i] = creal(coeff_c2s[270]) * gcart[nbra* 0+i]
-                                      + cimag(coeff_c2s[271]) * gcart[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[273]) * gcart[nbra* 3+i]
-                                      + cimag(coeff_c2s[276]) * gcart[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[280]) * gcart[nbra*10+i];
-                }
-        }
-}
-static void g_iket_cart2spinor(double complex *gsp, FINT nbra,
-                               double complex *gcart, FINT kappa, FINT l)
-{
-        const double complex *coeff_c2s;
-        FINT i;
-
-        if (kappa >= 0) {
-                coeff_c2s = g_c2s[4].cart2j_lt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[ 0]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 1]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[ 3]) * gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 6]) * gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[10]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[17]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[19]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[22]) * gcart[nbra*22+i]*_Complex_I
-                                      - cimag(coeff_c2s[26]) * gcart[nbra*26+i];
-                        gsp[1*nbra+i] = creal(coeff_c2s[32]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[34]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[37]) * gcart[nbra* 7+i]*_Complex_I
-                                      - cimag(coeff_c2s[41]) * gcart[nbra*11+i]
-                                      + creal(coeff_c2s[45]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[46]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[50]) * gcart[nbra*20+i]*_Complex_I
-                                      - cimag(coeff_c2s[51]) * gcart[nbra*21+i]
-                                      - cimag(coeff_c2s[53]) * gcart[nbra*23+i]
-                                      + creal(coeff_c2s[55]) * gcart[nbra*25+i]*_Complex_I
-                                      + creal(coeff_c2s[57]) * gcart[nbra*27+i]*_Complex_I;
-                        gsp[2*nbra+i] = creal(coeff_c2s[60]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[61]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[65]) * gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[66]) * gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[68]) * gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[70]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[72]) * gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[77]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[79]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[82]) * gcart[nbra*22+i]*_Complex_I
-                                      + creal(coeff_c2s[84]) * gcart[nbra*24+i]*_Complex_I
-                                      - cimag(coeff_c2s[86]) * gcart[nbra*26+i]
-                                      - cimag(coeff_c2s[88]) * gcart[nbra*28+i];
-                        gsp[3*nbra+i] = creal(coeff_c2s[92]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[94]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[97]) * gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[99]) * gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[101]) * gcart[nbra*11+i]
-                                      - cimag(coeff_c2s[103]) * gcart[nbra*13+i]
-                                      + creal(coeff_c2s[105]) * gcart[nbra*15+i]*_Complex_I
-                                      + creal(coeff_c2s[108]) * gcart[nbra*18+i]*_Complex_I
-                                      + creal(coeff_c2s[110]) * gcart[nbra*20+i]*_Complex_I
-                                      + creal(coeff_c2s[115]) * gcart[nbra*25+i]*_Complex_I
-                                      + creal(coeff_c2s[117]) * gcart[nbra*27+i]*_Complex_I
-                                      + creal(coeff_c2s[119]) * gcart[nbra*29+i]*_Complex_I;
-                        gsp[4*nbra+i] = creal(coeff_c2s[120]) * gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[123]) * gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[125]) * gcart[nbra* 5+i]*_Complex_I
-                                      + creal(coeff_c2s[130]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[132]) * gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[134]) * gcart[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[137]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[139]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[142]) * gcart[nbra*22+i]*_Complex_I
-                                      + creal(coeff_c2s[144]) * gcart[nbra*24+i]*_Complex_I
-                                      - cimag(coeff_c2s[146]) * gcart[nbra*26+i]
-                                      - cimag(coeff_c2s[148]) * gcart[nbra*28+i];
-                        gsp[5*nbra+i] = creal(coeff_c2s[152]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[154]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[157]) * gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[159]) * gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[161]) * gcart[nbra*11+i]
-                                      - cimag(coeff_c2s[163]) * gcart[nbra*13+i]
-                                      + creal(coeff_c2s[165]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[166]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[170]) * gcart[nbra*20+i]*_Complex_I
-                                      - cimag(coeff_c2s[171]) * gcart[nbra*21+i]
-                                      - cimag(coeff_c2s[173]) * gcart[nbra*23+i]
-                                      + creal(coeff_c2s[175]) * gcart[nbra*25+i]*_Complex_I
-                                      + creal(coeff_c2s[177]) * gcart[nbra*27+i]*_Complex_I;
-                        gsp[6*nbra+i] = creal(coeff_c2s[180]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[181]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[185]) * gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[186]) * gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[188]) * gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[190]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[192]) * gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[197]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[199]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[202]) * gcart[nbra*22+i]*_Complex_I
-                                      - cimag(coeff_c2s[206]) * gcart[nbra*26+i];
-                        gsp[7*nbra+i] = creal(coeff_c2s[212]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[214]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[217]) * gcart[nbra* 7+i]*_Complex_I
-                                      - cimag(coeff_c2s[221]) * gcart[nbra*11+i]
-                                      + creal(coeff_c2s[225]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[226]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[228]) * gcart[nbra*18+i]*_Complex_I
-                                      - cimag(coeff_c2s[231]) * gcart[nbra*21+i]
-                                      + creal(coeff_c2s[235]) * gcart[nbra*25+i]*_Complex_I;
-                };
-                gsp += nbra * 8;
-        }
-        if (kappa <= 0) {
-                coeff_c2s = g_c2s[4].cart2j_gt_l;
-                for (i = 0; i < nbra; i++) {
-                        gsp[0*nbra+i] = creal(coeff_c2s[15]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[16]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[18]) * gcart[nbra*18+i]*_Complex_I
-                                      - cimag(coeff_c2s[21]) * gcart[nbra*21+i]
-                                      + creal(coeff_c2s[25]) * gcart[nbra*25+i]*_Complex_I;
-                        gsp[1*nbra+i] = creal(coeff_c2s[30]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[31]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[33]) * gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[36]) * gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[40]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[47]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[49]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[52]) * gcart[nbra*22+i]*_Complex_I
-                                      - cimag(coeff_c2s[56]) * gcart[nbra*26+i];
-                        gsp[2*nbra+i] = creal(coeff_c2s[62]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[64]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[67]) * gcart[nbra* 7+i]*_Complex_I
-                                      - cimag(coeff_c2s[71]) * gcart[nbra*11+i]
-                                      + creal(coeff_c2s[75]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[76]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[80]) * gcart[nbra*20+i]*_Complex_I
-                                      - cimag(coeff_c2s[81]) * gcart[nbra*21+i]
-                                      - cimag(coeff_c2s[83]) * gcart[nbra*23+i]
-                                      + creal(coeff_c2s[85]) * gcart[nbra*25+i]*_Complex_I
-                                      + creal(coeff_c2s[87]) * gcart[nbra*27+i]*_Complex_I;
-                        gsp[3*nbra+i] = creal(coeff_c2s[90]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[91]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[95]) * gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[96]) * gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[98]) * gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[100]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[102]) * gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[107]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[109]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[112]) * gcart[nbra*22+i]*_Complex_I
-                                      + creal(coeff_c2s[114]) * gcart[nbra*24+i]*_Complex_I
-                                      - cimag(coeff_c2s[116]) * gcart[nbra*26+i]
-                                      - cimag(coeff_c2s[118]) * gcart[nbra*28+i];
-                        gsp[4*nbra+i] = creal(coeff_c2s[122]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[124]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[127]) * gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[129]) * gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[131]) * gcart[nbra*11+i]
-                                      - cimag(coeff_c2s[133]) * gcart[nbra*13+i]
-                                      + creal(coeff_c2s[135]) * gcart[nbra*15+i]*_Complex_I
-                                      + creal(coeff_c2s[138]) * gcart[nbra*18+i]*_Complex_I
-                                      + creal(coeff_c2s[140]) * gcart[nbra*20+i]*_Complex_I
-                                      + creal(coeff_c2s[145]) * gcart[nbra*25+i]*_Complex_I
-                                      + creal(coeff_c2s[147]) * gcart[nbra*27+i]*_Complex_I
-                                      + creal(coeff_c2s[149]) * gcart[nbra*29+i]*_Complex_I;
-                        gsp[5*nbra+i] = creal(coeff_c2s[150]) * gcart[nbra* 0+i]*_Complex_I
-                                      + creal(coeff_c2s[153]) * gcart[nbra* 3+i]*_Complex_I
-                                      + creal(coeff_c2s[155]) * gcart[nbra* 5+i]*_Complex_I
-                                      + creal(coeff_c2s[160]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[162]) * gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[164]) * gcart[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[167]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[169]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[172]) * gcart[nbra*22+i]*_Complex_I
-                                      + creal(coeff_c2s[174]) * gcart[nbra*24+i]*_Complex_I
-                                      - cimag(coeff_c2s[176]) * gcart[nbra*26+i]
-                                      - cimag(coeff_c2s[178]) * gcart[nbra*28+i];
-                        gsp[6*nbra+i] = creal(coeff_c2s[182]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[184]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[187]) * gcart[nbra* 7+i]*_Complex_I
-                                      + creal(coeff_c2s[189]) * gcart[nbra* 9+i]*_Complex_I
-                                      - cimag(coeff_c2s[191]) * gcart[nbra*11+i]
-                                      - cimag(coeff_c2s[193]) * gcart[nbra*13+i]
-                                      + creal(coeff_c2s[195]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[196]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[200]) * gcart[nbra*20+i]*_Complex_I
-                                      - cimag(coeff_c2s[201]) * gcart[nbra*21+i]
-                                      - cimag(coeff_c2s[203]) * gcart[nbra*23+i]
-                                      + creal(coeff_c2s[205]) * gcart[nbra*25+i]*_Complex_I
-                                      + creal(coeff_c2s[207]) * gcart[nbra*27+i]*_Complex_I;
-                        gsp[7*nbra+i] = creal(coeff_c2s[210]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[211]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[215]) * gcart[nbra* 5+i]*_Complex_I
-                                      - cimag(coeff_c2s[216]) * gcart[nbra* 6+i]
-                                      - cimag(coeff_c2s[218]) * gcart[nbra* 8+i]
-                                      + creal(coeff_c2s[220]) * gcart[nbra*10+i]*_Complex_I
-                                      + creal(coeff_c2s[222]) * gcart[nbra*12+i]*_Complex_I
-                                      + creal(coeff_c2s[227]) * gcart[nbra*17+i]*_Complex_I
-                                      - cimag(coeff_c2s[229]) * gcart[nbra*19+i]
-                                      + creal(coeff_c2s[232]) * gcart[nbra*22+i]*_Complex_I
-                                      - cimag(coeff_c2s[236]) * gcart[nbra*26+i];
-                        gsp[8*nbra+i] = creal(coeff_c2s[242]) * gcart[nbra* 2+i]*_Complex_I
-                                      - cimag(coeff_c2s[244]) * gcart[nbra* 4+i]
-                                      + creal(coeff_c2s[247]) * gcart[nbra* 7+i]*_Complex_I
-                                      - cimag(coeff_c2s[251]) * gcart[nbra*11+i]
-                                      + creal(coeff_c2s[255]) * gcart[nbra*15+i]*_Complex_I
-                                      - cimag(coeff_c2s[256]) * gcart[nbra*16+i]
-                                      + creal(coeff_c2s[258]) * gcart[nbra*18+i]*_Complex_I
-                                      - cimag(coeff_c2s[261]) * gcart[nbra*21+i]
-                                      + creal(coeff_c2s[265]) * gcart[nbra*25+i]*_Complex_I;
-                        gsp[9*nbra+i] = creal(coeff_c2s[270]) * gcart[nbra* 0+i]*_Complex_I
-                                      - cimag(coeff_c2s[271]) * gcart[nbra* 1+i]
-                                      + creal(coeff_c2s[273]) * gcart[nbra* 3+i]*_Complex_I
-                                      - cimag(coeff_c2s[276]) * gcart[nbra* 6+i]
-                                      + creal(coeff_c2s[280]) * gcart[nbra*10+i]*_Complex_I;
-                }
-        }
-}
 
 void (*c2s_bra_spinor_e1sf[])() = {
         s_bra_cart2spinor_e1sf,
@@ -5128,44 +4214,6 @@ void (*c2s_bra_spinor_sf[])() = {
         a_bra_cart2spinor_sf,
 };
 
-void (*c2s_ket_spinor[])() = {
-        s_ket_cart2spinor,
-        p_ket_cart2spinor,
-        d_ket_cart2spinor,
-        f_ket_cart2spinor,
-        g_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-        a_ket_cart2spinor,
-};
-
-void (*c2s_iket_spinor[])() = {
-        s_iket_cart2spinor,
-        p_iket_cart2spinor,
-        d_iket_cart2spinor,
-        f_iket_cart2spinor,
-        g_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-        a_iket_cart2spinor,
-};
-
 void (*c2s_bra_spinor_si[])() = {
         s_bra_cart2spinor_si,
         p_bra_cart2spinor_si,
@@ -5195,7 +4243,7 @@ static void a_ket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
         const double complex Z0 = 0;
         const double complex Z1 = 1;
         const char TRANS_N = 'N';
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nf2 = nf * 2;
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
@@ -5221,7 +4269,7 @@ static void a_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
         const double complex Z0 = 0;
         const double complex ZI = 0 + 1 * _Complex_I;
         const char TRANS_N = 'N';
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nf2 = nf * 2;
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
@@ -5240,28 +4288,51 @@ static void a_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
         free(tmp);
 }
 
-static void a_ket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                 double complex *gcart,
+static void a_ket_cart2spinor_si(double complex *gsp,
+                                 double complex *gcarta, double complex *gcartb,
                                  FINT lds, FINT nbra, FINT kappa, FINT l)
 {
         const double complex Z0 = 0;
         const double complex Z1 = 1;
         const char TRANS_N = 'N';
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nf2 = nf * 2;
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
-        double complex *gcart1 = gcart + nbra * nf2;
 
         if (kappa < 0) { // j = l + 1/2
                 coeff_c2s = g_c2s[l].cart2j_gt_l;
         } else {
                 coeff_c2s = g_c2s[l].cart2j_lt_l;
         }
-        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf2,
-               &Z1, gcart, &nbra, coeff_c2s, &nf2, &Z0, gspa, &lds);
-        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf2,
-               &Z1, gcart1, &nbra, coeff_c2s, &nf2, &Z0, gspb, &lds);
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &Z1, gcarta, &nbra, coeff_c2s   , &nf2, &Z0, gsp, &lds);
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &Z1, gcartb, &nbra, coeff_c2s+nf, &nf2, &Z1, gsp, &lds);
+}
+
+static void a_iket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
+                                  FINT lds, FINT nbra, FINT kappa, FINT l)
+{
+        const double complex Z0 = 0;
+        const double complex Z1 = 1;
+        const double complex ZI = 0 + 1 * _Complex_I;
+        const char TRANS_N = 'N';
+        FINT nf = _len_cart[l];
+        FINT nf2 = nf * 2;
+        FINT nd = _len_spinor(kappa, l);
+        const double complex *coeff_c2s;
+
+        if (kappa < 0) { // j = l + 1/2
+                coeff_c2s = g_c2s[l].cart2j_gt_l;
+        } else {
+                coeff_c2s = g_c2s[l].cart2j_lt_l;
+        }
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &ZI, gcarta, &nbra, coeff_c2s   , &nf2, &Z0, gsp, &lds);
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &ZI, gcartb, &nbra, coeff_c2s+nf, &nf2, &Z1, gsp, &lds);
 }
 
 // cket = conjugated ket. Equivalent to applying bra on columns
@@ -5272,7 +4343,7 @@ static void a_cket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
         const double complex Z0 = 0;
         const double complex Z1 = 1;
         const char TRANS_N = 'N';
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nf2 = nf * 2;
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
@@ -5296,18 +4367,17 @@ static void a_cket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
         free(tmp);
 }
 
-static void a_cket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                  double complex *gcart,
+static void a_cket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
                                   FINT lds, FINT nbra, FINT kappa, FINT l)
 {
         const double complex Z0 = 0;
         const double complex Z1 = 1;
         const char TRANS_N = 'N';
-        FINT nf = (l+1)*(l+2)/2;
+        FINT nf = _len_cart[l];
         FINT nf2 = nf * 2;
         FINT nd = _len_spinor(kappa, l);
         const double complex *coeff_c2s;
-        double complex *gcart1 = gcart + nbra * nf2;
         double complex *coeff_conj = malloc(sizeof(double complex)*nf2*nd);
         FINT i;
 
@@ -5319,10 +4389,10 @@ static void a_cket_cart2spinor_si(double complex *gspa, double complex *gspb,
         for (i = 0; i < nf2 * nd; i++) {
                 coeff_conj[i] = conj(coeff_c2s[i]);
         }
-        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf2,
-               &Z1, gcart, &nbra, coeff_conj, &nf2, &Z0, gspa, &lds);
-        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf2,
-               &Z1, gcart1, &nbra, coeff_conj, &nf2, &Z0, gspb, &lds);
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &Z1, gcarta, &nbra, coeff_conj   , &nf2, &Z0, gsp, &lds);
+        zgemm_(&TRANS_N, &TRANS_N, &nbra, &nd, &nf,
+               &Z1, gcartb, &nbra, coeff_conj+nf, &nf2, &Z1, gsp, &lds);
         free(coeff_conj);
 }
 
@@ -5350,20 +4420,24 @@ static void s_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 gspb[lds+i] = 0;
         }
 }
-static void s_ket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                 double complex *gcart,
+static void s_ket_cart2spinor_si(double complex *gsp,
+                                 double complex *gcarta, double complex *gcartb,
                                  FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart11 = gcart;
-        double complex *gcart12 = gcart11 + nbra;
-        double complex *gcart21 = gcart12 + nbra;
-        double complex *gcart22 = gcart21 + nbra;
         FINT i;
         for (i = 0; i < nbra; i++) {
-                gspa[    i] = gcart12[i];
-                gspa[lds+i] = gcart11[i];
-                gspb[    i] = gcart22[i];
-                gspb[lds+i] = gcart21[i];
+                gsp[    i] = gcartb[i];
+                gsp[lds+i] = gcarta[i];
+        }
+}
+static void s_iket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
+                                  FINT lds, FINT nbra, FINT kappa, FINT l)
+{
+        FINT i;
+        for (i = 0; i < nbra; i++) {
+                gsp[    i] = gcartb[i] * _Complex_I;
+                gsp[lds+i] = gcarta[i] * _Complex_I;
         }
 }
 
@@ -5483,56 +4557,73 @@ static void p_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void p_ket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                 double complex *gcart,
+static void p_ket_cart2spinor_si(double complex *gsp,
+                                 double complex *gcarta, double complex *gcartb,
                                  FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*6;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[    i] = creal(coeff_c2s[ 0])*gcart [nbra*0+i]
-                                    + cimag(coeff_c2s[ 1])*gcart [nbra*1+i]*_Complex_I
-                                    + creal(coeff_c2s[ 5])*gcart [nbra*5+i];
-                        gspa[lds+i] = creal(coeff_c2s[ 8])*gcart [nbra*2+i]
-                                    + creal(coeff_c2s[ 9])*gcart [nbra*3+i]
-                                    + cimag(coeff_c2s[10])*gcart [nbra*4+i]*_Complex_I;
-                        gspb[    i] = creal(coeff_c2s[ 0])*gcart1[nbra*0+i]
-                                    + cimag(coeff_c2s[ 1])*gcart1[nbra*1+i]*_Complex_I
-                                    + creal(coeff_c2s[ 5])*gcart1[nbra*5+i];
-                        gspb[lds+i] = creal(coeff_c2s[ 8])*gcart1[nbra*2+i]
-                                    + creal(coeff_c2s[ 9])*gcart1[nbra*3+i]
-                                    + cimag(coeff_c2s[10])*gcart1[nbra*4+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 0])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[ 1])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 5])*gcartb[i+nbra*2];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 8])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[ 9])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[10])*gcartb[i+nbra*1]*_Complex_I;
                 }
-                gspa += lds * 2;
-                gspb += lds * 2;
+                gsp += lds * 2;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[1].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 3])*gcart [nbra*3+i]
-                                      + cimag(coeff_c2s[ 4])*gcart [nbra*4+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[ 6])*gcart [nbra*0+i]
-                                      + cimag(coeff_c2s[ 7])*gcart [nbra*1+i]*_Complex_I
-                                      + creal(coeff_c2s[11])*gcart [nbra*5+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[14])*gcart [nbra*2+i]
-                                      + creal(coeff_c2s[15])*gcart [nbra*3+i]
-                                      + cimag(coeff_c2s[16])*gcart [nbra*4+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[18])*gcart [nbra*0+i]
-                                      + cimag(coeff_c2s[19])*gcart [nbra*1+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 3])*gcart1[nbra*3+i]
-                                      + cimag(coeff_c2s[ 4])*gcart1[nbra*4+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[ 6])*gcart1[nbra*0+i]
-                                      + cimag(coeff_c2s[ 7])*gcart1[nbra*1+i]*_Complex_I
-                                      + creal(coeff_c2s[11])*gcart1[nbra*5+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[14])*gcart1[nbra*2+i]
-                                      + creal(coeff_c2s[15])*gcart1[nbra*3+i]
-                                      + cimag(coeff_c2s[16])*gcart1[nbra*4+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[18])*gcart1[nbra*0+i]
-                                      + cimag(coeff_c2s[19])*gcart1[nbra*1+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 3])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[ 4])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 6])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[ 7])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[11])*gcartb[i+nbra*2];
+                        gsp[i+lds*2] = creal(coeff_c2s[14])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[15])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[16])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[18])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[19])*gcarta[i+nbra*1]*_Complex_I;
+                }
+        }
+}
+static void p_iket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
+                                  FINT lds, FINT nbra, FINT kappa, FINT l)
+{
+        const double complex *coeff_c2s;
+        FINT i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[1].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[ 0])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 1])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[ 5])*gcartb[i+nbra*2]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 8])*gcarta[i+nbra*2]*_Complex_I
+                                     + creal(coeff_c2s[ 9])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[10])*gcartb[i+nbra*1];
+                }
+                gsp += lds * 2;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[1].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[ 3])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 4])*gcartb[i+nbra*1];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 6])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 7])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[11])*gcartb[i+nbra*2]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[14])*gcarta[i+nbra*2]*_Complex_I
+                                     + creal(coeff_c2s[15])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[16])*gcartb[i+nbra*1];
+                        gsp[i+lds*3] = creal(coeff_c2s[18])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[19])*gcarta[i+nbra*1];
                 }
         }
 }
@@ -5594,56 +4685,38 @@ static void p_cket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void p_cket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                  double complex *gcart,
+static void p_cket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
                                   FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*6;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[1].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[    i] = creal(coeff_c2s[ 0])*gcart [nbra*0+i]
-                                    - cimag(coeff_c2s[ 1])*gcart [nbra*1+i]*_Complex_I
-                                    + creal(coeff_c2s[ 5])*gcart [nbra*5+i];
-                        gspa[lds+i] = creal(coeff_c2s[ 8])*gcart [nbra*2+i]
-                                    + creal(coeff_c2s[ 9])*gcart [nbra*3+i]
-                                    - cimag(coeff_c2s[10])*gcart [nbra*4+i]*_Complex_I;
-                        gspb[    i] = creal(coeff_c2s[ 0])*gcart1[nbra*0+i]
-                                    - cimag(coeff_c2s[ 1])*gcart1[nbra*1+i]*_Complex_I
-                                    + creal(coeff_c2s[ 5])*gcart1[nbra*5+i];
-                        gspb[lds+i] = creal(coeff_c2s[ 8])*gcart1[nbra*2+i]
-                                    + creal(coeff_c2s[ 9])*gcart1[nbra*3+i]
-                                    - cimag(coeff_c2s[10])*gcart1[nbra*4+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 0])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[ 1])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 5])*gcartb[i+nbra*2];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 8])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[ 9])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[10])*gcartb[i+nbra*1]*_Complex_I;
                 }
-                gspa += lds * 2;
-                gspb += lds * 2;
+                gsp += lds * 2;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[1].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 3])*gcart [nbra*3+i]
-                                      - cimag(coeff_c2s[ 4])*gcart [nbra*4+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[ 6])*gcart [nbra*0+i]
-                                      - cimag(coeff_c2s[ 7])*gcart [nbra*1+i]*_Complex_I
-                                      + creal(coeff_c2s[11])*gcart [nbra*5+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[14])*gcart [nbra*2+i]
-                                      + creal(coeff_c2s[15])*gcart [nbra*3+i]
-                                      - cimag(coeff_c2s[16])*gcart [nbra*4+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[18])*gcart [nbra*0+i]
-                                      - cimag(coeff_c2s[19])*gcart [nbra*1+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 3])*gcart1[nbra*3+i]
-                                      - cimag(coeff_c2s[ 4])*gcart1[nbra*4+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[ 6])*gcart1[nbra*0+i]
-                                      - cimag(coeff_c2s[ 7])*gcart1[nbra*1+i]*_Complex_I
-                                      + creal(coeff_c2s[11])*gcart1[nbra*5+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[14])*gcart1[nbra*2+i]
-                                      + creal(coeff_c2s[15])*gcart1[nbra*3+i]
-                                      - cimag(coeff_c2s[16])*gcart1[nbra*4+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[18])*gcart1[nbra*0+i]
-                                      - cimag(coeff_c2s[19])*gcart1[nbra*1+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 3])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[ 4])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 6])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[ 7])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[11])*gcartb[i+nbra*2];
+                        gsp[i+lds*2] = creal(coeff_c2s[14])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[15])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[16])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[18])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[19])*gcarta[i+nbra*1]*_Complex_I;
                 }
         }
 }
@@ -5856,116 +4929,133 @@ static void d_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void d_ket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                 double complex *gcart,
+static void d_ket_cart2spinor_si(double complex *gsp,
+                                 double complex *gcarta, double complex *gcartb,
                                  FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*12;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 0])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[ 3])*gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[ 1])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 8])*gcart [nbra* 8+i]
-                                      + cimag(coeff_c2s[10])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[14])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[16])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[18])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[21])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[23])*gcart [nbra*11+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[24])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[27])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[29])*gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[32])*gcart [nbra* 8+i]
-                                      + cimag(coeff_c2s[34])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[38])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[40])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[42])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[45])*gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[43])*gcart [nbra* 7+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 0])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[ 3])*gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[ 1])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 8])*gcart1[nbra* 8+i]
-                                      + cimag(coeff_c2s[10])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[14])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[16])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[18])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[21])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[23])*gcart1[nbra*11+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[24])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[27])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[29])*gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[32])*gcart1[nbra* 8+i]
-                                      + cimag(coeff_c2s[34])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[38])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[40])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[42])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[45])*gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[43])*gcart1[nbra* 7+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 0])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[ 3])*gcarta[i+nbra*3]
+                                     + cimag(coeff_c2s[ 1])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 8])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[10])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[14])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[16])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[18])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[21])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[23])*gcartb[i+nbra*5];
+                        gsp[i+lds*2] = creal(coeff_c2s[24])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[27])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[29])*gcarta[i+nbra*5]
+                                     + creal(coeff_c2s[32])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[34])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[38])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[40])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[42])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[45])*gcartb[i+nbra*3]
+                                     + cimag(coeff_c2s[43])*gcartb[i+nbra*1]*_Complex_I;
                 }
-                gspa += lds * 4;
-                gspb += lds * 4;
+                gsp += lds * 4;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[2].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 6])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[ 9])*gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[ 7])*gcart [nbra* 7+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[12])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[15])*gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[13])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[20])*gcart [nbra* 8+i]
-                                      + cimag(coeff_c2s[22])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[2*lds+i] = creal(coeff_c2s[26])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[28])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[30])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[33])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[35])*gcart [nbra*11+i];
-                        gspa[3*lds+i] = creal(coeff_c2s[36])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[39])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[41])*gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[44])*gcart [nbra* 8+i]
-                                      + cimag(coeff_c2s[46])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[4*lds+i] = creal(coeff_c2s[50])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[52])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[54])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[57])*gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[55])*gcart [nbra* 7+i]*_Complex_I;
-                        gspa[5*lds+i] = creal(coeff_c2s[60])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[63])*gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[61])*gcart [nbra* 1+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 6])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[ 9])*gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[ 7])*gcart1[nbra* 7+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[12])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[15])*gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[13])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[20])*gcart1[nbra* 8+i]
-                                      + cimag(coeff_c2s[22])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[2*lds+i] = creal(coeff_c2s[26])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[28])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[30])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[33])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[35])*gcart1[nbra*11+i];
-                        gspb[3*lds+i] = creal(coeff_c2s[36])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[39])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[41])*gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[44])*gcart1[nbra* 8+i]
-                                      + cimag(coeff_c2s[46])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[4*lds+i] = creal(coeff_c2s[50])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[52])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[54])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[57])*gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[55])*gcart1[nbra* 7+i]*_Complex_I;
-                        gspb[5*lds+i] = creal(coeff_c2s[60])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[63])*gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[61])*gcart1[nbra* 1+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 6])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[ 9])*gcartb[i+nbra*3]
+                                     + cimag(coeff_c2s[ 7])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[12])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[15])*gcarta[i+nbra*3]
+                                     + cimag(coeff_c2s[13])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[20])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[22])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[26])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[28])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[30])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[33])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[35])*gcartb[i+nbra*5];
+                        gsp[i+lds*3] = creal(coeff_c2s[36])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[39])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[41])*gcarta[i+nbra*5]
+                                     + creal(coeff_c2s[44])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[46])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[50])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[52])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[54])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[57])*gcartb[i+nbra*3]
+                                     + cimag(coeff_c2s[55])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[60])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[63])*gcarta[i+nbra*3]
+                                     + cimag(coeff_c2s[61])*gcarta[i+nbra*1]*_Complex_I;
+                }
+        }
+}
+static void d_iket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
+                                  FINT lds, FINT nbra, FINT kappa, FINT l)
+{
+        const double complex *coeff_c2s;
+        FINT i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[2].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[ 0])*gcarta[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[ 3])*gcarta[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[ 1])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[ 8])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[10])*gcartb[i+nbra*4];
+                        gsp[i+lds*1] = creal(coeff_c2s[14])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[16])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[18])*gcartb[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[21])*gcartb[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[23])*gcartb[i+nbra*5]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[24])*gcarta[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[27])*gcarta[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[29])*gcarta[i+nbra*5]*_Complex_I
+                                     + creal(coeff_c2s[32])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[34])*gcartb[i+nbra*4];
+                        gsp[i+lds*3] = creal(coeff_c2s[38])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[40])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[42])*gcartb[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[45])*gcartb[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[43])*gcartb[i+nbra*1];
+                }
+                gsp += lds * 4;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[2].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[ 6])*gcartb[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[ 9])*gcartb[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[ 7])*gcartb[i+nbra*1];
+                        gsp[i+lds*1] = creal(coeff_c2s[12])*gcarta[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[15])*gcarta[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[13])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[20])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[22])*gcartb[i+nbra*4];
+                        gsp[i+lds*2] = creal(coeff_c2s[26])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[28])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[30])*gcartb[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[33])*gcartb[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[35])*gcartb[i+nbra*5]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[36])*gcarta[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[39])*gcarta[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[41])*gcarta[i+nbra*5]*_Complex_I
+                                     + creal(coeff_c2s[44])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[46])*gcartb[i+nbra*4];
+                        gsp[i+lds*4] = creal(coeff_c2s[50])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[52])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[54])*gcartb[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[57])*gcartb[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[55])*gcartb[i+nbra*1];
+                        gsp[i+lds*5] = creal(coeff_c2s[60])*gcarta[i+nbra*0]*_Complex_I
+                                     + creal(coeff_c2s[63])*gcarta[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[61])*gcarta[i+nbra*1];
                 }
         }
 }
@@ -6074,116 +5164,68 @@ static void d_cket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void d_cket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                  double complex *gcart,
+static void d_cket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
                                   FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*12;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[2].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 0])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[ 3])*gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[ 1])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 8])*gcart [nbra* 8+i]
-                                      - cimag(coeff_c2s[10])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[14])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[16])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[18])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[21])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[23])*gcart [nbra*11+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[24])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[27])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[29])*gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[32])*gcart [nbra* 8+i]
-                                      - cimag(coeff_c2s[34])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[38])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[40])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[42])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[45])*gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[43])*gcart [nbra* 7+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 0])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[ 3])*gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[ 1])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 8])*gcart1[nbra* 8+i]
-                                      - cimag(coeff_c2s[10])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[14])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[16])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[18])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[21])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[23])*gcart1[nbra*11+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[24])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[27])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[29])*gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[32])*gcart1[nbra* 8+i]
-                                      - cimag(coeff_c2s[34])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[38])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[40])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[42])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[45])*gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[43])*gcart1[nbra* 7+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 0])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[ 3])*gcarta[i+nbra*3]
+                                     - cimag(coeff_c2s[ 1])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 8])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[10])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[14])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[16])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[18])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[21])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[23])*gcartb[i+nbra*5];
+                        gsp[i+lds*2] = creal(coeff_c2s[24])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[27])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[29])*gcarta[i+nbra*5]
+                                     + creal(coeff_c2s[32])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[34])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[38])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[40])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[42])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[45])*gcartb[i+nbra*3]
+                                     - cimag(coeff_c2s[43])*gcartb[i+nbra*1]*_Complex_I;
                 }
-                gspa += lds * 4;
-                gspb += lds * 4;
+                gsp += lds * 4;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[2].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 6])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[ 9])*gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[ 7])*gcart [nbra* 7+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[12])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[15])*gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[13])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[20])*gcart [nbra* 8+i]
-                                      - cimag(coeff_c2s[22])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[2*lds+i] = creal(coeff_c2s[26])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[28])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[30])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[33])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[35])*gcart [nbra*11+i];
-                        gspa[3*lds+i] = creal(coeff_c2s[36])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[39])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[41])*gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[44])*gcart [nbra* 8+i]
-                                      - cimag(coeff_c2s[46])*gcart [nbra*10+i]*_Complex_I;
-                        gspa[4*lds+i] = creal(coeff_c2s[50])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[52])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[54])*gcart [nbra* 6+i]
-                                      + creal(coeff_c2s[57])*gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[55])*gcart [nbra* 7+i]*_Complex_I;
-                        gspa[5*lds+i] = creal(coeff_c2s[60])*gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[63])*gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[61])*gcart [nbra* 1+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 6])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[ 9])*gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[ 7])*gcart1[nbra* 7+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[12])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[15])*gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[13])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[20])*gcart1[nbra* 8+i]
-                                      - cimag(coeff_c2s[22])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[2*lds+i] = creal(coeff_c2s[26])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[28])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[30])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[33])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[35])*gcart1[nbra*11+i];
-                        gspb[3*lds+i] = creal(coeff_c2s[36])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[39])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[41])*gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[44])*gcart1[nbra* 8+i]
-                                      - cimag(coeff_c2s[46])*gcart1[nbra*10+i]*_Complex_I;
-                        gspb[4*lds+i] = creal(coeff_c2s[50])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[52])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[54])*gcart1[nbra* 6+i]
-                                      + creal(coeff_c2s[57])*gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[55])*gcart1[nbra* 7+i]*_Complex_I;
-                        gspb[5*lds+i] = creal(coeff_c2s[60])*gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[63])*gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[61])*gcart1[nbra* 1+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 6])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[ 9])*gcartb[i+nbra*3]
+                                     - cimag(coeff_c2s[ 7])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[12])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[15])*gcarta[i+nbra*3]
+                                     - cimag(coeff_c2s[13])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[20])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[22])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[26])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[28])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[30])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[33])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[35])*gcartb[i+nbra*5];
+                        gsp[i+lds*3] = creal(coeff_c2s[36])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[39])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[41])*gcarta[i+nbra*5]
+                                     + creal(coeff_c2s[44])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[46])*gcartb[i+nbra*4]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[50])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[52])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[54])*gcartb[i+nbra*0]
+                                     + creal(coeff_c2s[57])*gcartb[i+nbra*3]
+                                     - cimag(coeff_c2s[55])*gcartb[i+nbra*1]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[60])*gcarta[i+nbra*0]
+                                     + creal(coeff_c2s[63])*gcarta[i+nbra*3]
+                                     - cimag(coeff_c2s[61])*gcarta[i+nbra*1]*_Complex_I;
                 }
         }
 }
@@ -6548,240 +5590,257 @@ static void f_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void f_ket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                 double complex *gcart,
+static void f_ket_cart2spinor_si(double complex *gsp,
+                                 double complex *gcarta, double complex *gcartb,
                                  FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*20;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[  0])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[  1])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3])*gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[  6])*gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 12])*gcart [nbra*12+i]
-                                      + cimag(coeff_c2s[ 14])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 17])*gcart [nbra*17+i];
-                        gspa[1*lds+i] = creal(coeff_c2s[ 22])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[ 24])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 27])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 30])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[ 31])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 35])*gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 36])*gcart [nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 38])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[2*lds+i] = creal(coeff_c2s[ 40])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 41])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 43])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[ 45])*gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[ 46])*gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 48])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52])*gcart [nbra*12+i]
-                                      + creal(coeff_c2s[ 57])*gcart [nbra*17+i]
-                                      + creal(coeff_c2s[ 59])*gcart [nbra*19+i];
-                        gspa[3*lds+i] = creal(coeff_c2s[ 62])*gcart [nbra* 2+i]
-                                      + creal(coeff_c2s[ 67])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 69])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[ 70])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[ 71])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 73])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 75])*gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 76])*gcart [nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 78])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[4*lds+i] = creal(coeff_c2s[ 80])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 81])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 83])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[ 85])*gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[ 86])*gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 88])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 92])*gcart [nbra*12+i]
-                                      + cimag(coeff_c2s[ 94])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97])*gcart [nbra*17+i];
-                        gspa[5*lds+i] = creal(coeff_c2s[102])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[104])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[107])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[110])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[111])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[113])*gcart [nbra*13+i]
-                                      + cimag(coeff_c2s[116])*gcart [nbra*16+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[  0])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[  1])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3])*gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[  6])*gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 12])*gcart1[nbra*12+i]
-                                      + cimag(coeff_c2s[ 14])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 17])*gcart1[nbra*17+i];
-                        gspb[1*lds+i] = creal(coeff_c2s[ 22])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[ 24])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 27])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 30])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[ 31])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 35])*gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 36])*gcart1[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 38])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[2*lds+i] = creal(coeff_c2s[ 40])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 41])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 43])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[ 45])*gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[ 46])*gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 48])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52])*gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[ 57])*gcart1[nbra*17+i]
-                                      + creal(coeff_c2s[ 59])*gcart1[nbra*19+i];
-                        gspb[3*lds+i] = creal(coeff_c2s[ 62])*gcart1[nbra* 2+i]
-                                      + creal(coeff_c2s[ 67])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 69])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[ 70])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[ 71])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 73])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 75])*gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 76])*gcart1[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 78])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[4*lds+i] = creal(coeff_c2s[ 80])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 81])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 83])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[ 85])*gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[ 86])*gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 88])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 92])*gcart1[nbra*12+i]
-                                      + cimag(coeff_c2s[ 94])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97])*gcart1[nbra*17+i];
-                        gspb[5*lds+i] = creal(coeff_c2s[102])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[104])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[107])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[110])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[111])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[113])*gcart1[nbra*13+i]
-                                      + cimag(coeff_c2s[116])*gcart1[nbra*16+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[  0])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[  1])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[  3])*gcarta[i+nbra*3]
+                                     + cimag(coeff_c2s[  6])*gcarta[i+nbra*6]*_Complex_I
+                                     + creal(coeff_c2s[ 12])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[ 14])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 17])*gcartb[i+nbra*7];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 22])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[ 24])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 27])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 30])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[ 31])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 33])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 35])*gcartb[i+nbra*5]
+                                     + cimag(coeff_c2s[ 36])*gcartb[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 38])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[ 40])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[ 41])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 43])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[ 45])*gcarta[i+nbra*5]
+                                     + cimag(coeff_c2s[ 46])*gcarta[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 48])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[ 52])*gcartb[i+nbra*2]
+                                     + creal(coeff_c2s[ 57])*gcartb[i+nbra*7]
+                                     + creal(coeff_c2s[ 59])*gcartb[i+nbra*9];
+                        gsp[i+lds*3] = creal(coeff_c2s[ 62])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[ 67])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 69])*gcarta[i+nbra*9]
+                                     + creal(coeff_c2s[ 70])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[ 71])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 73])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 75])*gcartb[i+nbra*5]
+                                     + cimag(coeff_c2s[ 76])*gcartb[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 78])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[ 80])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[ 81])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 83])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[ 85])*gcarta[i+nbra*5]
+                                     + cimag(coeff_c2s[ 86])*gcarta[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 88])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[ 92])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[ 94])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 97])*gcartb[i+nbra*7];
+                        gsp[i+lds*5] = creal(coeff_c2s[102])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[104])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[107])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[110])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[111])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[113])*gcartb[i+nbra*3]
+                                     + cimag(coeff_c2s[116])*gcartb[i+nbra*6]*_Complex_I;
                 }
-                gspa += lds * 6;
-                gspb += lds * 6;
+                gsp += lds * 6;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[3].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 10])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[ 11])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 13])*gcart [nbra*13+i]
-                                      + cimag(coeff_c2s[ 16])*gcart [nbra*16+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[ 20])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 21])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 23])*gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[ 26])*gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 32])*gcart [nbra*12+i]
-                                      + cimag(coeff_c2s[ 34])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37])*gcart [nbra*17+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[ 42])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[ 44])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 47])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 50])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[ 51])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 53])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 55])*gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 56])*gcart [nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 58])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[ 60])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 61])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 63])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[ 65])*gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[ 66])*gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 68])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 72])*gcart [nbra*12+i]
-                                      + creal(coeff_c2s[ 77])*gcart [nbra*17+i]
-                                      + creal(coeff_c2s[ 79])*gcart [nbra*19+i];
-                        gspa[4*lds+i] = creal(coeff_c2s[ 82])*gcart [nbra* 2+i]
-                                      + creal(coeff_c2s[ 87])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 89])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[ 90])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[ 91])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 93])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 95])*gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 96])*gcart [nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 98])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[5*lds+i] = creal(coeff_c2s[100])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[101])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[103])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[105])*gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[106])*gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[108])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[112])*gcart [nbra*12+i]
-                                      + cimag(coeff_c2s[114])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[117])*gcart [nbra*17+i];
-                        gspa[6*lds+i] = creal(coeff_c2s[122])*gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[124])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[130])*gcart [nbra*10+i]
-                                      + cimag(coeff_c2s[131])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[133])*gcart [nbra*13+i]
-                                      + cimag(coeff_c2s[136])*gcart [nbra*16+i]*_Complex_I;
-                        gspa[7*lds+i] = creal(coeff_c2s[140])*gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[141])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[143])*gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[146])*gcart [nbra* 6+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 10])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[ 11])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 13])*gcart1[nbra*13+i]
-                                      + cimag(coeff_c2s[ 16])*gcart1[nbra*16+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[ 20])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 21])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 23])*gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[ 26])*gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 32])*gcart1[nbra*12+i]
-                                      + cimag(coeff_c2s[ 34])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37])*gcart1[nbra*17+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[ 42])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[ 44])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 47])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 50])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[ 51])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 53])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 55])*gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 56])*gcart1[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 58])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[ 60])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 61])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 63])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[ 65])*gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[ 66])*gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 68])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 72])*gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[ 77])*gcart1[nbra*17+i]
-                                      + creal(coeff_c2s[ 79])*gcart1[nbra*19+i];
-                        gspb[4*lds+i] = creal(coeff_c2s[ 82])*gcart1[nbra* 2+i]
-                                      + creal(coeff_c2s[ 87])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 89])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[ 90])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[ 91])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 93])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 95])*gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 96])*gcart1[nbra*16+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 98])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[5*lds+i] = creal(coeff_c2s[100])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[101])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[103])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[105])*gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[106])*gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[108])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[112])*gcart1[nbra*12+i]
-                                      + cimag(coeff_c2s[114])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[117])*gcart1[nbra*17+i];
-                        gspb[6*lds+i] = creal(coeff_c2s[122])*gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[124])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[130])*gcart1[nbra*10+i]
-                                      + cimag(coeff_c2s[131])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[133])*gcart1[nbra*13+i]
-                                      + cimag(coeff_c2s[136])*gcart1[nbra*16+i]*_Complex_I;
-                        gspb[7*lds+i] = creal(coeff_c2s[140])*gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[141])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[143])*gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[146])*gcart1[nbra* 6+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 10])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[ 11])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 13])*gcartb[i+nbra*3]
+                                     + cimag(coeff_c2s[ 16])*gcartb[i+nbra*6]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 20])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[ 21])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 23])*gcarta[i+nbra*3]
+                                     + cimag(coeff_c2s[ 26])*gcarta[i+nbra*6]*_Complex_I
+                                     + creal(coeff_c2s[ 32])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[ 34])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 37])*gcartb[i+nbra*7];
+                        gsp[i+lds*2] = creal(coeff_c2s[ 42])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[ 44])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 47])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 50])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[ 51])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 53])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 55])*gcartb[i+nbra*5]
+                                     + cimag(coeff_c2s[ 56])*gcartb[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 58])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[ 60])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[ 61])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 63])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[ 65])*gcarta[i+nbra*5]
+                                     + cimag(coeff_c2s[ 66])*gcarta[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 68])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[ 72])*gcartb[i+nbra*2]
+                                     + creal(coeff_c2s[ 77])*gcartb[i+nbra*7]
+                                     + creal(coeff_c2s[ 79])*gcartb[i+nbra*9];
+                        gsp[i+lds*4] = creal(coeff_c2s[ 82])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[ 87])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 89])*gcarta[i+nbra*9]
+                                     + creal(coeff_c2s[ 90])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[ 91])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 93])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 95])*gcartb[i+nbra*5]
+                                     + cimag(coeff_c2s[ 96])*gcartb[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[ 98])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[100])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[101])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[103])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[105])*gcarta[i+nbra*5]
+                                     + cimag(coeff_c2s[106])*gcarta[i+nbra*6]*_Complex_I
+                                     + cimag(coeff_c2s[108])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[112])*gcartb[i+nbra*2]
+                                     + cimag(coeff_c2s[114])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[117])*gcartb[i+nbra*7];
+                        gsp[i+lds*6] = creal(coeff_c2s[122])*gcarta[i+nbra*2]
+                                     + cimag(coeff_c2s[124])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[127])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[130])*gcartb[i+nbra*0]
+                                     + cimag(coeff_c2s[131])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[133])*gcartb[i+nbra*3]
+                                     + cimag(coeff_c2s[136])*gcartb[i+nbra*6]*_Complex_I;
+                        gsp[i+lds*7] = creal(coeff_c2s[140])*gcarta[i+nbra*0]
+                                     + cimag(coeff_c2s[141])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[143])*gcarta[i+nbra*3]
+                                     + cimag(coeff_c2s[146])*gcarta[i+nbra*6]*_Complex_I;
+                }
+        }
+}
+static void f_iket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
+                                  FINT lds, FINT nbra, FINT kappa, FINT l)
+{
+        const double complex *coeff_c2s;
+        FINT i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[3].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[  0])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[  1])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[  3])*gcarta[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[  6])*gcarta[i+nbra*6]
+                                     + creal(coeff_c2s[ 12])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[ 14])*gcartb[i+nbra*4]
+                                     + creal(coeff_c2s[ 17])*gcartb[i+nbra*7]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 22])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[ 24])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[ 27])*gcarta[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[ 30])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 31])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[ 33])*gcartb[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 35])*gcartb[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 36])*gcartb[i+nbra*6]
+                                     - cimag(coeff_c2s[ 38])*gcartb[i+nbra*8];
+                        gsp[i+lds*2] = creal(coeff_c2s[ 40])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 41])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[ 43])*gcarta[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 45])*gcarta[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 46])*gcarta[i+nbra*6]
+                                     - cimag(coeff_c2s[ 48])*gcarta[i+nbra*8]
+                                     + creal(coeff_c2s[ 52])*gcartb[i+nbra*2]*_Complex_I
+                                     + creal(coeff_c2s[ 57])*gcartb[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[ 59])*gcartb[i+nbra*9]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[ 62])*gcarta[i+nbra*2]*_Complex_I
+                                     + creal(coeff_c2s[ 67])*gcarta[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[ 69])*gcarta[i+nbra*9]*_Complex_I
+                                     + creal(coeff_c2s[ 70])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 71])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[ 73])*gcartb[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 75])*gcartb[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 76])*gcartb[i+nbra*6]
+                                     - cimag(coeff_c2s[ 78])*gcartb[i+nbra*8];
+                        gsp[i+lds*4] = creal(coeff_c2s[ 80])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 81])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[ 83])*gcarta[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 85])*gcarta[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 86])*gcarta[i+nbra*6]
+                                     - cimag(coeff_c2s[ 88])*gcarta[i+nbra*8]
+                                     + creal(coeff_c2s[ 92])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[ 94])*gcartb[i+nbra*4]
+                                     + creal(coeff_c2s[ 97])*gcartb[i+nbra*7]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[102])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[104])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[107])*gcarta[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[110])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[111])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[113])*gcartb[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[116])*gcartb[i+nbra*6];
+                }
+                gsp += lds * 6;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[3].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[ 10])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 11])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[ 13])*gcartb[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[ 16])*gcartb[i+nbra*6];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 20])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 21])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[ 23])*gcarta[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[ 26])*gcarta[i+nbra*6]
+                                     + creal(coeff_c2s[ 32])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[ 34])*gcartb[i+nbra*4]
+                                     + creal(coeff_c2s[ 37])*gcartb[i+nbra*7]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[ 42])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[ 44])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[ 47])*gcarta[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[ 50])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 51])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[ 53])*gcartb[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 55])*gcartb[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 56])*gcartb[i+nbra*6]
+                                     - cimag(coeff_c2s[ 58])*gcartb[i+nbra*8];
+                        gsp[i+lds*3] = creal(coeff_c2s[ 60])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 61])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[ 63])*gcarta[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 65])*gcarta[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 66])*gcarta[i+nbra*6]
+                                     - cimag(coeff_c2s[ 68])*gcarta[i+nbra*8]
+                                     + creal(coeff_c2s[ 72])*gcartb[i+nbra*2]*_Complex_I
+                                     + creal(coeff_c2s[ 77])*gcartb[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[ 79])*gcartb[i+nbra*9]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[ 82])*gcarta[i+nbra*2]*_Complex_I
+                                     + creal(coeff_c2s[ 87])*gcarta[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[ 89])*gcarta[i+nbra*9]*_Complex_I
+                                     + creal(coeff_c2s[ 90])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[ 91])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[ 93])*gcartb[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[ 95])*gcartb[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[ 96])*gcartb[i+nbra*6]
+                                     - cimag(coeff_c2s[ 98])*gcartb[i+nbra*8];
+                        gsp[i+lds*5] = creal(coeff_c2s[100])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[101])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[103])*gcarta[i+nbra*3]*_Complex_I
+                                     + creal(coeff_c2s[105])*gcarta[i+nbra*5]*_Complex_I
+                                     - cimag(coeff_c2s[106])*gcarta[i+nbra*6]
+                                     - cimag(coeff_c2s[108])*gcarta[i+nbra*8]
+                                     + creal(coeff_c2s[112])*gcartb[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[114])*gcartb[i+nbra*4]
+                                     + creal(coeff_c2s[117])*gcartb[i+nbra*7]*_Complex_I;
+                        gsp[i+lds*6] = creal(coeff_c2s[122])*gcarta[i+nbra*2]*_Complex_I
+                                     - cimag(coeff_c2s[124])*gcarta[i+nbra*4]
+                                     + creal(coeff_c2s[127])*gcarta[i+nbra*7]*_Complex_I
+                                     + creal(coeff_c2s[130])*gcartb[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[131])*gcartb[i+nbra*1]
+                                     + creal(coeff_c2s[133])*gcartb[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[136])*gcartb[i+nbra*6];
+                        gsp[i+lds*7] = creal(coeff_c2s[140])*gcarta[i+nbra*0]*_Complex_I
+                                     - cimag(coeff_c2s[141])*gcarta[i+nbra*1]
+                                     + creal(coeff_c2s[143])*gcarta[i+nbra*3]*_Complex_I
+                                     - cimag(coeff_c2s[146])*gcarta[i+nbra*6];
                 }
         }
 }
@@ -6966,240 +6025,130 @@ static void f_cket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void f_cket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                  double complex *gcart,
+static void f_cket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
                                   FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*20;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[3].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[  0])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[  1])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3])*gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[  6])*gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 12])*gcart [nbra*12+i]
-                                      - cimag(coeff_c2s[ 14])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 17])*gcart [nbra*17+i];
-                        gspa[1*lds+i] = creal(coeff_c2s[ 22])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[ 24])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 27])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 30])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[ 31])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 35])*gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 36])*gcart [nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 38])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[2*lds+i] = creal(coeff_c2s[ 40])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 41])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 43])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[ 45])*gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[ 46])*gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 48])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52])*gcart [nbra*12+i]
-                                      + creal(coeff_c2s[ 57])*gcart [nbra*17+i]
-                                      + creal(coeff_c2s[ 59])*gcart [nbra*19+i];
-                        gspa[3*lds+i] = creal(coeff_c2s[ 62])*gcart [nbra* 2+i]
-                                      + creal(coeff_c2s[ 67])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 69])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[ 70])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[ 71])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 73])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 75])*gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 76])*gcart [nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 78])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[4*lds+i] = creal(coeff_c2s[ 80])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 81])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 83])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[ 85])*gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[ 86])*gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 88])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 92])*gcart [nbra*12+i]
-                                      - cimag(coeff_c2s[ 94])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97])*gcart [nbra*17+i];
-                        gspa[5*lds+i] = creal(coeff_c2s[102])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[104])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[107])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[110])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[111])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[113])*gcart [nbra*13+i]
-                                      - cimag(coeff_c2s[116])*gcart [nbra*16+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[  0])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[  1])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3])*gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[  6])*gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 12])*gcart1[nbra*12+i]
-                                      - cimag(coeff_c2s[ 14])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 17])*gcart1[nbra*17+i];
-                        gspb[1*lds+i] = creal(coeff_c2s[ 22])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[ 24])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 27])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 30])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[ 31])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 35])*gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 36])*gcart1[nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 38])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[2*lds+i] = creal(coeff_c2s[ 40])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 41])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 43])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[ 45])*gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[ 46])*gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 48])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52])*gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[ 57])*gcart1[nbra*17+i]
-                                      + creal(coeff_c2s[ 59])*gcart1[nbra*19+i];
-                        gspb[3*lds+i] = creal(coeff_c2s[ 62])*gcart1[nbra* 2+i]
-                                      + creal(coeff_c2s[ 67])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 69])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[ 70])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[ 71])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 73])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 75])*gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 76])*gcart1[nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 78])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[4*lds+i] = creal(coeff_c2s[ 80])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 81])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 83])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[ 85])*gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[ 86])*gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 88])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 92])*gcart1[nbra*12+i]
-                                      - cimag(coeff_c2s[ 94])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97])*gcart1[nbra*17+i];
-                        gspb[5*lds+i] = creal(coeff_c2s[102])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[104])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[107])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[110])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[111])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[113])*gcart1[nbra*13+i]
-                                      - cimag(coeff_c2s[116])*gcart1[nbra*16+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[  0])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[  1])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[  3])*gcarta[i+nbra*3]
+                                     - cimag(coeff_c2s[  6])*gcarta[i+nbra*6]*_Complex_I
+                                     + creal(coeff_c2s[ 12])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[ 14])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 17])*gcartb[i+nbra*7];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 22])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[ 24])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 27])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 30])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[ 31])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 33])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 35])*gcartb[i+nbra*5]
+                                     - cimag(coeff_c2s[ 36])*gcartb[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 38])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[ 40])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[ 41])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 43])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[ 45])*gcarta[i+nbra*5]
+                                     - cimag(coeff_c2s[ 46])*gcarta[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 48])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[ 52])*gcartb[i+nbra*2]
+                                     + creal(coeff_c2s[ 57])*gcartb[i+nbra*7]
+                                     + creal(coeff_c2s[ 59])*gcartb[i+nbra*9];
+                        gsp[i+lds*3] = creal(coeff_c2s[ 62])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[ 67])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 69])*gcarta[i+nbra*9]
+                                     + creal(coeff_c2s[ 70])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[ 71])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 73])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 75])*gcartb[i+nbra*5]
+                                     - cimag(coeff_c2s[ 76])*gcartb[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 78])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[ 80])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[ 81])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 83])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[ 85])*gcarta[i+nbra*5]
+                                     - cimag(coeff_c2s[ 86])*gcarta[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 88])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[ 92])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[ 94])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 97])*gcartb[i+nbra*7];
+                        gsp[i+lds*5] = creal(coeff_c2s[102])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[104])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[107])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[110])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[111])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[113])*gcartb[i+nbra*3]
+                                     - cimag(coeff_c2s[116])*gcartb[i+nbra*6]*_Complex_I;
                 }
-                gspa += lds * 6;
-                gspb += lds * 6;
+                gsp += lds * 6;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[3].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 10])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[ 11])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 13])*gcart [nbra*13+i]
-                                      - cimag(coeff_c2s[ 16])*gcart [nbra*16+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[ 20])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 21])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 23])*gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[ 26])*gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 32])*gcart [nbra*12+i]
-                                      - cimag(coeff_c2s[ 34])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37])*gcart [nbra*17+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[ 42])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[ 44])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 47])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 50])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[ 51])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 53])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 55])*gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 56])*gcart [nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 58])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[ 60])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 61])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 63])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[ 65])*gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[ 66])*gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 68])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 72])*gcart [nbra*12+i]
-                                      + creal(coeff_c2s[ 77])*gcart [nbra*17+i]
-                                      + creal(coeff_c2s[ 79])*gcart [nbra*19+i];
-                        gspa[4*lds+i] = creal(coeff_c2s[ 82])*gcart [nbra* 2+i]
-                                      + creal(coeff_c2s[ 87])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 89])*gcart [nbra* 9+i]
-                                      + creal(coeff_c2s[ 90])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[ 91])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 93])*gcart [nbra*13+i]
-                                      + creal(coeff_c2s[ 95])*gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 96])*gcart [nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 98])*gcart [nbra*18+i]*_Complex_I;
-                        gspa[5*lds+i] = creal(coeff_c2s[100])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[101])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[103])*gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[105])*gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[106])*gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[108])*gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[112])*gcart [nbra*12+i]
-                                      - cimag(coeff_c2s[114])*gcart [nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[117])*gcart [nbra*17+i];
-                        gspa[6*lds+i] = creal(coeff_c2s[122])*gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[124])*gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127])*gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[130])*gcart [nbra*10+i]
-                                      - cimag(coeff_c2s[131])*gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[133])*gcart [nbra*13+i]
-                                      - cimag(coeff_c2s[136])*gcart [nbra*16+i]*_Complex_I;
-                        gspa[7*lds+i] = creal(coeff_c2s[140])*gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[141])*gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[143])*gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[146])*gcart [nbra* 6+i]*_Complex_I;
-                        gspb[0*lds+i] = creal(coeff_c2s[ 10])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[ 11])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 13])*gcart1[nbra*13+i]
-                                      - cimag(coeff_c2s[ 16])*gcart1[nbra*16+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[ 20])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 21])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 23])*gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[ 26])*gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 32])*gcart1[nbra*12+i]
-                                      - cimag(coeff_c2s[ 34])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37])*gcart1[nbra*17+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[ 42])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[ 44])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 47])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 50])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[ 51])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 53])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 55])*gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 56])*gcart1[nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 58])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[ 60])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 61])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 63])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[ 65])*gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[ 66])*gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 68])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 72])*gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[ 77])*gcart1[nbra*17+i]
-                                      + creal(coeff_c2s[ 79])*gcart1[nbra*19+i];
-                        gspb[4*lds+i] = creal(coeff_c2s[ 82])*gcart1[nbra* 2+i]
-                                      + creal(coeff_c2s[ 87])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 89])*gcart1[nbra* 9+i]
-                                      + creal(coeff_c2s[ 90])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[ 91])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 93])*gcart1[nbra*13+i]
-                                      + creal(coeff_c2s[ 95])*gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 96])*gcart1[nbra*16+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 98])*gcart1[nbra*18+i]*_Complex_I;
-                        gspb[5*lds+i] = creal(coeff_c2s[100])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[101])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[103])*gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[105])*gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[106])*gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[108])*gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[112])*gcart1[nbra*12+i]
-                                      - cimag(coeff_c2s[114])*gcart1[nbra*14+i]*_Complex_I
-                                      + creal(coeff_c2s[117])*gcart1[nbra*17+i];
-                        gspb[6*lds+i] = creal(coeff_c2s[122])*gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[124])*gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127])*gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[130])*gcart1[nbra*10+i]
-                                      - cimag(coeff_c2s[131])*gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[133])*gcart1[nbra*13+i]
-                                      - cimag(coeff_c2s[136])*gcart1[nbra*16+i]*_Complex_I;
-                        gspb[7*lds+i] = creal(coeff_c2s[140])*gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[141])*gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[143])*gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[146])*gcart1[nbra* 6+i]*_Complex_I;
+                        gsp[i+lds*0] = creal(coeff_c2s[ 10])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[ 11])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 13])*gcartb[i+nbra*3]
+                                     - cimag(coeff_c2s[ 16])*gcartb[i+nbra*6]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 20])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[ 21])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 23])*gcarta[i+nbra*3]
+                                     - cimag(coeff_c2s[ 26])*gcarta[i+nbra*6]*_Complex_I
+                                     + creal(coeff_c2s[ 32])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[ 34])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 37])*gcartb[i+nbra*7];
+                        gsp[i+lds*2] = creal(coeff_c2s[ 42])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[ 44])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[ 47])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 50])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[ 51])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 53])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 55])*gcartb[i+nbra*5]
+                                     - cimag(coeff_c2s[ 56])*gcartb[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 58])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[ 60])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[ 61])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 63])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[ 65])*gcarta[i+nbra*5]
+                                     - cimag(coeff_c2s[ 66])*gcarta[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 68])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[ 72])*gcartb[i+nbra*2]
+                                     + creal(coeff_c2s[ 77])*gcartb[i+nbra*7]
+                                     + creal(coeff_c2s[ 79])*gcartb[i+nbra*9];
+                        gsp[i+lds*4] = creal(coeff_c2s[ 82])*gcarta[i+nbra*2]
+                                     + creal(coeff_c2s[ 87])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[ 89])*gcarta[i+nbra*9]
+                                     + creal(coeff_c2s[ 90])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[ 91])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[ 93])*gcartb[i+nbra*3]
+                                     + creal(coeff_c2s[ 95])*gcartb[i+nbra*5]
+                                     - cimag(coeff_c2s[ 96])*gcartb[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[ 98])*gcartb[i+nbra*8]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[100])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[101])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[103])*gcarta[i+nbra*3]
+                                     + creal(coeff_c2s[105])*gcarta[i+nbra*5]
+                                     - cimag(coeff_c2s[106])*gcarta[i+nbra*6]*_Complex_I
+                                     - cimag(coeff_c2s[108])*gcarta[i+nbra*8]*_Complex_I
+                                     + creal(coeff_c2s[112])*gcartb[i+nbra*2]
+                                     - cimag(coeff_c2s[114])*gcartb[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[117])*gcartb[i+nbra*7];
+                        gsp[i+lds*6] = creal(coeff_c2s[122])*gcarta[i+nbra*2]
+                                     - cimag(coeff_c2s[124])*gcarta[i+nbra*4]*_Complex_I
+                                     + creal(coeff_c2s[127])*gcarta[i+nbra*7]
+                                     + creal(coeff_c2s[130])*gcartb[i+nbra*0]
+                                     - cimag(coeff_c2s[131])*gcartb[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[133])*gcartb[i+nbra*3]
+                                     - cimag(coeff_c2s[136])*gcartb[i+nbra*6]*_Complex_I;
+                        gsp[i+lds*7] = creal(coeff_c2s[140])*gcarta[i+nbra*0]
+                                     - cimag(coeff_c2s[141])*gcarta[i+nbra*1]*_Complex_I
+                                     + creal(coeff_c2s[143])*gcarta[i+nbra*3]
+                                     - cimag(coeff_c2s[146])*gcarta[i+nbra*6]*_Complex_I;
                 }
         }
 }
@@ -7764,404 +6713,212 @@ static void g_iket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void g_ket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                 double complex *gcart,
+static void g_ket_cart2spinor_si(double complex *gsp,
+                                 double complex *gcarta, double complex *gcartb,
                                  FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*30;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[4].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[  0]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[  1]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3]) * gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[  6]) * gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 10]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[ 17]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[ 19]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 22]) * gcart [nbra*22+i]
-                                      + cimag(coeff_c2s[ 26]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[ 32]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[ 34]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37]) * gcart [nbra* 7+i]
-                                      + cimag(coeff_c2s[ 41]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 45]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 46]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 50]) * gcart [nbra*20+i]
-                                      + cimag(coeff_c2s[ 51]) * gcart [nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 53]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 55]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[ 57]) * gcart [nbra*27+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[ 60]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 61]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 65]) * gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[ 66]) * gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 68]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 70]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[ 72]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[ 77]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[ 79]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 82]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[ 84]) * gcart [nbra*24+i]
-                                      + cimag(coeff_c2s[ 86]) * gcart [nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 88]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[ 92]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[ 94]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 99]) * gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[101]) * gcart [nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[103]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[105]) * gcart [nbra*15+i]
-                                      + creal(coeff_c2s[108]) * gcart [nbra*18+i]
-                                      + creal(coeff_c2s[110]) * gcart [nbra*20+i]
-                                      + creal(coeff_c2s[115]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[117]) * gcart [nbra*27+i]
-                                      + creal(coeff_c2s[119]) * gcart [nbra*29+i];
-                        gspa[4*lds+i] = creal(coeff_c2s[120]) * gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[123]) * gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[125]) * gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[130]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[132]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[134]) * gcart [nbra*14+i]
-                                      + creal(coeff_c2s[137]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[139]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[142]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[144]) * gcart [nbra*24+i]
-                                      + cimag(coeff_c2s[146]) * gcart [nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[148]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[5*lds+i] = creal(coeff_c2s[152]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[154]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[157]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[159]) * gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[161]) * gcart [nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[163]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[165]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[166]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[170]) * gcart [nbra*20+i]
-                                      + cimag(coeff_c2s[171]) * gcart [nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[173]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[175]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[177]) * gcart [nbra*27+i];
-                        gspa[6*lds+i] = creal(coeff_c2s[180]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[181]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[185]) * gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[186]) * gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[188]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[190]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[192]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[197]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[199]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[202]) * gcart [nbra*22+i]
-                                      + cimag(coeff_c2s[206]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[7*lds+i] = creal(coeff_c2s[212]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[214]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[217]) * gcart [nbra* 7+i]
-                                      + cimag(coeff_c2s[221]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[225]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[226]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[228]) * gcart [nbra*18+i]
-                                      + cimag(coeff_c2s[231]) * gcart [nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[235]) * gcart [nbra*25+i];
-                        gspb[0*lds+i] = creal(coeff_c2s[  0]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[  1]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3]) * gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[  6]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 10]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[ 17]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[ 19]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 22]) * gcart1[nbra*22+i]
-                                      + cimag(coeff_c2s[ 26]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[ 32]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[ 34]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37]) * gcart1[nbra* 7+i]
-                                      + cimag(coeff_c2s[ 41]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 45]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 46]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 50]) * gcart1[nbra*20+i]
-                                      + cimag(coeff_c2s[ 51]) * gcart1[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 53]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 55]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[ 57]) * gcart1[nbra*27+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[ 60]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 61]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 65]) * gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[ 66]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 68]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 70]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[ 72]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[ 77]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[ 79]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 82]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[ 84]) * gcart1[nbra*24+i]
-                                      + cimag(coeff_c2s[ 86]) * gcart1[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 88]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[ 92]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[ 94]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 99]) * gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[101]) * gcart1[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[103]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[105]) * gcart1[nbra*15+i]
-                                      + creal(coeff_c2s[108]) * gcart1[nbra*18+i]
-                                      + creal(coeff_c2s[110]) * gcart1[nbra*20+i]
-                                      + creal(coeff_c2s[115]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[117]) * gcart1[nbra*27+i]
-                                      + creal(coeff_c2s[119]) * gcart1[nbra*29+i];
-                        gspb[4*lds+i] = creal(coeff_c2s[120]) * gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[123]) * gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[125]) * gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[130]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[132]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[134]) * gcart1[nbra*14+i]
-                                      + creal(coeff_c2s[137]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[139]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[142]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[144]) * gcart1[nbra*24+i]
-                                      + cimag(coeff_c2s[146]) * gcart1[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[148]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[5*lds+i] = creal(coeff_c2s[152]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[154]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[157]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[159]) * gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[161]) * gcart1[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[163]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[165]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[166]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[170]) * gcart1[nbra*20+i]
-                                      + cimag(coeff_c2s[171]) * gcart1[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[173]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[175]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[177]) * gcart1[nbra*27+i];
-                        gspb[6*lds+i] = creal(coeff_c2s[180]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[181]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[185]) * gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[186]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[188]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[190]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[192]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[197]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[199]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[202]) * gcart1[nbra*22+i]
-                                      + cimag(coeff_c2s[206]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[7*lds+i] = creal(coeff_c2s[212]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[214]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[217]) * gcart1[nbra* 7+i]
-                                      + cimag(coeff_c2s[221]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[225]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[226]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[228]) * gcart1[nbra*18+i]
-                                      + cimag(coeff_c2s[231]) * gcart1[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[235]) * gcart1[nbra*25+i];
-                };
-                gspa += lds * 8;
-                gspb += lds * 8;
+                        gsp[i+lds*0] = creal(coeff_c2s[  0]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[  1]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[  3]) * gcarta[i+nbra* 3]
+                                     + cimag(coeff_c2s[  6]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[ 10]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[ 17]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[ 19]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 22]) * gcartb[i+nbra* 7]
+                                     + cimag(coeff_c2s[ 26]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 32]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[ 34]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 37]) * gcarta[i+nbra* 7]
+                                     + cimag(coeff_c2s[ 41]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[ 45]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[ 46]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 50]) * gcartb[i+nbra* 5]
+                                     + cimag(coeff_c2s[ 51]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[ 53]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[ 55]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[ 57]) * gcartb[i+nbra*12];
+                        gsp[i+lds*2] = creal(coeff_c2s[ 60]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[ 61]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 65]) * gcarta[i+nbra* 5]
+                                     + cimag(coeff_c2s[ 66]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[ 68]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[ 70]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[ 72]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[ 77]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[ 79]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 82]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[ 84]) * gcartb[i+nbra* 9]
+                                     + cimag(coeff_c2s[ 86]) * gcartb[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[ 88]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[ 92]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[ 94]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 97]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[ 99]) * gcarta[i+nbra* 9]
+                                     + cimag(coeff_c2s[101]) * gcarta[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[103]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[105]) * gcartb[i+nbra* 0]
+                                     + creal(coeff_c2s[108]) * gcartb[i+nbra* 3]
+                                     + creal(coeff_c2s[110]) * gcartb[i+nbra* 5]
+                                     + creal(coeff_c2s[115]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[117]) * gcartb[i+nbra*12]
+                                     + creal(coeff_c2s[119]) * gcartb[i+nbra*14];
+                        gsp[i+lds*4] = creal(coeff_c2s[120]) * gcarta[i+nbra* 0]
+                                     + creal(coeff_c2s[123]) * gcarta[i+nbra* 3]
+                                     + creal(coeff_c2s[125]) * gcarta[i+nbra* 5]
+                                     + creal(coeff_c2s[130]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[132]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[134]) * gcarta[i+nbra*14]
+                                     + creal(coeff_c2s[137]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[139]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[142]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[144]) * gcartb[i+nbra* 9]
+                                     + cimag(coeff_c2s[146]) * gcartb[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[148]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[152]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[154]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[157]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[159]) * gcarta[i+nbra* 9]
+                                     + cimag(coeff_c2s[161]) * gcarta[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[163]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[165]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[166]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[170]) * gcartb[i+nbra* 5]
+                                     + cimag(coeff_c2s[171]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[173]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[175]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[177]) * gcartb[i+nbra*12];
+                        gsp[i+lds*6] = creal(coeff_c2s[180]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[181]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[185]) * gcarta[i+nbra* 5]
+                                     + cimag(coeff_c2s[186]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[188]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[190]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[192]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[197]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[199]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[202]) * gcartb[i+nbra* 7]
+                                     + cimag(coeff_c2s[206]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*7] = creal(coeff_c2s[212]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[214]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[217]) * gcarta[i+nbra* 7]
+                                     + cimag(coeff_c2s[221]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[225]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[226]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[228]) * gcartb[i+nbra* 3]
+                                     + cimag(coeff_c2s[231]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[235]) * gcartb[i+nbra*10];
+                }
+                gsp += lds * 8;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[4].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 15]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 16]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 18]) * gcart [nbra*18+i]
-                                      + cimag(coeff_c2s[ 21]) * gcart [nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[ 25]) * gcart [nbra*25+i];
-                        gspa[1*lds+i] = creal(coeff_c2s[ 30]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 31]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33]) * gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[ 36]) * gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 40]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[ 47]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[ 49]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52]) * gcart [nbra*22+i]
-                                      + cimag(coeff_c2s[ 56]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[2*lds+i] = creal(coeff_c2s[ 62]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[ 64]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 67]) * gcart [nbra* 7+i]
-                                      + cimag(coeff_c2s[ 71]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 75]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[ 76]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 80]) * gcart [nbra*20+i]
-                                      + cimag(coeff_c2s[ 81]) * gcart [nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 83]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 85]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[ 87]) * gcart [nbra*27+i];
-                        gspa[3*lds+i] = creal(coeff_c2s[ 90]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[ 91]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 95]) * gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[ 96]) * gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 98]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[100]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[102]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[107]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[109]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[112]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[114]) * gcart [nbra*24+i]
-                                      + cimag(coeff_c2s[116]) * gcart [nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[118]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[4*lds+i] = creal(coeff_c2s[122]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[124]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[129]) * gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[131]) * gcart [nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[133]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[135]) * gcart [nbra*15+i]
-                                      + creal(coeff_c2s[138]) * gcart [nbra*18+i]
-                                      + creal(coeff_c2s[140]) * gcart [nbra*20+i]
-                                      + creal(coeff_c2s[145]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[147]) * gcart [nbra*27+i]
-                                      + creal(coeff_c2s[149]) * gcart [nbra*29+i];
-                        gspa[5*lds+i] = creal(coeff_c2s[150]) * gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[153]) * gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[155]) * gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[160]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[162]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[164]) * gcart [nbra*14+i]
-                                      + creal(coeff_c2s[167]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[169]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[172]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[174]) * gcart [nbra*24+i]
-                                      + cimag(coeff_c2s[176]) * gcart [nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[178]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[6*lds+i] = creal(coeff_c2s[182]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[184]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[187]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[189]) * gcart [nbra* 9+i]
-                                      + cimag(coeff_c2s[191]) * gcart [nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[193]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[195]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[196]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[200]) * gcart [nbra*20+i]
-                                      + cimag(coeff_c2s[201]) * gcart [nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[203]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[205]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[207]) * gcart [nbra*27+i];
-                        gspa[7*lds+i] = creal(coeff_c2s[210]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[211]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[215]) * gcart [nbra* 5+i]
-                                      + cimag(coeff_c2s[216]) * gcart [nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[218]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[220]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[222]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[227]) * gcart [nbra*17+i]
-                                      + cimag(coeff_c2s[229]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[232]) * gcart [nbra*22+i]
-                                      + cimag(coeff_c2s[236]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[8*lds+i] = creal(coeff_c2s[242]) * gcart [nbra* 2+i]
-                                      + cimag(coeff_c2s[244]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[247]) * gcart [nbra* 7+i]
-                                      + cimag(coeff_c2s[251]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[255]) * gcart [nbra*15+i]
-                                      + cimag(coeff_c2s[256]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[258]) * gcart [nbra*18+i]
-                                      + cimag(coeff_c2s[261]) * gcart [nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[265]) * gcart [nbra*25+i];
-                        gspa[9*lds+i] = creal(coeff_c2s[270]) * gcart [nbra* 0+i]
-                                      + cimag(coeff_c2s[271]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[273]) * gcart [nbra* 3+i]
-                                      + cimag(coeff_c2s[276]) * gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[280]) * gcart [nbra*10+i];
-                        gspb[0*lds+i] = creal(coeff_c2s[ 15]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 16]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 18]) * gcart1[nbra*18+i]
-                                      + cimag(coeff_c2s[ 21]) * gcart1[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[ 25]) * gcart1[nbra*25+i];
-                        gspb[1*lds+i] = creal(coeff_c2s[ 30]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 31]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33]) * gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[ 36]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 40]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[ 47]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[ 49]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52]) * gcart1[nbra*22+i]
-                                      + cimag(coeff_c2s[ 56]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[2*lds+i] = creal(coeff_c2s[ 62]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[ 64]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 67]) * gcart1[nbra* 7+i]
-                                      + cimag(coeff_c2s[ 71]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 75]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[ 76]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 80]) * gcart1[nbra*20+i]
-                                      + cimag(coeff_c2s[ 81]) * gcart1[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 83]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 85]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[ 87]) * gcart1[nbra*27+i];
-                        gspb[3*lds+i] = creal(coeff_c2s[ 90]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[ 91]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 95]) * gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[ 96]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[ 98]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[100]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[102]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[107]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[109]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[112]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[114]) * gcart1[nbra*24+i]
-                                      + cimag(coeff_c2s[116]) * gcart1[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[118]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[4*lds+i] = creal(coeff_c2s[122]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[124]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[129]) * gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[131]) * gcart1[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[133]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[135]) * gcart1[nbra*15+i]
-                                      + creal(coeff_c2s[138]) * gcart1[nbra*18+i]
-                                      + creal(coeff_c2s[140]) * gcart1[nbra*20+i]
-                                      + creal(coeff_c2s[145]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[147]) * gcart1[nbra*27+i]
-                                      + creal(coeff_c2s[149]) * gcart1[nbra*29+i];
-                        gspb[5*lds+i] = creal(coeff_c2s[150]) * gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[153]) * gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[155]) * gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[160]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[162]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[164]) * gcart1[nbra*14+i]
-                                      + creal(coeff_c2s[167]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[169]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[172]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[174]) * gcart1[nbra*24+i]
-                                      + cimag(coeff_c2s[176]) * gcart1[nbra*26+i]*_Complex_I
-                                      + cimag(coeff_c2s[178]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[6*lds+i] = creal(coeff_c2s[182]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[184]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[187]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[189]) * gcart1[nbra* 9+i]
-                                      + cimag(coeff_c2s[191]) * gcart1[nbra*11+i]*_Complex_I
-                                      + cimag(coeff_c2s[193]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[195]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[196]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[200]) * gcart1[nbra*20+i]
-                                      + cimag(coeff_c2s[201]) * gcart1[nbra*21+i]*_Complex_I
-                                      + cimag(coeff_c2s[203]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[205]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[207]) * gcart1[nbra*27+i];
-                        gspb[7*lds+i] = creal(coeff_c2s[210]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[211]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[215]) * gcart1[nbra* 5+i]
-                                      + cimag(coeff_c2s[216]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + cimag(coeff_c2s[218]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[220]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[222]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[227]) * gcart1[nbra*17+i]
-                                      + cimag(coeff_c2s[229]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[232]) * gcart1[nbra*22+i]
-                                      + cimag(coeff_c2s[236]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[8*lds+i] = creal(coeff_c2s[242]) * gcart1[nbra* 2+i]
-                                      + cimag(coeff_c2s[244]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[247]) * gcart1[nbra* 7+i]
-                                      + cimag(coeff_c2s[251]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[255]) * gcart1[nbra*15+i]
-                                      + cimag(coeff_c2s[256]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[258]) * gcart1[nbra*18+i]
-                                      + cimag(coeff_c2s[261]) * gcart1[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[265]) * gcart1[nbra*25+i];
-                        gspb[9*lds+i] = creal(coeff_c2s[270]) * gcart1[nbra* 0+i]
-                                      + cimag(coeff_c2s[271]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[273]) * gcart1[nbra* 3+i]
-                                      + cimag(coeff_c2s[276]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[280]) * gcart1[nbra*10+i];
+                        gsp[i+lds*0] = creal(coeff_c2s[ 15]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[ 16]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 18]) * gcartb[i+nbra* 3]
+                                     + cimag(coeff_c2s[ 21]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[ 25]) * gcartb[i+nbra*10];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 30]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[ 31]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 33]) * gcarta[i+nbra* 3]
+                                     + cimag(coeff_c2s[ 36]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[ 40]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[ 47]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[ 49]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 52]) * gcartb[i+nbra* 7]
+                                     + cimag(coeff_c2s[ 56]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[ 62]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[ 64]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 67]) * gcarta[i+nbra* 7]
+                                     + cimag(coeff_c2s[ 71]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[ 75]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[ 76]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 80]) * gcartb[i+nbra* 5]
+                                     + cimag(coeff_c2s[ 81]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[ 83]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[ 85]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[ 87]) * gcartb[i+nbra*12];
+                        gsp[i+lds*3] = creal(coeff_c2s[ 90]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[ 91]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 95]) * gcarta[i+nbra* 5]
+                                     + cimag(coeff_c2s[ 96]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[ 98]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[100]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[102]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[107]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[109]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[112]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[114]) * gcartb[i+nbra* 9]
+                                     + cimag(coeff_c2s[116]) * gcartb[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[118]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[122]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[124]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[127]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[129]) * gcarta[i+nbra* 9]
+                                     + cimag(coeff_c2s[131]) * gcarta[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[133]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[135]) * gcartb[i+nbra* 0]
+                                     + creal(coeff_c2s[138]) * gcartb[i+nbra* 3]
+                                     + creal(coeff_c2s[140]) * gcartb[i+nbra* 5]
+                                     + creal(coeff_c2s[145]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[147]) * gcartb[i+nbra*12]
+                                     + creal(coeff_c2s[149]) * gcartb[i+nbra*14];
+                        gsp[i+lds*5] = creal(coeff_c2s[150]) * gcarta[i+nbra* 0]
+                                     + creal(coeff_c2s[153]) * gcarta[i+nbra* 3]
+                                     + creal(coeff_c2s[155]) * gcarta[i+nbra* 5]
+                                     + creal(coeff_c2s[160]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[162]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[164]) * gcarta[i+nbra*14]
+                                     + creal(coeff_c2s[167]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[169]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[172]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[174]) * gcartb[i+nbra* 9]
+                                     + cimag(coeff_c2s[176]) * gcartb[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[178]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*6] = creal(coeff_c2s[182]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[184]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[187]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[189]) * gcarta[i+nbra* 9]
+                                     + cimag(coeff_c2s[191]) * gcarta[i+nbra*11]*_Complex_I
+                                     + cimag(coeff_c2s[193]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[195]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[196]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[200]) * gcartb[i+nbra* 5]
+                                     + cimag(coeff_c2s[201]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[203]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[205]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[207]) * gcartb[i+nbra*12];
+                        gsp[i+lds*7] = creal(coeff_c2s[210]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[211]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[215]) * gcarta[i+nbra* 5]
+                                     + cimag(coeff_c2s[216]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + cimag(coeff_c2s[218]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[220]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[222]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[227]) * gcartb[i+nbra* 2]
+                                     + cimag(coeff_c2s[229]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[232]) * gcartb[i+nbra* 7]
+                                     + cimag(coeff_c2s[236]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*8] = creal(coeff_c2s[242]) * gcarta[i+nbra* 2]
+                                     + cimag(coeff_c2s[244]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[247]) * gcarta[i+nbra* 7]
+                                     + cimag(coeff_c2s[251]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[255]) * gcartb[i+nbra* 0]
+                                     + cimag(coeff_c2s[256]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[258]) * gcartb[i+nbra* 3]
+                                     + cimag(coeff_c2s[261]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[265]) * gcartb[i+nbra*10];
+                        gsp[i+lds*9] = creal(coeff_c2s[270]) * gcarta[i+nbra* 0]
+                                     + cimag(coeff_c2s[271]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[273]) * gcarta[i+nbra* 3]
+                                     + cimag(coeff_c2s[276]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[280]) * gcarta[i+nbra*10];
                 }
         }
 }
@@ -8446,404 +7203,421 @@ static void g_cket_cart2spinor_e1sf(double complex *gspa, double complex *gspb,
                 }
         }
 }
-static void g_cket_cart2spinor_si(double complex *gspa, double complex *gspb,
-                                  double complex *gcart,
+static void g_iket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
                                   FINT lds, FINT nbra, FINT kappa, FINT l)
 {
-        double complex *gcart1 = gcart + nbra*30;
         const double complex *coeff_c2s;
         FINT i;
 
         if (kappa >= 0) {
                 coeff_c2s = g_c2s[4].cart2j_lt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[  0]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[  1]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3]) * gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[  6]) * gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 10]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[ 17]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[ 19]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 22]) * gcart [nbra*22+i]
-                                      - cimag(coeff_c2s[ 26]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[1*lds+i] = creal(coeff_c2s[ 32]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[ 34]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37]) * gcart [nbra* 7+i]
-                                      - cimag(coeff_c2s[ 41]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 45]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 46]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 50]) * gcart [nbra*20+i]
-                                      - cimag(coeff_c2s[ 51]) * gcart [nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 53]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 55]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[ 57]) * gcart [nbra*27+i];
-                        gspa[2*lds+i] = creal(coeff_c2s[ 60]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 61]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 65]) * gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[ 66]) * gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 68]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 70]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[ 72]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[ 77]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[ 79]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 82]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[ 84]) * gcart [nbra*24+i]
-                                      - cimag(coeff_c2s[ 86]) * gcart [nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 88]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[3*lds+i] = creal(coeff_c2s[ 92]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[ 94]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[ 99]) * gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[101]) * gcart [nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[103]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[105]) * gcart [nbra*15+i]
-                                      + creal(coeff_c2s[108]) * gcart [nbra*18+i]
-                                      + creal(coeff_c2s[110]) * gcart [nbra*20+i]
-                                      + creal(coeff_c2s[115]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[117]) * gcart [nbra*27+i]
-                                      + creal(coeff_c2s[119]) * gcart [nbra*29+i];
-                        gspa[4*lds+i] = creal(coeff_c2s[120]) * gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[123]) * gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[125]) * gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[130]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[132]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[134]) * gcart [nbra*14+i]
-                                      + creal(coeff_c2s[137]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[139]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[142]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[144]) * gcart [nbra*24+i]
-                                      - cimag(coeff_c2s[146]) * gcart [nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[148]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[5*lds+i] = creal(coeff_c2s[152]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[154]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[157]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[159]) * gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[161]) * gcart [nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[163]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[165]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[166]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[170]) * gcart [nbra*20+i]
-                                      - cimag(coeff_c2s[171]) * gcart [nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[173]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[175]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[177]) * gcart [nbra*27+i];
-                        gspa[6*lds+i] = creal(coeff_c2s[180]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[181]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[185]) * gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[186]) * gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[188]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[190]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[192]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[197]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[199]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[202]) * gcart [nbra*22+i]
-                                      - cimag(coeff_c2s[206]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[7*lds+i] = creal(coeff_c2s[212]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[214]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[217]) * gcart [nbra* 7+i]
-                                      - cimag(coeff_c2s[221]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[225]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[226]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[228]) * gcart [nbra*18+i]
-                                      - cimag(coeff_c2s[231]) * gcart [nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[235]) * gcart [nbra*25+i];
-                        gspb[0*lds+i] = creal(coeff_c2s[  0]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[  1]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[  3]) * gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[  6]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 10]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[ 17]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[ 19]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 22]) * gcart1[nbra*22+i]
-                                      - cimag(coeff_c2s[ 26]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[1*lds+i] = creal(coeff_c2s[ 32]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[ 34]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 37]) * gcart1[nbra* 7+i]
-                                      - cimag(coeff_c2s[ 41]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 45]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 46]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 50]) * gcart1[nbra*20+i]
-                                      - cimag(coeff_c2s[ 51]) * gcart1[nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 53]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 55]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[ 57]) * gcart1[nbra*27+i];
-                        gspb[2*lds+i] = creal(coeff_c2s[ 60]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 61]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 65]) * gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[ 66]) * gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 68]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[ 70]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[ 72]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[ 77]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[ 79]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 82]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[ 84]) * gcart1[nbra*24+i]
-                                      - cimag(coeff_c2s[ 86]) * gcart1[nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 88]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[3*lds+i] = creal(coeff_c2s[ 92]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[ 94]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 97]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[ 99]) * gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[101]) * gcart1[nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[103]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[105]) * gcart1[nbra*15+i]
-                                      + creal(coeff_c2s[108]) * gcart1[nbra*18+i]
-                                      + creal(coeff_c2s[110]) * gcart1[nbra*20+i]
-                                      + creal(coeff_c2s[115]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[117]) * gcart1[nbra*27+i]
-                                      + creal(coeff_c2s[119]) * gcart1[nbra*29+i];
-                        gspb[4*lds+i] = creal(coeff_c2s[120]) * gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[123]) * gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[125]) * gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[130]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[132]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[134]) * gcart1[nbra*14+i]
-                                      + creal(coeff_c2s[137]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[139]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[142]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[144]) * gcart1[nbra*24+i]
-                                      - cimag(coeff_c2s[146]) * gcart1[nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[148]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[5*lds+i] = creal(coeff_c2s[152]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[154]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[157]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[159]) * gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[161]) * gcart1[nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[163]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[165]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[166]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[170]) * gcart1[nbra*20+i]
-                                      - cimag(coeff_c2s[171]) * gcart1[nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[173]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[175]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[177]) * gcart1[nbra*27+i];
-                        gspb[6*lds+i] = creal(coeff_c2s[180]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[181]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[185]) * gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[186]) * gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[188]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[190]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[192]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[197]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[199]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[202]) * gcart1[nbra*22+i]
-                                      - cimag(coeff_c2s[206]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[7*lds+i] = creal(coeff_c2s[212]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[214]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[217]) * gcart1[nbra* 7+i]
-                                      - cimag(coeff_c2s[221]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[225]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[226]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[228]) * gcart1[nbra*18+i]
-                                      - cimag(coeff_c2s[231]) * gcart1[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[235]) * gcart1[nbra*25+i];
-                };
-                gspa += lds * 8;
-                gspb += lds * 8;
+                        gsp[i+lds*0] = creal(coeff_c2s[  0]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[  1]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[  3]) * gcarta[i+nbra* 3]*_Complex_I
+                                     - cimag(coeff_c2s[  6]) * gcarta[i+nbra* 6]
+                                     + creal(coeff_c2s[ 10]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[ 17]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[ 19]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[ 22]) * gcartb[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[ 26]) * gcartb[i+nbra*11];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 32]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[ 34]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[ 37]) * gcarta[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[ 41]) * gcarta[i+nbra*11]
+                                     + creal(coeff_c2s[ 45]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[ 46]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[ 50]) * gcartb[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[ 51]) * gcartb[i+nbra* 6]
+                                     - cimag(coeff_c2s[ 53]) * gcartb[i+nbra* 8]
+                                     + creal(coeff_c2s[ 55]) * gcartb[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[ 57]) * gcartb[i+nbra*12]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[ 60]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[ 61]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[ 65]) * gcarta[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[ 66]) * gcarta[i+nbra* 6]
+                                     - cimag(coeff_c2s[ 68]) * gcarta[i+nbra* 8]
+                                     + creal(coeff_c2s[ 70]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[ 72]) * gcarta[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[ 77]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[ 79]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[ 82]) * gcartb[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[ 84]) * gcartb[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[ 86]) * gcartb[i+nbra*11]
+                                     - cimag(coeff_c2s[ 88]) * gcartb[i+nbra*13];
+                        gsp[i+lds*3] = creal(coeff_c2s[ 92]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[ 94]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[ 97]) * gcarta[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[ 99]) * gcarta[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[101]) * gcarta[i+nbra*11]
+                                     - cimag(coeff_c2s[103]) * gcarta[i+nbra*13]
+                                     + creal(coeff_c2s[105]) * gcartb[i+nbra* 0]*_Complex_I
+                                     + creal(coeff_c2s[108]) * gcartb[i+nbra* 3]*_Complex_I
+                                     + creal(coeff_c2s[110]) * gcartb[i+nbra* 5]*_Complex_I
+                                     + creal(coeff_c2s[115]) * gcartb[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[117]) * gcartb[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[119]) * gcartb[i+nbra*14]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[120]) * gcarta[i+nbra* 0]*_Complex_I
+                                     + creal(coeff_c2s[123]) * gcarta[i+nbra* 3]*_Complex_I
+                                     + creal(coeff_c2s[125]) * gcarta[i+nbra* 5]*_Complex_I
+                                     + creal(coeff_c2s[130]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[132]) * gcarta[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[134]) * gcarta[i+nbra*14]*_Complex_I
+                                     + creal(coeff_c2s[137]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[139]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[142]) * gcartb[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[144]) * gcartb[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[146]) * gcartb[i+nbra*11]
+                                     - cimag(coeff_c2s[148]) * gcartb[i+nbra*13];
+                        gsp[i+lds*5] = creal(coeff_c2s[152]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[154]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[157]) * gcarta[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[159]) * gcarta[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[161]) * gcarta[i+nbra*11]
+                                     - cimag(coeff_c2s[163]) * gcarta[i+nbra*13]
+                                     + creal(coeff_c2s[165]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[166]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[170]) * gcartb[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[171]) * gcartb[i+nbra* 6]
+                                     - cimag(coeff_c2s[173]) * gcartb[i+nbra* 8]
+                                     + creal(coeff_c2s[175]) * gcartb[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[177]) * gcartb[i+nbra*12]*_Complex_I;
+                        gsp[i+lds*6] = creal(coeff_c2s[180]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[181]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[185]) * gcarta[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[186]) * gcarta[i+nbra* 6]
+                                     - cimag(coeff_c2s[188]) * gcarta[i+nbra* 8]
+                                     + creal(coeff_c2s[190]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[192]) * gcarta[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[197]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[199]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[202]) * gcartb[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[206]) * gcartb[i+nbra*11];
+                        gsp[i+lds*7] = creal(coeff_c2s[212]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[214]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[217]) * gcarta[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[221]) * gcarta[i+nbra*11]
+                                     + creal(coeff_c2s[225]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[226]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[228]) * gcartb[i+nbra* 3]*_Complex_I
+                                     - cimag(coeff_c2s[231]) * gcartb[i+nbra* 6]
+                                     + creal(coeff_c2s[235]) * gcartb[i+nbra*10]*_Complex_I;
+                }
+                gsp += lds * 8;
         }
         if (kappa <= 0) {
                 coeff_c2s = g_c2s[4].cart2j_gt_l;
                 for (i = 0; i < nbra; i++) {
-                        gspa[0*lds+i] = creal(coeff_c2s[ 15]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 16]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 18]) * gcart [nbra*18+i]
-                                      - cimag(coeff_c2s[ 21]) * gcart [nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[ 25]) * gcart [nbra*25+i];
-                        gspa[1*lds+i] = creal(coeff_c2s[ 30]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 31]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33]) * gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[ 36]) * gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 40]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[ 47]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[ 49]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52]) * gcart [nbra*22+i]
-                                      - cimag(coeff_c2s[ 56]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[2*lds+i] = creal(coeff_c2s[ 62]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[ 64]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 67]) * gcart [nbra* 7+i]
-                                      - cimag(coeff_c2s[ 71]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 75]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[ 76]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 80]) * gcart [nbra*20+i]
-                                      - cimag(coeff_c2s[ 81]) * gcart [nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 83]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 85]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[ 87]) * gcart [nbra*27+i];
-                        gspa[3*lds+i] = creal(coeff_c2s[ 90]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[ 91]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 95]) * gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[ 96]) * gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 98]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[100]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[102]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[107]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[109]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[112]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[114]) * gcart [nbra*24+i]
-                                      - cimag(coeff_c2s[116]) * gcart [nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[118]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[4*lds+i] = creal(coeff_c2s[122]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[124]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[129]) * gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[131]) * gcart [nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[133]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[135]) * gcart [nbra*15+i]
-                                      + creal(coeff_c2s[138]) * gcart [nbra*18+i]
-                                      + creal(coeff_c2s[140]) * gcart [nbra*20+i]
-                                      + creal(coeff_c2s[145]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[147]) * gcart [nbra*27+i]
-                                      + creal(coeff_c2s[149]) * gcart [nbra*29+i];
-                        gspa[5*lds+i] = creal(coeff_c2s[150]) * gcart [nbra* 0+i]
-                                      + creal(coeff_c2s[153]) * gcart [nbra* 3+i]
-                                      + creal(coeff_c2s[155]) * gcart [nbra* 5+i]
-                                      + creal(coeff_c2s[160]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[162]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[164]) * gcart [nbra*14+i]
-                                      + creal(coeff_c2s[167]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[169]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[172]) * gcart [nbra*22+i]
-                                      + creal(coeff_c2s[174]) * gcart [nbra*24+i]
-                                      - cimag(coeff_c2s[176]) * gcart [nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[178]) * gcart [nbra*28+i]*_Complex_I;
-                        gspa[6*lds+i] = creal(coeff_c2s[182]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[184]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[187]) * gcart [nbra* 7+i]
-                                      + creal(coeff_c2s[189]) * gcart [nbra* 9+i]
-                                      - cimag(coeff_c2s[191]) * gcart [nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[193]) * gcart [nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[195]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[196]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[200]) * gcart [nbra*20+i]
-                                      - cimag(coeff_c2s[201]) * gcart [nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[203]) * gcart [nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[205]) * gcart [nbra*25+i]
-                                      + creal(coeff_c2s[207]) * gcart [nbra*27+i];
-                        gspa[7*lds+i] = creal(coeff_c2s[210]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[211]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[215]) * gcart [nbra* 5+i]
-                                      - cimag(coeff_c2s[216]) * gcart [nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[218]) * gcart [nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[220]) * gcart [nbra*10+i]
-                                      + creal(coeff_c2s[222]) * gcart [nbra*12+i]
-                                      + creal(coeff_c2s[227]) * gcart [nbra*17+i]
-                                      - cimag(coeff_c2s[229]) * gcart [nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[232]) * gcart [nbra*22+i]
-                                      - cimag(coeff_c2s[236]) * gcart [nbra*26+i]*_Complex_I;
-                        gspa[8*lds+i] = creal(coeff_c2s[242]) * gcart [nbra* 2+i]
-                                      - cimag(coeff_c2s[244]) * gcart [nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[247]) * gcart [nbra* 7+i]
-                                      - cimag(coeff_c2s[251]) * gcart [nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[255]) * gcart [nbra*15+i]
-                                      - cimag(coeff_c2s[256]) * gcart [nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[258]) * gcart [nbra*18+i]
-                                      - cimag(coeff_c2s[261]) * gcart [nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[265]) * gcart [nbra*25+i];
-                        gspa[9*lds+i] = creal(coeff_c2s[270]) * gcart [nbra* 0+i]
-                                      - cimag(coeff_c2s[271]) * gcart [nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[273]) * gcart [nbra* 3+i]
-                                      - cimag(coeff_c2s[276]) * gcart [nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[280]) * gcart [nbra*10+i];
-                        gspb[0*lds+i] = creal(coeff_c2s[ 15]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 16]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 18]) * gcart1[nbra*18+i]
-                                      - cimag(coeff_c2s[ 21]) * gcart1[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[ 25]) * gcart1[nbra*25+i];
-                        gspb[1*lds+i] = creal(coeff_c2s[ 30]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 31]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 33]) * gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[ 36]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[ 40]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[ 47]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[ 49]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[ 52]) * gcart1[nbra*22+i]
-                                      - cimag(coeff_c2s[ 56]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[2*lds+i] = creal(coeff_c2s[ 62]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[ 64]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[ 67]) * gcart1[nbra* 7+i]
-                                      - cimag(coeff_c2s[ 71]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[ 75]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[ 76]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[ 80]) * gcart1[nbra*20+i]
-                                      - cimag(coeff_c2s[ 81]) * gcart1[nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 83]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[ 85]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[ 87]) * gcart1[nbra*27+i];
-                        gspb[3*lds+i] = creal(coeff_c2s[ 90]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[ 91]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[ 95]) * gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[ 96]) * gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[ 98]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[100]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[102]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[107]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[109]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[112]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[114]) * gcart1[nbra*24+i]
-                                      - cimag(coeff_c2s[116]) * gcart1[nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[118]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[4*lds+i] = creal(coeff_c2s[122]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[124]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[127]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[129]) * gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[131]) * gcart1[nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[133]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[135]) * gcart1[nbra*15+i]
-                                      + creal(coeff_c2s[138]) * gcart1[nbra*18+i]
-                                      + creal(coeff_c2s[140]) * gcart1[nbra*20+i]
-                                      + creal(coeff_c2s[145]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[147]) * gcart1[nbra*27+i]
-                                      + creal(coeff_c2s[149]) * gcart1[nbra*29+i];
-                        gspb[5*lds+i] = creal(coeff_c2s[150]) * gcart1[nbra* 0+i]
-                                      + creal(coeff_c2s[153]) * gcart1[nbra* 3+i]
-                                      + creal(coeff_c2s[155]) * gcart1[nbra* 5+i]
-                                      + creal(coeff_c2s[160]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[162]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[164]) * gcart1[nbra*14+i]
-                                      + creal(coeff_c2s[167]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[169]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[172]) * gcart1[nbra*22+i]
-                                      + creal(coeff_c2s[174]) * gcart1[nbra*24+i]
-                                      - cimag(coeff_c2s[176]) * gcart1[nbra*26+i]*_Complex_I
-                                      - cimag(coeff_c2s[178]) * gcart1[nbra*28+i]*_Complex_I;
-                        gspb[6*lds+i] = creal(coeff_c2s[182]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[184]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[187]) * gcart1[nbra* 7+i]
-                                      + creal(coeff_c2s[189]) * gcart1[nbra* 9+i]
-                                      - cimag(coeff_c2s[191]) * gcart1[nbra*11+i]*_Complex_I
-                                      - cimag(coeff_c2s[193]) * gcart1[nbra*13+i]*_Complex_I
-                                      + creal(coeff_c2s[195]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[196]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[200]) * gcart1[nbra*20+i]
-                                      - cimag(coeff_c2s[201]) * gcart1[nbra*21+i]*_Complex_I
-                                      - cimag(coeff_c2s[203]) * gcart1[nbra*23+i]*_Complex_I
-                                      + creal(coeff_c2s[205]) * gcart1[nbra*25+i]
-                                      + creal(coeff_c2s[207]) * gcart1[nbra*27+i];
-                        gspb[7*lds+i] = creal(coeff_c2s[210]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[211]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[215]) * gcart1[nbra* 5+i]
-                                      - cimag(coeff_c2s[216]) * gcart1[nbra* 6+i]*_Complex_I
-                                      - cimag(coeff_c2s[218]) * gcart1[nbra* 8+i]*_Complex_I
-                                      + creal(coeff_c2s[220]) * gcart1[nbra*10+i]
-                                      + creal(coeff_c2s[222]) * gcart1[nbra*12+i]
-                                      + creal(coeff_c2s[227]) * gcart1[nbra*17+i]
-                                      - cimag(coeff_c2s[229]) * gcart1[nbra*19+i]*_Complex_I
-                                      + creal(coeff_c2s[232]) * gcart1[nbra*22+i]
-                                      - cimag(coeff_c2s[236]) * gcart1[nbra*26+i]*_Complex_I;
-                        gspb[8*lds+i] = creal(coeff_c2s[242]) * gcart1[nbra* 2+i]
-                                      - cimag(coeff_c2s[244]) * gcart1[nbra* 4+i]*_Complex_I
-                                      + creal(coeff_c2s[247]) * gcart1[nbra* 7+i]
-                                      - cimag(coeff_c2s[251]) * gcart1[nbra*11+i]*_Complex_I
-                                      + creal(coeff_c2s[255]) * gcart1[nbra*15+i]
-                                      - cimag(coeff_c2s[256]) * gcart1[nbra*16+i]*_Complex_I
-                                      + creal(coeff_c2s[258]) * gcart1[nbra*18+i]
-                                      - cimag(coeff_c2s[261]) * gcart1[nbra*21+i]*_Complex_I
-                                      + creal(coeff_c2s[265]) * gcart1[nbra*25+i];
-                        gspb[9*lds+i] = creal(coeff_c2s[270]) * gcart1[nbra* 0+i]
-                                      - cimag(coeff_c2s[271]) * gcart1[nbra* 1+i]*_Complex_I
-                                      + creal(coeff_c2s[273]) * gcart1[nbra* 3+i]
-                                      - cimag(coeff_c2s[276]) * gcart1[nbra* 6+i]*_Complex_I
-                                      + creal(coeff_c2s[280]) * gcart1[nbra*10+i];
+                        gsp[i+lds*0] = creal(coeff_c2s[ 15]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[ 16]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[ 18]) * gcartb[i+nbra* 3]*_Complex_I
+                                     - cimag(coeff_c2s[ 21]) * gcartb[i+nbra* 6]
+                                     + creal(coeff_c2s[ 25]) * gcartb[i+nbra*10]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 30]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[ 31]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[ 33]) * gcarta[i+nbra* 3]*_Complex_I
+                                     - cimag(coeff_c2s[ 36]) * gcarta[i+nbra* 6]
+                                     + creal(coeff_c2s[ 40]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[ 47]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[ 49]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[ 52]) * gcartb[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[ 56]) * gcartb[i+nbra*11];
+                        gsp[i+lds*2] = creal(coeff_c2s[ 62]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[ 64]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[ 67]) * gcarta[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[ 71]) * gcarta[i+nbra*11]
+                                     + creal(coeff_c2s[ 75]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[ 76]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[ 80]) * gcartb[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[ 81]) * gcartb[i+nbra* 6]
+                                     - cimag(coeff_c2s[ 83]) * gcartb[i+nbra* 8]
+                                     + creal(coeff_c2s[ 85]) * gcartb[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[ 87]) * gcartb[i+nbra*12]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[ 90]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[ 91]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[ 95]) * gcarta[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[ 96]) * gcarta[i+nbra* 6]
+                                     - cimag(coeff_c2s[ 98]) * gcarta[i+nbra* 8]
+                                     + creal(coeff_c2s[100]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[102]) * gcarta[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[107]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[109]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[112]) * gcartb[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[114]) * gcartb[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[116]) * gcartb[i+nbra*11]
+                                     - cimag(coeff_c2s[118]) * gcartb[i+nbra*13];
+                        gsp[i+lds*4] = creal(coeff_c2s[122]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[124]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[127]) * gcarta[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[129]) * gcarta[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[131]) * gcarta[i+nbra*11]
+                                     - cimag(coeff_c2s[133]) * gcarta[i+nbra*13]
+                                     + creal(coeff_c2s[135]) * gcartb[i+nbra* 0]*_Complex_I
+                                     + creal(coeff_c2s[138]) * gcartb[i+nbra* 3]*_Complex_I
+                                     + creal(coeff_c2s[140]) * gcartb[i+nbra* 5]*_Complex_I
+                                     + creal(coeff_c2s[145]) * gcartb[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[147]) * gcartb[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[149]) * gcartb[i+nbra*14]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[150]) * gcarta[i+nbra* 0]*_Complex_I
+                                     + creal(coeff_c2s[153]) * gcarta[i+nbra* 3]*_Complex_I
+                                     + creal(coeff_c2s[155]) * gcarta[i+nbra* 5]*_Complex_I
+                                     + creal(coeff_c2s[160]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[162]) * gcarta[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[164]) * gcarta[i+nbra*14]*_Complex_I
+                                     + creal(coeff_c2s[167]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[169]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[172]) * gcartb[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[174]) * gcartb[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[176]) * gcartb[i+nbra*11]
+                                     - cimag(coeff_c2s[178]) * gcartb[i+nbra*13];
+                        gsp[i+lds*6] = creal(coeff_c2s[182]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[184]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[187]) * gcarta[i+nbra* 7]*_Complex_I
+                                     + creal(coeff_c2s[189]) * gcarta[i+nbra* 9]*_Complex_I
+                                     - cimag(coeff_c2s[191]) * gcarta[i+nbra*11]
+                                     - cimag(coeff_c2s[193]) * gcarta[i+nbra*13]
+                                     + creal(coeff_c2s[195]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[196]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[200]) * gcartb[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[201]) * gcartb[i+nbra* 6]
+                                     - cimag(coeff_c2s[203]) * gcartb[i+nbra* 8]
+                                     + creal(coeff_c2s[205]) * gcartb[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[207]) * gcartb[i+nbra*12]*_Complex_I;
+                        gsp[i+lds*7] = creal(coeff_c2s[210]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[211]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[215]) * gcarta[i+nbra* 5]*_Complex_I
+                                     - cimag(coeff_c2s[216]) * gcarta[i+nbra* 6]
+                                     - cimag(coeff_c2s[218]) * gcarta[i+nbra* 8]
+                                     + creal(coeff_c2s[220]) * gcarta[i+nbra*10]*_Complex_I
+                                     + creal(coeff_c2s[222]) * gcarta[i+nbra*12]*_Complex_I
+                                     + creal(coeff_c2s[227]) * gcartb[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[229]) * gcartb[i+nbra* 4]
+                                     + creal(coeff_c2s[232]) * gcartb[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[236]) * gcartb[i+nbra*11];
+                        gsp[i+lds*8] = creal(coeff_c2s[242]) * gcarta[i+nbra* 2]*_Complex_I
+                                     - cimag(coeff_c2s[244]) * gcarta[i+nbra* 4]
+                                     + creal(coeff_c2s[247]) * gcarta[i+nbra* 7]*_Complex_I
+                                     - cimag(coeff_c2s[251]) * gcarta[i+nbra*11]
+                                     + creal(coeff_c2s[255]) * gcartb[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[256]) * gcartb[i+nbra* 1]
+                                     + creal(coeff_c2s[258]) * gcartb[i+nbra* 3]*_Complex_I
+                                     - cimag(coeff_c2s[261]) * gcartb[i+nbra* 6]
+                                     + creal(coeff_c2s[265]) * gcartb[i+nbra*10]*_Complex_I;
+                        gsp[i+lds*9] = creal(coeff_c2s[270]) * gcarta[i+nbra* 0]*_Complex_I
+                                     - cimag(coeff_c2s[271]) * gcarta[i+nbra* 1]
+                                     + creal(coeff_c2s[273]) * gcarta[i+nbra* 3]*_Complex_I
+                                     - cimag(coeff_c2s[276]) * gcarta[i+nbra* 6]
+                                     + creal(coeff_c2s[280]) * gcarta[i+nbra*10]*_Complex_I;
+                }
+        }
+}
+static void g_cket_cart2spinor_si(double complex *gsp,
+                                  double complex *gcarta, double complex *gcartb,
+                                  FINT lds, FINT nbra, FINT kappa, FINT l)
+{
+        const double complex *coeff_c2s;
+        FINT i;
+
+        if (kappa >= 0) {
+                coeff_c2s = g_c2s[4].cart2j_lt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[  0]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[  1]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[  3]) * gcarta[i+nbra* 3]
+                                     - cimag(coeff_c2s[  6]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[ 10]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[ 17]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[ 19]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 22]) * gcartb[i+nbra* 7]
+                                     - cimag(coeff_c2s[ 26]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*1] = creal(coeff_c2s[ 32]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[ 34]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 37]) * gcarta[i+nbra* 7]
+                                     - cimag(coeff_c2s[ 41]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[ 45]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[ 46]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 50]) * gcartb[i+nbra* 5]
+                                     - cimag(coeff_c2s[ 51]) * gcartb[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[ 53]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[ 55]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[ 57]) * gcartb[i+nbra*12];
+                        gsp[i+lds*2] = creal(coeff_c2s[ 60]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[ 61]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 65]) * gcarta[i+nbra* 5]
+                                     - cimag(coeff_c2s[ 66]) * gcarta[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[ 68]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[ 70]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[ 72]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[ 77]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[ 79]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 82]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[ 84]) * gcartb[i+nbra* 9]
+                                     - cimag(coeff_c2s[ 86]) * gcartb[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[ 88]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*3] = creal(coeff_c2s[ 92]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[ 94]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 97]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[ 99]) * gcarta[i+nbra* 9]
+                                     - cimag(coeff_c2s[101]) * gcarta[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[103]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[105]) * gcartb[i+nbra* 0]
+                                     + creal(coeff_c2s[108]) * gcartb[i+nbra* 3]
+                                     + creal(coeff_c2s[110]) * gcartb[i+nbra* 5]
+                                     + creal(coeff_c2s[115]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[117]) * gcartb[i+nbra*12]
+                                     + creal(coeff_c2s[119]) * gcartb[i+nbra*14];
+                        gsp[i+lds*4] = creal(coeff_c2s[120]) * gcarta[i+nbra* 0]
+                                     + creal(coeff_c2s[123]) * gcarta[i+nbra* 3]
+                                     + creal(coeff_c2s[125]) * gcarta[i+nbra* 5]
+                                     + creal(coeff_c2s[130]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[132]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[134]) * gcarta[i+nbra*14]
+                                     + creal(coeff_c2s[137]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[139]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[142]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[144]) * gcartb[i+nbra* 9]
+                                     - cimag(coeff_c2s[146]) * gcartb[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[148]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*5] = creal(coeff_c2s[152]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[154]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[157]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[159]) * gcarta[i+nbra* 9]
+                                     - cimag(coeff_c2s[161]) * gcarta[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[163]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[165]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[166]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[170]) * gcartb[i+nbra* 5]
+                                     - cimag(coeff_c2s[171]) * gcartb[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[173]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[175]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[177]) * gcartb[i+nbra*12];
+                        gsp[i+lds*6] = creal(coeff_c2s[180]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[181]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[185]) * gcarta[i+nbra* 5]
+                                     - cimag(coeff_c2s[186]) * gcarta[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[188]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[190]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[192]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[197]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[199]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[202]) * gcartb[i+nbra* 7]
+                                     - cimag(coeff_c2s[206]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*7] = creal(coeff_c2s[212]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[214]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[217]) * gcarta[i+nbra* 7]
+                                     - cimag(coeff_c2s[221]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[225]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[226]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[228]) * gcartb[i+nbra* 3]
+                                     - cimag(coeff_c2s[231]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[235]) * gcartb[i+nbra*10];
+                }
+                gsp += lds * 8;
+        }
+        if (kappa <= 0) {
+                coeff_c2s = g_c2s[4].cart2j_gt_l;
+                for (i = 0; i < nbra; i++) {
+                        gsp[i+lds*0] = creal(coeff_c2s[ 15]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[ 16]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 18]) * gcartb[i+nbra* 3]
+                                     - cimag(coeff_c2s[ 21]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[ 25]) * gcartb[i+nbra*10];
+                        gsp[i+lds*1] = creal(coeff_c2s[ 30]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[ 31]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 33]) * gcarta[i+nbra* 3]
+                                     - cimag(coeff_c2s[ 36]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[ 40]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[ 47]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[ 49]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 52]) * gcartb[i+nbra* 7]
+                                     - cimag(coeff_c2s[ 56]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*2] = creal(coeff_c2s[ 62]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[ 64]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[ 67]) * gcarta[i+nbra* 7]
+                                     - cimag(coeff_c2s[ 71]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[ 75]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[ 76]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 80]) * gcartb[i+nbra* 5]
+                                     - cimag(coeff_c2s[ 81]) * gcartb[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[ 83]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[ 85]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[ 87]) * gcartb[i+nbra*12];
+                        gsp[i+lds*3] = creal(coeff_c2s[ 90]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[ 91]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[ 95]) * gcarta[i+nbra* 5]
+                                     - cimag(coeff_c2s[ 96]) * gcarta[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[ 98]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[100]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[102]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[107]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[109]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[112]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[114]) * gcartb[i+nbra* 9]
+                                     - cimag(coeff_c2s[116]) * gcartb[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[118]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*4] = creal(coeff_c2s[122]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[124]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[127]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[129]) * gcarta[i+nbra* 9]
+                                     - cimag(coeff_c2s[131]) * gcarta[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[133]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[135]) * gcartb[i+nbra* 0]
+                                     + creal(coeff_c2s[138]) * gcartb[i+nbra* 3]
+                                     + creal(coeff_c2s[140]) * gcartb[i+nbra* 5]
+                                     + creal(coeff_c2s[145]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[147]) * gcartb[i+nbra*12]
+                                     + creal(coeff_c2s[149]) * gcartb[i+nbra*14];
+                        gsp[i+lds*5] = creal(coeff_c2s[150]) * gcarta[i+nbra* 0]
+                                     + creal(coeff_c2s[153]) * gcarta[i+nbra* 3]
+                                     + creal(coeff_c2s[155]) * gcarta[i+nbra* 5]
+                                     + creal(coeff_c2s[160]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[162]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[164]) * gcarta[i+nbra*14]
+                                     + creal(coeff_c2s[167]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[169]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[172]) * gcartb[i+nbra* 7]
+                                     + creal(coeff_c2s[174]) * gcartb[i+nbra* 9]
+                                     - cimag(coeff_c2s[176]) * gcartb[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[178]) * gcartb[i+nbra*13]*_Complex_I;
+                        gsp[i+lds*6] = creal(coeff_c2s[182]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[184]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[187]) * gcarta[i+nbra* 7]
+                                     + creal(coeff_c2s[189]) * gcarta[i+nbra* 9]
+                                     - cimag(coeff_c2s[191]) * gcarta[i+nbra*11]*_Complex_I
+                                     - cimag(coeff_c2s[193]) * gcarta[i+nbra*13]*_Complex_I
+                                     + creal(coeff_c2s[195]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[196]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[200]) * gcartb[i+nbra* 5]
+                                     - cimag(coeff_c2s[201]) * gcartb[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[203]) * gcartb[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[205]) * gcartb[i+nbra*10]
+                                     + creal(coeff_c2s[207]) * gcartb[i+nbra*12];
+                        gsp[i+lds*7] = creal(coeff_c2s[210]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[211]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[215]) * gcarta[i+nbra* 5]
+                                     - cimag(coeff_c2s[216]) * gcarta[i+nbra* 6]*_Complex_I
+                                     - cimag(coeff_c2s[218]) * gcarta[i+nbra* 8]*_Complex_I
+                                     + creal(coeff_c2s[220]) * gcarta[i+nbra*10]
+                                     + creal(coeff_c2s[222]) * gcarta[i+nbra*12]
+                                     + creal(coeff_c2s[227]) * gcartb[i+nbra* 2]
+                                     - cimag(coeff_c2s[229]) * gcartb[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[232]) * gcartb[i+nbra* 7]
+                                     - cimag(coeff_c2s[236]) * gcartb[i+nbra*11]*_Complex_I;
+                        gsp[i+lds*8] = creal(coeff_c2s[242]) * gcarta[i+nbra* 2]
+                                     - cimag(coeff_c2s[244]) * gcarta[i+nbra* 4]*_Complex_I
+                                     + creal(coeff_c2s[247]) * gcarta[i+nbra* 7]
+                                     - cimag(coeff_c2s[251]) * gcarta[i+nbra*11]*_Complex_I
+                                     + creal(coeff_c2s[255]) * gcartb[i+nbra* 0]
+                                     - cimag(coeff_c2s[256]) * gcartb[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[258]) * gcartb[i+nbra* 3]
+                                     - cimag(coeff_c2s[261]) * gcartb[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[265]) * gcartb[i+nbra*10];
+                        gsp[i+lds*9] = creal(coeff_c2s[270]) * gcarta[i+nbra* 0]
+                                     - cimag(coeff_c2s[271]) * gcarta[i+nbra* 1]*_Complex_I
+                                     + creal(coeff_c2s[273]) * gcarta[i+nbra* 3]
+                                     - cimag(coeff_c2s[276]) * gcarta[i+nbra* 6]*_Complex_I
+                                     + creal(coeff_c2s[280]) * gcarta[i+nbra*10];
                 }
         }
 }
@@ -8886,7 +7660,9 @@ void (*c2s_iket_spinor_e1sf[])() = {
         a_iket_cart2spinor_e1sf,
 };
 
-void (*c2s_ket_spinor_si[])() = {
+void (*c2s_ket_spinor_si[])(double complex *gsp,
+                            double complex *gcarta, double complex *gcartb,
+                            FINT lds, FINT nbra, FINT kappa, FINT l) = {
         s_ket_cart2spinor_si,
         p_ket_cart2spinor_si,
         d_ket_cart2spinor_si,
@@ -8903,6 +7679,27 @@ void (*c2s_ket_spinor_si[])() = {
         a_ket_cart2spinor_si,
         a_ket_cart2spinor_si,
         a_ket_cart2spinor_si,
+};
+
+void (*c2s_iket_spinor_si[])(double complex *gsp,
+                             double complex *gcarta, double complex *gcartb,
+                             FINT lds, FINT nbra, FINT kappa, FINT l) = {
+        s_iket_cart2spinor_si,
+        p_iket_cart2spinor_si,
+        d_iket_cart2spinor_si,
+        f_iket_cart2spinor_si,
+        g_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
+        a_iket_cart2spinor_si,
 };
 
 void (*c2s_cket_spinor_e1sf[])() = {
@@ -8924,7 +7721,9 @@ void (*c2s_cket_spinor_e1sf[])() = {
         a_cket_cart2spinor_e1sf,
 };
 
-void (*c2s_cket_spinor_si[])() = {
+void (*c2s_cket_spinor_si[])(double complex *gsp,
+                             double complex *gcarta, double complex *gcartb,
+                             FINT lds, FINT nbra, FINT kappa, FINT l) = {
         s_ket_cart2spinor_si,
         p_cket_cart2spinor_si,
         d_cket_cart2spinor_si,
@@ -9242,6 +8041,21 @@ void c2s_zset0(double complex *out, FINT *dims, FINT *counts)
         }
 }
 
+void c2s_grids_dset0(double *out, FINT *dims, FINT *counts)
+{
+        FINT counts1[4] = {counts[2], counts[0], counts[1], counts[3]};
+        FINT dims1[4] = {dims[2], dims[0], dims[1],dims [3]};
+        c2s_dset0(out, dims1, counts1);
+}
+
+void c2s_grids_zset0(double complex *out, FINT *dims, FINT *counts)
+{
+        FINT counts1[4] = {counts[2], counts[0], counts[1], counts[3]};
+        FINT dims1[4] = {dims[2], dims[0], dims[1],dims [3]};
+        c2s_zset0(out, dims1, counts1);
+}
+
+
 /*
  * use f_ket to transform k,l for gctr(i,j,k,l), where
  * sizsph = nbra * (2*l+1)
@@ -9292,9 +8106,9 @@ static double *sph2e_inner(double *gsph, double *gcart,
 // spinor_stride = Ng * _len_spinor(kappa, l);
 // cart_stride = Ng * (l+1)*(l+2)/2;
 // nbra = Ng;
-static void *spinor_e1sf_inner(double complex *gspinor, double *gcart,
-                               FINT kappa, FINT l, FINT nbra, FINT ncall,
-                               FINT spinor_stride, FINT cart_stride)
+static void spinor_e1sf_inner(double complex *gspinor, double *gcart,
+                              FINT kappa, FINT l, FINT nbra, FINT ncall,
+                              FINT spinor_stride, FINT cart_stride)
 {
         double complex *gspa = gspinor;
         double complex *gspb = gspinor + ncall * spinor_stride;
@@ -9304,16 +8118,17 @@ static void *spinor_e1sf_inner(double complex *gspinor, double *gcart,
                                            gcart+n*cart_stride, nbra, nbra, kappa, l);
         }
 }
-static void *spinor_si_inner(double complex *gspinor, double complex *gcart,
-                             FINT kappa, FINT l, FINT nbra, FINT ncall,
-                             FINT spinor_stride, FINT cart_stride)
+static void spinor_si_inner(double complex *gspinor, double complex *gcart,
+                            FINT kappa, FINT l, FINT nbra, FINT ncall,
+                            FINT spinor_stride, FINT cart_stride)
 {
-        double complex *gspa = gspinor;
-        double complex *gspb = gspinor + ncall * spinor_stride;
+        double complex *gcarta = gcart;
+        double complex *gcartb = gcart + ncall * cart_stride;
         FINT n;
         for (n = 0; n < ncall; n++) {
-                (*c2s_cket_spinor_si[l])(gspa+n*spinor_stride, gspb+n*spinor_stride,
-                                         gcart+n*cart_stride, nbra, nbra, kappa, l);
+                (*c2s_cket_spinor_si[l])(gspinor+n*spinor_stride,
+                                         gcarta+n*cart_stride, gcartb+n*cart_stride,
+                                         nbra, nbra, kappa, l);
         }
 }
 
@@ -9386,7 +8201,7 @@ void c2s_sf_1e(double complex *opij, double *gctr, FINT *dims,
         for (jc = 0; jc < j_ctr; jc++) {
         for (ic = 0; ic < i_ctr; ic++) {
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(tmp2, di, tmp1, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(tmp2, tmp1, tmp1+di*nfj, di, di, j_kp, j_l);
                 zcopy_ij(opij+ofj*jc+di*ic, tmp2, ni, nj, di, dj);
                 gctr += nf;
         } }
@@ -9420,7 +8235,7 @@ void c2s_sf_1ei(double complex *opij, double *gctr, FINT *dims,
         for (jc = 0; jc < j_ctr; jc++) {
         for (ic = 0; ic < i_ctr; ic++) {
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, nfj, gctr, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(tmp2, di, tmp1, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(tmp2, tmp1, tmp1+di*nfj, di, di, j_kp, j_l);
                 zcopy_ij(opij+ofj*jc+di*ic, tmp2, ni, nj, di, dj);
                 gctr += nf;
         } }
@@ -9473,7 +8288,7 @@ void c2s_si_1e(double complex *opij, double *gctr, FINT *dims,
                 CINTdcmplx_np(nf, tmp1+nfi*nf2j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*nf2j+nf, gc_1, gc_z);
                 (c2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(tmp1, di, tmp2, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(tmp1, tmp2, tmp2+di*nfj, di, di, j_kp, j_l);
                 zcopy_ij(opij+ofj*jc+di*ic, tmp1, ni, nj, di, dj);
 
                 gc_x += nf;
@@ -9525,7 +8340,7 @@ void c2s_si_1ei(double complex *opij, double *gctr, FINT *dims,
                 CINTdcmplx_np(nf, tmp1+nfi*nf2j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*nf2j+nf, gc_1, gc_z);
                 (c2s_bra_spinor_si[i_l])(tmp2, nf2j, tmp1, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(tmp1, di, tmp2, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(tmp1, tmp2, tmp2+di*nfj, di, di, j_kp, j_l);
                 zcopy_ij(opij+ofj*jc+di*ic, tmp1, ni, nj, di, dj);
 
                 gc_x += nf;
@@ -9545,8 +8360,9 @@ void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = i_l * 2 + 1;
         FINT dj = j_l * 2 + 1;
-        FINT ni = dims[1];
-        FINT nj = dims[2];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        size_t Ng = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nf = envs->nf;
@@ -9567,8 +8383,8 @@ void c2s_sph_1e_grids(double *out, double *gctr, FINT *dims,
                 for (ic = 0; ic < i_ctr; ic++) {
                         tmp1 = (c2s_ket_sph[j_l])(buf1, gctr, bgrids_nfi, bgrids_nfi, j_l);
                         tmp1 = sph2e_inner(buf2, tmp1, i_l, bgrids, dj, bgrids_di, bgrids_nfi);
-                        pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
-                        dcopy_grids_ij(pij, tmp1, dims[0], ni, nj, bgrids, di, dj);
+                        pij = out + Ng * (ofj * jc + di * ic) + grids_offset;
+                        dcopy_grids_ij(pij, tmp1, Ng, ni, nj, bgrids, di, dj);
                         gctr += bgrids * nf;
                 } }
         }
@@ -9580,8 +8396,9 @@ void c2s_cart_1e_grids(double *out, double *gctr, FINT *dims,
         FINT ngrids = envs->ngrids;
         FINT i_ctr = envs->x_ctr[0];
         FINT j_ctr = envs->x_ctr[1];
-        FINT ni = dims[1];
-        FINT nj = dims[2];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        size_t Ng = dims[2];
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
         FINT nf = envs->nf;
@@ -9594,8 +8411,8 @@ void c2s_cart_1e_grids(double *out, double *gctr, FINT *dims,
                 bgrids = MIN(ngrids - grids_offset, GRID_BLKSIZE);
                 for (jc = 0; jc < j_ctr; jc++) {
                 for (ic = 0; ic < i_ctr; ic++) {
-                        pij = out + ((size_t)ngrids) * (ofj * jc + nfi * ic) + grids_offset;
-                        dcopy_grids_ij(pij, gctr, ngrids, ni, nj, bgrids, nfi, nfj);
+                        pij = out + Ng * (ofj * jc + nfi * ic) + grids_offset;
+                        dcopy_grids_ij(pij, gctr, Ng, ni, nj, bgrids, nfi, nfj);
                         gctr += bgrids * nf;
                 } }
         }
@@ -9620,8 +8437,9 @@ void c2s_sf_1e_grids(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[1];
-        FINT nj = dims[2];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        size_t Ng = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9641,9 +8459,9 @@ void c2s_sf_1e_grids(double complex *out, double *gctr, FINT *dims,
                 for (jc = 0; jc < j_ctr; jc++) {
                 for (ic = 0; ic < i_ctr; ic++) {
                         spinor_e1sf_inner(tmp1, gctr, i_kp, i_l, bgrids, nfj, bgrids_di, bgrids_nfi);
-                        (c2s_ket_spinor[j_l])(tmp2, bgrids_di, tmp1, j_kp, j_l);
-                        pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
-                        zcopy_grids_ij(pij, tmp2, ngrids, ni, nj, bgrids, di, dj);
+                        (c2s_ket_spinor_si[j_l])(tmp2, tmp1, tmp1+bgrids_di*nfj, bgrids_di, bgrids_di, j_kp, j_l);
+                        pij = out + Ng * (ofj * jc + di * ic) + grids_offset;
+                        zcopy_grids_ij(pij, tmp2, Ng, ni, nj, bgrids, di, dj);
                         gctr += bgrids * nf;
                 } }
         }
@@ -9664,8 +8482,9 @@ void c2s_sf_1e_gridsi(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[1];
-        FINT nj = dims[2];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        size_t Ng = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9685,9 +8504,9 @@ void c2s_sf_1e_gridsi(double complex *out, double *gctr, FINT *dims,
                 for (jc = 0; jc < j_ctr; jc++) {
                 for (ic = 0; ic < i_ctr; ic++) {
                         spinor_e1sf_inner(tmp1, gctr, i_kp, i_l, bgrids, nfj, bgrids_di, bgrids_nfi);
-                        (c2s_iket_spinor[j_l])(tmp2, bgrids_di, tmp1, j_kp, j_l);
-                        pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
-                        zcopy_grids_ij(pij, tmp2, ngrids, ni, nj, bgrids, di, dj);
+                        (c2s_iket_spinor_si[j_l])(tmp2, tmp1, tmp1+bgrids_di*nfj, bgrids_di, bgrids_di, j_kp, j_l);
+                        pij = out + Ng * (ofj * jc + di * ic) + grids_offset;
+                        zcopy_grids_ij(pij, tmp2, Ng, ni, nj, bgrids, di, dj);
                         gctr += bgrids * nf;
                 } }
         }
@@ -9708,8 +8527,9 @@ void c2s_si_1e_grids(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[1];
-        FINT nj = dims[2];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        size_t Ng = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9719,9 +8539,9 @@ void c2s_si_1e_grids(double complex *out, double *gctr, FINT *dims,
         FINT ic, jc, grids_offset;
         FINT bgrids, bgrids_di, bgrids_nfi, bgrids_nf;
         double *gc_x = gctr;
-        double *gc_y = gc_x + GRID_BLKSIZE * nf * i_ctr * j_ctr;
-        double *gc_z = gc_y + GRID_BLKSIZE * nf * i_ctr * j_ctr;
-        double *gc_1 = gc_z + GRID_BLKSIZE * nf * i_ctr * j_ctr;
+        double *gc_y = gc_x + ngrids * nf * i_ctr * j_ctr;
+        double *gc_z = gc_y + ngrids * nf * i_ctr * j_ctr;
+        double *gc_1 = gc_z + ngrids * nf * i_ctr * j_ctr;
         double complex *tmp1, *tmp2, *pij;
         MALLOC_INSTACK(tmp1, GRID_BLKSIZE * nf2i*nf2j);
         MALLOC_INSTACK(tmp2, GRID_BLKSIZE * di  *nf2j);
@@ -9742,10 +8562,10 @@ void c2s_si_1e_grids(double complex *out, double *gctr, FINT *dims,
                         CINTdcmplx_np(bgrids_nf, tmp1+bgrids_nfi*nf2j          , gc_y, gc_x);
                         CINTdcmplx_pn(bgrids_nf, tmp1+bgrids_nfi*nf2j+bgrids_nf, gc_1, gc_z);
 
-                        spinor_si_inner(tmp2, tmp1, i_kp, i_l, bgrids, nf2j, bgrids_di, bgrids_nfi*2);
-                        (c2s_ket_spinor[j_l])(tmp1, bgrids_di, tmp2, j_kp, j_l);
-                        pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
-                        zcopy_grids_ij(pij, tmp1, ngrids, ni, nj, bgrids, di, dj);
+                        spinor_si_inner(tmp2, tmp1, i_kp, i_l, bgrids, nf2j, bgrids_di, bgrids_nfi);
+                        (c2s_ket_spinor_si[j_l])(tmp1, tmp2, tmp2+bgrids_di*nfj, bgrids_di, bgrids_di, j_kp, j_l);
+                        pij = out + Ng * (ofj * jc + di * ic) + grids_offset;
+                        zcopy_grids_ij(pij, tmp1, Ng, ni, nj, bgrids, di, dj);
                         gc_x += bgrids_nf;
                         gc_y += bgrids_nf;
                         gc_z += bgrids_nf;
@@ -9769,8 +8589,9 @@ void c2s_si_1e_gridsi(double complex *out, double *gctr, FINT *dims,
         FINT j_ctr = envs->x_ctr[1];
         FINT di = _len_spinor(i_kp, i_l);
         FINT dj = _len_spinor(j_kp, j_l);
-        FINT ni = dims[1];
-        FINT nj = dims[2];
+        FINT ni = dims[0];
+        FINT nj = dims[1];
+        size_t Ng = dims[2];
         FINT ofj = ni * dj;
         FINT nfi = envs->nfi;
         FINT nfj = envs->nfj;
@@ -9780,9 +8601,9 @@ void c2s_si_1e_gridsi(double complex *out, double *gctr, FINT *dims,
         FINT ic, jc, grids_offset;
         FINT bgrids, bgrids_di, bgrids_nfi, bgrids_nf;
         double *gc_x = gctr;
-        double *gc_y = gc_x + GRID_BLKSIZE * nf * i_ctr * j_ctr;
-        double *gc_z = gc_y + GRID_BLKSIZE * nf * i_ctr * j_ctr;
-        double *gc_1 = gc_z + GRID_BLKSIZE * nf * i_ctr * j_ctr;
+        double *gc_y = gc_x + ngrids * nf * i_ctr * j_ctr;
+        double *gc_z = gc_y + ngrids * nf * i_ctr * j_ctr;
+        double *gc_1 = gc_z + ngrids * nf * i_ctr * j_ctr;
         double complex *tmp1, *tmp2, *pij;
         MALLOC_INSTACK(tmp1, GRID_BLKSIZE * nf2i*nf2j);
         MALLOC_INSTACK(tmp2, GRID_BLKSIZE * di  *nf2j);
@@ -9803,10 +8624,10 @@ void c2s_si_1e_gridsi(double complex *out, double *gctr, FINT *dims,
                         CINTdcmplx_np(bgrids_nf, tmp1+bgrids_nfi*nf2j          , gc_y, gc_x);
                         CINTdcmplx_pn(bgrids_nf, tmp1+bgrids_nfi*nf2j+bgrids_nf, gc_1, gc_z);
 
-                        spinor_si_inner(tmp2, tmp1, i_kp, i_l, bgrids, nf2j, bgrids_di, bgrids_nfi*2);
-                        (c2s_iket_spinor[j_l])(tmp1, bgrids_di, tmp2, j_kp, j_l);
-                        pij = out + ((size_t)ngrids) * (ofj * jc + di * ic) + grids_offset;
-                        zcopy_grids_ij(pij, tmp1, ngrids, ni, nj, bgrids, di, dj);
+                        spinor_si_inner(tmp2, tmp1, i_kp, i_l, bgrids, nf2j, bgrids_di, bgrids_nfi);
+                        (c2s_iket_spinor_si[j_l])(tmp1, tmp2, tmp2+bgrids_di*nfj, bgrids_di, bgrids_di, j_kp, j_l);
+                        pij = out + Ng * (ofj * jc + di * ic) + grids_offset;
+                        zcopy_grids_ij(pij, tmp1, Ng, ni, nj, bgrids, di, dj);
                         gc_x += bgrids_nf;
                         gc_y += bgrids_nf;
                         gc_z += bgrids_nf;
@@ -9914,7 +8735,7 @@ void c2s_sf_2e1(double complex *opij, double *gctr, FINT *dims,
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(opij, d_i, tmp1, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(opij, tmp1, tmp1+d_i*nfj, d_i, d_i, j_kp, j_l);
                 gctr += nf;
                 opij += no;
         }
@@ -9950,7 +8771,7 @@ void c2s_sf_2e1i(double complex *opij, double *gctr, FINT *dims,
 
         for (i = 0; i < i_ctr * j_ctr * k_ctr * l_ctr; i++) {
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(opij, d_i, tmp1, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(opij, tmp1, tmp1+d_i*nfj, d_i, d_i, j_kp, j_l);
                 gctr += nf;
                 opij += no;
         }
@@ -10015,7 +8836,7 @@ void c2s_sf_2e2(double complex *fijkl, double complex *opij, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
                 (c2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_kp, k_l);
-                (c2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_kp, l_l);
+                (c2s_ket_spinor_si[l_l])(tmp1, tmp2, tmp2+d_k*nfl, d_k, d_k, l_kp, l_l);
                 pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + di * ic);
 
                 zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -10075,7 +8896,7 @@ void c2s_sf_2e2i(double complex *fijkl, double complex *opij, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 zswap_ik_jl(tmp1, opij, di, dj, nfk, nfl);
                 (c2s_bra_spinor_sf[k_l])(tmp2, d_l, tmp1, k_kp, k_l);
-                (c2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_kp, l_l);
+                (c2s_iket_spinor_si[l_l])(tmp1, tmp2, tmp2+d_k*nfl, d_k, d_k, l_kp, l_l);
                 pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + di * ic);
 
                 zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -10137,7 +8958,7 @@ void c2s_si_2e1(double complex *opij, double *gctr, FINT *dims,
                 CINTdcmplx_np(nf, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*d_j+nf, gc_1, gc_z);
                 (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(opij, d_i, tmp2, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(opij, tmp2, tmp2+d_i*nfj, d_i, d_i, j_kp, j_l);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -10193,7 +9014,7 @@ void c2s_si_2e1i(double complex *opij, double *gctr, FINT *dims,
                 CINTdcmplx_np(nf, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nf, tmp1+nfi*d_j+nf, gc_1, gc_z);
                 (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(opij, d_i, tmp2, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(opij, tmp2, tmp2+d_i*nfj, d_i, d_i, j_kp, j_l);
                 gc_x += nf;
                 gc_y += nf;
                 gc_z += nf;
@@ -10304,7 +9125,7 @@ void c2s_si_2e2(double complex *fijkl, double complex *opij, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
                 (c2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_kp, k_l);
-                (c2s_ket_spinor[l_l])(tmp1, d_k, tmp2, l_kp, l_l);
+                (c2s_ket_spinor_si[l_l])(tmp1, tmp2, tmp2+d_k*nfl, d_k, d_k, l_kp, l_l);
                 pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + di * ic);
 
                 zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -10372,7 +9193,7 @@ void c2s_si_2e2i(double complex *fijkl, double complex *opij, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 si2e_swap(tmp1, ox, oy, oz, o1, di, dj, nfk, nfl);
                 (c2s_bra_spinor_si[k_l])(tmp2, d_l, tmp1, k_kp, k_l);
-                (c2s_iket_spinor[l_l])(tmp1, d_k, tmp2, l_kp, l_l);
+                (c2s_iket_spinor_si[l_l])(tmp1, tmp2, tmp2+d_k*nfl, d_k, d_k, l_kp, l_l);
                 pfijkl = fijkl + (ofl * lc + ofk * kc + ofj * jc + di * ic);
 
                 zcopy_kijl(pfijkl, tmp1, ni, nj, nk, nl, di, dj, dk, dl);
@@ -10611,7 +9432,7 @@ void c2s_sf_3c2e1(double complex *opijk, double *gctr, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 pbuf = sph2e_inner(buf, gctr, k_l, nfi, nfj, nfi*dk, nfik);
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(tmp2, d_i, tmp1, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(tmp2, tmp1, tmp1+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, dk, 1);
                 gctr += nf;
@@ -10664,7 +9485,7 @@ void c2s_sf_3c2e1i(double complex *opijk, double *gctr, FINT *dims,
         for (ic = 0; ic < i_ctr; ic++) {
                 pbuf = sph2e_inner(buf, gctr, k_l, nfi, nfj, nfi*dk, nfik);
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, pbuf, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(tmp2, d_i, tmp1, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(tmp2, tmp1, tmp1+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, dk, 1);
                 gctr += nf;
@@ -10743,7 +9564,7 @@ void c2s_si_3c2e1(double complex *opijk, double *gctr, FINT *dims,
                 CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, pbufy, pbufx);
                 CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, pbuf1, pbufz);
                 (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(tmp3, d_i, tmp2, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(tmp3, tmp2, tmp2+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, dk, 1);
                 gc_x += nf;
@@ -10823,7 +9644,7 @@ void c2s_si_3c2e1i(double complex *opijk, double *gctr, FINT *dims,
                 CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, pbufy, pbufx);
                 CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, pbuf1, pbufz);
                 (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(tmp3, d_i, tmp2, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(tmp3, tmp2, tmp2+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, dk, 1);
                 gc_x += nf;
@@ -10872,7 +9693,7 @@ void c2s_sf_3c2e1_ssc(double complex *opijk, double *gctr, FINT *dims,
         for (jc = 0; jc < j_ctr; jc++) {
         for (ic = 0; ic < i_ctr; ic++) {
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(tmp2, d_i, tmp1, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(tmp2, tmp1, tmp1+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, nfk, 1);
                 gctr += nf;
@@ -10918,7 +9739,7 @@ void c2s_sf_3c2e1i_ssc(double complex *opijk, double *gctr, FINT *dims,
         for (jc = 0; jc < j_ctr; jc++) {
         for (ic = 0; ic < i_ctr; ic++) {
                 (c2s_bra_spinor_e1sf[i_l])(tmp1, d_j, gctr, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(tmp2, d_i, tmp1, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(tmp2, tmp1, tmp1+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp2, ni, nj, nk, 1, di, dj, nfk, 1);
                 gctr += nf;
@@ -10980,7 +9801,7 @@ void c2s_si_3c2e1_ssc(double complex *opijk, double *gctr, FINT *dims,
                 CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, gc_1, gc_z);
                 (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_kp, i_l);
-                (c2s_ket_spinor[j_l])(tmp3, d_i, tmp2, j_kp, j_l);
+                (c2s_ket_spinor_si[j_l])(tmp3, tmp2, tmp2+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, nfk, 1);
                 gc_x += nf;
@@ -11045,7 +9866,7 @@ void c2s_si_3c2e1i_ssc(double complex *opijk, double *gctr, FINT *dims,
                 CINTdcmplx_np(nfijdk, tmp1+nfi*d_j, gc_y, gc_x);
                 CINTdcmplx_pn(nfijdk, tmp1+nfi*d_j+nfijdk, gc_1, gc_z);
                 (c2s_bra_spinor_si[i_l])(tmp2, d_j, tmp1, i_kp, i_l);
-                (c2s_iket_spinor[j_l])(tmp3, d_i, tmp2, j_kp, j_l);
+                (c2s_iket_spinor_si[j_l])(tmp3, tmp2, tmp2+d_i*nfj, d_i, d_i, j_kp, j_l);
                 pijk = opijk + ofk * kc + ofj * jc + di * ic;
                 zcopy_iklj(pijk, tmp3, ni, nj, nk, 1, di, dj, nfk, 1);
                 gc_x += nf;
@@ -11104,12 +9925,14 @@ void CINTc2s_bra_spinor_sf(double complex *gsp, FINT nket,
 void CINTc2s_ket_spinor(double complex *gsp, FINT nbra,
                         double complex *gcart, FINT kappa, FINT l)
 {
-        (c2s_ket_spinor[l])(gsp, nbra, gcart, kappa, l);
+        FINT nf = _len_cart[l];
+        (c2s_ket_spinor_si[l])(gsp, gcart, gcart+nbra*nf, nbra, nbra, kappa, l);
 }
 void CINTc2s_iket_spinor(double complex *gsp, FINT nbra,
                          double complex *gcart, FINT kappa, FINT l)
 {
-        (c2s_iket_spinor[l])(gsp, nbra, gcart, kappa, l);
+        FINT nf = _len_cart[l];
+        (c2s_iket_spinor_si[l])(gsp, gcart, gcart+nbra*nf, nbra, nbra, kappa, l);
 }
 void CINTc2s_bra_spinor_si(double complex *gsp, FINT nket,
                            double complex *gcart, FINT kappa, FINT l)
@@ -11158,7 +9981,7 @@ void CINTc2s_ket_spinor_si1(double complex *gspa, double complex *gspb, double *
         double *gc_y = gc_x + nctr*ngc;
         double *gc_z = gc_y + nctr*ngc;
         double *gc_1 = gc_z + nctr*ngc;
-        double complex *tmp = malloc(sizeof(double complex)*ngc*4);
+        double complex *tmp = malloc(sizeof(double complex)*ngc*2);
         FINT k;
 
         for (k = 0; k < nctr; k++) {
@@ -11166,11 +9989,12 @@ void CINTc2s_ket_spinor_si1(double complex *gspa, double complex *gspb, double *
                 //cmplx( gctr.POS_Y, gctr.POS_X)
                 CINTdcmplx_pp(ngc, tmp      , gc_1+k*ngc, gc_z+k*ngc);
                 CINTdcmplx_pp(ngc, tmp+ngc  , gc_y+k*ngc, gc_x+k*ngc);
+                (c2s_ket_spinor_si[l])(gspa, tmp, tmp+ngc, lds, ldc, kappa, l);
                 //cmplx(-gctr.POS_Y, gctr.POS_X)
                 //cmplx( gctr.POS_1,-gctr.POS_Z)
-                CINTdcmplx_np(ngc, tmp+ngc*2, gc_y+k*ngc, gc_x+k*ngc);
-                CINTdcmplx_pn(ngc, tmp+ngc*3, gc_1+k*ngc, gc_z+k*ngc);
-                (c2s_ket_spinor_si[l])(gspa, gspb, tmp, lds, ldc, kappa, l);
+                CINTdcmplx_np(ngc, tmp    , gc_y+k*ngc, gc_x+k*ngc);
+                CINTdcmplx_pn(ngc, tmp+ngc, gc_1+k*ngc, gc_z+k*ngc);
+                (c2s_ket_spinor_si[l])(gspb, tmp, tmp+ngc, lds, ldc, kappa, l);
                 gspa += deg * lds;
                 gspb += deg * lds;
         }
@@ -11186,7 +10010,7 @@ void CINTc2s_iket_spinor_si1(double complex *gspa, double complex *gspb, double 
         double *gc_y = gc_x + nctr*ngc;
         double *gc_z = gc_y + nctr*ngc;
         double *gc_1 = gc_z + nctr*ngc;
-        double complex *tmp = malloc(sizeof(double complex)*ngc*4);
+        double complex *tmp = malloc(sizeof(double complex)*ngc*2);
         FINT k;
 
         for (k = 0; k < nctr; k++) {
@@ -11194,11 +10018,12 @@ void CINTc2s_iket_spinor_si1(double complex *gspa, double complex *gspb, double 
                 //i*cmplx( gctr.POS_Y, gctr.POS_X)
                 CINTdcmplx_np(ngc, tmp      , gc_z+k*ngc, gc_1+k*ngc);
                 CINTdcmplx_np(ngc, tmp+ngc  , gc_x+k*ngc, gc_y+k*ngc);
+                (c2s_ket_spinor_si[l])(gspa, tmp, tmp+ngc, lds, ldc, kappa, l);
                 //i*cmplx(-gctr.POS_Y, gctr.POS_X)
                 //i*cmplx( gctr.POS_1,-gctr.POS_Z)
-                CINTdcmplx_nn(ngc, tmp+ngc*2, gc_x+k*ngc, gc_y+k*ngc);
-                CINTdcmplx_pp(ngc, tmp+ngc*3, gc_z+k*ngc, gc_1+k*ngc);
-                (c2s_ket_spinor_si[l])(gspa, gspb, tmp, lds, ldc, kappa, l);
+                CINTdcmplx_nn(ngc, tmp    , gc_x+k*ngc, gc_y+k*ngc);
+                CINTdcmplx_pp(ngc, tmp+ngc, gc_z+k*ngc, gc_1+k*ngc);
+                (c2s_ket_spinor_si[l])(gspb, tmp, tmp+ngc, lds, ldc, kappa, l);
                 gspa += deg * lds;
                 gspb += deg * lds;
         }

@@ -33,7 +33,11 @@ static void CINTgout1e_int1e_r2_origi(double *gout, double *g, FINT *idx, CINTEn
                 s = g3[ix+0]*g0[iy+0]*g0[iz+0];
                 s+= g0[ix+0]*g3[iy+0]*g0[iz+0];
                 s+= g0[ix+0]*g0[iy+0]*g3[iz+0];
-                gout[n] += s;
+                if (empty) {
+                        gout[n] = s;
+                } else {
+                        gout[n] += s;
+                }
         }
 }
 void int1e_r2_origi_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
@@ -105,7 +109,11 @@ static void CINTgout1e_int1e_r4_origi(double *gout, double *g, FINT *idx, CINTEn
                 s+= g0[ix+0]*g15[iy+0]*g0[iz+0];
                 s+= g0[ix+0]*g12[iy+0]*g3[iz+0] * 2;
                 s+= g0[ix+0]*g0[iy+0]*g15[iz+0];
-                gout[n] += s;
+                if (empty) {
+                        gout[n] = s;
+                } else {
+                        gout[n] += s;
+                }
         }
 }
 void int1e_r4_origi_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {

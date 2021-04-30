@@ -14,7 +14,7 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
-#include "cint_const.h"
+#include "config.h"
 #include "rys_roots.h"
 
 #ifdef HAVE_QUADMATH_H
@@ -1963,13 +1963,13 @@ static int R_lsmit(long double *cs, long double *fmt_ints, int n)
 
 int CINTlrys_schmidt(int nroots, double x, double lower, double *roots, double *weights)
 {
-        int i, k, j, m, order;
+        int i, k, j, order;
         int nroots1 = nroots + 1;
         long double fmt_ints[MXRYSROOTS * 3 + MXRYSROOTS * MXRYSROOTS];
         long double *rt = fmt_ints + nroots1 * 2;
         long double *cs = rt + nroots1;
         long double *a;
-        long double root, poly, wsum, dum;
+        long double root, poly, dum;
 
         if (lower == 0) {
                 lgamma_inc_like(fmt_ints, x, nroots*2);

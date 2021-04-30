@@ -1,5 +1,10 @@
+Version 4.4.0  (2021-05-04):
+	* Fix bugs in c2s transfomration for int1e_grids
+	* Fix bugs int1e_grids code generator
+	* Refactor cart2sph
+	* Refactor int1e drivers
 Version 4.3.0  (2021-04-24):
-	* Add int1e_grids
+	* Add new integral type int1e_grids
 	* Fix cache size type
 Version 4.1.3  (2021-04-13):
 	* Fix memory address int32 overflow for heavily contracted basis

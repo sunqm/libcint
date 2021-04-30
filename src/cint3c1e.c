@@ -398,7 +398,7 @@ CACHE_SIZE_T CINT3c1e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                CACHE_SIZE_T cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
+                FINT cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
                                       nc*n_comp+envs->nf*3);
                 return cache_size;
         }
@@ -407,7 +407,7 @@ CACHE_SIZE_T CINT3c1e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 PAIRDATA_NON0IDX_SIZE(pdata_size);
                 FINT leng = envs->g_size*3*((1<<envs->gbits)+1);
                 FINT len0 = envs->nf*n_comp;
-                size_t cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
+                FINT cache_size = MAX(leng+len0+nc*n_comp*4 + pdata_size,
                                       nc*n_comp+envs->nf*3);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;

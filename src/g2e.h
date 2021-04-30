@@ -4,7 +4,7 @@
  * Provide the intermediate variable g(nroots,i,j,k,l,[xyz])
  */
 
-#include "cint_const.h"
+#include "config.h"
 #include "g1e.h"
 
 #ifndef HAVE_BC

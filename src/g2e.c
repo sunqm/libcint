@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
-#include "cint_const.h"
+#include "config.h"
 #include "cint_bas.h"
 #include "rys_roots.h"
 #include "misc.h"
@@ -442,15 +442,14 @@ void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs)
         p2z = gz - dk + dl;
         for (j = 0; j <= lj; j++) {
         for (k = 1; k <= lk; k++) {
-                for (l = 0; l <= mmax-k; l++) {
-                        ptr = j*dj + l*dl + k*dk;
-                        for (n = ptr; n < ptr+dk; n++) {
-                                gx[n] = rx * p1x[n] + p2x[n];
-                                gy[n] = ry * p1y[n] + p2y[n];
-                                gz[n] = rz * p1z[n] + p2z[n];
-                        }
+        for (l = 0; l <= mmax-k; l++) {
+                ptr = j*dj + l*dl + k*dk;
+                for (n = ptr; n < ptr+dk; n++) {
+                        gx[n] = rx * p1x[n] + p2x[n];
+                        gy[n] = ry * p1y[n] + p2y[n];
+                        gz[n] = rz * p1z[n] + p2z[n];
                 }
-        } }
+        } } }
 }
 /* 2d is based on k,j */
 void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
@@ -513,8 +512,7 @@ void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs)
                         gy[n] = ry * p1y[n] + p2y[n];
                         gz[n] = rz * p1z[n] + p2z[n];
                 }
-                }
-        } }
+        } } }
 }
 /* 2d is based on i,l */
 void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs)

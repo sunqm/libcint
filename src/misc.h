@@ -33,7 +33,7 @@ double CINTgto_norm(FINT n, double a);
 
 #ifdef WITH_CINT2_INTERFACE
 #define ALL_CINT(NAME) \
-CACHE_SIZE_T c##NAME##_cart(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME##_cart(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env, CINTOpt *opt) { \
         return NAME##_cart(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
 } \
@@ -41,7 +41,7 @@ void c##NAME##_cart_optimizer(CINTOpt **opt, FINT *atm, FINT natm, \
                          FINT *bas, FINT nbas, double *env) { \
         NAME##_optimizer(opt, atm, natm, bas, nbas, env); \
 } \
-CACHE_SIZE_T c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env, CINTOpt *opt) { \
         return NAME##_sph(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
 } \
@@ -49,7 +49,7 @@ void c##NAME##_sph_optimizer(CINTOpt **opt, FINT *atm, FINT natm, \
                          FINT *bas, FINT nbas, double *env) { \
         NAME##_optimizer(opt, atm, natm, bas, nbas, env); \
 } \
-CACHE_SIZE_T c##NAME(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env, CINTOpt *opt) { \
         return NAME##_spinor((double complex *)out, NULL, shls, \
                              atm, natm, bas, nbas, env, opt, NULL); \
@@ -61,15 +61,15 @@ void c##NAME##_optimizer(CINTOpt **opt, FINT *atm, FINT natm, \
 
 
 #define ALL_CINT1E(NAME) \
-CACHE_SIZE_T c##NAME##_cart(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME##_cart(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env) { \
         return NAME##_cart(out, NULL, shls, atm, natm, bas, nbas, env, NULL, NULL); \
 } \
-CACHE_SIZE_T c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env) { \
         return NAME##_sph(out, NULL, shls, atm, natm, bas, nbas, env, NULL, NULL); \
 } \
-CACHE_SIZE_T c##NAME(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env) { \
         return NAME##_spinor((double complex *)out, NULL, shls, \
                              atm, natm, bas, nbas, env, NULL, NULL); \

@@ -42,7 +42,7 @@ void int2e_yp_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
 }
 
 #define ALL_CINT(NAME) \
-CACHE_SIZE_T c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
+FINT c##NAME##_sph(double *out, FINT *shls, FINT *atm, FINT natm, \
             FINT *bas, FINT nbas, double *env, CINTOpt *opt) { \
         return NAME##_sph(out, NULL, shls, atm, natm, bas, nbas, env, opt, NULL); \
 } \

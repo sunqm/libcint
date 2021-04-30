@@ -40,7 +40,7 @@ CACHE_SIZE_T int2e_breit_##X##_spinor(double complex *out, FINT *dims, FINT *shl
                                 ncomp_tensor, &int2e_##X##_spinor, \
                                 &int2e_gauge_r1_##X##_spinor, &int2e_gauge_r2_##X##_spinor); \
 } \
-CACHE_SIZE_T cint2e_breit_##X##_spinor(double complex *out, FINT *shls, \
+FINT cint2e_breit_##X##_spinor(double complex *out, FINT *shls, \
                       FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, \
                       CINTOpt *opt) \
 { \

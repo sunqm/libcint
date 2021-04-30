@@ -22,21 +22,27 @@
 #define CACHE_SIZE_T FINT
 #endif
 
-#define PTR_EXPCUTOFF   0
-#define PTR_COMMON_ORIG 1
-#define PTR_RINV_ORIG   4
-#define PTR_RINV_ZETA   7
+// global parameters in env
+// Overall cutoff for integral prescreening, value needs to be ~ln(threshold)
+#define PTR_EXPCUTOFF           0
+// R_C of (r-R_C) in dipole, GIAO operators
+#define PTR_COMMON_ORIG         1
+// R_O in 1/|r-R_O|
+#define PTR_RINV_ORIG           4
+// ZETA parameter for Gaussian charge distribution (Gaussian nuclear model)
+#define PTR_RINV_ZETA           7
 // omega parameter in range-separated coulomb operator
 // LR interaction: erf(omega*r12)/r12 if omega > 0
 // SR interaction: erfc(omega*r12)/r12 if omega < 0
-#define PTR_RANGE_OMEGA 8
-// Yukawa potential and slater-type geminal e^{-zeta r}
-#define PTR_F12_ZETA    9
+#define PTR_RANGE_OMEGA         8
+// Yukawa potential and Slater-type geminal e^{-zeta r}
+#define PTR_F12_ZETA            9
 // Gaussian type geminal e^{-zeta r^2}
-#define PTR_GTG_ZETA    10
-#define NGRIDS          11
-#define PTR_GRIDS       12
-#define PTR_ENV_START   20
+#define PTR_GTG_ZETA            10
+#define NGRIDS                  11
+#define PTR_GRIDS               12
+#define PTR_ENV_START           20
+
 
 // slots of atm
 #define CHARGE_OF       0
@@ -113,8 +119,15 @@
 #define TSRZY       7
 #define TSRZZ       8
 
-// some other boundaries
-#define ANG_MAX         12 // l = 0..11
+// other boundaries
+#define MXRYSROOTS      32 // > ANG_MAX*2+1 for 4c2e
+#define ANG_MAX         15 // l = 0..15
+#define LMAX1           16 // > ANG_MAX
+#define CART_MAX        136 // > (ANG_MAX*(ANG_MAX+1)/2)
+#define SHLS_MAX        1048576
+#define NPRIM_MAX       64
+#define NCTR_MAX        64
+
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
 #define FRAC_CHARGE_NUC 3
@@ -168,32 +181,29 @@ double *CINTc2s_ket_sph1(double *sph, double *cart, FINT lds, FINT ldc, FINT l);
 double CINTgto_norm(FINT n, double a);
 
 
-void CINTinit_2e_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
-void CINTinit_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                        const FINT *bas, const FINT nbas, const double *env);
+void CINTinit_2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env);
+void CINTinit_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                        FINT *bas, FINT nbas, double *env);
 void CINTdel_2e_optimizer(CINTOpt **opt);
 void CINTdel_optimizer(CINTOpt **opt);
 
 
-CACHE_SIZE_T cint2e_cart(double *opijkl, const FINT *shls,
-                const FINT *atm, const FINT natm,
-                const FINT *bas, const FINT nbas, const double *env,
-                const CINTOpt *opt);
-void cint2e_cart_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                           const FINT *bas, const FINT nbas, const double *env);
-CACHE_SIZE_T cint2e_sph(double *opijkl, const FINT *shls,
-               const FINT *atm, const FINT natm,
-               const FINT *bas, const FINT nbas, const double *env,
-               const CINTOpt *opt);
-void cint2e_sph_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                          const FINT *bas, const FINT nbas, const double *env);
-CACHE_SIZE_T cint2e(double *opijkl, const FINT *shls,
-           const FINT *atm, const FINT natm,
-           const FINT *bas, const FINT nbas, const double *env,
-           const CINTOpt *opt);
-void cint2e_optimizer(CINTOpt **opt, const FINT *atm, const FINT natm,
-                      const FINT *bas, const FINT nbas, const double *env);
+FINT cint2e_cart(double *opijkl, FINT *shls,
+                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env,
+                CINTOpt *opt);
+void cint2e_cart_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                           FINT *bas, FINT nbas, double *env);
+FINT cint2e_sph(double *opijkl, FINT *shls,
+               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env,
+               CINTOpt *opt);
+void cint2e_sph_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                          FINT *bas, FINT nbas, double *env);
+FINT cint2e(double *opijkl, FINT *shls,
+           FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env,
+           CINTOpt *opt);
+void cint2e_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
+                      FINT *bas, FINT nbas, double *env);
 
 #ifndef __cplusplus
 #include <complex.h>

@@ -1008,7 +1008,8 @@ ALL_CINT_FORTRAN_(int2e_ipvg2_xp1)
 /* <i|NUC |RC CROSS P j> */
 void CINTgout1e_int1e_inuc_rcxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
 FINT nf = envs->nf;
-FINT ix, iy, iz, n;
+FINT nrys_roots = envs->nrys_roots;
+FINT ix, iy, iz, n, i;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
@@ -1017,27 +1018,35 @@ double drj[3];
 drj[0] = envs->rj[0] - envs->env[PTR_COMMON_ORIG+0];
 drj[1] = envs->rj[1] - envs->env[PTR_COMMON_ORIG+1];
 drj[2] = envs->rj[2] - envs->env[PTR_COMMON_ORIG+2];
+G2E_D_J(g1, g0, envs->i_l+0, envs->j_l+0, 0, 0);
+G2E_RCJ(g2, g0, envs->i_l+0, envs->j_l+1, 0, 0);
+G2E_D_J(g3, g2, envs->i_l+0, envs->j_l+0, 0, 0);
 double s[9];
-G1E_D_J(g1, g0, envs->i_l+0, envs->j_l+0, 0);
-G1E_RCJ(g2, g0, envs->i_l+0, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+0, envs->j_l+0, 0);
 for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
 iy = idx[1+n*3];
 iz = idx[2+n*3];
-s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
-s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
-s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
-s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
-s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
-s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
-s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+for (i = 0; i < 9; i++) { s[i] = 0; }
+for (i = 0; i < nrys_roots; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+if (gout_empty) {
+gout[n*3+0] = + s[5] - s[7];
+gout[n*3+1] = + s[6] - s[2];
+gout[n*3+2] = + s[1] - s[3];
+} else {
 gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
-}}
+}}}
 void int1e_inuc_rcxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
 FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);
@@ -1071,32 +1080,41 @@ ALL_CINT1E_FORTRAN_(int1e_inuc_rcxp)
 /* <i|NUC |R CROSS P j> */
 void CINTgout1e_int1e_inuc_rxp(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
 FINT nf = envs->nf;
-FINT ix, iy, iz, n;
+FINT nrys_roots = envs->nrys_roots;
+FINT ix, iy, iz, n, i;
 double *g0 = g;
 double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
 double *g3 = g2 + envs->g_size * 3;
+G2E_D_J(g1, g0, envs->i_l+0, envs->j_l+0, 0, 0);
+G2E_R_J(g2, g0, envs->i_l+0, envs->j_l+1, 0, 0);
+G2E_D_J(g3, g2, envs->i_l+0, envs->j_l+0, 0, 0);
 double s[9];
-G1E_D_J(g1, g0, envs->i_l+0, envs->j_l+0, 0);
-G1E_R_J(g2, g0, envs->i_l+0, envs->j_l+1, 0);
-G1E_D_J(g3, g2, envs->i_l+0, envs->j_l+0, 0);
 for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
 iy = idx[1+n*3];
 iz = idx[2+n*3];
-s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
-s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
-s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
-s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
-s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
-s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
-s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
+for (i = 0; i < 9; i++) { s[i] = 0; }
+for (i = 0; i < nrys_roots; i++) {
+s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
+s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
+s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
+s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
+s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
+s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
+s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
+s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
+s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
+}
+if (gout_empty) {
+gout[n*3+0] = + s[5] - s[7];
+gout[n*3+1] = + s[6] - s[2];
+gout[n*3+2] = + s[1] - s[3];
+} else {
 gout[n*3+0] += + s[5] - s[7];
 gout[n*3+1] += + s[6] - s[2];
 gout[n*3+2] += + s[1] - s[3];
-}}
+}}}
 void int1e_inuc_rxp_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {
 FINT ng[] = {0, 2, 0, 0, 2, 1, 0, 3};
 CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);

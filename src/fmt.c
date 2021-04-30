@@ -15,7 +15,7 @@
 
 #include <float.h>
 #include <math.h>
-#include "cint_const.h"
+#include "config.h"
 #include "rys_roots.h"
 #define SML_FLOAT64   (DBL_EPSILON * .5)
 #define SML_FLOAT80   2.0e-20

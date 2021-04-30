@@ -265,13 +265,29 @@ if __name__ == '__main__':
     ua, ub = sph2spinor(l)
     for k in range(l * 2):
         print(f'// j = {l*2-1}/2, mj = {k*2+1-l*2}/2')
-        ca = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]
-        cb = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ub[:,k]]
+        ca = [f'{mpmath.nstr(c.real, 18)}' for c in ua[:,k]]
+        cb = [f'{mpmath.nstr(c.real, 18)}' for c in ub[:,k]]
         print(f'{", ".join(ca)},')
         print(f'{", ".join(cb)},')
     for k in range(l * 2, l * 4 + 2):
         print(f'// j = {l*2+1}/2, mj = {k*2-1-l*6}/2')
-        ca = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]
-        cb = [f'{mpmath.nstr(c.real, 18)} + {mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ub[:,k]]
+        ca = [f'{mpmath.nstr(c.real, 18)}' for c in ua[:,k]]
+        cb = [f'{mpmath.nstr(c.real, 18)}' for c in ub[:,k]]
+        print(f'{", ".join(ca)},')
+        print(f'{", ".join(cb)},')
+
+    l = 4
+    ncart = (l + 1) * (l + 2) // 2
+    ua, ub = sph2spinor(l)
+    for k in range(l * 2):
+        print(f'// j = {l*2-1}/2, mj = {k*2+1-l*2}/2')
+        ca = [f'{mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]
+        cb = [f'{mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ub[:,k]]
+        print(f'{", ".join(ca)},')
+        print(f'{", ".join(cb)},')
+    for k in range(l * 2, l * 4 + 2):
+        print(f'// j = {l*2+1}/2, mj = {k*2-1-l*6}/2')
+        ca = [f'{mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]
+        cb = [f'{mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ub[:,k]]
         print(f'{", ".join(ca)},')
         print(f'{", ".join(cb)},')

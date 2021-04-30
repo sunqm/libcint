@@ -386,7 +386,44 @@ ix = idx[0+n*3];
 iy = idx[1+n*3];
 iz = idx[2+n*3];~%")
       (dump-s-for-nroots fout tot-bits 1)
-      (gen-c-block+ fout flat-script)
+      (gen-c-block-with-empty fout flat-script)
+      (format fout "}}~%")
+      goutinc)))
+
+(defun gen-code-gout1e-rinv (fout intname raw-infix flat-script)
+  (destructuring-bind (op bra-i ket-j bra-k ket-l)
+    (split-int-expression raw-infix)
+    (let* ((i-rev (effect-keys bra-i)) ;<i| already in reverse order
+           (j-rev (reverse (effect-keys ket-j)))
+           (op-rev (reverse (effect-keys op)))
+           (i-len (length i-rev))
+           (j-len (length j-rev))
+           (op-len (length op-rev))
+           (tot-bits (+ i-len j-len op-len))
+           (goutinc (length flat-script)))
+      (format fout "void CINTgout1e_~a" intname)
+      (format fout "(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
+FINT nf = envs->nf;
+FINT nrys_roots = envs->nrys_roots;
+FINT ix, iy, iz, n, i;
+double *g0 = g;~%")
+      (loop
+        for i in (range (num-g-intermediates tot-bits op i-len j-len)) do
+        (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
+      (dump-declare-dri-for-rc fout bra-i "i")
+      (dump-declare-dri-for-rc fout (append op ket-j) "j")
+      (dump-declare-giao-ij fout bra-i (append op ket-j))
+;;; generate g_(bin)
+;;; for the operators act on the |ket>, the reversed scan order and r_combinator
+;;; is required; for the operators acto on the <bra|, the normal scan order and
+      (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, 0, 0);~%")
+            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);
+G2E_~aI(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);
+for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
+            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);~%")))
+        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
+      (dump-s-2e fout tot-bits 0)
+      (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
       goutinc)))
 
@@ -415,8 +452,11 @@ iz = idx[2+n*3];~%")
                     (if (or (member 'nuc raw-infix)
                             (member 'rinv raw-infix)
                             (member 'nabla-rinv raw-infix))
-                      (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
-                              i-len (+ op-len j-len) tot-bits e1comps tensors)
+                      (if (intersection *act-left-right* op)
+                          (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+                                  (1+ i-len) (+ op-len j-len) tot-bits e1comps tensors)
+                          (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+                                  i-len (+ op-len j-len) tot-bits e1comps tensors))
                       (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 1, ~d};~%"
                               i-len (+ op-len j-len) tot-bits e1comps tensors))))
            (envs-common (with-output-to-string (tmpout)
@@ -429,7 +469,11 @@ iz = idx[2+n*3];~%")
       (write-functype-header
         t intname (format nil "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */" bra-i op ket-j))
       (format fout "/* <~{~a ~}i|~{~a ~}|~{~a ~}j> */~%" bra-i op ket-j)
-      (gen-code-gout1e fout intname raw-infix flat-script)
+      (cond ((or (member 'nuc raw-infix)
+                 (member 'rinv raw-infix)
+                 (member 'nabla-rinv raw-infix))
+             (gen-code-gout1e-rinv fout intname raw-infix flat-script))
+            (t (gen-code-gout1e fout intname raw-infix flat-script)))
       (format fout "void ~a_optimizer(CINTOpt **opt, FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env) {~%" intname)
       (format fout ngdef)
       (format fout "CINTall_1e_optimizer(opt, ng, atm, natm, bas, nbas, env);~%}~%")
@@ -1290,8 +1334,11 @@ for (ig = 0; ig < bgrids; ig++) {~%")
            (e1comps (if (eql sf 'sf) 1 4))
            (tensors (if (eql sf 'sf) goutinc (/ goutinc 4)))
            (ngdef (with-output-to-string (tmpout)
-                    (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
-                            i-len (+ op-len j-len) tot-bits e1comps tensors)))
+                    (if (intersection *act-left-right* op)
+                        (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+                                (1+ i-len) (+ op-len j-len) tot-bits e1comps tensors)
+                        (format tmpout "FINT ng[] = {~d, ~d, 0, 0, ~d, ~d, 0, ~d};~%"
+                                i-len (+ op-len j-len) tot-bits e1comps tensors))))
            (envs-common (with-output-to-string (tmpout)
                           (format tmpout ngdef)
                           (format tmpout "CINTEnvVars envs;~%")

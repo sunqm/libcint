@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 #include <complex.h>
-#include "config.h"
+#include "cint.h"
 
 double dasum_(const FINT *n, const double *dx, const FINT *incx);
 void dscal_(const FINT *n, const double *da, double *dx, const FINT *incx);

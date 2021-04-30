@@ -19,12 +19,11 @@ typedef struct {
         FINT i_l;
         FINT j_l;
         FINT k_l;
-        union {FINT l_l; FINT grids_offset;};
+        FINT l_l;
         FINT nfi;  // number of cartesian components
         FINT nfj;
-        FINT nfk;
-        // in int2e or int3c2e, the number of cartensian components of the fourth shell
-        // in int1e_grids, the number of grids
+        // in int1e_grids, the grids_offset and the number of grids
+        union {FINT nfk; FINT grids_offset;};
         union {FINT nfl; FINT ngrids;};
         FINT nf;  // = nfi*nfj*nfk*nfl;
         FINT _padding;
@@ -32,7 +31,7 @@ typedef struct {
 
         FINT gbits;
         FINT ncomp_e1; // = 1 if spin free, = 4 when spin included, it
-        FINT ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint_const.h
+        FINT ncomp_e2; // corresponds to POSX,POSY,POSZ,POS1, see cint.h
         FINT ncomp_tensor; // e.g. = 3 for gradients
 
         /* values may diff based on the g0_2d4d algorithm */
@@ -89,10 +88,9 @@ void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 
 void CINTg1e_index_xyz(FINT *idx, CINTEnvVars *envs);
 
-void CINTg_ovlp(double *g, double ai, double aj, double fac, CINTEnvVars *envs);
+FINT CINTg1e_ovlp(double *g, double fac, CINTEnvVars *envs);
 
-void CINTg_nuc(double *g, double aij, double *rij,
-               double *cr, double t2, double fac, CINTEnvVars *envs);
+FINT CINTg1e_nuc(double *g, double fac, CINTEnvVars *envs, FINT nuc_id);
 
 void CINTnabla1i_1e(double *f, double *g,
                     FINT li, FINT lj, FINT lk, CINTEnvVars *envs);

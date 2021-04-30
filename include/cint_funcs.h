@@ -1072,3 +1072,15 @@ extern CINTIntegralFunction int1e_grids_ip_cart;
 extern CINTIntegralFunction int1e_grids_ip_sph;
 extern CINTIntegralFunction int1e_grids_ip_spinor;
 
+/* <NABLA i| 1/r_{grids} |NABLA j> */
+extern CINTOptimizerFunction int1e_grids_ipvip_optimizer;
+extern CINTIntegralFunction int1e_grids_ipvip_cart;
+extern CINTIntegralFunction int1e_grids_ipvip_sph;
+extern CINTIntegralFunction int1e_grids_ipvip_spinor;
+
+/* <SIGMA DOT P i| 1/r_{grids} |SIGMA DOT P j> */
+extern CINTOptimizerFunction int1e_grids_spvsp_optimizer;
+extern CINTIntegralFunction int1e_grids_spvsp_cart;
+extern CINTIntegralFunction int1e_grids_spvsp_sph;
+extern CINTIntegralFunction int1e_grids_spvsp_spinor;
+

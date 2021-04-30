@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "cint_const.h"
+#include "config.h"
 #include "cint_bas.h"
 #include "g1e.h"
 #include "g1e_grids.h"

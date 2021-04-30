@@ -4,10 +4,7 @@
  * basic cGTO function
  */
 
-#include "cint_const.h"
-
-#define bas(SLOT,I)     bas[BAS_SLOTS * (I) + (SLOT)]
-#define atm(SLOT,I)     atm[ATM_SLOTS * (I) + (SLOT)]
+#include "config.h"
 
 FINT CINTlen_cart(const FINT l);
 FINT CINTlen_spinor(const FINT bas_id, const FINT *bas);

@@ -6,7 +6,7 @@
 
 #include <math.h>
 #include <complex.h>
-#include "cint_const.h"
+#include "config.h"
 
 void CINTdcmplx_re(const FINT n, double complex *z, const double *re)
 {

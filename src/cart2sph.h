@@ -64,6 +64,8 @@ void c2s_cart_3c1e(double *fijkl, double *gctr, FINT *dims, CINTEnvVars *envs, d
 
 void c2s_dset0(double *out, FINT *dims, FINT *counts);
 void c2s_zset0(double complex *out, FINT *dims, FINT *counts);
+void c2s_grids_dset0(double *out, FINT *dims, FINT *counts);
+void c2s_grids_zset0(double complex *out, FINT *dims, FINT *counts);
 
 /*************************************************
  *

@@ -4,8 +4,8 @@
 (load "gen-code.cl")
 
 (gen-cint "intor1.c"
-  '("int1e_ovlp"                ( \| ))
-  '("int1e_nuc"                 ( \| nuc \| ))
+  ;'("int1e_ovlp"                ( \| ))
+  ;'("int1e_nuc"                 ( \| nuc \| ))
   '("int1e_kin"                 (.5 \| p dot p))
   '("int1e_ia01p"               (#C(0 1) \| nabla-rinv \| cross p))
   '("int1e_giao_irjxp"          (#C(0 1) \| r cross p))
@@ -222,5 +222,7 @@
 )
 
 (gen-cint "int1e_grids1.c"
-  '("int1e_grids_ip"           ( nabla \| grids \| ))
+  '("int1e_grids_ip"            ( nabla \| grids \| ))
+  '("int1e_grids_ipvip"         ( nabla \| grids \| nabla ))
+  '("int1e_grids_spvsp"         ( sigma dot p \| grids \| sigma dot p ))
 )

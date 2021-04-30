@@ -6,7 +6,7 @@
 #include <complex.h>
 #include "config.h"
 
-FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache);
+FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT int1e_type);
 
 FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, double *cache);
 
