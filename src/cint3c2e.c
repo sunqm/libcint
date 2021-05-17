@@ -546,7 +546,7 @@ static FINT (*CINTf_3c2e_loop[8])() = {
                            + i_prim * x_ctr[0] \
                            + j_prim * x_ctr[1] \
                            + k_prim * x_ctr[2] \
-                           +(i_prim+j_prim)*2 + k_prim + envs->nf*3);
+                           +(i_prim+j_prim)*2 + k_prim + envs->nf*3 + 16);
 
 CACHE_SIZE_T CINT3c2e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *opt,
                          double *cache, void (*f_e1_c2s)(), FINT is_ssc)
@@ -754,7 +754,7 @@ CACHE_SIZE_T int3c2e_spsp1_spinor_ssc(double complex *out, FINT *dims, FINT *shl
 void int3c2e_ssc_optimizer(CINTOpt **opt, FINT *atm, FINT natm,
                            FINT *bas, FINT nbas, double *env)
 {
-        int3c2e_ssc_optimizer(opt, atm, natm, bas, nbas, env);
+        int3c2e_optimizer(opt, atm, natm, bas, nbas, env);
 }
 
 
