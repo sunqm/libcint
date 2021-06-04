@@ -1,3 +1,5 @@
+Version 4.4.1  (2021-06-04):
+	* Fix bugs in int1e_grids for attenuated Coulomb operators
 Version 4.4.0  (2021-05-04):
 	* Fix bugs in c2s transfomration for int1e_grids
 	* Fix bugs int1e_grids code generator
