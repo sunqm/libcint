@@ -340,6 +340,9 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
 {
         FINT ip, jp, n;
         double aij, eij, cceij;
+        // This estimation is based on the assumption that the two gaussian charge
+        // distributions are separated in space. If two gaussians are too close (the
+        // distance between gaussian product ij and gaussian product kl < 1), rr
         double log_rr_ij = (li_ceil+lj_ceil+1) * approx_log(rr_ij+1) / 2;
         PairData *pdata;
 

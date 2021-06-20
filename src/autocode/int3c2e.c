@@ -384,6 +384,7 @@ return CINT2c2e_drv(out, dims, &envs, opt, cache, &c2s_sph_1e);
 CACHE_SIZE_T int2c2e_ip1_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
 fprintf(stderr, "&c2s_sf_1e_spinor not implementedn");
+return 0;
 }
 ALL_CINT(int2c2e_ip1)
 ALL_CINT_FORTRAN_(int2c2e_ip1)
@@ -461,6 +462,7 @@ return CINT2c2e_drv(out, dims, &envs, opt, cache, &c2s_sph_1e);
 CACHE_SIZE_T int2c2e_ip2_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
 fprintf(stderr, "&c2s_sf_1e_spinor not implementedn");
+return 0;
 }
 ALL_CINT(int2c2e_ip2)
 ALL_CINT_FORTRAN_(int2c2e_ip2)
@@ -1286,6 +1288,7 @@ return CINT2c2e_drv(out, dims, &envs, opt, cache, &c2s_sph_1e);
 CACHE_SIZE_T int2c2e_ipip1_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
 fprintf(stderr, "&c2s_sf_1e_spinor not implementedn");
+return 0;
 }
 ALL_CINT(int2c2e_ipip1)
 ALL_CINT_FORTRAN_(int2c2e_ipip1)
@@ -1363,6 +1366,7 @@ return CINT2c2e_drv(out, dims, &envs, opt, cache, &c2s_sph_1e);
 CACHE_SIZE_T int2c2e_ip1ip2_spinor(double complex *out, FINT *dims, FINT *shls,
 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *cache) {
 fprintf(stderr, "&c2s_sf_1e_spinor not implementedn");
+return 0;
 }
 ALL_CINT(int2c2e_ip1ip2)
 ALL_CINT_FORTRAN_(int2c2e_ip1ip2)

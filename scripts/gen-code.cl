@@ -1087,6 +1087,7 @@ FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env, CINTOpt *opt, double *c
 ;      (format fout "return CINT2c2e_spinor_drv(out, dims, &envs, opt, cache, ~a);
 ;} // ~a_spinor~%" (name-c2sor "1e" 'spinor sf1 ts1) intname)))
       (format fout "fprintf(stderr, \"~a_spinor not implemented\n\");
+return 0;
 }~%" (name-c2sor "1e" 'spinor sf1 ts1) intname)))
 ;;; int2e -> cint2e
   (format fout "ALL_CINT(~a)~%" intname)
