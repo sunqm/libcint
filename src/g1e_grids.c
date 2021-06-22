@@ -109,9 +109,14 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
                 theta = omega * omega / (omega * omega + aij);
                 sqrt_theta = sqrt(theta);
                 fac1 = fac / aij;
+                // FIXME:
+                // very small erfc() leads to ~0 weights. They can cause
+                // numerical issue in sr_rys_roots Use this cutoff as a
+                // temporary solution to avoid the numerical issue
+                double temp_cutoff = MIN(envs->expcutoff, EXPCUTOFF_SR - nroots);
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * RGSQUARE(rijrg, ig);
-                        if (theta * x > envs->expcutoff) {
+                        if (theta * x > temp_cutoff) {
                                 // very small erfc() leads to ~0 weights
                                 for (i = 0; i < nroots; i++) {
                                         u[ig+GRID_BLKSIZE*i] = 0;

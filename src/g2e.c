@@ -1714,6 +1714,7 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 FINT CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 {
         FINT irys;
+        FINT nroots = envs->nrys_roots;
         const double aij = envs->aij;
         const double akl = envs->akl;
         double a0, a1, fac1, x;
@@ -1744,26 +1745,30 @@ FINT CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
 
 #ifdef WITH_RANGE_COULOMB
         if (omega < 0) { // short-range part of range-separated Coulomb
-                // very small erfc() leads to ~0 weights
-                if (theta * x > envs->expcutoff) {
+                // FIXME:
+                // very small erfc() leads to ~0 weights. They can cause
+                // numerical issue in sr_rys_roots Use this cutoff as a
+                // temporary solution to avoid the numerical issue
+                double temp_cutoff = MIN(envs->expcutoff, EXPCUTOFF_SR - nroots);
+                if (theta * x > temp_cutoff) {
                         return 0;
                 }
-                CINTsr_rys_roots(envs->nrys_roots, x, sqrt(theta), u, w);
+                CINTsr_rys_roots(nroots, x, sqrt(theta), u, w);
         } else {
-                CINTrys_roots(envs->nrys_roots, x, u, w);
+                CINTrys_roots(nroots, x, u, w);
                 if (omega > 0) {
                         /* u[:] = tau^2 / (1 - tau^2)
                          * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
                          * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
                          * so the rest code can be reused.
                          */
-                        for (irys = 0; irys < envs->nrys_roots; irys++) {
+                        for (irys = 0; irys < nroots; irys++) {
                                 u[irys] /= u[irys] + 1 - u[irys] * theta;
                         }
                 }
         }
 #else
-        CINTrys_roots(envs->nrys_roots, x, u, w);
+        CINTrys_roots(nroots, x, u, w);
 #endif
         fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
         if (envs->g_size == 1) {
@@ -1783,7 +1788,7 @@ FINT CINTg0_2e(double *g, const double fac, const CINTEnvVars *envs)
         double *b10 = bc.b10;
         double *b01 = bc.b01;
 
-        for (irys = 0; irys < envs->nrys_roots; irys++, c00+=3, c0p+=3) {
+        for (irys = 0; irys < nroots; irys++, c00+=3, c0p+=3) {
                 /*
                  *u(irys) = t2/(1-t2)
                  *t2 = u(irys)/(1+u(irys))

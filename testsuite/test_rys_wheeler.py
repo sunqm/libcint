@@ -100,6 +100,11 @@ def check_rys_wheeler_sr():
                 diffs = check(i, x, low)
                 print(i, low, x, diffs)
 
+    # TODO: test the diffcult case. When 40 < low**2*x < 60, rys_wheeler is
+    # very inaccurate
+    #print(roots_and_weights(7, 77., 0.76))
+    #print(roots_and_weights(7, 65., 0.8))
+
 def check_rys_wheeler_sr1():
     def check(nroots, x, low):
         r_ref, w_ref = rys_roots.rys_roots_weights(nroots, x, low)
