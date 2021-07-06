@@ -21,13 +21,65 @@
 #define SML_FLOAT80   2.0e-20
 #define SQRTPIE4      .8862269254527580136490837416705725913987747280611935641069038949264
 #define SQRTPIE4l     .8862269254527580136490837416705725913987747280611935641069038949264l
-#define ERFC_bound    705
+#define ERFC_bound    350
 
 #ifdef HAVE_QUADMATH_H
 #include <quadmath.h>
 #define SQRTPIE4q     .8862269254527580136490837416705725913987747280611935641069038949264q
 #define SML_FLOAT128  1.0e-35
 #endif
+
+/*
+ * Relative errors of fmt1_erfc_like are of
+ *      (2*t)**(m-1) / (2m-3)!! * machine_precision * fmt_val
+ * Errors of the other choice are
+ *      (2m-1)!! / (2*t)**(m-1) * machine_precision * fmt_val
+ * Given m, the turn-over point for t should satisfy
+ *      (2m-1)!! / (2*t)**(m-1) > (2m-1)**.5
+ * t0 = .5 * ((2m-1)!!/(2m-1)**.5)**(1/(m-1))
+ */
+static double TURNOVER_POINT[] = {
+        0.,
+        0.,
+        0.866025403784,
+        1.295010032056,
+        1.705493613097,
+        2.106432965305,
+        2.501471934009,
+        2.892473348218,
+        3.280525047072,
+        3.666320693281,
+        4.05033123037 ,
+        4.432891808508,
+        4.814249856864,
+        5.194593501454,
+        5.574069276051,
+        5.952793645111,
+        6.330860773135,
+        6.708347923415,
+        7.08531930745 ,
+        7.461828891625,
+        7.837922483937,
+        8.213639312398,
+        8.589013237349,
+        8.964073695432,
+        9.338846443746,
+        9.713354153046,
+        10.08761688545,
+        10.46165248270,
+        10.83547688448,
+        11.20910439128,
+        11.58254788331,
+        11.95581900374,
+        12.32892831326,
+        12.70188542111,
+        13.07469909673,
+        13.44737736550,
+        13.81992759110,
+        14.19235654675,
+        14.56467047710,
+        14.93687515212
+};
 
 /*
  * Name
@@ -152,17 +204,10 @@ static void fmt1_gamma_inc_like(double *f, double t, int m)
 
 void gamma_inc_like(double *f, double t, int m)
 {
-        int i;
-        double turnover_point;
-        if (m < 3) {
-                turnover_point = m + 1.5;
-        } else {
-                turnover_point = 5;
-        }
-
-        if (t < turnover_point) {
+        if (t < TURNOVER_POINT[m]) {
                 fmt1_gamma_inc_like(f, t, m);
         } else {
+                int i;
                 double tt = sqrt(t);
                 f[0] = SQRTPIE4 / tt * erf(tt);
                 if (m > 0) {
@@ -196,17 +241,10 @@ static void fmt1_lgamma_inc_like(long double *f, long double t, int m)
 
 void lgamma_inc_like(long double *f, long double t, int m)
 {
-        int i;
-        long double turnover_point;
-        if (m < 3) {
-                turnover_point = m + 1.5;
-        } else {
-                turnover_point = 5;
-        }
-
-        if (t < turnover_point) {
+        if (t < TURNOVER_POINT[m]) {
                 fmt1_lgamma_inc_like(f, t, m);
         } else {
+                int i;
                 long double tt = sqrtl(t);
                 f[0] = SQRTPIE4l / tt * erfl(tt);
                 if (m > 0) {
@@ -302,14 +340,7 @@ void fmt_erfc_like(double *f, double t, double lower, int m)
         }
 #endif
 
-        double turnover_point;
-        if (m < 3) {
-                turnover_point = m + .5;
-        } else {
-                turnover_point = 4;
-        }
-
-        if (t < turnover_point) {
+        if (t < TURNOVER_POINT[m]) {
                 fmt1_erfc_like(f, t, lower, m);
         } else {
                 double tt = sqrt(t);
@@ -320,6 +351,40 @@ void fmt_erfc_like(double *f, double t, double lower, int m)
                         double e = exp(-t);
                         double e1 = exp(-t * lower2) * lower;
                         double b = .5 / t;
+                        for (i = 0; i < m; i++) {
+                                val = b * ((2*i+1) * val - e + e1);
+                                e1 *= lower2;
+                                f[i+1] = val;
+                        }
+                }
+        }
+}
+
+void fmt_lerfc_like(long double *f, long double t, long double lower, int m)
+{
+        int i;
+        long double lower2 = lower * lower;
+#ifdef WITH_RANGE_COULOMB
+        // F[m] < .5*sqrt(pi/t) * erfc(low*tt)
+        if (t * lower2 > ERFC_bound) {
+                for (i = 0; i <= m; i++) {
+                        f[i] = 0;
+                }
+                return;
+        }
+#endif
+
+        if (t < TURNOVER_POINT[m]) {
+                fmt1_lerfc_like(f, t, lower, m);
+        } else {
+                long double tt = sqrtl(t);
+                // erfc(a) - erfc(b) is more accurate than erf(b) - erf(a)
+                long double val = SQRTPIE4l / tt * (erfcl(lower * tt) - erfcl(tt));
+                f[0] = val;
+                if (m > 0) {
+                        long double e = expl(-t);
+                        long double e1 = expl(-t * lower2) * lower;
+                        long double b = .5l / t;
                         for (i = 0; i < m; i++) {
                                 val = b * ((2*i+1) * val - e + e1);
                                 e1 *= lower2;
@@ -383,17 +448,10 @@ static void fmt1_qgamma_inc_like(__float128 *f, __float128 t, int m)
 
 void qgamma_inc_like(__float128 *f, __float128 t, int m)
 {
-        int i;
-        __float128 turnover_point;
-        if (m < 3) {
-                turnover_point = m + 1.5;
-        } else {
-                turnover_point = 5;
-        }
-
-        if (t < turnover_point) {
+        if (t < TURNOVER_POINT[m]) {
                 fmt1_qgamma_inc_like(f, t, m);
         } else {
+                int i;
                 __float128 tt = sqrtq(t);
                 f[0] = SQRTPIE4q / tt * erfq(tt);
                 if (m > 0) {
@@ -416,6 +474,40 @@ static inline __float128 _powq(__float128 base, int exponent)
                 base *= base;
         }
         return result;
+}
+
+void fmt_qerfc_like(__float128 *f, __float128 t, __float128 lower, int m)
+{
+        int i;
+        __float128 lower2 = lower * lower;
+#ifdef WITH_RANGE_COULOMB
+        // F[m] < .5*sqrt(pi/t) * erfc(low*tt)
+        if (t * lower2 > ERFC_bound) {
+                for (i = 0; i <= m; i++) {
+                        f[i] = 0;
+                }
+                return;
+        }
+#endif
+
+        if (t < TURNOVER_POINT[m]) {
+                fmt1_qerfc_like(f, t, lower, m);
+        } else {
+                __float128 tt = sqrtq(t);
+                // erfc(a) - erfc(b) is more accurate than erf(b) - erf(a)
+                __float128 val = SQRTPIE4q / tt * (erfcq(lower * tt) - erfcq(tt));
+                f[0] = val;
+                if (m > 0) {
+                        __float128 e = expq(-t);
+                        __float128 e1 = expq(-t * lower2) * lower;
+                        __float128 b = .5q / t;
+                        for (i = 0; i < m; i++) {
+                                val = b * ((2*i+1) * val - e + e1);
+                                e1 *= lower2;
+                                f[i+1] = val;
+                        }
+                }
+        }
 }
 
 void fmt1_qerfc_like(__float128 *f, __float128 t, __float128 lower, int m)

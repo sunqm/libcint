@@ -134,14 +134,23 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
 void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 {
         switch (nroots) {
-        case 1: case 2: case 3:
+        case 1: case 2:
                 CINTrys_schmidt(nroots, x, lower, u, w);
+                break;
+        case 3:
+                if (lower < 0.9) {
+                        CINTrys_schmidt(nroots, x, lower, u, w);
+                } else if (lower < 0.94) {
+                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTqrys_schmidt);
+                } else {
+                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                }
                 break;
         case 4:
                 if (lower < 0.85) {
                         CINTrys_schmidt(nroots, x, lower, u, w);
                 } else if (lower < 0.9) {
-                        segment_solve(nroots, x, lower, u, w, 6, CINTlrys_jacobi, CINTrys_schmidt);
+                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
                         CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
@@ -1921,7 +1930,7 @@ static int R_lsmit(long double *cs, long double *fmt_ints, int n)
         fac = -fmt_ints[1] / fmt_ints[0];
         tmp = fmt_ints[2] + fac * fmt_ints[1];
         if (tmp <= 0) {
-                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
+                fprintf(stderr, "libcint::rys_roots negative value in sqrtl for roots %d (j=1)\n", n-1);
                 SET_ZERO(cs, n, 1);
                 return 1;
         }
@@ -1947,7 +1956,7 @@ static int R_lsmit(long double *cs, long double *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrtl for roots %d (j=%d)\n", n-1, j);
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
                         return j;
@@ -1974,7 +1983,7 @@ int CINTlrys_schmidt(int nroots, double x, double lower, double *roots, double *
         if (lower == 0) {
                 lgamma_inc_like(fmt_ints, x, nroots*2);
         } else {
-                fmt1_lerfc_like(fmt_ints, x, lower, nroots*2);
+                fmt_lerfc_like(fmt_ints, x, lower, nroots*2);
         }
 
         if (fmt_ints[0] == 0) {
@@ -2134,7 +2143,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, int n)
         fac = -fmt_ints[1] / fmt_ints[0];
         tmp = fmt_ints[2] + fac * fmt_ints[1];
         if (tmp <= 0) {
-                fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=1)\n", n-1);
+                fprintf(stderr, "libcint::rys_roots negative value in sqrtq for roots %d (j=1)\n", n-1);
                 SET_ZERO(cs, n, 1);
                 return 1;
         }
@@ -2160,7 +2169,7 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrtq for roots %d (j=%d)\n", n-1, j);
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
                         return j;

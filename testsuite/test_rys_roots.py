@@ -165,6 +165,18 @@ def test_rys_roots_weights_erfc():
     #assert max_w_error < 1e-7
     # Errors for high-angular basis are slightly larger
     #assert max_rw_error < 1e-7
+
+    for i in range(2, 4):
+        for low in [.92, .94, .96, .98, .99, .992, .994, .996]:
+            for x in es:
+                diffs = check(i, x, low)
+                if diffs[0] > 1e-4 or diffs[1] > 1e-7:
+                    print('Errors for root', i, x, low, diffs)
+                    #failed |= not all(s < 1e-4 for s in diffs)
+                    max_r_error = max(max_r_error, diffs[0])
+                    max_w_error = max(max_w_error, diffs[1])
+                    max_rw_error = max(max_rw_error, diffs[0]*diffs[1])
+    assert max_r_error < 1e-2
     print('test_rys_roots_weights_erfc .. pass')
 
 
