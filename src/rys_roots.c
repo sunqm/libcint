@@ -134,8 +134,15 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
 void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 {
         switch (nroots) {
-        case 1: case 2:
+        case 1:
                 CINTrys_schmidt(nroots, x, lower, u, w);
+                break;
+        case 2:
+                if (lower < 0.99) {
+                        CINTrys_schmidt(nroots, x, lower, u, w);
+                } else {
+                        CINTqrys_schmidt(nroots, x, lower, u, w);
+                }
                 break;
         case 3:
                 if (lower < 0.9) {
