@@ -1,3 +1,5 @@
+Version 4.4.2  (2021-07-08):
+	* Improve short-range rys-roots accuracy
 Version 4.4.1  (2021-06-04):
 	* Fix bugs in int1e_grids for attenuated Coulomb operators
 Version 4.4.0  (2021-05-04):
