@@ -198,8 +198,11 @@ def shifted_jacobi_moments(n, t, low=0):
     return alphas, betas, mus
 
 def laguerre_mu0(t, low=0):
-    tt = mpmath.sqrt(t)
-    return mpmath.sqrt(mpmath.pi) / 2 / tt * (mpmath.erfc(low * tt) - mpmath.erfc(tt))
+    if t == 0:
+        return 1 - low
+    else:
+        tt = mpmath.sqrt(t)
+        return mpmath.sqrt(mpmath.pi) / 2 / tt * (mpmath.erfc(low * tt) - mpmath.erfc(tt))
 
 def t_scaled_laguerre(T, a, n, x=1):
     l0 = mpmath.mpf(1)
@@ -242,8 +245,11 @@ def flocke_jacobi_moments(n, T):
         #    raise RuntimeError
 
     moments = np.array(moments)[::-1]
-    tt = np.sqrt(T)
-    fmt0 = np.pi**.5/2. / tt * scipy.special.erf(tt)
+    if t == 0:
+        fmt0 = 1
+    else:
+        tt = np.sqrt(T)
+        fmt0 = np.pi**.5/2. / tt * scipy.special.erf(tt)
     moments = moments[:n] * (fmt0 / mu0)
     idx = np.arange(n - 1)
     alpha = (2 * idx * (idx + .5) - .25) / ((2 * idx + .5)**2 - 1)

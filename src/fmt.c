@@ -328,6 +328,10 @@ void fmt1_erfc_like(double *f, double t, double lower, int m)
 }
 void fmt_erfc_like(double *f, double t, double lower, int m)
 {
+        if (lower == 0) {
+                return gamma_inc_like(f, t, m);
+        }
+
         int i;
         double lower2 = lower * lower;
 #ifdef WITH_RANGE_COULOMB
@@ -362,6 +366,10 @@ void fmt_erfc_like(double *f, double t, double lower, int m)
 
 void fmt_lerfc_like(long double *f, long double t, long double lower, int m)
 {
+        if (lower == 0) {
+                return lgamma_inc_like(f, t, m);
+        }
+
         int i;
         long double lower2 = lower * lower;
 #ifdef WITH_RANGE_COULOMB
@@ -478,6 +486,10 @@ static inline __float128 _powq(__float128 base, int exponent)
 
 void fmt_qerfc_like(__float128 *f, __float128 t, __float128 lower, int m)
 {
+        if (lower == 0) {
+                return qgamma_inc_like(f, t, m);
+        }
+
         int i;
         __float128 lower2 = lower * lower;
 #ifdef WITH_RANGE_COULOMB
