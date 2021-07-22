@@ -1,3 +1,6 @@
+Version 4.4.3  (2021-07-22):
+	* Fix divide-by-0 bug
+	* Improve performance of quadruple precision rys-roots function
 Version 4.4.2  (2021-07-08):
 	* Improve short-range rys-roots accuracy
 Version 4.4.1  (2021-06-04):
