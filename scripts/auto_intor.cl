@@ -174,6 +174,8 @@
   '("int1e_ipnucip"             ( nabla \| nuc \| nabla ))
   '("int1e_ipiprinv"            ( nabla nabla \| rinv \| ))
   '("int1e_iprinvip"            ( nabla \| rinv \| nabla ))
+  '("int1e_ipipr"               ( nabla nabla \| rc \| ))
+  '("int1e_iprip"               ( nabla \| rc \| nabla ))
   '("int2e_ipip1"               ( nabla nabla \, \| \, ))
   '("int2e_ipvip1"              ( nabla \, nabla \| \, ))
   '("int2e_ip1ip2"              ( nabla \, \| nabla \, ))
