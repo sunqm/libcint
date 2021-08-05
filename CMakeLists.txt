@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.5)
 project (cint C)
-set(cint_VERSION_MAJOR "4")
-set(cint_VERSION_MINOR "4")
-set(cint_VERSION_PATCH "6")
+set(cint_VERSION_MAJOR "5")
+set(cint_VERSION_MINOR "0")
+set(cint_VERSION_PATCH "0")
 set(cint_VERSION_TWEAK "0")
 set(cint_VERSION "${cint_VERSION_MAJOR}.${cint_VERSION_MINOR}.${cint_VERSION_PATCH}")
 set(cint_SOVERSION "${cint_VERSION_MAJOR}")
@@ -43,8 +43,6 @@ find_package(QUADMATH)
 if(QUADMATH_FOUND)
   set(HAVE_QUADMATH_H 1 CACHE INTERNAL "Have QUADMATH")
 endif()
-
-find_package(BLAS REQUIRED)
 
 include(CheckFunctionExists)
 set(CMAKE_REQUIRED_INCLUDES math.h)
@@ -158,7 +156,6 @@ set_target_properties(cint PROPERTIES
   VERSION ${cint_VERSION}
   SOVERSION ${cint_SOVERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-target_link_libraries(cint ${BLAS_LIBRARIES})
 if(QUADMATH_FOUND)
   target_link_libraries(cint quadmath)
 endif()

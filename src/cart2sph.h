@@ -34,17 +34,17 @@ void c2s_sf_1e_gridsi(double complex *out, double *gctr, FINT *dims, CINTEnvVars
 void c2s_si_1e_grids(double complex *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 void c2s_si_1e_gridsi(double complex *out, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 
-void c2s_sf_2e1(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
-void c2s_sf_2e1i(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_sf_2e1(double *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_sf_2e1i(double *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 
-void c2s_sf_2e2(double complex *fijkl, double complex *opij, FINT *dims, CINTEnvVars *envs, double *cache);
-void c2s_sf_2e2i(double complex *fijkl, double complex *opij, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_sf_2e2(double complex *fijkl, double *opij, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_sf_2e2i(double complex *fijkl, double *opij, FINT *dims, CINTEnvVars *envs, double *cache);
 
-void c2s_si_2e1(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
-void c2s_si_2e1i(double complex *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_si_2e1(double *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_si_2e1i(double *opij, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 
-void c2s_si_2e2(double complex *fijkl, double complex *opij, FINT *dims, CINTEnvVars *envs, double *cache);
-void c2s_si_2e2i(double complex *fijkl, double complex *opij, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_si_2e2(double complex *fijkl, double *opij, FINT *dims, CINTEnvVars *envs, double *cache);
+void c2s_si_2e2i(double complex *fijkl, double *opij, FINT *dims, CINTEnvVars *envs, double *cache);
 
 void c2s_sph_3c2e1(double *fijkl, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);
 void c2s_cart_3c2e1(double *fijkl, double *gctr, FINT *dims, CINTEnvVars *envs, double *cache);

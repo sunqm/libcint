@@ -202,13 +202,30 @@ def cg_spin(l, jdouble, mjdouble, spin):
         c = 0
     return c
 
+# Return 2D array than transforms cartesian basis to real spherical basis
+def cart2sph(l):
+    if l == 0:
+        return numpy.eye(1)
+    elif l == 1:
+        return numpy.eye(3)
+    else:
+        u1 = []
+        for m in range(-l,l+1):
+            for lx in range(l, -1, -1):
+                for ly in range(l-lx, -1, -1):
+                    lz = l - lx - ly
+                    u1.append(xyz2sph_real(lx, ly, lz, m))
+        ncart = (l + 1) * (l + 2) // 2
+        u1 = numpy.array(u1).reshape(2*l+1, ncart).T
+    return u1
+
 # |spinor> = (|real_sph>, |real_sph>) * / u_alpha \
 #                                       \ u_beta  /
 # Return 2D array U_{sph,spinor}
-def sph2spinor(l):
+def cart2spinor(l):
     if l == 0:
-        return numpy.array([[0., 1.],
-                            [1., 0.]])
+        ua = numpy.array([[0., 1.]])
+        ub = numpy.array([[1., 0.]])
     else:
         u1 = []
         for m in range(-l,l+1):
@@ -262,7 +279,7 @@ if __name__ == '__main__':
 
     l = 4
     ncart = (l + 1) * (l + 2) // 2
-    ua, ub = sph2spinor(l)
+    ua, ub = cart2spinor(l)
     for k in range(l * 2):
         print(f'// j = {l*2-1}/2, mj = {k*2+1-l*2}/2')
         ca = [f'{mpmath.nstr(c.real, 18)}' for c in ua[:,k]]
@@ -278,7 +295,7 @@ if __name__ == '__main__':
 
     l = 4
     ncart = (l + 1) * (l + 2) // 2
-    ua, ub = sph2spinor(l)
+    ua, ub = cart2spinor(l)
     for k in range(l * 2):
         print(f'// j = {l*2-1}/2, mj = {k*2+1-l*2}/2')
         ca = [f'{mpmath.nstr(c.imag, 18)}*_Complex_I' for c in ua[:,k]]

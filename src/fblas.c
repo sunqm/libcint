@@ -12,7 +12,7 @@
 
 void CINTdset0(const FINT n, double *x)
 {
-        size_t i;
+        FINT i;
         for (i = 0; i < n; i++) {
                 x[i] = 0;
         }
@@ -39,41 +39,79 @@ void CINTdaxpy2v(const FINT n, const double a,
 void CINTdmat_transpose(double *a_t, const double *a, const FINT m, const FINT n)
 {
         FINT i, j, k;
-        double *pa1, *pa2, *pa3;
 
         for (j = 0; j < n-3; j+=4) {
-                pa1 = a_t + m;
-                pa2 = pa1 + m;
-                pa3 = pa2 + m;
-                for (i = 0, k = j; i < m; i++, k+=n) {
-                        a_t[i] = a[k+0];
-                        pa1[i] = a[k+1];
-                        pa2[i] = a[k+2];
-                        pa3[i] = a[k+3];
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[(j+0)*m+i] = a[i*n+j+0];
+                        a_t[(j+1)*m+i] = a[i*n+j+1];
+                        a_t[(j+2)*m+i] = a[i*n+j+2];
+                        a_t[(j+3)*m+i] = a[i*n+j+3];
                 }
-                a_t += m * 4;
         }
 
         switch (n-j) {
         case 1:
-                for (i = 0, k = j; i < m; i++, k+=n) {
-                        a_t[i] = a[k];
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[j*m+i] = a[i*n+j];
                 }
                 break;
         case 2:
-                pa1 = a_t + m;
-                for (i = 0, k = j; i < m; i++, k+=n) {
-                        a_t[i] = a[k+0];
-                        pa1[i] = a[k+1];
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[(j+0)*m+i] = a[i*n+j+0];
+                        a_t[(j+1)*m+i] = a[i*n+j+1];
                 }
                 break;
         case 3:
-                pa1 = a_t + m;
-                pa2 = pa1 + m;
-                for (i = 0, k = j; i < m; i++, k+=n) {
-                        a_t[i] = a[k+0];
-                        pa1[i] = a[k+1];
-                        pa2[i] = a[k+2];
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[(j+0)*m+i] = a[i*n+j+0];
+                        a_t[(j+1)*m+i] = a[i*n+j+1];
+                        a_t[(j+2)*m+i] = a[i*n+j+2];
+                }
+                break;
+        }
+}
+
+/*
+ * a_t[n,m] += a[m,n]
+ */
+void CINTdplus_transpose(double *a_t, const double *a, const FINT m, const FINT n)
+{
+        FINT i, j, k;
+
+        for (j = 0; j < n-3; j+=4) {
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[(j+0)*m+i] += a[i*n+j+0];
+                        a_t[(j+1)*m+i] += a[i*n+j+1];
+                        a_t[(j+2)*m+i] += a[i*n+j+2];
+                        a_t[(j+3)*m+i] += a[i*n+j+3];
+                }
+        }
+
+        switch (n-j) {
+        case 1:
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[j*m+i] += a[i*n+j];
+                }
+                break;
+        case 2:
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[(j+0)*m+i] += a[i*n+j+0];
+                        a_t[(j+1)*m+i] += a[i*n+j+1];
+                }
+                break;
+        case 3:
+#pragma GCC ivdep
+                for (i = 0; i < m; i++) {
+                        a_t[(j+0)*m+i] += a[i*n+j+0];
+                        a_t[(j+1)*m+i] += a[i*n+j+1];
+                        a_t[(j+2)*m+i] += a[i*n+j+2];
                 }
                 break;
         }
