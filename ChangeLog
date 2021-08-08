@@ -1,3 +1,5 @@
+Version 4.4.4  (2021-08-07):
+	* Fix Cartesian-spherical and Cartesian-spinor transformation coefficients
 Version 4.4.3  (2021-07-22):
 	* Fix divide-by-0 bug
 	* Improve performance of quadruple precision rys-roots function
@@ -257,7 +259,7 @@ Version 2.4.0 (2014-12-24):
 	* Add 2-center and 3-center 2e integrals
 
 Version 2.3.0 (2014-12-14):
-	* fix ordering bug in cartesain-GTO integrals
+	* fix ordering bug in cartesian-GTO integrals
 	* optimize cartesian to spherical transformation
 
 Version 2.2.0 (2014-12-01):
