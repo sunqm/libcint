@@ -245,7 +245,7 @@ def flocke_jacobi_moments(n, T):
         #    raise RuntimeError
 
     moments = np.array(moments)[::-1]
-    if t == 0:
+    if T == 0:
         fmt0 = 1
     else:
         tt = np.sqrt(T)

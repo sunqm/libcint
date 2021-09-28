@@ -1932,16 +1932,6 @@ int CINTlrys_schmidt(int nroots, double x, double lower, double *roots, double *
                 return 0;
         }
 
-#ifndef KEEP_GOING
-        if (error) {
-                exit(error);
-        }
-#else
-        if (error == 1) {
-                return 1;
-        }
-#endif
-
         if (nroots == 1) {
                 rt[0] = fmt_ints[1] / fmt_ints[0];
         } else {
