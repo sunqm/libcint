@@ -34,7 +34,7 @@ endif()
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 
-cmake_policy(SET CMP0042 NEW) 
+cmake_policy(SET CMP0042 NEW)
 include(GNUInstallDirs)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -44,6 +44,7 @@ if(QUADMATH_FOUND)
   set(HAVE_QUADMATH_H 1 CACHE INTERNAL "Have QUADMATH")
 endif()
 
+cmake_policy(SET CMP0075 NEW)
 find_package(BLAS REQUIRED)
 
 include(CheckFunctionExists)
@@ -68,7 +69,7 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/include/cint.h.in"
   "${PROJECT_BINARY_DIR}/include/cint.h")
 
-set(cintSrc 
+set(cintSrc
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
   src/fmt.c src/rys_wheeler.c src/eigh.c src/rys_roots.c
