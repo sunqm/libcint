@@ -161,3 +161,63 @@ void CINTzmat_dagger(double complex *a_t, const double complex *a,
         }
 }
 
+void CINTdgemm_NN1(FINT m, FINT n, FINT k,
+                   double *a, double *b, double *c, FINT ldc)
+{
+        FINT i, j, kp;
+        double bi;
+        for (j = 0; j < n; j++) {
+                for (i = 0; i < m; i++) {
+                        c[i+ldc*j] = 0;
+                }
+                for (kp = 0; kp < k; kp++) {
+                        bi = b[kp+k*j];
+#pragma GCC ivdep
+                        for (i = 0; i < m; i++) {
+                                c[i+ldc*j] += a[i+m*kp] * bi;
+                        }
+                }
+        }
+}
+
+void CINTdgemm_NN(FINT m, FINT n, FINT k,
+                  double *a, double *b, double *c)
+{
+        CINTdgemm_NN1(m, n, k, a, b, c, m);
+}
+
+void CINTdgemm_TN(FINT m, FINT n, FINT k,
+                  double *a, double *b, double *c)
+{
+        FINT i, j, kp;
+        double ci;
+        for (j = 0; j < n; j++) {
+                for (i = 0; i < m; i++) {
+                        ci = 0;
+#pragma GCC ivdep
+                        for (kp = 0; kp < k; kp++) {
+                                ci += a[kp+k*i] * b[kp+k*j];
+                        }
+                        c[i+m*j] = ci;
+                }
+        }
+}
+
+void CINTdgemm_NT(FINT m, FINT n, FINT k,
+                  double *a, double *b, double *c)
+{
+        FINT i, j, kp;
+        double bi;
+        for (j = 0; j < n; j++) {
+                for (i = 0; i < m; i++) {
+                        c[i+m*j] = 0;
+                }
+                for (kp = 0; kp < k; kp++) {
+                        bi = b[j+n*kp];
+#pragma GCC ivdep
+                        for (i = 0; i < m; i++) {
+                                c[i+m*j] += a[i+m*kp] * bi;
+                        }
+                }
+        }
+}
