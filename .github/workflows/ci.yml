@@ -34,4 +34,3 @@ jobs:
           python test_3c2e.py --quick
           python test_cart2sph.py
           python test_c2s.py
-          python test_cint4c1e.py

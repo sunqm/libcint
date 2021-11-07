@@ -1,3 +1,8 @@
+Version 5.0.0  (2021-11-07):
+	* Improve the cartesian-spinor transformation
+	* Remove the dependency to BLAS library
+	* Update the header file cint.h
+	* Update the drivers for cint2e, cint3c2e, cint3c1e, cint2c2e
 Version 4.4.6  (2021-09-27):
 	* Fix uninitialized variables in rys_roots
 Version 4.4.4  (2021-08-07):
