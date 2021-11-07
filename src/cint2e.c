@@ -17,11 +17,6 @@
 #include "cart2sph.h"
 #include "c2f.h"
 
-#define SHLTYPi       0
-#define SHLTYPj       1
-#define SHLTYPk       2
-#define SHLTYPl       3
-
 #define gctrg   gout
 #define gctrm   gctr
 #define mempty  empty

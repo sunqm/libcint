@@ -5,6 +5,7 @@ import ctypes
 import numpy
 
 _cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
+#_cint4 = ctypes.cdll.LoadLibrary('libcint.so.4')
 
 from pyscf import gto, lib
 
@@ -56,7 +57,7 @@ def run(intor, comp=1, suffix='_sph', thr=1e-9):
         intor = intor = 'c%s%s'%(intor,suffix)
     print(intor)
     fn1 = getattr(_cint, intor)
-    #fn2 = getattr(_cint2, intor)
+    #fn2 = getattr(_cint4, intor)
     #cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
     cintopt = lib.c_null_ptr()
     args = (mol._atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.natm),

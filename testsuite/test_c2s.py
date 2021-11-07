@@ -144,7 +144,7 @@ def random_cart(bas_id, seed=12, dtype='d'):
         cart = cart + numpy.random.random((ng, ncart)) * 1j
     return numpy.asarray(cart, order='F')
 
-def test_c2s_ket_sph1(name, ref):
+def test_c2s_ket_sph1(name, ref, thr=1e-14):
     v1 = 0
     fn = getattr(_cint, name)
     for j in range(nbas.value*2):
@@ -154,9 +154,9 @@ def test_c2s_ket_sph1(name, ref):
         sph = numpy.empty((ng, dj), order='F')
         _cint.CINTc2s_ket_sph1(sph.ctypes.data_as(ctypes.c_void_p), cart.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(ng), ctypes.c_int(ng), ctypes.c_int(l))
         v1 += fp(sph)
-    print(name, abs(ref - v1))
+    assert abs(ref - v1) < thr
 
-def test_c2s_bra_spinor_e1sf(name, ref):
+def test_c2s_bra_spinor_e1sf(name, ref, thr=1e-14):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -167,9 +167,9 @@ def test_c2s_bra_spinor_e1sf(name, ref):
         gsp = numpy.empty((dj, ng, 2), order='F', dtype=numpy.complex128)
         fn(gsp.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(ng), cart.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(kappa), ctypes.c_int(l))
         v1 += fp(gsp)
-    print(name, ref - abs(v1))
+    assert abs(ref - abs(v1)) < thr
 
-def test_c2s_bra_spinor_sf(name, ref):
+def test_c2s_bra_spinor_sf(name, ref, thr=1e-14):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -180,9 +180,9 @@ def test_c2s_bra_spinor_sf(name, ref):
         gsp = numpy.empty((dj, ng, 2), order='F', dtype=numpy.complex128)
         fn(gsp.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(ng), cart.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(kappa), ctypes.c_int(l))
         v1 += fp(gsp)
-    print(name, ref - abs(v1))
+    assert abs(ref - abs(v1)) < thr
 
-def test_c2s_bra_spinor_si(name, ref):
+def test_c2s_bra_spinor_si(name, ref, thr=1e-14):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -195,9 +195,9 @@ def test_c2s_bra_spinor_si(name, ref):
         gsp = numpy.empty((dj, ng), order='F', dtype=numpy.complex128)
         fn(gsp.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(ng), cart.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(kappa), ctypes.c_int(l))
         v1 += fp(gsp)
-    print(name, ref - abs(v1))
+    assert abs(ref - abs(v1)) < thr
 
-def test_c2s_ket_spinor(name, ref):
+def test_c2s_ket_spinor(name, ref, thr=1e-14):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -210,9 +210,9 @@ def test_c2s_ket_spinor(name, ref):
         gsp = numpy.empty((ng, dj), order='F', dtype=numpy.complex128)
         fn(gsp.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(ng), cart.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(kappa), ctypes.c_int(l))
         v1 += fp(gsp)
-    print(name, ref - abs(v1))
+    assert abs(ref - abs(v1)) < thr
 
-def test_c2s_ket_spinor_sf1(name, ref):
+def test_c2s_ket_spinor_sf1(name, ref, thr=1e-14):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -226,9 +226,9 @@ def test_c2s_ket_spinor_sf1(name, ref):
            cart.ctypes.data_as(ctypes.c_void_p),
            ctypes.c_int(ng), ctypes.c_int(ng), ctypes.c_int(1), ctypes.c_int(kappa), ctypes.c_int(l))
         v1 += fp(gsp)
-    print(name, ref - abs(v1))
+    assert abs(ref - abs(v1)) < thr
 
-def test_c2s_ket_spinor_si1(name, ref):
+def test_c2s_ket_spinor_si1(name, ref, thr=1e-14):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -246,7 +246,7 @@ def test_c2s_ket_spinor_si1(name, ref):
            cart.ctypes.data_as(ctypes.c_void_p),
            ctypes.c_int(ng), ctypes.c_int(ng), ctypes.c_int(1), ctypes.c_int(kappa), ctypes.c_int(l))
         v1 += fp(gsp)
-    print(name, ref - abs(v1))
+    assert abs(ref - abs(v1)) < thr
 
 if __name__ == "__main__":
     test_c2s_ket_sph1('CINTc2s_ket_sph1', 5.597110704570622)

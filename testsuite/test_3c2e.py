@@ -251,7 +251,7 @@ def test_int3c2e_spinor(name, fnref, vref, dim, place):
                 di = (bas[i,ANG_OF] * 4 + 2) * bas[i,NCTR_OF]
                 dj = (bas[j,ANG_OF] * 4 + 2) * bas[j,NCTR_OF]
                 dk = (bas[k,ANG_OF] * 2 + 1) * bas[k,NCTR_OF]
-                op = numpy.empty((di,dj,dk,dim), order='F', dtype=numpy.complex)
+                op = numpy.empty((di,dj,dk,dim), order='F', dtype=numpy.complex128)
                 intor(op.ctypes.data_as(ctypes.c_void_p), shls,
                       c_atm, natm, c_bas, nbas, c_env, opt)
                 if not numpy.allclose(zmat, op[:,:,:,0]):

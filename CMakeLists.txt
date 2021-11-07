@@ -71,7 +71,7 @@ set(cintSrc
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
   src/fmt.c src/rys_wheeler.c src/eigh.c src/rys_roots.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c
-  src/cint3c1e.c src/g3c1e.c src/breit.c src/cint4c1e.c src/g4c1e.c
+  src/cint3c1e.c src/g3c1e.c src/breit.c
   src/cint1e_a.c src/cint3c1e_a.c
   src/cint1e_grids.c src/g1e_grids.c
   src/autocode/breit1.c src/autocode/dkb.c src/autocode/gaunt1.c
@@ -103,8 +103,13 @@ if(WITH_GTG)
   set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c src/cint3c2e_gtg.c
     src/cint2c2e_gtg.c)
   add_definitions(-DWITH_GTG)
-  message("Enabled WITH_GTG")
+  message("Enabled WITH_GTG. Note there are bugs in gtg type integrals")
 endif(WITH_GTG)
+
+if(WITH_4C1E)
+  set(cintSrc ${cintSrc} src/cint4c1e.c src/g4c1e.c)
+  message("Enabled WITH_4C1E. Note there are bugs in 4c1e integral functions")
+endif(WITH_4C1E)
 
 if(PYPZPX)
   add_definitions(-DPYPZPX)

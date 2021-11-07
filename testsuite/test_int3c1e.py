@@ -1,9 +1,9 @@
 
+import os
 import ctypes
 import numpy
 
-#_cint2 = ctypes.cdll.LoadLibrary('libcint.so.2.8')
-_cint3 = ctypes.cdll.LoadLibrary('libcint.so.3')
+_cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
 #_cint4 = ctypes.cdll.LoadLibrary('libcint.so.4')
 
 from pyscf import gto, lib
@@ -48,7 +48,7 @@ def make_cintopt(atm, bas, env, intor):
     natm = c_atm.shape[0]
     nbas = c_bas.shape[0]
     cintopt = lib.c_null_ptr()
-    foptinit = getattr(_cint3, intor+'_optimizer')
+    foptinit = getattr(_cint, intor+'_optimizer')
     foptinit(ctypes.byref(cintopt),
              c_atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(natm),
              c_bas.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(nbas),
@@ -62,15 +62,14 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
         intor3 = 'c%s%s'%(intor,suffix)
     intor2 = 'c%s%s'%(intor,suffix)
     print(intor)
-    fn1 = getattr(_cint3, intor3)
-    #fn2 = getattr(_cint2, intor2)
+    fn1 = getattr(_cint, intor3)
+    fn2 = getattr(_cint4, intor2)
     cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
     #cintopt = lib.c_null_ptr()
     args = (mol._atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.natm),
             mol._bas.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.nbas),
             mol._env.ctypes.data_as(ctypes.c_void_p), cintopt)
     for i in range(mol.nbas):
-        #print i
         for j in range(mol.nbas):
             for k in range(mol.nbas):
                 ref = mol.intor_by_shell(intor2, [i,j,k], comp=comp)

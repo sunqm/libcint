@@ -4,6 +4,7 @@ import ctypes
 import numpy
 
 _cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
+#_cint4 = ctypes.cdll.LoadLibrary('libcint.so.4')
 
 from pyscf import gto, lib
 
@@ -54,7 +55,7 @@ def make_cintopt(atm, bas, env, intor):
              c_env.ctypes.data_as(ctypes.c_void_p))
     return cintopt
 
-def run(intor, comp=1, suffix='_sph', thr=1e-7):
+def run(intor, comp=1, suffix='_sph', thr=1e-9):
     if suffix == '_spinor':
         intor3 = 'c%s'%intor
     else:
@@ -62,7 +63,7 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
     intor2 = 'c%s%s'%(intor,suffix)
     print(intor)
     fn1 = getattr(_cint, intor3)
-    #fn2 = getattr(_cint2, intor2)
+    #fn2 = getattr(_cint4, intor2)
     cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
     #cintopt = lib.c_null_ptr()
     args = (mol._atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.natm),
@@ -83,12 +84,12 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
                     mol._atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.natm),
                     mol._bas.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.nbas),
                     mol._env.ctypes.data_as(ctypes.c_void_p), lib.c_null_ptr())
-                if numpy.linalg.norm(ref-buf) > thr:
+                if abs(ref-buf).max() > thr:
                     print(intor, '| nopt', i, j, k, numpy.linalg.norm(ref-buf))#, ref, buf
                     #exit()
                 fn1(buf.ctypes.data_as(ctypes.c_void_p),
                     (ctypes.c_int*3)(i,j,k), *args)
-                if numpy.linalg.norm(ref-buf) > thr:
+                if abs(ref-buf).max() > thr:
                     print(intor, '|', i, j, k, numpy.linalg.norm(ref-buf))
                     #exit()
 
