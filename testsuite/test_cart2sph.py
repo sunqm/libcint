@@ -264,7 +264,7 @@ def make_envs_1e_grids(li, lj, sf=True):
     shls = np.array([0, 1], dtype=np.int32)
     x_ctr = (ctypes.c_int * 4)(nctr, nctr, 1, 1)
     dims = np.asarray(dims, dtype=np.int32)
-    cache = np.empty(GRID_BLOCK*nf*16)
+    cache = np.empty(GRID_BLOCK*nf*16+10)
     gcart0 = np.asarray(np.random.random(shape), order='F')
     gcart1 = []
     if sf:

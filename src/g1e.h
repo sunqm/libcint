@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013-  Qiming Sun <osirpt.sun@gmail.com>
  *
  */
 
-#include "config.h"
+#include "cint.h"
 
 void CINTinit_int1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                             FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);

@@ -2,24 +2,7 @@
  * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
  */
 
-#include "config.h"
-
-#if !defined HAVE_DEFINED_CINTOPT_H
-#define HAVE_DEFINED_CINTOPT_H
-typedef struct {
-    double rij[3];
-    double eij;
-    double cceij;
-} PairData;
-typedef struct {
-    FINT **index_xyz_array; // LMAX1**4 pointers to index_xyz
-    FINT **non0ctr;
-    FINT **sortedidx;
-    FINT nbas;
-    double **log_max_coeff;
-    PairData **pairdata;  // NULL indicates not-initialized, NO_VALUE can be skipped
-} CINTOpt;
-#endif
+#include "cint.h"
 
 #define NOVALUE                 ((void *)0xffffffffffffffffuL)
 #define MAX_PGTO_FOR_PAIRDATA   2048

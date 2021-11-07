@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013  Qiming Sun <osirpt.sun@gmail.com>
+ * Copyright (C) 2013- Qiming Sun <osirpt.sun@gmail.com>
  *
  * Cartisen GTO to spheric or spinor GTO transformation
  * (and reorder the integrals from block(i,j,k,l)_{contr_idx(I,K,L,J)}
@@ -4508,102 +4508,6 @@ static void a_iket1_cart2spinor(double *gspR, double *gspI,
         }
 }
 
-#if 0
-void (*c2s_ket_spinor_e1sf[])() = {
-        s_ket_cart2spinor_e1sf,
-        p_ket_cart2spinor_e1sf,
-        d_ket_cart2spinor_e1sf,
-        f_ket_cart2spinor_e1sf,
-        g_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-        a_ket_cart2spinor_e1sf,
-};
-
-void (*c2s_iket_spinor_e1sf[])() = {
-        s_iket_cart2spinor_e1sf,
-        p_iket_cart2spinor_e1sf,
-        d_iket_cart2spinor_e1sf,
-        f_iket_cart2spinor_e1sf,
-        g_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-        a_iket_cart2spinor_e1sf,
-};
-
-void (*c2s_ket_spinor_si[])() = {
-        s_ket_cart2spinor_si,
-        p_ket_cart2spinor_si,
-        d_ket_cart2spinor_si,
-        f_ket_cart2spinor_si,
-        g_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-        a_ket_cart2spinor_si,
-};
-
-void (*c2s_cket_spinor_e1sf[])() = {
-        s_ket_cart2spinor_e1sf,
-        p_cket_cart2spinor_e1sf,
-        d_cket_cart2spinor_e1sf,
-        f_cket_cart2spinor_e1sf,
-        g_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-        a_cket_cart2spinor_e1sf,
-};
-
-void (*c2s_cket_spinor_si[])() = {
-        s_ket_cart2spinor_si,
-        p_cket_cart2spinor_si,
-        d_cket_cart2spinor_si,
-        f_cket_cart2spinor_si,
-        g_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-        a_cket_cart2spinor_si,
-};
-#endif
 
 /*************************************************
  *

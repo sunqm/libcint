@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
+import os
 import ctypes
 import numpy
 
-#_cint2 = ctypes.cdll.LoadLibrary('libcint.so.2.8')
-#_cint3 = ctypes.cdll.LoadLibrary('libcint.so.3')
-_cint = _cint4 = ctypes.cdll.LoadLibrary('libcint.so.4')
+_cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
 
 from pyscf import gto, lib
 

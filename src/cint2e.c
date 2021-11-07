@@ -17,6 +17,24 @@
 #include "cart2sph.h"
 #include "c2f.h"
 
+#define SHLTYPi       0
+#define SHLTYPj       1
+#define SHLTYPk       2
+#define SHLTYPl       3
+
+#define gctrg   gout
+#define gctrm   gctr
+#define mempty  empty
+#define m_ctr   n_comp
+#define ALIAS_ADDR_IF_EQUAL(x, y) \
+        if (y##_ctr == 1) { \
+                gctr##x = gctr##y; \
+                x##empty = y##empty; \
+        } else { \
+                gctr##x = g1; \
+                g1 += len##x; \
+        }
+
 #define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
                 if (*ctrsymb##empty) { \
@@ -36,10 +54,10 @@
 #define TRANSPOSE(a) \
         if (*empty) { \
                 CINTdmat_transpose(gctr, a, nf*nc, n_comp); \
+                *empty = 0; \
         } else { \
                 CINTdplus_transpose(gctr, a, nf*nc, n_comp); \
         } \
-        *empty = 0;
 
 FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
@@ -142,40 +160,11 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         double *gout, *gctri, *gctrj, *gctrk, *gctrl;
         double eijcutoff;
 
-        if (n_comp == 1) {
-                gctrl = gctr;
-                lempty = empty;
-        } else {
-                gctrl = g1;
-                g1 += lenl;
-        }
-        if (l_ctr == 1) {
-                gctrk = gctrl;
-                kempty = lempty;
-        } else {
-                gctrk = g1;
-                g1 += lenk;
-        }
-        if (k_ctr == 1) {
-                gctrj = gctrk;
-                jempty = kempty;
-        } else {
-                gctrj = g1;
-                g1 += lenj;
-        }
-        if (j_ctr == 1) {
-                gctri = gctrj;
-                iempty = jempty;
-        } else {
-                gctri = g1;
-                g1 += leni;
-        }
-        if (i_ctr == 1) {
-                gout = gctri;
-                gempty = iempty;
-        } else {
-                gout = g1;
-        }
+        ALIAS_ADDR_IF_EQUAL(l, m);
+        ALIAS_ADDR_IF_EQUAL(k, l);
+        ALIAS_ADDR_IF_EQUAL(j, k);
+        ALIAS_ADDR_IF_EQUAL(i, j);
+        ALIAS_ADDR_IF_EQUAL(g, i);
 
         for (lp = 0; lp < l_prim; lp++) {
                 envs->al = al[lp];
@@ -433,13 +422,7 @@ FINT CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctri;
-        if (n_comp == 1) {
-                gctri = gctr;
-                iempty = empty;
-        } else {
-                gctri = g1;
-                g1 += leni;
-        }
+        ALIAS_ADDR_IF_EQUAL(i, m);
         gout = g1;
 
         pdata_kl = _pdata_kl;
@@ -491,13 +474,7 @@ FINT CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctrj;
-        if (n_comp == 1) {
-                gctrj = gctr;
-                jempty = empty;
-        } else {
-                gctrj = g1;
-                g1 += lenj;
-        }
+        ALIAS_ADDR_IF_EQUAL(j, m);
         gout = g1;
 
         pdata_kl = _pdata_kl;
@@ -550,13 +527,7 @@ FINT CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctrk;
-        if (n_comp == 1) {
-                gctrk = gctr;
-                kempty = empty;
-        } else {
-                gctrk = g1;
-                g1 += lenk;
-        }
+        ALIAS_ADDR_IF_EQUAL(k, m);
         gout = g1;
 
         pdata_kl = _pdata_kl;
@@ -609,13 +580,7 @@ FINT CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         MALLOC_INSTACK(g, len);
         double *g1 = g + leng;
         double *gout, *gctrl;
-        if (n_comp == 1) {
-                gctrl = gctr;
-                lempty = empty;
-        } else {
-                gctrl = g1;
-                g1 += lenl;
-        }
+        ALIAS_ADDR_IF_EQUAL(l, m);
         gout = g1;
 
         pdata_kl = _pdata_kl;
@@ -671,40 +636,11 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
         double *g1 = g + leng;
         double *gout, *gctri, *gctrj, *gctrk, *gctrl;
 
-        if (n_comp == 1) {
-                gctrl = gctr;
-                lempty = empty;
-        } else {
-                gctrl = g1;
-                g1 += lenl;
-        }
-        if (l_ctr == 1) {
-                gctrk = gctrl;
-                kempty = lempty;
-        } else {
-                gctrk = g1;
-                g1 += lenk;
-        }
-        if (k_ctr == 1) {
-                gctrj = gctrk;
-                jempty = kempty;
-        } else {
-                gctrj = g1;
-                g1 += lenj;
-        }
-        if (j_ctr == 1) {
-                gctri = gctrj;
-                iempty = jempty;
-        } else {
-                gctri = g1;
-                g1 += leni;
-        }
-        if (i_ctr == 1) {
-                gout = gctri;
-                gempty = iempty;
-        } else {
-                gout = g1;
-        }
+        ALIAS_ADDR_IF_EQUAL(l, m);
+        ALIAS_ADDR_IF_EQUAL(k, l);
+        ALIAS_ADDR_IF_EQUAL(j, k);
+        ALIAS_ADDR_IF_EQUAL(i, j);
+        ALIAS_ADDR_IF_EQUAL(g, i);
 
         pdata_kl = _pdata_kl;
         for (lp = 0; lp < l_prim; lp++) {

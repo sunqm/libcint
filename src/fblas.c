@@ -10,7 +10,7 @@
 
 #define OF_CMPLX        2
 
-void CINTdset0(const FINT n, double *x)
+void CINTdset0(FINT n, double *x)
 {
         FINT i;
         for (i = 0; i < n; i++) {
@@ -22,8 +22,7 @@ void CINTdset0(const FINT n, double *x)
 /*
  * v = a * x + y
  */
-void CINTdaxpy2v(const FINT n, const double a,
-                 const double *x, const double *y, double *v)
+void CINTdaxpy2v(FINT n, double a, double *x, double *y, double *v)
 {
         //cblas_dcopy(n, y, 1, v, 1);
         //cblas_daxpy(n, a, x, 1, v, 1);
@@ -36,7 +35,7 @@ void CINTdaxpy2v(const FINT n, const double a,
 /*
  * a[m,n] -> a_t[n,m]
  */
-void CINTdmat_transpose(double *a_t, const double *a, const FINT m, const FINT n)
+void CINTdmat_transpose(double *a_t, double *a, FINT m, FINT n)
 {
         FINT i, j, k;
 
@@ -78,7 +77,7 @@ void CINTdmat_transpose(double *a_t, const double *a, const FINT m, const FINT n
 /*
  * a_t[n,m] += a[m,n]
  */
-void CINTdplus_transpose(double *a_t, const double *a, const FINT m, const FINT n)
+void CINTdplus_transpose(double *a_t, double *a, FINT m, FINT n)
 {
         FINT i, j, k;
 
@@ -120,8 +119,7 @@ void CINTdplus_transpose(double *a_t, const double *a, const FINT m, const FINT 
 /*
  * a[m,n] -> a_t[n,m]
  */
-void CINTzmat_transpose(double complex *a_t, const double complex *a,
-                        const FINT m, const FINT n)
+void CINTzmat_transpose(double complex *a_t, double complex *a, FINT m, FINT n)
 {
         FINT i, j;
 
@@ -149,8 +147,7 @@ void CINTzmat_transpose(double complex *a_t, const double complex *a,
         }
 }
 
-void CINTzmat_dagger(double complex *a_t, const double complex *a,
-                     const FINT m, const FINT n)
+void CINTzmat_dagger(double complex *a_t, double complex *a, FINT m, FINT n)
 {
         FINT i, j;
 

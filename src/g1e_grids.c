@@ -180,51 +180,74 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         double *p0x, *p0y, *p0z;
         double *p1x, *p1y, *p1z;
         double *p2x, *p2y, *p2z;
-        double *rirg;
-        MALLOC_ALIGN8_INSTACK(rirg, GRID_BLKSIZE*2);
-        double *t2 = rirg + GRID_BLKSIZE;
+        double *t2;
+        MALLOC_ALIGN8_INSTACK(t2, GRID_BLKSIZE*4);
+        double *rirgx = t2 + GRID_BLKSIZE;
+        double *rirgy = rirgx + GRID_BLKSIZE;
+        double *rirgz = rirgy + GRID_BLKSIZE;
         double aij2 = 0.5 / envs->aij;
+        double tx, ty, tz;
 
         for (n = 0; n < nroots; n++) {
                 p0x = gx + GRID_BLKSIZE*n;
                 p0y = gy + GRID_BLKSIZE*n;
                 p0z = gz + GRID_BLKSIZE*n;
+                p1x = p0x + di;
+                p1y = p0y + di;
+                p1z = p0z + di;
 #pragma GCC ivdep
                 for (ig = 0; ig < bgrids; ig++) {
-                        t2[ig] = aij2 * (1 - u[ig+GRID_BLKSIZE*n]);
-                        rirg[ig] = rijrx[0] + u[ig+GRID_BLKSIZE*n] * rijrg[ig+GRID_BLKSIZE*0];
-                        rirg[ig] = rijrx[1] + u[ig+GRID_BLKSIZE*n] * rijrg[ig+GRID_BLKSIZE*1];
-                        rirg[ig] = rijrx[2] + u[ig+GRID_BLKSIZE*n] * rijrg[ig+GRID_BLKSIZE*2];
-                        p0x[ig+di] = rirg[ig] * p0x[ig];
-                        p0y[ig+di] = rirg[ig] * p0y[ig];
-                        p0z[ig+di] = rirg[ig] * p0z[ig];
+                        rirgx[ig] = rijrx[0] + u[ig+GRID_BLKSIZE*n] * rijrg[ig+GRID_BLKSIZE*0];
+                        rirgy[ig] = rijrx[1] + u[ig+GRID_BLKSIZE*n] * rijrg[ig+GRID_BLKSIZE*1];
+                        rirgz[ig] = rijrx[2] + u[ig+GRID_BLKSIZE*n] * rijrg[ig+GRID_BLKSIZE*2];
+                        p1x[ig] = rirgx[ig] * p0x[ig];
+                        p1y[ig] = rirgy[ig] * p0y[ig];
+                        p1z[ig] = rirgz[ig] * p0z[ig];
+                }
+                if (nmax > 0) {
+                        for (ig = 0; ig < bgrids; ig++) {
+                                t2[ig] = aij2 * (1 - u[ig+GRID_BLKSIZE*n]);
+                        }
                 }
                 for (i = 1; i < nmax; i++) {
                         p0x = gx + GRID_BLKSIZE*n + i * di;
                         p0y = gy + GRID_BLKSIZE*n + i * di;
                         p0z = gz + GRID_BLKSIZE*n + i * di;
+                        p1x = p0x + di;
+                        p1y = p0y + di;
+                        p1z = p0z + di;
+                        p2x = p0x - di;
+                        p2y = p0y - di;
+                        p2z = p0z - di;
 #pragma GCC ivdep
                         for (ig = 0; ig < bgrids; ig++) {
-                                p0x[ig+di] = i * t2[ig] * p0x[ig-di] + rirg[ig] * p0x[ig];
-                                p0y[ig+di] = i * t2[ig] * p0y[ig-di] + rirg[ig] * p0y[ig];
-                                p0z[ig+di] = i * t2[ig] * p0z[ig-di] + rirg[ig] * p0z[ig];
+                                p1x[ig] = i * t2[ig] * p2x[ig] + rirgx[ig] * p0x[ig];
+                                p1y[ig] = i * t2[ig] * p2y[ig] + rirgy[ig] * p0y[ig];
+                                p1z[ig] = i * t2[ig] * p2z[ig] + rirgz[ig] * p0z[ig];
                         }
                 }
         }
 
         for (j = 1; j <= lj; j++) {
         for (i = 0; i <= nmax - j; i++) {
-        for (n = 0; n < nroots; n++) {
-                p0x = gx + j * dj + i * di + GRID_BLKSIZE*n;
-                p0y = gy + j * dj + i * di + GRID_BLKSIZE*n;
-                p0z = gz + j * dj + i * di + GRID_BLKSIZE*n;
+                p0x = gx + j * dj + i * di;
+                p0y = gy + j * dj + i * di;
+                p0z = gz + j * dj + i * di;
+                p1x = p0x - dj;
+                p1y = p0y - dj;
+                p1z = p0z - dj;
+                p2x = p1x + di;
+                p2y = p1y + di;
+                p2z = p1z + di;
+
+                for (n = 0; n < nroots; n++) {
 #pragma GCC ivdep
                 for (ig = 0; ig < bgrids; ig++) {
-                        p0x[ig] = p0x[ig+di] + rirj[0] * p0x[ig-di];
-                        p0y[ig] = p0y[ig+di] + rirj[1] * p0y[ig-di];
-                        p0z[ig] = p0z[ig+di] + rirj[2] * p0z[ig-di];
-                }
-        } } }
+                        p0x[ig+GRID_BLKSIZE*n] = p2x[ig+GRID_BLKSIZE*n] + rirj[0] * p1x[ig+GRID_BLKSIZE*n];
+                        p0y[ig+GRID_BLKSIZE*n] = p2y[ig+GRID_BLKSIZE*n] + rirj[1] * p1y[ig+GRID_BLKSIZE*n];
+                        p0z[ig+GRID_BLKSIZE*n] = p2z[ig+GRID_BLKSIZE*n] + rirj[2] * p1z[ig+GRID_BLKSIZE*n];
+                } }
+        } }
         return 1;
 }
 
