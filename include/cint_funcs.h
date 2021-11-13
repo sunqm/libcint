@@ -1060,6 +1060,12 @@ extern CINTIntegralFunction int3c1e_iprinv_cart;
 extern CINTIntegralFunction int3c1e_iprinv_sph;
 extern CINTIntegralFunction int3c1e_iprinv_spinor;
 
+/* 3-center 1-electron integral <(NABLA i) (j) (k)> */
+extern CINTOptimizerFunction int3c1e_ip1_optimizer;
+extern CINTIntegralFunction int3c1e_ip1_cart;
+extern CINTIntegralFunction int3c1e_ip1_sph;
+extern CINTIntegralFunction int3c1e_ip1_spinor;
+
 /* <NABLA NABLA NABLA i|NUC |j> */
 extern CINTOptimizerFunction int1e_ipipipnuc_optimizer;
 extern CINTIntegralFunction int1e_ipipipnuc_cart;

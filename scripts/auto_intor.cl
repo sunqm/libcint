@@ -215,6 +215,7 @@
 (gen-cint "int3c1e.c"
   '("int3c1e_p2"                ( \, \, p dot p))
   '("int3c1e_iprinv"            ( p \, \| rinv \| ))
+  '("int3c1e_ip1"               ( nabla \, \,))
 )
 
 (gen-cint "deriv3.c"
