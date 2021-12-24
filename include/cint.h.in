@@ -151,6 +151,8 @@ typedef struct {
     PairData **pairdata;  // NULL indicates not-initialized, NO_VALUE can be skipped
 } CINTOpt;
 
+// Add this macro def to make pyscf compatible with both v4 and v5
+#define HAVE_DEFINED_CINTENVVARS_H
 typedef struct {
         FINT *atm;
         FINT *bas;
