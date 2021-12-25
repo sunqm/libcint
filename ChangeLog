@@ -1,5 +1,5 @@
-Version 5.0.1  (2021-12-24):
-	* Update cint.h for pyscf
+Version 5.1.0  (2021-12-24):
+	* Update cint.h to make CINTEnvVars closed to the definition in qcint
 Version 5.0.0  (2021-11-07):
 	* Improve the cartesian-spinor transformation
 	* Remove the dependency to BLAS library
