@@ -213,17 +213,14 @@ typedef struct {
         CINTOpt *opt;
 
         /* values are assigned during calculation */
-        FINT *idx;
-        double ai;
-        double aj;
-        double ak;
-        double al;
-        double aij;
-        double akl;
-        double *rij;
-        double *rkl;
-        double rijrx[3];
-        double rklrx[3];
+        int *idx;
+        double ai[1];
+        double aj[1];
+        double ak[1];
+        double al[1];
+        double fac[1];
+        double rij[3];
+        double rkl[3];
 } CINTEnvVars;
 #endif
 

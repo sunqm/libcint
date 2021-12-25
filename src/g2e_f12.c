@@ -14,8 +14,8 @@
 #include "misc.h"
 #include "g2e.h"
 
-FINT CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs);
-FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs);
+FINT CINTg0_2e_stg(double *g, CINTEnvVars *envs);
+FINT CINTg0_2e_yp(double *g, CINTEnvVars *envs);
 void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
 void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
@@ -158,7 +158,7 @@ void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         CINTg0_lj2d_4d(g, envs);
 }
 
-FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
+FINT CINTg0_2e_yp(double *g, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
         double ua = 0;
@@ -171,12 +171,12 @@ FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         FINT nroots = envs->nrys_roots;
         FINT i;
 
-        aij = envs->ai + envs->aj;
-        akl = envs->ak + envs->al;
+        aij = envs->ai[0] + envs->aj[0];
+        akl = envs->ak[0] + envs->al[0];
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
         //fac1 = sqrt(a0 / (a1 * a1 * a1)) * envs->fac[idsimd];
-        fac1 = fac / (sqrt(aij+akl) * a1);
+        fac1 = envs->fac[0] / (sqrt(aij+akl) * a1);
 
         //:ua[k] = zeta*zeta / a0[k];
         if (zeta > 0) {
@@ -212,8 +212,14 @@ FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
         }
 
         double u2, div, tmp1, tmp2, tmp3, tmp4;
-        double *rijrx = envs->rijrx;
-        double *rklrx = envs->rklrx;
+        double rijrx[3];
+        double rklrx[3];
+        rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
+        rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
+        rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
+        rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
+        rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
+        rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
@@ -247,7 +253,7 @@ FINT CINTg0_2e_yp(double *g, double fac, CINTEnvVars *envs)
 }
 
 
-FINT CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
+FINT CINTg0_2e_stg(double *g, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
         double ua = 0;
@@ -260,12 +266,12 @@ FINT CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         FINT nroots = envs->nrys_roots;
         FINT i;
 
-        aij = envs->ai + envs->aj;
-        akl = envs->ak + envs->al;
+        aij = envs->ai[0] + envs->aj[0];
+        akl = envs->ak[0] + envs->al[0];
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
         //fac1 = sqrt(a0 / (a1 * a1 * a1)) * fac;
-        fac1 = fac / (sqrt(aij+akl) * a1);
+        fac1 = envs->fac[0] / (sqrt(aij+akl) * a1);
 
         //:ua[k] = zeta*zeta / a0[k];
         if (zeta > 0) {
@@ -302,8 +308,14 @@ FINT CINTg0_2e_stg(double *g, double fac, CINTEnvVars *envs)
         }
 
         double u2, div, tmp1, tmp2, tmp3, tmp4;
-        double *rijrx = envs->rijrx;
-        double *rklrx = envs->rklrx;
+        double rijrx[3];
+        double rklrx[3];
+        rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
+        rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
+        rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
+        rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
+        rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
+        rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;

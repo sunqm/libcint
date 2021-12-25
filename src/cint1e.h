@@ -8,8 +8,6 @@
 
 FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT int1e_type);
 
-FINT CINT1e_nuc_loop(double *gctr, CINTEnvVars *envs, double fac, FINT nuc_id, double *cache);
-
 CACHE_SIZE_T CINT1e_drv(double *out, FINT *dims, CINTEnvVars *envs,
                double *cache, void (*f_c2s)(), FINT int1e_type);
 

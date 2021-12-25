@@ -53,8 +53,7 @@ void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                              r[ig+GRID_BLKSIZE*1]*r[ig+GRID_BLKSIZE*1] + \
                              r[ig+GRID_BLKSIZE*2]*r[ig+GRID_BLKSIZE*2])
 
-FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
-                    double *cache, double *gridsT)
+FINT CINTg0_1e_grids(double *g, CINTEnvVars *envs, double *cache, double *gridsT)
 {
         FINT ngrids = envs->ngrids;
         FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
@@ -70,7 +69,7 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         MALLOC_ALIGN8_INSTACK(u, GRID_BLKSIZE*nroots);
         double *rijrg;
         MALLOC_ALIGN8_INSTACK(rijrg, GRID_BLKSIZE*3);
-        double aij = envs->aij;
+        double aij = envs->ai[0] + envs->aj[0];
         FINT n, i, j, ig;
         double x, fac1;
 
@@ -92,7 +91,7 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         double theta, sqrt_theta;
 
         if (omega == 0) {
-                fac1 = fac / aij;
+                fac1 = envs->fac[0] / aij;
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * RGSQUARE(rijrg, ig);
                         CINTrys_roots(nroots, x, ubuf, wbuf);
@@ -105,7 +104,7 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         } else if (omega < 0) { // short-range part of range-separated Coulomb
                 theta = omega * omega / (omega * omega + aij);
                 sqrt_theta = sqrt(theta);
-                fac1 = fac / aij;
+                fac1 = envs->fac[0] / aij;
                 // FIXME:
                 // very small erfc() leads to ~0 weights. They can cause
                 // numerical issue in sr_rys_roots Use this cutoff as a
@@ -129,7 +128,7 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
                 }
         } else {  // long-range part of range-separated Coulomb
                 theta = omega * omega / (omega * omega + aij);
-                fac1 = fac * sqrt(theta) / aij;
+                fac1 = envs->fac[0] * sqrt(theta) / aij;
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * theta * RGSQUARE(rijrg, ig);
                         CINTrys_roots(nroots, x, ubuf, wbuf);
@@ -141,7 +140,7 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
                 }
         }
 #else
-        fac1 = fac / aij;
+        fac1 = envs->fac[0] / aij;
         for (ig = 0; ig < bgrids; ig++) {
                 x = aij * RGSQUARE(rijrg, ig);
                 CINTrys_roots(nroots, x, ubuf, wbuf);
@@ -185,7 +184,7 @@ FINT CINTg0_1e_grids(double *g, const double fac, CINTEnvVars *envs,
         double *rirgx = t2 + GRID_BLKSIZE;
         double *rirgy = rirgx + GRID_BLKSIZE;
         double *rirgz = rirgy + GRID_BLKSIZE;
-        double aij2 = 0.5 / envs->aij;
+        double aij2 = 0.5 / aij;
         double tx, ty, tz;
 
         for (n = 0; n < nroots; n++) {
@@ -307,7 +306,7 @@ void CINTnabla1i_grids(double *f, double *g,
         FINT nroots = envs->nrys_roots;
         const FINT di = envs->g_stride_i;
         const FINT dj = envs->g_stride_j;
-        const double ai2 = -2 * envs->ai;
+        const double ai2 = -2 * envs->ai[0];
         FINT i, j, n, ig, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
@@ -349,7 +348,7 @@ void CINTnabla1j_grids(double *f, double *g,
         FINT nroots = envs->nrys_roots;
         const FINT di = envs->g_stride_i;
         const FINT dj = envs->g_stride_j;
-        const double aj2 = -2 * envs->aj;
+        const double aj2 = -2 * envs->aj[0];
         FINT i, j, n, ig, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;

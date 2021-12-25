@@ -121,16 +121,16 @@ void CINTg1e_index_xyz(FINT *idx, CINTEnvVars *envs)
 }
 
 
-FINT CINTg1e_ovlp(double *g, double fac, CINTEnvVars *envs)
+FINT CINTg1e_ovlp(double *g, CINTEnvVars *envs)
 {
         double *gx = g;
         double *gy = g + envs->g_size;
         double *gz = g + envs->g_size * 2;
-        double aij = envs->ai + envs->aj;
+        double aij = envs->ai[0] + envs->aj[0];
 
         gx[0] = 1;
         gy[0] = 1;
-        gz[0] = fac * SQRTPI*M_PI / (aij * sqrt(aij));
+        gz[0] = envs->fac[0] * SQRTPI*M_PI / (aij * sqrt(aij));
 
         FINT nmax = envs->li_ceil + envs->lj_ceil;
         if (nmax == 0) {
@@ -204,7 +204,7 @@ double CINTnuc_mod(double aij, FINT nuc_id, FINT *atm, double *env)
         }
 }
 
-FINT CINTg1e_nuc(double *g, double fac, CINTEnvVars *envs, FINT nuc_id)
+FINT CINTg1e_nuc(double *g, CINTEnvVars *envs, FINT nuc_id)
 {
         FINT nrys_roots = envs->nrys_roots;
         FINT *atm = envs->atm;
@@ -219,17 +219,17 @@ FINT CINTg1e_nuc(double *g, double fac, CINTEnvVars *envs, FINT nuc_id)
         FINT i, j, n;
         double crij[3];
         double x, fac1;
-        double aij = envs->ai + envs->aj;
+        double aij = envs->ai[0] + envs->aj[0];
         double tau = CINTnuc_mod(aij, nuc_id, atm, env);
 
         if (nuc_id < 0) {
-                fac1 = 2*M_PI * fac * tau / aij;
+                fac1 = 2*M_PI * envs->fac[0] * tau / aij;
                 cr = env + PTR_RINV_ORIG;
         } else if (atm(NUC_MOD_OF, nuc_id) == FRAC_CHARGE_NUC) {
-                fac1 = 2*M_PI * -env[atm[PTR_FRAC_CHARGE+nuc_id*ATM_SLOTS]] * fac * tau / aij;
+                fac1 = 2*M_PI * -env[atm[PTR_FRAC_CHARGE+nuc_id*ATM_SLOTS]] * envs->fac[0] * tau / aij;
                 cr = env + atm(PTR_COORD, nuc_id);
         } else {
-                fac1 = 2*M_PI * -fabs(atm[CHARGE_OF+nuc_id*ATM_SLOTS]) * fac * tau / aij;
+                fac1 = 2*M_PI * -fabs(atm[CHARGE_OF+nuc_id*ATM_SLOTS]) * envs->fac[0] * tau / aij;
                 cr = env + atm(PTR_COORD, nuc_id);
         }
         crij[0] = cr[0] - rij[0];
@@ -323,7 +323,7 @@ void CINTnabla1i_1e(double *f, double *g,
 {
         const FINT dj = envs->g_stride_j;
         const FINT dk = envs->g_stride_k;
-        const double ai2 = -2 * envs->ai;
+        const double ai2 = -2 * envs->ai[0];
         FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
@@ -353,7 +353,7 @@ void CINTnabla1j_1e(double *f, double *g,
 {
         const FINT dj = envs->g_stride_j;
         const FINT dk = envs->g_stride_k;
-        const double aj2 = -2 * envs->aj;
+        const double aj2 = -2 * envs->aj[0];
         FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
@@ -390,7 +390,7 @@ void CINTnabla1k_1e(double *f, double *g,
 {
         const FINT dj = envs->g_stride_j;
         const FINT dk = envs->g_stride_k;
-        const double ak2 = -2 * envs->ak;
+        const double ak2 = -2 * envs->ak[0];
         FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;

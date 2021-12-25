@@ -141,7 +141,7 @@ void CINTg4c1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 }
 
 
-void CINTg4c1e_ovlp(double *g, double fac, const CINTEnvVars *envs)
+void CINTg4c1e_ovlp(double *g, const CINTEnvVars *envs)
 {
         const FINT li = envs->li_ceil;
         const FINT lj = envs->lj_ceil;
@@ -176,7 +176,7 @@ void CINTg4c1e_ovlp(double *g, double fac, const CINTEnvVars *envs)
         aijkl = aij + akl;
         bufx[0] = 1;
         bufy[0] = 1;
-        bufz[0] = fac / (aijkl * sqrt(aijkl));
+        bufz[0] = envs->fac[0] / (aijkl * sqrt(aijkl));
 
         if (nmax >= mmax) {
                 r1r12[0] = ri[0] - (aij*rij[0] + akl*rkl[0]) / aijkl;

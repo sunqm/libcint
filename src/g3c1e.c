@@ -122,7 +122,7 @@ void CINTg3c1e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 
 
 void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
-                    double fac, const CINTEnvVars *envs)
+                    const CINTEnvVars *envs)
 {
         const FINT li = envs->li_ceil;
         const FINT lj = envs->lj_ceil;
@@ -134,7 +134,7 @@ void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
         double *gz = g + envs->g_size * 2;
         gx[0] = 1;
         gy[0] = 1;
-        gz[0] = fac;
+        gz[0] = envs->fac[0];
         if (nmax == 0) {
                 return;
         }
@@ -190,7 +190,7 @@ void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
 }
 
 void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
-                   double *cr, double t2, double fac, CINTEnvVars *envs)
+                   double *cr, double t2, CINTEnvVars *envs)
 {
         const FINT li = envs->li_ceil;
         const FINT lj = envs->lj_ceil;
@@ -202,7 +202,7 @@ void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
         double *gz = g + envs->g_size * 2;
         gx[0] = 1;
         gy[0] = 1;
-        gz[0] = 2/SQRTPI * fac;
+        gz[0] = 2/SQRTPI * envs->fac[0];
         if (nmax == 0) {
                 return;
         }
@@ -265,7 +265,7 @@ void CINTnabla1i_3c1e(double *f, const double *g,
 {
         const FINT dj = envs->g_stride_j;
         const FINT dk = envs->g_stride_k;
-        const double ai2 = -2 * envs->ai;
+        const double ai2 = -2 * envs->ai[0];
         FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
@@ -299,7 +299,7 @@ void CINTnabla1j_3c1e(double *f, const double *g,
 {
         const FINT dj = envs->g_stride_j;
         const FINT dk = envs->g_stride_k;
-        const double aj2 = -2 * envs->aj;
+        const double aj2 = -2 * envs->aj[0];
         FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;
@@ -337,7 +337,7 @@ void CINTnabla1k_3c1e(double *f, const double *g,
 {
         const FINT dj = envs->g_stride_j;
         const FINT dk = envs->g_stride_k;
-        const double ak2 = -2 * envs->ak;
+        const double ak2 = -2 * envs->ak[0];
         FINT i, j, k, ptr;
         const double *gx = g;
         const double *gy = g + envs->g_size;

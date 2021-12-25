@@ -140,8 +140,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
         ALIAS_ADDR_IF_EQUAL(g, i);
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
+                envs->ak[0] = ak[kp];
                 if (k_ctr == 1) {
                         fac1k = envs->common_factor * ck[kp];
                 } else {
@@ -151,7 +150,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
 
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
-                        envs->aj = aj[jp];
+                        envs->aj[0] = aj[jp];
                         if (j_ctr == 1) {
                                 fac1j = fac1k * cj[jp];
                         } else {
@@ -162,20 +161,19 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
                                 if (pdata_ij->cceij > expcutoff) {
                                         goto i_contracted;
                                 }
-                                envs->ai = ai[ip];
-                                envs->aij = ai[ip] + aj[jp];
+                                envs->ai[0] = ai[ip];
                                 expij = pdata_ij->eij;
                                 rij = pdata_ij->rij;
-                                envs->rij = rij;
-                                envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
-                                envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
-                                envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
+                                envs->rij[0] = rij[0];
+                                envs->rij[1] = rij[1];
+                                envs->rij[2] = rij[2];
                                 if (i_ctr == 1) {
                                         fac1i = fac1j*ci[ip]*expij;
                                 } else {
                                         fac1i = fac1j*expij;
                                 }
-                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                envs->fac[0] = fac1i;
+                                if ((*envs->f_g0_2e)(g, envs)) {
                                         (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                         PRIM2CTR0(i, gout, len0);
                                 }
@@ -265,14 +263,12 @@ i_contracted: ;
         if (pdata_ij->cceij > expcutoff) { \
                 goto i_contracted; \
         } \
-        envs->ai  = ai[ip]; \
-        envs->aij = ai[ip] + aj[jp]; \
+        envs->ai[0] = ai[ip]; \
         expij = pdata_ij->eij; \
         rij = pdata_ij->rij; \
-        envs->rij = rij; \
-        envs->rijrx[0] = rij[0] - envs->rx_in_rijrx[0]; \
-        envs->rijrx[1] = rij[1] - envs->rx_in_rijrx[1]; \
-        envs->rijrx[2] = rij[2] - envs->rx_in_rijrx[2]
+        envs->rij[0] = rij[0]; \
+        envs->rij[1] = rij[1]; \
+        envs->rij[2] = rij[2];
 
 #define PRIM2CTR(ctrsymb, gp, ngp) \
         if (ctrsymb##_ctr > 1) {\
@@ -310,18 +306,18 @@ FINT CINT3c2e_111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *emp
         }
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
+                envs->ak[0] = ak[kp];
                 fac1k = envs->common_factor * ck[kp];
 
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
-                        envs->aj = aj[jp];
+                        envs->aj[0] = aj[jp];
                         fac1j = fac1k * cj[jp];
                         for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 fac1i = fac1j*ci[ip]*expij;
-                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                envs->fac[0] = fac1i;
+                                if ((*envs->f_g0_2e)(g, envs)) {
                                         (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                         *gempty = 0;
                                 }
@@ -354,17 +350,17 @@ FINT CINT3c2e_n11_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *emp
         gout = g1;
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
+                envs->ak[0] = ak[kp];
                 fac1k = envs->common_factor * ck[kp];
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
-                        envs->aj = aj[jp];
+                        envs->aj[0] = aj[jp];
                         fac1j = fac1k * cj[jp];
                         for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 fac1i = fac1j*expij;
-                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                envs->fac[0] = fac1i;
+                                if ((*envs->f_g0_2e)(g, envs)) {
                                         (*envs->f_gout)(gout, g, idx, envs, 1);
                                         PRIM2CTR(i, gout, len0);
                                 }
@@ -397,18 +393,18 @@ FINT CINT3c2e_1n1_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *emp
         gout = g1;
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
+                envs->ak[0] = ak[kp];
                 fac1k = envs->common_factor * ck[kp];
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
-                        envs->aj = aj[jp];
+                        envs->aj[0] = aj[jp];
                         fac1j = fac1k;
                         *iempty = 1;
                         for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                 SET_RIJ;
                                 fac1i = fac1j*ci[ip]*expij;
-                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                envs->fac[0] = fac1i;
+                                if ((*envs->f_g0_2e)(g, envs)) {
                                         (*envs->f_gout)(gout, g, idx, envs, *iempty);
                                         *iempty = 0;
                                 }
@@ -449,8 +445,7 @@ FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
         ALIAS_ADDR_IF_EQUAL(g, i);
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
+                envs->ak[0] = ak[kp];
                 if (k_ctr == 1) {
                         fac1k = envs->common_factor * ck[kp];
                 } else {
@@ -459,7 +454,7 @@ FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
                 }
                 pdata_ij = pdata_base;
                 for (jp = 0; jp < j_prim; jp++) {
-                        envs->aj = aj[jp];
+                        envs->aj[0] = aj[jp];
                         if (j_ctr == 1) {
                                 fac1j = fac1k * cj[jp];
                         } else {
@@ -473,7 +468,8 @@ FINT CINT3c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
                                 } else {
                                         fac1i = fac1j*expij;
                                 }
-                                if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                                envs->fac[0] = fac1i;
+                                if ((*envs->f_g0_2e)(g, envs)) {
                                         (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                         PRIM2CTR(i, gout, len0);
                                 }

@@ -12,9 +12,9 @@ void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 
 void CINTg1e_index_xyz(FINT *idx, CINTEnvVars *envs);
 
-FINT CINTg1e_ovlp(double *g, double fac, CINTEnvVars *envs);
+FINT CINTg1e_ovlp(double *g, CINTEnvVars *envs);
 
-FINT CINTg1e_nuc(double *g, double fac, CINTEnvVars *envs, FINT nuc_id);
+FINT CINTg1e_nuc(double *g, CINTEnvVars *envs, FINT nuc_id);
 
 void CINTnabla1i_1e(double *f, double *g,
                     FINT li, FINT lj, FINT lk, CINTEnvVars *envs);
