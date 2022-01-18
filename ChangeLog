@@ -1,3 +1,5 @@
+Version 5.1.1  (2022-01-18):
+	* Fix integer overflow in gto_norm function
 Version 5.1.0  (2021-12-24):
 	* Update cint.h to make CINTEnvVars closed to the definition in qcint
 Version 5.0.0  (2021-11-07):
