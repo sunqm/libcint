@@ -69,19 +69,27 @@ double CINTsquare_dist(const double *r1, const double *r2)
         return r12[0] * r12[0] + r12[1] * r12[1] + r12[2] * r12[2];
 }
 
-static FINT factorial(FINT n)
+static double _gaussian_int(FINT n, double alpha)
 {
-        FINT i, fact = 1;
-        for (i = 1; i <= n; i++) {
-                fact *= i;
-        }
-        return fact;
+        double n1 = (n + 1) * .5;
+        return exp(lgamma(n1)) / (2. * pow(alpha, n1));
 }
+
+/*
+ * Normalized factor for GTO radial part g=r^l e^{-\alpha r^2}
+ *
+ * \frac{1}{\sqrt{\int g^2 r^2 dr}}
+ *   = \sqrt{\frac{2^{2l+3} (l+1)! (2a)^{l+1.5}}{(2l+2)!\sqrt{\pi}}}
+ *
+ * Ref: H. B. Schlegel and M. J. Frisch, Int. J. Quant.  Chem., 54(1995), 83-87.
+ */
 double CINTgto_norm(FINT n, double a)
 {
-        double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
-                / (factorial(2*n+2) * sqrt(M_PI));
-        return sqrt(nn);
+        //double nn = pow(2, (2*n+3)) * factorial(n+1) * pow((2*a), (n+1.5)) \
+        //        / (factorial(2*n+2) * sqrt(M_PI));
+        //return sqrt(nn);
+        return 1. / sqrt(_gaussian_int(n*2+2, 2*a));
+
 }
 double CINTgto_norm_(FINT *n, double *a)
 {
