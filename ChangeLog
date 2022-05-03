@@ -1,3 +1,11 @@
+Version 5.1.2  (2022-05-03):
+	* Fix cint3c1e_cart integral
+	* New integrals 
+	  <i | nabla nabla r | j>
+	  <i | nabla r nabla | j>
+	  <i | nabla nabla nabla 1/r | j>
+	  <i | nabla nabla 1/r nabla | j>
+
 Version 5.1.1  (2022-01-18):
 	* Fix integer overflow in gto_norm function
 Version 5.1.0  (2021-12-24):
