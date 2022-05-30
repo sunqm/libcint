@@ -126,7 +126,7 @@ double cintgto_norm_(FINT *n, double *a)
  * let Fortran be able to change CINTOpt
  */
 /* in Fortran, pass an integer(8) to hold the pointer of CINTOpt */
-//typedef long CINTOptPtrAsInteger8;
+//typedef int64_t CINTOptPtrAsInteger8;
 void cintinit_2e_optimizer_(CINTOpt **opt,
                             FINT *atm, FINT *natm,
                             FINT *bas, FINT *nbas, double *env)
