@@ -82,7 +82,8 @@ set(cintSrc
   src/autocode/grad1.c src/autocode/grad2.c src/autocode/hess.c
   src/autocode/int3c1e.c src/autocode/int3c2e.c src/autocode/intor1.c
   src/autocode/intor2.c src/autocode/intor3.c src/autocode/intor4.c
-  src/autocode/deriv3.c src/autocode/int1e_grids1.c)
+  src/autocode/deriv3.c src/autocode/int1e_grids1.c
+  src/autocode/deriv4.c)
 
 #option(WITH_RANGE_COULOMB "Range separated Coulomb" on)
 if(WITH_RANGE_COULOMB)
