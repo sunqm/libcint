@@ -224,6 +224,12 @@
   '("int1e_ipiprinvip"          ( nabla nabla \| rinv \| nabla ))
 )
 
+(gen-cint "deriv4.c"
+  '("int1e_ipiprinvipip"        ( nabla nabla \| rinv \| nabla nabla ))
+  '("int1e_ipipiprinvip"        ( nabla nabla nabla \| rinv \| nabla ))
+  '("int1e_ipipipiprinv"        ( nabla nabla nabla nabla \| rinv \| ))
+)
+
 (gen-cint "int1e_grids1.c"
   '("int1e_grids_ip"            ( nabla \| grids \| ))
   '("int1e_grids_ipvip"         ( nabla \| grids \| nabla ))
