@@ -1,3 +1,6 @@
+Version 5.1.3  (2022-06-15):
+	* Missing cart2sph function for l=15
+
 Version 5.1.2  (2022-05-03):
 	* Fix cint3c1e_cart integral
 	* New integrals 
