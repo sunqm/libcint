@@ -21,6 +21,7 @@
   '("int1e_zz"                  ( \| zc zc \| ))
   '("int1e_r"                   ( \| rc \| ))
   '("int1e_r2"                  ( \| rc dot rc \| ))
+  '("int1e_r4"                  ( \| rc dot rc rc dot rc \| ))
   '("int1e_rr"                  ( \| rc rc \| ))
   '("int1e_rrr"                 ( \| rc rc rc \| ))
   '("int1e_rrrr"                ( \| rc rc rc rc \| ))
@@ -174,6 +175,8 @@
   '("int1e_ipnucip"             ( nabla \| nuc \| nabla ))
   '("int1e_ipiprinv"            ( nabla nabla \| rinv \| ))
   '("int1e_iprinvip"            ( nabla \| rinv \| nabla ))
+  '("int1e_ipipr"               ( nabla nabla \| rc \| ))
+  '("int1e_iprip"               ( nabla \| rc \| nabla ))
   '("int2e_ipip1"               ( nabla nabla \, \| \, ))
   '("int2e_ipvip1"              ( nabla \, nabla \| \, ))
   '("int2e_ip1ip2"              ( nabla \, \| nabla \, ))
@@ -220,6 +223,12 @@
   '("int1e_ipipiprinv"          ( nabla nabla nabla \| rinv \| ))
   '("int1e_ipipnucip"           ( nabla nabla \| nuc \| nabla ))
   '("int1e_ipiprinvip"          ( nabla nabla \| rinv \| nabla ))
+)
+
+(gen-cint "deriv4.c"
+  '("int1e_ipiprinvipip"        ( nabla nabla \| rinv \| nabla nabla ))
+  '("int1e_ipipiprinvip"        ( nabla nabla nabla \| rinv \| nabla ))
+  '("int1e_ipipipiprinv"        ( nabla nabla nabla nabla \| rinv \| ))
 )
 
 (gen-cint "int1e_grids1.c"

@@ -124,6 +124,12 @@ extern CINTIntegralFunction int1e_r2_cart;
 extern CINTIntegralFunction int1e_r2_sph;
 extern CINTIntegralFunction int1e_r2_spinor;
 
+/* <i|RC DOT RC RC DOT RC |j> */
+extern CINTOptimizerFunction int1e_r4_optimizer;
+extern CINTIntegralFunction int1e_r4_cart;
+extern CINTIntegralFunction int1e_r4_sph;
+extern CINTIntegralFunction int1e_r4_spinor;
+
 /* <i|RC RC |j> */
 extern CINTOptimizerFunction int1e_rr_optimizer;
 extern CINTIntegralFunction int1e_rr_cart;
@@ -856,6 +862,18 @@ extern CINTIntegralFunction int1e_iprinvip_cart;
 extern CINTIntegralFunction int1e_iprinvip_sph;
 extern CINTIntegralFunction int1e_iprinvip_spinor;
 
+/* <NABLA NABLA i|RC |j> */
+extern CINTOptimizerFunction int1e_ipipr_optimizer;
+extern CINTIntegralFunction int1e_ipipr_cart;
+extern CINTIntegralFunction int1e_ipipr_sph;
+extern CINTIntegralFunction int1e_ipipr_spinor;
+
+/* <NABLA i|RC |NABLA j> */
+extern CINTOptimizerFunction int1e_iprip_optimizer;
+extern CINTIntegralFunction int1e_iprip_cart;
+extern CINTIntegralFunction int1e_iprip_sph;
+extern CINTIntegralFunction int1e_iprip_spinor;
+
 /* (NABLA NABLA i j|R12 |k l) */
 extern CINTOptimizerFunction int2e_ipip1_optimizer;
 extern CINTIntegralFunction int2e_ipip1_cart;
@@ -1090,3 +1108,20 @@ extern CINTIntegralFunction int1e_grids_spvsp_cart;
 extern CINTIntegralFunction int1e_grids_spvsp_sph;
 extern CINTIntegralFunction int1e_grids_spvsp_spinor;
 
+/* <NABLA NABLA i|RINV |NABLA NABLA j> */
+extern CINTOptimizerFunction int1e_ipiprinvipip_optimizer;
+extern CINTIntegralFunction int1e_ipiprinvipip_cart;
+extern CINTIntegralFunction int1e_ipiprinvipip_sph;
+extern CINTIntegralFunction int1e_ipiprinvipip_spinor;
+
+/* <NABLA NABLA NABLA i|RINV |NABLA j> */
+extern CINTOptimizerFunction int1e_ipipiprinvip_optimizer;
+extern CINTIntegralFunction int1e_ipipiprinvip_cart;
+extern CINTIntegralFunction int1e_ipipiprinvip_sph;
+extern CINTIntegralFunction int1e_ipipiprinvip_spinor;
+
+/* <NABLA NABLA NABLA NABLA i|RINV |j> */
+extern CINTOptimizerFunction int1e_ipipipiprinv_optimizer;
+extern CINTIntegralFunction int1e_ipipipiprinv_cart;
+extern CINTIntegralFunction int1e_ipipipiprinv_sph;
+extern CINTIntegralFunction int1e_ipipipiprinv_spinor;

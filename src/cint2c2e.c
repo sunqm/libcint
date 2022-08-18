@@ -111,8 +111,8 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
         }
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp]; // to use CINTg0_2e
+                envs->ak[0] = ak[kp];
+                envs->al[0] = 0; // to use CINTg0_2e
                 if (k_ctr == 1) {
                         fac1k = envs->common_factor * ck[kp];
                 } else {
@@ -120,14 +120,15 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
                         *iempty = 1;
                 }
                 for (ip = 0; ip < i_prim; ip++) {
-                        envs->ai = ai[ip];
-                        envs->aij = ai[ip];
+                        envs->ai[0] = ai[ip];
+                        envs->aj[0] = 0;
                         if (i_ctr == 1) {
                                 fac1i = fac1k*ci[ip];
                         } else {
                                 fac1i = fac1k;
                         }
-                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                        envs->fac[0] = fac1i;
+                        if ((*envs->f_g0_2e)(g, envs)) {
                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                 PRIM2CTR(i, gout, len0);
                         }
@@ -197,8 +198,7 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
         ALIAS_ADDR_IF_EQUAL(g, i);
 
         for (kp = 0; kp < k_prim; kp++) {
-                envs->ak = ak[kp];
-                envs->akl = ak[kp];
+                envs->ak[0] = ak[kp];
                 if (k_ctr == 1) {
                         fac1k = envs->common_factor * ck[kp];
                 } else {
@@ -206,14 +206,14 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
                         *iempty = 1;
                 }
                 for (ip = 0; ip < i_prim; ip++) {
-                        envs->ai = ai[ip];
-                        envs->aij = ai[ip];
+                        envs->ai[0] = ai[ip];
                         if (i_ctr == 1) {
                                 fac1i = fac1k*ci[ip];
                         } else {
                                 fac1i = fac1k;
                         }
-                        if ((*envs->f_g0_2e)(g, fac1i, envs)) {
+                        envs->fac[0] = fac1i;
+                        if ((*envs->f_g0_2e)(g, envs)) {
                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                 PRIM2CTR(i, gout, len0);
                         }

@@ -30,7 +30,7 @@
         } \
         *ctrsymb##empty = 0
 
-static void make_g1e_gout(double *gout, double *g, double fac, FINT *idx,
+static void make_g1e_gout(double *gout, double *g, FINT *idx,
                           CINTEnvVars *envs, FINT empty, FINT int1e_type);
 
 /*
@@ -122,7 +122,7 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT int1e_type
 
         pdata_ij = pdata_base;
         for (jp = 0; jp < j_prim; jp++) {
-                envs->aj = aj[jp];
+                envs->aj[0] = aj[jp];
                 if (j_ctr == 1) {
                         fac1j = common_factor * cj[jp];
                 } else {
@@ -133,16 +133,19 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT int1e_type
                         if (pdata_ij->cceij > expcutoff) {
                                 continue;
                         }
-                        envs->ai = ai[ip];
+                        envs->ai[0] = ai[ip];
                         expij = pdata_ij->eij;
                         rij = pdata_ij->rij;
-                        envs->rij = rij;
+                        envs->rij[0] = rij[0];
+                        envs->rij[1] = rij[1];
+                        envs->rij[2] = rij[2];
                         if (i_ctr == 1) {
                                 fac1i = fac1j*ci[ip]*expij;
                         } else {
                                 fac1i = fac1j*expij;
                         }
-                        make_g1e_gout(gout, g, fac1i, idx, envs, *gempty, int1e_type);
+                        envs->fac[0] = fac1i;
+                        make_g1e_gout(gout, g, idx, envs, *gempty, int1e_type);
                         PRIM2CTR0(i, gout, envs->nf*n_comp);
                 }
                 if (!*iempty) {
@@ -278,22 +281,22 @@ CACHE_SIZE_T CINT1e_spinor_drv(double complex *out, FINT *dims, CINTEnvVars *env
         return has_value;
 }
 
-static void make_g1e_gout(double *gout, double *g, double fac, FINT *idx,
+static void make_g1e_gout(double *gout, double *g, FINT *idx,
                           CINTEnvVars *envs, FINT empty, FINT int1e_type)
 {
         FINT ia;
         switch (int1e_type) {
         case 0:
-                CINTg1e_ovlp(g, fac, envs);
+                CINTg1e_ovlp(g, envs);
                 (*envs->f_gout)(gout, g, idx, envs, empty);
                 break;
         case 1:
-                CINTg1e_nuc(g, fac, envs, -1);
+                CINTg1e_nuc(g, envs, -1);
                 (*envs->f_gout)(gout, g, idx, envs, empty);
                 break;
         case 2:
                 for (ia = 0; ia < envs->natm; ia++) {
-                        CINTg1e_nuc(g, fac, envs, ia);
+                        CINTg1e_nuc(g, envs, ia);
                         (*envs->f_gout)(gout, g, idx, envs, (empty && ia == 0));
                 }
                 break;

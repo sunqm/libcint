@@ -89,15 +89,14 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->g_stride_j = envs->nrys_roots * dli * dlk;
         envs->g_size     = envs->nrys_roots * dli * dlk * dlj;
 
-        envs->al = 0;
-        envs->rkl = envs->rk;
+        envs->al[0] = 0;
+        envs->rkl[0] = envs->rk[0];
+        envs->rkl[1] = envs->rk[1];
+        envs->rkl[2] = envs->rk[2];
         envs->g2d_klmax = envs->g_stride_k;
         envs->rkrl[0] = envs->rk[0];
         envs->rkrl[1] = envs->rk[1];
         envs->rkrl[2] = envs->rk[2];
-        envs->rklrx[0] = 0;
-        envs->rklrx[1] = 0;
-        envs->rklrx[2] = 0;
         // in g0_2d rklrx = rkl - rx = 0 => rkl = rx
         envs->rx_in_rklrx = envs->rk;
 
@@ -198,15 +197,14 @@ void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->g_stride_j = envs->nrys_roots * dli * dlk;
         envs->g_size     = envs->nrys_roots * dli * dlk * dlj;
 
-        envs->al = 0;
-        envs->rkl = envs->rk;
+        envs->al[0] = 0;
+        envs->rkl[0] = envs->rk[0];
+        envs->rkl[1] = envs->rk[1];
+        envs->rkl[2] = envs->rk[2];
         envs->g2d_klmax = envs->g_stride_k;
         envs->rkrl[0] = envs->rk[0];
         envs->rkrl[1] = envs->rk[1];
         envs->rkrl[2] = envs->rk[2];
-        envs->rklrx[0] = 0;
-        envs->rklrx[1] = 0;
-        envs->rklrx[2] = 0;
         // in g0_2d rklrx = rkl - rx = 0 => rkl = rx
         envs->rx_in_rklrx = envs->rk;
 

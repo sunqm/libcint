@@ -13,7 +13,7 @@
 #include "g2e.h"
 
 void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs);
-FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs);
+FINT CINTg0_2e_gtg(double *g, CINTEnvVars *envs);
 
 void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -166,12 +166,12 @@ void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
+FINT CINTg0_2e_gtg(double *g, CINTEnvVars *envs)
 {
-        const double aij = envs->aij;
-        const double akl = envs->akl;
-        const double *env = envs->env;
-        const double zeta = env[PTR_GTG_ZETA];
+        double aij = envs->ai[0] + envs->aj[0];
+        double akl = envs->ak[0] + envs->al[0];
+        double *env = envs->env;
+        double zeta = env[PTR_GTG_ZETA];
         double a0, a1, fac1, x, t;
         double *gz = g + envs->g_size * 2;
         double rijrkl[3];
@@ -186,7 +186,7 @@ FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
                + rijrkl[1] * rijrkl[1]
                + rijrkl[2] * rijrkl[2]);
         fac1 = (1-t) / a1;
-        gz[0] = fac1*sqrt(fac1) * exp(-t * x) * fac;
+        gz[0] = fac1*sqrt(fac1) * exp(-t * x) * envs->fac[0];
         if (envs->g_size == 1) {
                 g[0] = 1;
                 g[1] = 1;
@@ -194,8 +194,14 @@ FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs)
         }
 
         double div, tmp1, tmp2, tmp3, tmp4;
-        const double *rijrx = envs->rijrx;
-        const double *rklrx = envs->rklrx;
+        double rijrx[3];
+        double rklrx[3];
+        rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
+        rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
+        rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
+        rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
+        rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
+        rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;

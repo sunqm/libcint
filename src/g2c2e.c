@@ -66,24 +66,22 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->g_stride_l = envs->g_stride_k;
         envs->g_size     = envs->nrys_roots * dli * dlk;
 
-        envs->aj = 0;
-        envs->al = 0;
-        envs->rij = envs->ri;
-        envs->rkl = envs->rk;
+        envs->aj[0] = 0;
+        envs->al[0] = 0;
+        envs->rij[0] = envs->ri[0];
+        envs->rij[1] = envs->ri[1];
+        envs->rij[2] = envs->ri[2];
+        envs->rkl[0] = envs->rk[0];
+        envs->rkl[1] = envs->rk[1];
+        envs->rkl[2] = envs->rk[2];
         envs->g2d_ijmax = envs->g_stride_i;
         envs->g2d_klmax = envs->g_stride_k;
         envs->rkrl[0] = envs->rk[0];
         envs->rkrl[1] = envs->rk[1];
         envs->rkrl[2] = envs->rk[2];
-        envs->rklrx[0] = 0;
-        envs->rklrx[1] = 0;
-        envs->rklrx[2] = 0;
         envs->rirj[0] = envs->ri[0];
         envs->rirj[1] = envs->ri[1];
         envs->rirj[2] = envs->ri[2];
-        envs->rijrx[0] = 0;
-        envs->rijrx[1] = 0;
-        envs->rijrx[2] = 0;
         envs->rx_in_rklrx = envs->rk;
         envs->rx_in_rijrx = envs->ri;
 
@@ -155,24 +153,22 @@ void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->g_stride_l = envs->g_stride_k;
         envs->g_size     = envs->nrys_roots * dli * dlk;
 
-        envs->aj = 0;
-        envs->al = 0;
-        envs->rij = envs->ri;
-        envs->rkl = envs->rk;
+        envs->aj[0] = 0;
+        envs->al[0] = 0;
+        envs->rij[0] = envs->ri[0];
+        envs->rij[1] = envs->ri[1];
+        envs->rij[2] = envs->ri[2];
+        envs->rkl[0] = envs->rk[0];
+        envs->rkl[1] = envs->rk[1];
+        envs->rkl[2] = envs->rk[2];
         envs->g2d_ijmax = envs->g_stride_i;
         envs->g2d_klmax = envs->g_stride_k;
         envs->rkrl[0] = envs->rk[0];
         envs->rkrl[1] = envs->rk[1];
         envs->rkrl[2] = envs->rk[2];
-        envs->rklrx[0] = 0;
-        envs->rklrx[1] = 0;
-        envs->rklrx[2] = 0;
         envs->rirj[0] = envs->ri[0];
         envs->rirj[1] = envs->ri[1];
         envs->rirj[2] = envs->ri[2];
-        envs->rijrx[0] = 0;
-        envs->rijrx[1] = 0;
-        envs->rijrx[2] = 0;
         envs->rx_in_rklrx = envs->rk;
         envs->rx_in_rijrx = envs->ri;
 

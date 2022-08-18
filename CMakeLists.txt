@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.5)
 project (cint C)
 set(cint_VERSION_MAJOR "5")
-set(cint_VERSION_MINOR "0")
-set(cint_VERSION_PATCH "0")
+set(cint_VERSION_MINOR "1")
+set(cint_VERSION_PATCH "4")
 set(cint_VERSION_TWEAK "0")
 set(cint_VERSION "${cint_VERSION_MAJOR}.${cint_VERSION_MINOR}.${cint_VERSION_PATCH}")
 set(cint_SOVERSION "${cint_VERSION_MAJOR}")
@@ -82,7 +82,8 @@ set(cintSrc
   src/autocode/grad1.c src/autocode/grad2.c src/autocode/hess.c
   src/autocode/int3c1e.c src/autocode/int3c2e.c src/autocode/intor1.c
   src/autocode/intor2.c src/autocode/intor3.c src/autocode/intor4.c
-  src/autocode/deriv3.c src/autocode/int1e_grids1.c)
+  src/autocode/deriv3.c src/autocode/int1e_grids1.c
+  src/autocode/deriv4.c)
 
 #option(WITH_RANGE_COULOMB "Range separated Coulomb" on)
 if(WITH_RANGE_COULOMB)
@@ -211,7 +212,7 @@ set(CPACK_PACKAGE_VENDOR "Qiming @sunqm Sun")
 set(CPACK_PACKAGE_CONTACT "https://github.com/sunqm/libcint")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/sunqm/libcint")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.rst")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/doc/libcint.CPack.txt")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${cint_VERSION_MAJOR}")

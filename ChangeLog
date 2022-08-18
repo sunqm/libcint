@@ -1,3 +1,21 @@
+Version 5.1.4  (2022-06-25):
+	* New integral int1e_r4
+
+Version 5.1.3  (2022-06-15):
+	* Missing cart2sph function for l=15
+
+Version 5.1.2  (2022-05-03):
+	* Fix cint3c1e_cart integral
+	* New integrals 
+	  <i | nabla nabla r | j>
+	  <i | nabla r nabla | j>
+	  <i | nabla nabla nabla 1/r | j>
+	  <i | nabla nabla 1/r nabla | j>
+
+Version 5.1.1  (2022-01-18):
+	* Fix integer overflow in gto_norm function
+Version 5.1.0  (2021-12-24):
+	* Update cint.h to make CINTEnvVars closed to the definition in qcint
 Version 5.0.0  (2021-11-07):
 	* Improve the cartesian-spinor transformation
 	* Remove the dependency to BLAS library

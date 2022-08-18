@@ -2,9 +2,9 @@ void CINTinit_int3c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
-                    double fac, CINTEnvVars *envs);
+                    CINTEnvVars *envs);
 void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
-                   double *cr, double t2, double fac, CINTEnvVars *envs);
+                   double *cr, double t2, CINTEnvVars *envs);
 
 void CINTnabla1i_3c1e(double *f, const double *g,
                       const FINT li, const FINT lj, const FINT lk,
