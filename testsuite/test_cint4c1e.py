@@ -171,7 +171,6 @@ def test_int2c1e_sph():
         ref+= (buf[:,:,0] + buf[:,:,4] + buf[:,:,8]).transpose(1,0)
         return ref * (-.25/numpy.pi)
 
-    #intor = _cint.cint4c1e_sph
     ao_loc = mol.ao_loc_nr()
     for nucid in range(mol.natm):
         mol.set_rinv_orig(coords[nucid])
@@ -233,4 +232,4 @@ def test_int4c1e_sph():
     print('cint4c1e_sph pass')
 
 test_int2c1e_sph()
-#test_int4c1e_sph()
+test_int4c1e_sph()

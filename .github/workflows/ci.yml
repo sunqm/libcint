@@ -18,7 +18,7 @@ jobs:
       - name: Compile
         run: |
           env
-          cmake -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -Bbuild -DKEEP_GOING=1 .
+          cmake -DWITH_CINT2_INTERFACE=1 -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -DWITH_4C1E=1 -Bbuild -DKEEP_GOING=1 .
           cmake --build build
       - name: Test for rys-roots
         if: startsWith(matrix.os, 'ubuntu')
@@ -34,3 +34,4 @@ jobs:
           python test_3c2e.py --quick
           python test_cart2sph.py
           python test_c2s.py
+          python test_cint4c1e.py
