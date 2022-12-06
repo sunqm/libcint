@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <assert.h>
 #include "config.h"
 #include "cint_bas.h"
 #include "g1e.h"
@@ -124,7 +125,7 @@ static void gen_idx(CINTOpt *opt, void (*finit)(), void (*findex_xyz)(),
         if (max_l == 0) {
                 max_l = max_l1;
         } else {
-                max_l = MIN(max_l, max_l1);
+                assert(max_l1 < max_l);
         }
         FINT fakenbas = max_l+1;
         FINT *buf = _allocate_index_xyz(opt, max_l, order);
@@ -189,7 +190,7 @@ void CINTall_2e_optimizer(CINTOpt **opt, FINT *ng,
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2e_EnvVars, &CINTg2e_index_xyz,
-                4, 0, ng, atm, natm, bas, nbas, env);
+                4, ANG_MAX, ng, atm, natm, bas, nbas, env);
 }
 
 void CINTall_3c2e_optimizer(CINTOpt **opt, FINT *ng,
@@ -243,7 +244,7 @@ void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2e_stg_EnvVars, &CINTg2e_index_xyz,
-                4, 0, ng, atm, natm, bas, nbas, env);
+                4, ANG_MAX, ng, atm, natm, bas, nbas, env);
 }
 #endif
 
@@ -255,7 +256,7 @@ void CINTall_2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
         CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
         CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
         gen_idx(*opt, &CINTinit_int2e_gtg_EnvVars, &CINTg2e_index_xyz,
-                4, 0, ng, atm, natm, bas, nbas, env);
+                4, ANG_MAX, ng, atm, natm, bas, nbas, env);
 }
 
 void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
