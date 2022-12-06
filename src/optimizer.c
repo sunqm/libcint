@@ -116,16 +116,14 @@ static FINT *_allocate_index_xyz(CINTOpt *opt, FINT max_l, FINT order)
         return buf;
 }
 static void gen_idx(CINTOpt *opt, void (*finit)(), void (*findex_xyz)(),
-                    FINT order, FINT max_l, FINT *ng,
+                    FINT order, FINT l_allow, FINT *ng,
                     FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
 {
         FINT i, j, k, l, ptr;
         FINT fakebas[BAS_SLOTS*LMAX1];
-        FINT max_l1 = _make_fakebas(fakebas, bas, nbas, env);
-        if (max_l == 0) {
-                max_l = max_l1;
-        } else {
-                assert(max_l1 < max_l);
+        FINT max_l = _make_fakebas(fakebas, bas, nbas, env);
+        if (l_allow != 0) {
+                assert(max_l < l_allow);
         }
         FINT fakenbas = max_l+1;
         FINT *buf = _allocate_index_xyz(opt, max_l, order);
