@@ -100,8 +100,8 @@ static FINT *_allocate_index_xyz(CINTOpt *opt, FINT max_l, FINT l_allow, FINT or
 {
         FINT i;
         FINT cumcart = (l_allow+1) * (l_allow+2) * (l_allow+3) / 6;
-        FINT ll = max_l + 1;
-        FINT cc = cumcart;
+        size_t ll = max_l + 1;
+        size_t cc = cumcart;
         for (i = 1; i < order; i++) {
                 ll *= LMAX1;
                 cc *= cumcart;
@@ -136,7 +136,7 @@ static void gen_idx(CINTOpt *opt, void (*finit)(), void (*findex_xyz)(),
                         (*finit)(&envs, ng, shls, atm, natm, fakebas, fakenbas, env);
                         ptr = i*LMAX1 + j;
                         opt->index_xyz_array[ptr] = buf;
-                        (*findex_xyz)(opt->index_xyz_array[ptr], &envs);
+                        (*findex_xyz)(buf, &envs);
                         buf += envs.nf * 3;
                 } }
 
@@ -148,7 +148,7 @@ static void gen_idx(CINTOpt *opt, void (*finit)(), void (*findex_xyz)(),
                         (*finit)(&envs, ng, shls, atm, natm, fakebas, fakenbas, env);
                         ptr = i*LMAX1*LMAX1 + j*LMAX1 + k;
                         opt->index_xyz_array[ptr] = buf;
-                        (*findex_xyz)(opt->index_xyz_array[ptr], &envs);
+                        (*findex_xyz)(buf, &envs);
                         buf += envs.nf * 3;
                 } } }
 
@@ -164,7 +164,7 @@ static void gen_idx(CINTOpt *opt, void (*finit)(), void (*findex_xyz)(),
                             + k*LMAX1
                             + l;
                         opt->index_xyz_array[ptr] = buf;
-                        (*findex_xyz)(opt->index_xyz_array[ptr], &envs);
+                        (*findex_xyz)(buf, &envs);
                         buf += envs.nf * 3;
                 } } } }
         }
