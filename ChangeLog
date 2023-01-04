@@ -1,5 +1,7 @@
-Version 5.1.7  (2023-01-03):
+Version 5.1.8  (2023-01-03):
 	* Fix integer overflow error in cintopt initialization
+
+Version 5.1.7  (2022-12-06):
 	* Boundary check when initializing CINTOpt
 
 Version 5.1.6  (2022-08-26):
