@@ -57,11 +57,6 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         } else {
                 envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
         }
-#ifdef WITH_RANGE_COULOMB
-        if (env[PTR_RANGE_OMEGA] < 0) {
-                envs->expcutoff = MIN(envs->expcutoff, EXPCUTOFF_SR);
-        }
-#endif
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];

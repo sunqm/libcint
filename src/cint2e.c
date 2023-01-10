@@ -98,7 +98,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         CINTOpt_log_max_pgto_coeff(log_maxcj, cj, j_prim, j_ctr);
         if (CINTset_pairdata(pdata_base, ai, aj, envs->ri, envs->rj,
                              log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil,
-                             i_prim, j_prim, rr_ij, expcutoff)) {
+                             i_prim, j_prim, rr_ij, expcutoff, env)) {
                 return 0;
         }
         CINTOpt_log_max_pgto_coeff(log_maxck, ck, k_prim, k_ctr);
@@ -129,7 +129,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 //    (aj*d/aij+theta*R)^li * (ai*d/aij+theta*R)^lj * pi^1.5/aij^{(li+lj+3)/2}
                 // is a good approximation for polynomial parts in SR-ERIs.
                 //    <~ (aj*d/aij+theta*R)^li * (ai*d/aij+theta*R)^lj * (pi/aij)^1.5
-                //    <~ (d/2+theta*R)^li * (d/2+theta*R)^lj * (pi/aij)^1.5
+                //    <~ (d+theta*R)^li * (d+theta*R)^lj * (pi/aij)^1.5
                 if (envs->nrys_roots > 1) {
                         double r_guess = 8.;
                         double omega2 = omega * omega;
@@ -139,22 +139,22 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                 double dist_ij = sqrt(rr_ij);
                                 double theta = omega2 / (omega2 + aij);
                                 expcutoff += lij * approx_log(
-                                        (dist_ij+theta*r_guess*2.)/(dist_ij+2.));
+                                        (dist_ij+theta*r_guess+1.)/(dist_ij+1.));
                         }
                         if (lkl > 0) {
                                 double theta = omega2 / (omega2 + akl);
                                 log_rr_kl += lkl * approx_log(
-                                        .5*sqrt(rr_kl) + theta*r_guess);
+                                        sqrt(rr_kl) + theta*r_guess + 1.);
                         }
                 }
         } else {
                 if (lkl > 0) {
-                        log_rr_kl += lkl * approx_log(.5*sqrt(rr_kl) + 1.);
+                        log_rr_kl += lkl * approx_log(sqrt(rr_kl) + 1.);
                 }
         }
 #else
         if (lkl > 0) {
-                log_rr_kl += lkl * approx_log(.5*sqrt(rr_kl) + 1.);
+                log_rr_kl += lkl * approx_log(sqrt(rr_kl) + 1.);
         }
 #endif
 
@@ -318,7 +318,7 @@ k_contracted: ;
                 MALLOC_INSTACK(_pdata_ij, i_prim*j_prim + k_prim*l_prim); \
                 if (CINTset_pairdata(_pdata_ij, ai, aj, envs->ri, envs->rj, \
                                      log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil, \
-                                     i_prim, j_prim, rr_ij, expcutoff)) { \
+                                     i_prim, j_prim, rr_ij, expcutoff, env)) { \
                         return 0; \
                 } \
                 double *log_maxck = opt->log_max_coeff[k_sh]; \
@@ -326,7 +326,7 @@ k_contracted: ;
                 _pdata_kl = _pdata_ij + i_prim*j_prim; \
                 if (CINTset_pairdata(_pdata_kl, ak, al, envs->rk, envs->rl, \
                                      log_maxck, log_maxcl, envs->lk_ceil, envs->ll_ceil, \
-                                     k_prim, l_prim, rr_kl, expcutoff)) { \
+                                     k_prim, l_prim, rr_kl, expcutoff, env)) { \
                         return 0; \
                 } \
         } \
@@ -373,14 +373,14 @@ k_contracted: ;
                         double aij = ai[i_prim-1] + aj[j_prim-1]; \
                         double theta = omega2 / (omega2 + aij); \
                         expcutoff += lij * approx_log( \
-                                (dist_ij+theta*r_guess*2.)/(dist_ij+2.)); \
+                                (dist_ij+theta*r_guess+1.)/(dist_ij+1.)); \
                 } \
                 if (lkl > 0) { \
                         double dist_kl = sqrt(rr_kl); \
                         double akl = ak[k_prim-1] + al[l_prim-1]; \
                         double theta = omega2 / (omega2 + akl); \
                         expcutoff += lkl * approx_log( \
-                                (dist_kl+theta*r_guess*2.)/(dist_kl+2.)); \
+                                (dist_kl+theta*r_guess+1.)/(dist_kl+1.)); \
                 } \
         }
 #else

@@ -60,11 +60,6 @@ void CINTinit_int2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                 // +1 to ensure accuracy. See comments in function CINT2e_loop_nopt
                 envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]) + 1;
         }
-#ifdef WITH_RANGE_COULOMB
-        if (env[PTR_RANGE_OMEGA] < 0) {
-                envs->expcutoff = MIN(envs->expcutoff, EXPCUTOFF_SR);
-        }
-#endif
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
@@ -1745,7 +1740,7 @@ FINT CINTg0_2e(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *
                 x = a0 * rr;
                 // very small erfc() leads to ~0 weights. They can cause
                 // numerical issue in sr_rys_roots
-                if (theta * x > cutoff) {
+                if (theta * x > cutoff || theta * x > EXPCUTOFF_SR) {
                         return 0;
                 }
                 CINTsr_rys_roots(nroots, x, sqrt(theta), u, w);

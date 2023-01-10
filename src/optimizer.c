@@ -320,20 +320,35 @@ void CINTOpt_set_log_maxc(CINTOpt *opt, FINT *atm, FINT natm,
 FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, double *rj,
                      double *log_maxci, double *log_maxcj,
                      FINT li_ceil, FINT lj_ceil, FINT iprim, FINT jprim,
-                     double rr_ij, double expcutoff)
+                     double rr_ij, double expcutoff, double *env)
 {
         FINT ip, jp, n;
         double aij, eij, cceij, wj;
-        // Normally the factor
-        //    (aj*d/sqrt(aij)+1)^li * (ai*d/sqrt(aij)+1)^lj * pi^1.5/aij^{(li+lj+3)/2}
-        // is a good approximation for the upper bound of polynomial parts.
-        //    <~ (aj*d/aij+1)^li * (ai*d/aij+1)^lj * (pi/aij)^1.5
-        //    <~ (d/2+1)^li * (d/2+1)^lj * (pi/aij)^1.5
-        //    <~ (d^2/4+d+1)^((li+lj)/2) * (pi/aij)^1.5
-        //    <~ (d^2/4+d+1)^((li+lj)/2) * (pi/aij)^1.5
-        //    <~ (d^2+1)^((li+lj)/2) * (pi/aij)^1.5   if d > 4/3
-        double log_rr_ij = (li_ceil+lj_ceil) * approx_log(.5*sqrt(rr_ij) + 1)
-                + 1.7 - 1.5 * approx_log(ai[iprim-1] + aj[jprim-1]);
+        // Normally
+        //    (aj*d/sqrt(aij)+1)^li * (ai*d/sqrt(aij)+1)^lj
+        //    * pi^1.5/aij^{(li+lj+3)/2} * exp(-ai*aj/aij*rr_ij)
+        // is a good approximation for overlap integrals.
+        //    <~ (aj*d/aij+1/sqrt(aij))^li * (ai*d/aij+1/sqrt(aij))^lj * (pi/aij)^1.5
+        //    <~ (d+1/sqrt(aij))^(li+lj) * (pi/aij)^1.5
+        aij = ai[iprim-1] + aj[jprim-1];
+        double log_rr_ij = 1.7 - 1.5 * approx_log(aij);
+        int lij = li_ceil + lj_ceil;
+        if (lij > 0) {
+#ifdef WITH_RANGE_COULOMB
+                double omega = env[PTR_RANGE_OMEGA];
+                double dist_ij = sqrt(rr_ij);
+                if (omega < 0) {
+                        double r_guess = 8.;
+                        double omega2 = omega * omega;
+                        double theta = omega2 / (omega2 + aij);
+                        log_rr_ij += lij * approx_log(dist_ij + theta*r_guess + 1.);
+                } else {
+                        log_rr_ij += lij * approx_log(dist_ij + 1.);
+                }
+#else
+                log_rr_ij += lij * approx_log(dist_ij + 1.);
+#endif
+        }
         PairData *pdata;
 
         FINT empty = 1;
@@ -420,7 +435,7 @@ void CINTOpt_setij(CINTOpt *opt, FINT *ng,
                            + (ri[2]-rj[2])*(ri[2]-rj[2]);
 
                         empty = CINTset_pairdata(pdata, ai, aj, ri, rj, log_maxci, log_maxcj,
-                                                 li+ijkl_inc, lj, iprim, jprim, rr, expcutoff);
+                                                 li+ijkl_inc, lj, iprim, jprim, rr, expcutoff, env);
                         if (i == 0 && j == 0) {
                                 opt->pairdata[0] = pdata;
                                 pdata += iprim * jprim;

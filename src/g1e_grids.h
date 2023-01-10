@@ -1,9 +1,8 @@
 void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                   FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
-FINT CINTg0_1e_grids(double *g, CINTEnvVars *envs, double *cache, double *gridsT);
-void CINTg0_1e_grids_igtj(double *g, CINTEnvVars *envs);
-void CINTg0_1e_grids_iltj(double *g, CINTEnvVars *envs);
+FINT CINTg0_1e_grids(double *g, double cutoff,
+                     CINTEnvVars *envs, double *cache, double *gridsT);
 
 void CINTgout1e_grids(double *gout, double *g, FINT *idx,
                       CINTEnvVars *envs, FINT gout_empty);

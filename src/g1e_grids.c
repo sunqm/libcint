@@ -53,7 +53,8 @@ void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                              r[ig+GRID_BLKSIZE*1]*r[ig+GRID_BLKSIZE*1] + \
                              r[ig+GRID_BLKSIZE*2]*r[ig+GRID_BLKSIZE*2])
 
-FINT CINTg0_1e_grids(double *g, CINTEnvVars *envs, double *cache, double *gridsT)
+FINT CINTg0_1e_grids(double *g, double cutoff,
+                     CINTEnvVars *envs, double *cache, double *gridsT)
 {
         FINT ngrids = envs->ngrids;
         FINT bgrids = MIN(ngrids - envs->grids_offset, GRID_BLKSIZE);
@@ -109,7 +110,7 @@ FINT CINTg0_1e_grids(double *g, CINTEnvVars *envs, double *cache, double *gridsT
                 // very small erfc() leads to ~0 weights. They can cause
                 // numerical issue in sr_rys_roots Use this cutoff as a
                 // temporary solution to avoid the numerical issue
-                double temp_cutoff = MIN(envs->expcutoff, EXPCUTOFF_SR - nroots);
+                double temp_cutoff = MIN(cutoff, EXPCUTOFF_SR);
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * RGSQUARE(rijrg, ig);
                         if (theta * x > temp_cutoff) {

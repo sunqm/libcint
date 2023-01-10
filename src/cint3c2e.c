@@ -87,7 +87,7 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
         CINTOpt_log_max_pgto_coeff(log_maxcj, cj, j_prim, j_ctr);
         if (CINTset_pairdata(pdata_base, ai, aj, envs->ri, envs->rj,
                              log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil,
-                             i_prim, j_prim, rr_ij, expcutoff)) {
+                             i_prim, j_prim, rr_ij, expcutoff, env)) {
                 return 0;
         }
 
@@ -105,8 +105,6 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
         double expij, cutoff;
         double *rij;
         double *rkl = envs->rk;
-        // the penalty due to auxbasis pi^1.5/ak^{lk+1.5}
-        expcutoff += 1.7 - (envs->lk_ceil+1.5)*approx_log(ak[k_prim-1]);
 #ifdef WITH_RANGE_COULOMB
         double omega = env[PTR_RANGE_OMEGA];
         if (omega < 0 && envs->nrys_roots > 1) {
@@ -118,11 +116,11 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
                         double aij = ai[i_prim-1] + aj[j_prim-1];
                         double theta = omega2 / (omega2 + aij);
                         expcutoff += lij * approx_log(
-                                (dist_ij+theta*r_guess*2.)/(dist_ij+2.));
+                                (dist_ij+theta*r_guess+1.)/(dist_ij+1.));
                 }
                 if (envs->lk_ceil > 0) {
                         double theta = omega2 / (omega2 + ak[k_prim-1]);
-                        expcutoff += envs->lk_ceil * approx_log(theta*r_guess);
+                        expcutoff += envs->lk_ceil * approx_log(theta*r_guess+1.);
                 }
         }
 #endif
@@ -240,7 +238,6 @@ i_contracted: ;
         double *cj = env + bas(PTR_COEFF, j_sh); \
         double *ck = env + bas(PTR_COEFF, k_sh); \
         double expcutoff = envs->expcutoff; \
-        expcutoff += 1.7 - (envs->lk_ceil+1.5)*approx_log(ak[k_prim-1]); \
         double rr_ij = SQUARE(envs->rirj); \
         PairData *pdata_base, *pdata_ij; \
         if (opt->pairdata != NULL) { \
@@ -251,7 +248,7 @@ i_contracted: ;
                 MALLOC_INSTACK(pdata_base, i_prim*j_prim); \
                 if (CINTset_pairdata(pdata_base, ai, aj, envs->ri, envs->rj, \
                                      log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil, \
-                                     i_prim, j_prim, rr_ij, expcutoff)) { \
+                                     i_prim, j_prim, rr_ij, expcutoff, env)) { \
                         return 0; \
                 } \
         } \
@@ -294,11 +291,11 @@ i_contracted: ;
                         double aij = ai[i_prim-1] + aj[j_prim-1]; \
                         double theta = omega2 / (omega2 + aij); \
                         expcutoff += lij * approx_log( \
-                                (dist_ij+theta*r_guess*2.)/(dist_ij+2.)); \
+                                (dist_ij+theta*r_guess+1.)/(dist_ij+1.)); \
                 } \
                 if (envs->lk_ceil > 0) { \
                         double theta = omega2 / (omega2 + ak[k_prim-1]); \
-                        expcutoff += envs->lk_ceil * approx_log(theta*r_guess); \
+                        expcutoff += envs->lk_ceil * approx_log(theta*r_guess+1.); \
                 } \
         }
 #else
