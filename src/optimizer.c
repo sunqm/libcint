@@ -323,11 +323,17 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
                      double rr_ij, double expcutoff)
 {
         FINT ip, jp, n;
-        double aij, eij, cceij;
-        // This estimation is based on the assumption that the two gaussian charge
-        // distributions are separated in space. If two gaussians are too close (the
-        // distance between gaussian product ij and gaussian product kl < 1), rr
-        double log_rr_ij = (li_ceil+lj_ceil+1) * approx_log(rr_ij+1) / 2;
+        double aij, eij, cceij, wj;
+        // Normally the factor
+        //    (aj*d/sqrt(aij)+1)^li * (ai*d/sqrt(aij)+1)^lj * pi^1.5/aij^{(li+lj+3)/2}
+        // is a good approximation for the upper bound of polynomial parts.
+        //    <~ (aj*d/aij+1)^li * (ai*d/aij+1)^lj * (pi/aij)^1.5
+        //    <~ (d/2+1)^li * (d/2+1)^lj * (pi/aij)^1.5
+        //    <~ (d^2/4+d+1)^((li+lj)/2) * (pi/aij)^1.5
+        //    <~ (d^2/4+d+1)^((li+lj)/2) * (pi/aij)^1.5
+        //    <~ (d^2+1)^((li+lj)/2) * (pi/aij)^1.5   if d > 4/3
+        double log_rr_ij = (li_ceil+lj_ceil) * approx_log(.5*sqrt(rr_ij) + 1)
+                + 1.7 - 1.5 * approx_log(ai[iprim-1] + aj[jprim-1]);
         PairData *pdata;
 
         FINT empty = 1;
@@ -340,14 +346,15 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
                         pdata->cceij = cceij;
                         if (cceij < expcutoff) {
                                 empty = 0;
-                                pdata->rij[0] = (ai[ip]*ri[0] + aj[jp]*rj[0]) * aij;
-                                pdata->rij[1] = (ai[ip]*ri[1] + aj[jp]*rj[1]) * aij;
-                                pdata->rij[2] = (ai[ip]*ri[2] + aj[jp]*rj[2]) * aij;
+                                wj = aj[jp] * aij;
+                                pdata->rij[0] = ri[0] + wj * (rj[0]-ri[0]);
+                                pdata->rij[1] = ri[1] + wj * (rj[1]-ri[1]);
+                                pdata->rij[2] = ri[2] + wj * (rj[2]-ri[2]);
                                 pdata->eij = exp(-eij);
                         } else {
-                                pdata->rij[0] = 0;
-                                pdata->rij[1] = 0;
-                                pdata->rij[2] = 0;
+                                pdata->rij[0] = 1e18;
+                                pdata->rij[1] = 1e18;
+                                pdata->rij[2] = 1e18;
                                 pdata->eij = 0;
                         }
                 }

@@ -13,7 +13,7 @@
 #include "rys_roots.h"
 #include "g2e.h"
 
-FINT CINTg0_2e_coulerf(double *g, CINTEnvVars *envs);
+FINT CINTg0_2e_coulerf(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
 
 void CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                     FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -25,7 +25,7 @@ void CINTinit_int2e_coulerf_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-FINT CINTg0_2e_coulerf(double *g, CINTEnvVars *envs)
+FINT CINTg0_2e_coulerf(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs)
 {
         double aij = envs->ai[0] + envs->aj[0];
         double akl = envs->ak[0] + envs->al[0];
@@ -34,9 +34,9 @@ FINT CINTg0_2e_coulerf(double *g, CINTEnvVars *envs)
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
         double rijrkl[3];
-        rijrkl[0] = envs->rij[0] - envs->rkl[0];
-        rijrkl[1] = envs->rij[1] - envs->rkl[1];
-        rijrkl[2] = envs->rij[2] - envs->rkl[2];
+        rijrkl[0] = rij[0] - rkl[0];
+        rijrkl[1] = rij[1] - rkl[1];
+        rijrkl[2] = rij[2] - rkl[2];
 
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
@@ -74,12 +74,12 @@ FINT CINTg0_2e_coulerf(double *g, CINTEnvVars *envs)
         double u2, div, tmp1, tmp2, tmp3, tmp4;
         double rijrx[3];
         double rklrx[3];
-        rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
-        rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
-        rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
-        rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
-        rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
-        rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
+        rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
+        rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
+        rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
+        rklrx[0] = rkl[0] - envs->rx_in_rklrx[0];
+        rklrx[1] = rkl[1] - envs->rx_in_rklrx[1];
+        rklrx[2] = rkl[2] - envs->rx_in_rklrx[2];
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;

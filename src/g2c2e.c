@@ -10,6 +10,7 @@
 #include "cint_bas.h"
 #include "misc.h"
 #include "g2e.h"
+#include "rys_roots.h"
 
 void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -47,6 +48,11 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         } else {
                 envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
         }
+#ifdef WITH_RANGE_COULOMB
+        if (env[PTR_RANGE_OMEGA] < 0) {
+                envs->expcutoff = MIN(envs->expcutoff, EXPCUTOFF_SR);
+        }
+#endif
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
@@ -96,7 +102,7 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 }
 
 #ifdef WITH_GTG
-FINT CINTg0_2e_gtg(double *g, const double fac, const CINTEnvVars *envs);
+FINT CINTg0_2e_gtg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
 
 void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)

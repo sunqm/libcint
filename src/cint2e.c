@@ -85,6 +85,8 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         double *ck = env + bas(PTR_COEFF, k_sh);
         double *cl = env + bas(PTR_COEFF, l_sh);
         double expcutoff = envs->expcutoff;
+        double rr_ij = SQUARE(envs->rirj);
+        double rr_kl = SQUARE(envs->rkrl);
         double *log_maxci, *log_maxcj, *log_maxck, *log_maxcl;
         PairData *pdata_base, *pdata_ij;
         MALLOC_INSTACK(log_maxci, i_prim+j_prim+k_prim+l_prim);
@@ -96,7 +98,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         CINTOpt_log_max_pgto_coeff(log_maxcj, cj, j_prim, j_ctr);
         if (CINTset_pairdata(pdata_base, ai, aj, envs->ri, envs->rj,
                              log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil,
-                             i_prim, j_prim, SQUARE(envs->rirj), expcutoff)) {
+                             i_prim, j_prim, rr_ij, expcutoff)) {
                 return 0;
         }
         CINTOpt_log_max_pgto_coeff(log_maxck, ck, k_prim, k_ctr);
@@ -114,12 +116,48 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         FINT *gempty = _empty + 4;
         /* COMMON_ENVS_AND_DECLARE end */
 
-        double rr_kl = SQUARE(envs->rkrl);
-        double log_rr_kl = (envs->lk_ceil+envs->ll_ceil+1)*log(rr_kl+1)/2;
-        double akl, ekl, expijkl, ccekl;
+        int lkl = envs->lk_ceil + envs->ll_ceil;
+        double akl, ekl, expijkl, ccekl, log_rr_kl, eijcutoff, cutoff;
+        double rkl[3];
         double *rij;
-        //double dist_ij = SQUARE(envs->rirj);
-        double dist_kl = SQUARE(envs->rkrl);
+        akl = ak[k_prim-1] + al[l_prim-1];
+        log_rr_kl = 1.7 - 1.5 * approx_log(akl);
+#ifdef WITH_RANGE_COULOMB
+        double omega = env[PTR_RANGE_OMEGA];
+        if (omega < 0) {
+                // Normally the factor
+                //    (aj*d/aij+theta*R)^li * (ai*d/aij+theta*R)^lj * pi^1.5/aij^{(li+lj+3)/2}
+                // is a good approximation for polynomial parts in SR-ERIs.
+                //    <~ (aj*d/aij+theta*R)^li * (ai*d/aij+theta*R)^lj * (pi/aij)^1.5
+                //    <~ (d/2+theta*R)^li * (d/2+theta*R)^lj * (pi/aij)^1.5
+                if (envs->nrys_roots > 1) {
+                        double r_guess = 8.;
+                        double omega2 = omega * omega;
+                        int lij = envs->li_ceil + envs->lj_ceil;
+                        if (lij > 0) {
+                                double aij = ai[i_prim-1] + aj[j_prim-1];
+                                double dist_ij = sqrt(rr_ij);
+                                double theta = omega2 / (omega2 + aij);
+                                expcutoff += lij * approx_log(
+                                        (dist_ij+theta*r_guess*2.)/(dist_ij+2.));
+                        }
+                        if (lkl > 0) {
+                                double theta = omega2 / (omega2 + akl);
+                                log_rr_kl += lkl * approx_log(
+                                        .5*sqrt(rr_kl) + theta*r_guess);
+                        }
+                }
+        } else {
+                if (lkl > 0) {
+                        log_rr_kl += lkl * approx_log(.5*sqrt(rr_kl) + 1.);
+                }
+        }
+#else
+        if (lkl > 0) {
+                log_rr_kl += lkl * approx_log(.5*sqrt(rr_kl) + 1.);
+        }
+#endif
+
         FINT *idx;
         MALLOC_INSTACK(idx, nf * 3);
         CINTg2e_index_xyz(idx, envs);
@@ -152,8 +190,6 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         MALLOC_INSTACK(g, len);  // must be allocated last in this function
         double *g1 = g + leng;
         double *gout, *gctri, *gctrj, *gctrk, *gctrl;
-        double eijcutoff;
-
         ALIAS_ADDR_IF_EQUAL(l, m);
         ALIAS_ADDR_IF_EQUAL(k, l);
         ALIAS_ADDR_IF_EQUAL(j, k);
@@ -170,26 +206,16 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 }
                 for (kp = 0; kp < k_prim; kp++) {
                         akl = ak[kp] + al[lp];
-                        ekl = dist_kl * ak[kp] * al[lp] / akl;
+                        ekl = rr_kl * ak[kp] * al[lp] / akl;
                         ccekl = ekl - log_rr_kl - log_maxck[kp] - log_maxcl[lp];
-                        // ccekl is almost the overlap of |k> |l>. For typical
-                        // chemistry systems, use overlap to prescreen eri
-                        // almost 100% works.
-                        // The largest error may appear for two Gaussians with
-                        // dist_kl ~4^2 and ak=al ~2.5. If in the middle of |k>
-                        // and |l> it happens to exist steep functions |i>, |j>.
-                        // The error ~ 2*\sqrt{2*ak/pi} ~ 3. So in the worst case,
-                        // an integral ~= 3*cutoff may be incorrectly dropped.
-                        // Increasing expcutoff by ln(3) can guarantee to get
-                        // the required accuracy in any circumstance.
                         if (ccekl > expcutoff) {
                                 goto k_contracted;
                         }
                         envs->ak[0] = ak[kp];
-                        envs->rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / akl;
-                        envs->rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / akl;
-                        envs->rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / akl;
-                        eijcutoff = expcutoff - MAX(ccekl, 0);
+                        rkl[0] = (ak[kp]*rk[0] + al[lp]*rl[0]) / akl;
+                        rkl[1] = (ak[kp]*rk[1] + al[lp]*rl[1]) / akl;
+                        rkl[2] = (ak[kp]*rk[2] + al[lp]*rl[2]) / akl;
+                        eijcutoff = expcutoff - ccekl;
                         ekl = exp(-ekl);
 
                         if (k_ctr == 1) {
@@ -214,9 +240,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                         }
                                         envs->ai[0] = ai[ip];
                                         rij = pdata_ij->rij;
-                                        envs->rij[0] = rij[0];
-                                        envs->rij[1] = rij[1];
-                                        envs->rij[2] = rij[2];
+                                        cutoff = eijcutoff - pdata_ij->cceij;
                                         expijkl = pdata_ij->eij * ekl;
                                         if (i_ctr == 1) {
                                                 fac1i = fac1j*ci[ip]*expijkl;
@@ -224,7 +248,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                                 fac1i = fac1j*expijkl;
                                         }
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                                 PRIM2CTR(i, gout, len0);
                                         }
@@ -282,6 +306,8 @@ k_contracted: ;
         double *ck = env + bas(PTR_COEFF, k_sh); \
         double *cl = env + bas(PTR_COEFF, l_sh); \
         double expcutoff = envs->expcutoff; \
+        double rr_ij = SQUARE(envs->rirj); \
+        double rr_kl = SQUARE(envs->rkrl); \
         PairData *_pdata_ij, *_pdata_kl, *pdata_ij, *pdata_kl; \
         if (opt->pairdata != NULL) { \
                 _pdata_ij = opt->pairdata[i_sh*opt->nbas+j_sh]; \
@@ -292,7 +318,7 @@ k_contracted: ;
                 MALLOC_INSTACK(_pdata_ij, i_prim*j_prim + k_prim*l_prim); \
                 if (CINTset_pairdata(_pdata_ij, ai, aj, envs->ri, envs->rj, \
                                      log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil, \
-                                     i_prim, j_prim, SQUARE(envs->rirj), expcutoff)) { \
+                                     i_prim, j_prim, rr_ij, expcutoff)) { \
                         return 0; \
                 } \
                 double *log_maxck = opt->log_max_coeff[k_sh]; \
@@ -300,7 +326,7 @@ k_contracted: ;
                 _pdata_kl = _pdata_ij + i_prim*j_prim; \
                 if (CINTset_pairdata(_pdata_kl, ak, al, envs->rk, envs->rl, \
                                      log_maxck, log_maxcl, envs->lk_ceil, envs->ll_ceil, \
-                                     k_prim, l_prim, SQUARE(envs->rkrl), expcutoff)) { \
+                                     k_prim, l_prim, rr_kl, expcutoff)) { \
                         return 0; \
                 } \
         } \
@@ -322,7 +348,7 @@ k_contracted: ;
         FINT *non0idxj = opt->sortedidx[j_sh]; \
         FINT *non0idxk = opt->sortedidx[k_sh]; \
         FINT *non0idxl = opt->sortedidx[l_sh]; \
-        double expij, expkl, eijcutoff, eklcutoff; \
+        double expij, expkl, eijcutoff, eklcutoff, cutoff; \
         eklcutoff = expcutoff; \
         double *rij, *rkl; \
         FINT *idx = opt->index_xyz_array[envs->i_l*LMAX1*LMAX1*LMAX1 \
@@ -334,20 +360,45 @@ k_contracted: ;
                 CINTg2e_index_xyz(idx, envs); \
         }
 
+#ifdef WITH_RANGE_COULOMB
+#define ADJUST_CUTOFF      \
+        double omega = env[PTR_RANGE_OMEGA]; \
+        if (omega < 0 && envs->nrys_roots > 1) { \
+                double r_guess = 8.; \
+                double omega2 = omega * omega; \
+                int lij = envs->li_ceil + envs->lj_ceil; \
+                int lkl = envs->lk_ceil + envs->ll_ceil; \
+                if (lij > 0) { \
+                        double dist_ij = sqrt(rr_ij); \
+                        double aij = ai[i_prim-1] + aj[j_prim-1]; \
+                        double theta = omega2 / (omega2 + aij); \
+                        expcutoff += lij * approx_log( \
+                                (dist_ij+theta*r_guess*2.)/(dist_ij+2.)); \
+                } \
+                if (lkl > 0) { \
+                        double dist_kl = sqrt(rr_kl); \
+                        double akl = ak[k_prim-1] + al[l_prim-1]; \
+                        double theta = omega2 / (omega2 + akl); \
+                        expcutoff += lkl * approx_log( \
+                                (dist_kl+theta*r_guess*2.)/(dist_kl+2.)); \
+                } \
+        }
+#else
+#define ADJUST_CUTOFF
+#endif
+
 #define SET_RIJ(I,J)    \
         if (pdata_##I##J->cceij > e##I##J##cutoff) { \
                 goto I##_contracted; } \
         envs->a##I[0] = a##I[I##p]; \
         exp##I##J = pdata_##I##J->eij; \
-        r##I##J = pdata_##I##J->rij; \
-        envs->r##I##J[0] = r##I##J[0]; \
-        envs->r##I##J[1] = r##I##J[1]; \
-        envs->r##I##J[2] = r##I##J[2];
+        r##I##J = pdata_##I##J->rij;
 
 // i_ctr = j_ctr = k_ctr = l_ctr = 1;
 FINT CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
         COMMON_ENVS_AND_DECLARE;
+        ADJUST_CUTOFF;
         FINT nc = 1;
         size_t leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
         size_t len0 = nf * n_comp;
@@ -369,7 +420,7 @@ FINT CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 for (kp = 0; kp < k_prim; kp++, pdata_kl++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l * ck[kp];
-                        eijcutoff = eklcutoff - MAX(pdata_kl->cceij, 0);
+                        eijcutoff = eklcutoff - pdata_kl->cceij;
                         pdata_ij = _pdata_ij;
                         for (jp = 0; jp < j_prim; jp++) {
                                 envs->aj[0] = aj[jp];
@@ -378,7 +429,8 @@ FINT CINT2e_1111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                         SET_RIJ(i, j);
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        cutoff = eijcutoff - pdata_ij->cceij;
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                                 *gempty = 0;
                                         }
@@ -399,7 +451,7 @@ k_contracted: ;
 FINT CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
         COMMON_ENVS_AND_DECLARE;
-
+        ADJUST_CUTOFF;
         FINT nc = i_ctr;
         size_t leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
         size_t leni = nf * i_ctr * n_comp; // gctri
@@ -419,7 +471,7 @@ FINT CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 for (kp = 0; kp < k_prim; kp++, pdata_kl++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l * ck[kp];
-                        eijcutoff = eklcutoff - MAX(pdata_kl->cceij, 0);
+                        eijcutoff = eklcutoff - pdata_kl->cceij;
                         pdata_ij = _pdata_ij;
                         for (jp = 0; jp < j_prim; jp++) {
                                 envs->aj[0] = aj[jp];
@@ -429,9 +481,10 @@ FINT CINT2e_n111_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                                 goto i_contracted;
                                         }
                                         SET_RIJ(i, j);
+                                        cutoff = eijcutoff - pdata_ij->cceij;
                                         fac1i = fac1j*expij*expkl;
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, 1);
                                                 PRIM2CTR(i, gout, len0);
                                         }
@@ -452,7 +505,7 @@ k_contracted: ;
 FINT CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
         COMMON_ENVS_AND_DECLARE;
-
+        ADJUST_CUTOFF;
         FINT nc = j_ctr;
         size_t leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
         size_t lenj = nf * j_ctr * n_comp; // gctrj
@@ -472,7 +525,7 @@ FINT CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 for (kp = 0; kp < k_prim; kp++, pdata_kl++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l * ck[kp];
-                        eijcutoff = eklcutoff - MAX(pdata_kl->cceij, 0);
+                        eijcutoff = eklcutoff - pdata_kl->cceij;
                         pdata_ij = _pdata_ij;
                         for (jp = 0; jp < j_prim; jp++) {
                                 envs->aj[0] = aj[jp];
@@ -480,9 +533,10 @@ FINT CINT2e_1n11_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                 *iempty = 1;
                                 for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                         SET_RIJ(i, j);
+                                        cutoff = eijcutoff - pdata_ij->cceij;
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *iempty);
                                                 *iempty = 0;
                                         }
@@ -506,7 +560,7 @@ k_contracted: ;
 FINT CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
         COMMON_ENVS_AND_DECLARE;
-
+        ADJUST_CUTOFF;
         FINT nc = k_ctr;
         size_t leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
         size_t lenk = nf * k_ctr * n_comp; // gctrk
@@ -526,7 +580,7 @@ FINT CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 for (kp = 0; kp < k_prim; kp++, pdata_kl++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l;
-                        eijcutoff = eklcutoff - MAX(pdata_kl->cceij, 0);
+                        eijcutoff = eklcutoff - pdata_kl->cceij;
                         pdata_ij = _pdata_ij;
                         *jempty = 1;
                         for (jp = 0; jp < j_prim; jp++) {
@@ -534,9 +588,10 @@ FINT CINT2e_11n1_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                                 fac1j = fac1k * cj[jp];
                                 for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                         SET_RIJ(i, j);
+                                        cutoff = eijcutoff - pdata_ij->cceij;
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *jempty);
                                                 *jempty = 0;
                                         }
@@ -560,7 +615,7 @@ k_contracted: ;
 FINT CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
         COMMON_ENVS_AND_DECLARE;
-
+        ADJUST_CUTOFF;
         FINT nc = l_ctr;
         size_t leng = envs->g_size * 3 * ((1<<envs->gbits)+1);
         size_t lenl = nf * l_ctr * n_comp; // gctrl
@@ -581,16 +636,17 @@ FINT CINT2e_111n_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 for (kp = 0; kp < k_prim; kp++, pdata_kl++) {
                         SET_RIJ(k, l);
                         fac1k = fac1l * ck[kp];
-                        eijcutoff = eklcutoff - MAX(pdata_kl->cceij, 0);
+                        eijcutoff = eklcutoff - pdata_kl->cceij;
                         pdata_ij = _pdata_ij;
                         for (jp = 0; jp < j_prim; jp++) {
                                 envs->aj[0] = aj[jp];
                                 fac1j = fac1k * cj[jp];
                                 for (ip = 0; ip < i_prim; ip++, pdata_ij++) {
                                         SET_RIJ(i, j);
+                                        cutoff = eijcutoff - pdata_ij->cceij;
                                         fac1i = fac1j*ci[ip]*expij*expkl;
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *kempty);
                                                 *kempty = 0;
                                         }
@@ -614,6 +670,7 @@ k_contracted: ;
 FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
 {
         COMMON_ENVS_AND_DECLARE;
+        ADJUST_CUTOFF;
         FINT nc = i_ctr * j_ctr * k_ctr * l_ctr;
         size_t leng = envs->g_size * 3 * ((1<<envs->gbits)+1); // (irys,i,j,k,l,coord,0:1);
         size_t lenl = nf * nc * n_comp; // gctrl
@@ -650,10 +707,7 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
                         envs->ak[0] = ak[kp];
                         expkl = pdata_kl->eij;
                         rkl = pdata_kl->rij;
-                        envs->rkl[0] = rkl[0];
-                        envs->rkl[1] = rkl[1];
-                        envs->rkl[2] = rkl[2];
-                        eijcutoff = eklcutoff - MAX(pdata_kl->cceij, 0);
+                        eijcutoff = eklcutoff - pdata_kl->cceij;
                         /* SET_RIJ(k, l); end */
                         if (k_ctr == 1) {
                                 fac1k = fac1l * ck[kp];
@@ -679,17 +733,15 @@ FINT CINT2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
                                         envs->ai[0] = ai[ip];
                                         expij = pdata_ij->eij;
                                         rij = pdata_ij->rij;
-                                        envs->rij[0] = rij[0];
-                                        envs->rij[1] = rij[1];
-                                        envs->rij[2] = rij[2];
                                         /* SET_RIJ(i, j); end */
+                                        cutoff = eijcutoff - pdata_ij->cceij;
                                         if (i_ctr == 1) {
                                                 fac1i = fac1j*ci[ip] * expij*expkl;
                                         } else {
                                                 fac1i = fac1j * expij*expkl;
                                         }
                                         envs->fac[0] = fac1i;
-                                        if ((*envs->f_g0_2e)(g, envs)) {
+                                        if ((*envs->f_g0_2e)(g, rij, rkl, cutoff, envs)) {
                                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                                 PRIM2CTR(i, gout, len0);
                                         }

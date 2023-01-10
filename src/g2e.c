@@ -60,6 +60,11 @@ void CINTinit_int2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                 // +1 to ensure accuracy. See comments in function CINT2e_loop_nopt
                 envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]) + 1;
         }
+#ifdef WITH_RANGE_COULOMB
+        if (env[PTR_RANGE_OMEGA] < 0) {
+                envs->expcutoff = MIN(envs->expcutoff, EXPCUTOFF_SR);
+        }
+#endif
 
         envs->gbits = ng[GSHIFT];
         envs->ncomp_e1 = ng[POS_E1];
@@ -1711,7 +1716,7 @@ void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-FINT CINTg0_2e(double *g, const CINTEnvVars *envs)
+FINT CINTg0_2e(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs)
 {
         FINT irys;
         FINT nroots = envs->nrys_roots;
@@ -1720,10 +1725,10 @@ FINT CINTg0_2e(double *g, const CINTEnvVars *envs)
         double a0, a1, fac1, x;
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
-        double rijrkl[3];
-        rijrkl[0] = envs->rij[0] - envs->rkl[0];
-        rijrkl[1] = envs->rij[1] - envs->rkl[1];
-        rijrkl[2] = envs->rij[2] - envs->rkl[2];
+        double xij_kl = rij[0] - rkl[0];
+        double yij_kl = rij[1] - rkl[1];
+        double zij_kl = rij[2] - rkl[2];
+        double rr = xij_kl * xij_kl + yij_kl * yij_kl + zij_kl * zij_kl;
 
         a1 = aij * akl;
         a0 = a1 / (aij + akl);
@@ -1731,43 +1736,36 @@ FINT CINTg0_2e(double *g, const CINTEnvVars *envs)
 #ifdef WITH_RANGE_COULOMB
         const double omega = envs->env[PTR_RANGE_OMEGA];
         double theta = 0;
-        if (omega != 0) {
+        if (omega == 0.) {
+                x = a0 * rr;
+                CINTrys_roots(nroots, x, u, w);
+        } else if (omega < 0.) {
+                // short-range part of range-separated Coulomb
                 theta = omega * omega / (omega * omega + a0);
-                if (omega > 0) { // long-range part of range-separated Coulomb
-                        a0 *= theta;
-                }
-        }
-#endif
-
-        x = a0 *(rijrkl[0] * rijrkl[0]
-               + rijrkl[1] * rijrkl[1]
-               + rijrkl[2] * rijrkl[2]);
-
-#ifdef WITH_RANGE_COULOMB
-        if (omega < 0) { // short-range part of range-separated Coulomb
-                // FIXME:
+                x = a0 * rr;
                 // very small erfc() leads to ~0 weights. They can cause
-                // numerical issue in sr_rys_roots Use this cutoff as a
-                // temporary solution to avoid the numerical issue
-                double temp_cutoff = MIN(envs->expcutoff, EXPCUTOFF_SR - nroots);
-                if (theta * x > temp_cutoff) {
+                // numerical issue in sr_rys_roots
+                if (theta * x > cutoff) {
                         return 0;
                 }
                 CINTsr_rys_roots(nroots, x, sqrt(theta), u, w);
-        } else {
+        } else { // omega > 0.
+                // long-range part of range-separated Coulomb
+                theta = omega * omega / (omega * omega + a0);
+                a0 *= theta;
+                x = a0 * rr;
                 CINTrys_roots(nroots, x, u, w);
-                if (omega > 0) {
-                        /* u[:] = tau^2 / (1 - tau^2)
-                         * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
-                         * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
-                         * so the rest code can be reused.
-                         */
-                        for (irys = 0; irys < nroots; irys++) {
-                                u[irys] /= u[irys] + 1 - u[irys] * theta;
-                        }
+                /* u[:] = tau^2 / (1 - tau^2)
+                 * omega^2u^2 = a0 * tau^2 / (theta^-1 - tau^2)
+                 * transform u[:] to theta^-1 tau^2 / (theta^-1 - tau^2)
+                 * so the rest code can be reused.
+                 */
+                for (irys = 0; irys < nroots; irys++) {
+                        u[irys] /= u[irys] + 1 - u[irys] * theta;
                 }
         }
 #else
+        x = a0 * rr;
         CINTrys_roots(nroots, x, u, w);
 #endif
         fac1 = sqrt(a0 / (a1 * a1 * a1)) * envs->fac[0];
@@ -1781,12 +1779,12 @@ FINT CINTg0_2e(double *g, const CINTEnvVars *envs)
         double u2, tmp1, tmp2, tmp3, tmp4, tmp5;
         double rijrx[3];
         double rklrx[3];
-        rijrx[0] = envs->rij[0] - envs->rx_in_rijrx[0];
-        rijrx[1] = envs->rij[1] - envs->rx_in_rijrx[1];
-        rijrx[2] = envs->rij[2] - envs->rx_in_rijrx[2];
-        rklrx[0] = envs->rkl[0] - envs->rx_in_rklrx[0];
-        rklrx[1] = envs->rkl[1] - envs->rx_in_rklrx[1];
-        rklrx[2] = envs->rkl[2] - envs->rx_in_rklrx[2];
+        rijrx[0] = rij[0] - envs->rx_in_rijrx[0];
+        rijrx[1] = rij[1] - envs->rx_in_rijrx[1];
+        rijrx[2] = rij[2] - envs->rx_in_rijrx[2];
+        rklrx[0] = rkl[0] - envs->rx_in_rklrx[0];
+        rklrx[1] = rkl[1] - envs->rx_in_rklrx[1];
+        rklrx[2] = rkl[2] - envs->rx_in_rklrx[2];
         struct _BC bc;
         double *c00 = bc.c00;
         double *c0p = bc.c0p;
@@ -1809,12 +1807,12 @@ FINT CINTg0_2e(double *g, const CINTEnvVars *envs)
                 b00[irys] = tmp5;
                 b10[irys] = tmp5 + tmp4 * akl;
                 b01[irys] = tmp5 + tmp4 * aij;
-                c00[0] = rijrx[0] - tmp2 * rijrkl[0];
-                c00[1] = rijrx[1] - tmp2 * rijrkl[1];
-                c00[2] = rijrx[2] - tmp2 * rijrkl[2];
-                c0p[0] = rklrx[0] + tmp3 * rijrkl[0];
-                c0p[1] = rklrx[1] + tmp3 * rijrkl[1];
-                c0p[2] = rklrx[2] + tmp3 * rijrkl[2];
+                c00[0] = rijrx[0] - tmp2 * xij_kl;
+                c00[1] = rijrx[1] - tmp2 * yij_kl;
+                c00[2] = rijrx[2] - tmp2 * zij_kl;
+                c0p[0] = rklrx[0] + tmp3 * xij_kl;
+                c0p[1] = rklrx[1] + tmp3 * yij_kl;
+                c0p[2] = rklrx[2] + tmp3 * zij_kl;
                 w[irys] *= fac1;
         }
 

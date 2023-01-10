@@ -14,8 +14,8 @@
 #include "misc.h"
 #include "g2e.h"
 
-FINT CINTg0_2e_stg(double *g, CINTEnvVars *envs);
-FINT CINTg0_2e_yp(double *g, CINTEnvVars *envs);
+FINT CINTg0_2e_stg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
+FINT CINTg0_2e_yp(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
 void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
 
 void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
@@ -158,12 +158,10 @@ void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
         CINTg0_lj2d_4d(g, envs);
 }
 
-FINT CINTg0_2e_yp(double *g, CINTEnvVars *envs)
+FINT CINTg0_2e_yp(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
         double ua = 0;
-        double *rij = envs->rij;
-        double *rkl = envs->rkl;
         double rijrkl[3];
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz
@@ -253,12 +251,10 @@ FINT CINTg0_2e_yp(double *g, CINTEnvVars *envs)
 }
 
 
-FINT CINTg0_2e_stg(double *g, CINTEnvVars *envs)
+FINT CINTg0_2e_stg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs)
 {
         double aij, akl, a0, a1, fac1, x;
         double ua = 0;
-        double *rij = envs->rij;
-        double *rkl = envs->rkl;
         double rijrkl[3];
         double u[MXRYSROOTS];
         double *w = g + envs->g_size * 2; // ~ gz

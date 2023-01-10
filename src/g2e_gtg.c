@@ -13,7 +13,7 @@
 #include "g2e.h"
 
 void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs);
-FINT CINTg0_2e_gtg(double *g, CINTEnvVars *envs);
+FINT CINTg0_2e_gtg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
 
 void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                 FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -166,7 +166,7 @@ void CINTg0_2e_lj2d4d_regular(double *g, struct _BC *bc, const CINTEnvVars *envs
 /*
  * g[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
-FINT CINTg0_2e_gtg(double *g, CINTEnvVars *envs)
+FINT CINTg0_2e_gtg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs)
 {
         double aij = envs->ai[0] + envs->aj[0];
         double akl = envs->ak[0] + envs->al[0];
