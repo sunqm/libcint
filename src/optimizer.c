@@ -277,20 +277,6 @@ void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
 }
 #endif
 
-
-// little endian on x86
-typedef union {
-    double d;
-    unsigned short s[4];
-} type_IEEE754;
-// ~4 times faster than built-in log
-static inline double approx_log(double x)
-{
-        type_IEEE754 y;
-        y.d = x;
-        return ((y.s[3] >> 4) - 1023 + 1) * 0.693145751953125;
-}
-
 void CINTOpt_log_max_pgto_coeff(double *log_maxc, double *coeff, FINT nprim, FINT nctr)
 {
         FINT i, ip;
