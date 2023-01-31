@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 5.1.9
-2022-01-09
+version 5.2.0
+2022-01-31
 
 
 What is libcint
