@@ -332,11 +332,11 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
         //    <~ (d+1/sqrt(aij))^(li+lj) * (pi/aij)^1.5
         aij = ai[iprim-1] + aj[jprim-1];
         double log_rr_ij = 1.7 - 1.5 * approx_log(aij);
+        double dist_ij = sqrt(rr_ij);
         int lij = li_ceil + lj_ceil;
         if (lij > 0) {
 #ifdef WITH_RANGE_COULOMB
                 double omega = env[PTR_RANGE_OMEGA];
-                double dist_ij = sqrt(rr_ij);
                 if (omega < 0) {
                         double r_guess = 8.;
                         double omega2 = omega * omega;
