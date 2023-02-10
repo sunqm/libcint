@@ -1,5 +1,5 @@
 Version 5.2.0  (2023-01-31):
-	* Optimize SR-ERI integral screen
+	* Optimize SR-ERI integral screening
 
 Version 5.1.9  (2023-01-09):
 	* Fix approx_log bug for non-x86 architecture
