@@ -1,3 +1,6 @@
+Version 5.2.2  (2023-03-22):
+	* Improves rys-roots finder accuracy
+
 Version 5.2.1  (2023-01-31):
 	* Improve error handling for SR-ERI integrals
 
