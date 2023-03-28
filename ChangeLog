@@ -1,3 +1,6 @@
+Version 5.3.0  (2023-03-28):
+	* Improves rys-roots numerical stability in the near-zero limit
+
 Version 5.2.2  (2023-03-22):
 	* Improves rys-roots finder accuracy
 
