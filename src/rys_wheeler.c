@@ -25,6 +25,7 @@
 // For quadruple precision 0.063^36 < 2**-113
 #define FLOCKE_EXTRA_ORDER_FOR_QP       36
 #define THRESHOLD_ZERO  (DBL_EPSILON * 8)
+#define SMALLX_LIMIT    3e-7
 
 int _CINTdiagonalize(int n, double *diag, double *diag_off1, double *eig, double *vec);
 
@@ -3359,7 +3360,7 @@ static void naive_jacobi_moments(int n, double t, double lower, double *mus)
 // Flocke's recipe JCP, 131, 064107
 static void flocke_jacobi_moments(int n, double t, double *mus)
 {
-        if (t < THRESHOLD_ZERO) {
+        if (t < SMALLX_LIMIT) {
                 return naive_jacobi_moments(n, t, 0., mus);
         }
 
@@ -3551,7 +3552,7 @@ static void lnaive_jacobi_moments(int n, double t, double lower, long double *mu
 // Flocke's recipe JCP, 131, 064107
 static void lflocke_jacobi_moments(int n, double t, long double *mus)
 {
-        if (t < THRESHOLD_ZERO) {
+        if (t < SMALLX_LIMIT) {
                 return lnaive_jacobi_moments(n, t, 0., mus);
         }
 
@@ -6209,7 +6210,7 @@ static void qnaive_jacobi_moments(int n, double t, double lower, __float128 *mus
 // Flocke's recipe JCP, 131, 064107
 static void qflocke_jacobi_moments(int n, double t, __float128 *mus)
 {
-        if (t < THRESHOLD_ZERO) {
+        if (t < SMALLX_LIMIT) {
                 return qnaive_jacobi_moments(n, t, 0., mus);
         }
 

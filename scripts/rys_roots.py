@@ -3,6 +3,7 @@ DECIMALS = 120
 mpmath.mp.dps = DECIMALS
 
 import numpy as np
+import scipy.special
 
 def fmt(t, m, low=None):
 #             _ 1           2
@@ -274,3 +275,33 @@ def rys_roots_weights(nroots, x, low=None):
     rt, weights = rys_roots_weights_partial(nroots, x, low)
     roots = rt / (1 - rt)
     return roots, weights
+
+def polyfit_large_x_limits(nroots, x, low=None):
+    # polynomial fits for large X
+    # roots = rx / (x - rx)
+    # weights = mpmath.sqrt(mpmath.pi/4/x) * rat
+    #assert x > 1e9
+    r, w = rys_roots_weights_partial(nroots, x, low)
+    rx = r * x
+    tt = x**.5
+    w0 = mpmath.sqrt(mpmath.pi/4/x)
+    if low is not None:
+        w0 *= mpmath.erfc(low * tt) - mpmath.erfc(tt)
+    rat = w / w0
+    rat[0] = 1 - rat[1:].sum()
+    return rx, rat
+
+def polyfit_small_x_limits(nroots, x, low=None):
+    # polynomial fits for large X
+    # roots = pr1 * x + pr0;
+    # weights = pw1 * w + pw0;
+    assert x < 1e-12
+    x0 = x
+    x1 = x / 2**10
+    r0, w0 = rys_roots_weights(nroots, x0, low)
+    r1, w1 = rys_roots_weights(nroots, x1, low)
+    pr1 = (r1 - r0) / (x1 - x0)
+    pr0 = r0 - pr1 * x0
+    pw1 = (w1 - w0) / (x1 - x0)
+    pw0 = w0 - pw1 * x0
+    return pr0, pr1, pw0, pw1

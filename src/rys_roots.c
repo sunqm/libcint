@@ -1,6 +1,6 @@
 /*
  * Rys quadrature
- 
+
  Code is edited based on
  * PyQuante quantum chemistry program suite http://pyquante.sourceforge.net
  * BDF program package
@@ -23,6 +23,7 @@
 #endif
 #define PIE4        0.78539816339744827900
 #define THRESHOLD_ZERO  (DBL_EPSILON * 8)
+#define SMALLX_LIMIT    3e-7
 
 static int rys_root1(double x, double *roots, double *weights);
 static int rys_root2(double x, double *roots, double *weights);
@@ -53,12 +54,23 @@ static int segment_solve(int n, double x, double lower, double *u, double *w,
 
 void CINTrys_roots(int nroots, double x, double *u, double *w)
 {
-        if (x < THRESHOLD_ZERO) {
+        if (x < SMALLX_LIMIT) {
                 int off = nroots * (nroots - 1) / 2;
                 int i;
                 for (i = 0; i < nroots; i++)  {
-                        u[i] = ROOTS_FOR_X0[off + i];
-                        w[i] = WEIGHTS_FOR_X0[off + i];
+                        u[i] = POLY_SMALLX_R0[off+i] + POLY_SMALLX_R1[off+i] * x;
+                        w[i] = POLY_SMALLX_W0[off+i] + POLY_SMALLX_W1[off+i] * x;
+                }
+                return;
+        } else if (x > 500) {
+                int off = nroots * (nroots - 1) / 2;
+                int i;
+                double rt;
+                double t = sqrt(PIE4/x);
+                for (i = 0; i < nroots; i++)  {
+                        rt = POLY_LARGEX_RT[off+i];
+                        u[i] = rt / (x - rt);
+                        w[i] = POLY_LARGEX_WW[off+i] * t;
                 }
                 return;
         }
@@ -97,7 +109,6 @@ void CINTrys_roots(int nroots, double x, double *u, double *w)
                 break;
         default:
                 err = segment_solve(nroots, x, 0., u, w, 50, CINTqrys_jacobi, CINTqrys_laguerre);
-                break;
         }
         if (err) {
                 fprintf(stderr, "rys_roots fails: nroots=%d x=%g\n",
@@ -457,7 +468,7 @@ static int rys_root3(double X, double *roots, double *weights)
 {
 
         double R13, R23, W23, R33, W33;
-        double RT1, RT2, RT3, WW1, WW2, WW3; 
+        double RT1, RT2, RT3, WW1, WW2, WW3;
         double F1, F2, E, T1, T2, T3, A1, A2, Y;
 
         R13 = 1.90163509193487E-01;
@@ -690,7 +701,7 @@ static int rys_root3(double X, double *roots, double *weights)
                 A1 = F1-T1*WW1;
                 WW3 = (A2-T2*A1)/((T3-T2)*(T3-T1));
                 WW2 = (T3*A1-A2)/((T3-T2)*(T2-T1));
-                WW1 = WW1-WW2-WW3; 
+                WW1 = WW1-WW2-WW3;
         } else if (X < 47) {
                 WW1 = sqrt(PIE4/X);
                 E = exp(-X);
@@ -1027,7 +1038,7 @@ static int rys_root4(double X, double *roots, double *weights)
                          1.70830039597097E+04)*X-2.90517939780207E+05)*X +
                        (3.49059698304732E+07/X-1.64944522586065E+07)/X +
                        2.96817940164703E+06)*E + R44/(X-R44);
-                if (X <= 25) 
+                if (X <= 25)
                         WW4 = ((((((( 2.33766206773151E-07*X-
                                       3.81542906607063E-05)*X +3.51416601267000E-03)*X-
                                    1.66538571864728E-01)*X +4.80006136831847E+00)*X-
