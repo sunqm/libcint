@@ -3,7 +3,6 @@ DECIMALS = 120
 mpmath.mp.dps = DECIMALS
 
 import numpy as np
-import scipy.special
 
 def fmt(t, m, low=None):
 #             _ 1           2
