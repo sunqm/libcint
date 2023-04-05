@@ -48,10 +48,9 @@
 #define CHARGE_OF       0
 #define PTR_COORD       1
 #define NUC_MOD_OF      2
-#define PTR_ZETA        3
 #define PTR_FRAC_CHARGE 3
-#define RESERVE_ATMLOT1 4
-#define RESERVE_ATMLOT2 5
+#define PTR_ZETA        4
+#define RESERVE_ATMLOT  5
 #define ATM_SLOTS       6
 
 
@@ -131,6 +130,7 @@
 #define POINT_NUC       1
 #define GAUSSIAN_NUC    2
 #define FRAC_CHARGE_NUC 3
+#define FRAC_GAUSS_NUC  4
 
 #define bas(SLOT,I)     bas[BAS_SLOTS * (I) + (SLOT)]
 #define atm(SLOT,I)     atm[ATM_SLOTS * (I) + (SLOT)]
