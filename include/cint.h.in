@@ -48,8 +48,8 @@
 #define CHARGE_OF       0
 #define PTR_COORD       1
 #define NUC_MOD_OF      2
-#define PTR_FRAC_CHARGE 3
-#define PTR_ZETA        4
+#define PTR_ZETA        3
+#define PTR_FRAC_CHARGE 4
 #define RESERVE_ATMLOT  5
 #define ATM_SLOTS       6
 
