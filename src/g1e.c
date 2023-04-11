@@ -191,7 +191,7 @@ double CINTnuc_mod(double aij, FINT nuc_id, FINT *atm, double *env)
         double zeta;
         if (nuc_id < 0) {
                 zeta = env[PTR_RINV_ZETA];
-        } else if ((atm(NUC_MOD_OF, nuc_id)-1) & 1 == 1) {
+        } else if ((atm(NUC_MOD_OF, nuc_id)-1) & (GAUSSIAN_NUC-1)) {
                 zeta = env[atm(PTR_ZETA, nuc_id)];
         } else {
                 zeta = 0;
@@ -225,7 +225,7 @@ FINT CINTg1e_nuc(double *g, CINTEnvVars *envs, FINT nuc_id)
         if (nuc_id < 0) {
                 fac1 = 2*M_PI * envs->fac[0] * tau / aij;
                 cr = env + PTR_RINV_ORIG;
-        } else if (((atm(NUC_MOD_OF, nuc_id)-1) & (1 << 1)) >> 1 == 1) {
+        } else if ((atm(NUC_MOD_OF, nuc_id)-1) & (FRAC_CHARGE_NUC-1)) {
                 fac1 = 2*M_PI * -env[atm[PTR_FRAC_CHARGE+nuc_id*ATM_SLOTS]] * envs->fac[0] * tau / aij;
                 cr = env + atm(PTR_COORD, nuc_id);
         } else {
