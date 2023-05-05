@@ -90,6 +90,7 @@ if(WITH_RANGE_COULOMB)
 # defined in config.h
 #  add_definitions(-DWITH_RANGE_COULOMB)
   message("Enabled WITH_RANGE_COULOMB")
+  set(cintSrc ${cintSrc} src/polyfits.c src/sr_rys_polyfits.c)
 endif(WITH_RANGE_COULOMB)
 
 if(WITH_COULOMB_ERF)

@@ -1,8 +1,8 @@
 import mpmath
-DECIMALS = 120
+DECIMALS = 100
 mpmath.mp.dps = DECIMALS
-
 import numpy as np
+from find_polyroots import find_polyroots
 
 def fmt(t, m, low=None):
 #             _ 1           2
@@ -126,6 +126,7 @@ def fmt2_erfc(t, m, low=0):
     e1 = mpmath.exp(-t*low2) * low
     b = half / t
     out = [f]
+    #.5/t*(1+mpmath.exp(-t*low2)*low/f)
     for i in range(m):
         f = b * ((2*i+1) * f - e + e1)
         e1 *= low2
@@ -147,87 +148,21 @@ def zeros(shape):
         size = np.prod(shape)
     return np.array([mpmath.mpf(0)] * size).reshape(shape)
 
-ACCRT = min(mpmath.power(.1, DECIMALS/2), mpmath.mpf('1e-35'))
-def R_dnode(a, rt):
-    order = a.size - 1
-    quat1 = mpmath.mpf('.25')
-    quat3 = mpmath.mpf('.75')
-
-    x1init = mpmath.mpf(0)
-    p1init = mpmath.mpf(a[0])
-    for m in range(order):
-        x0 = x1init
-        p0 = p1init
-        x1init = mpmath.mpf(rt[m])
-        p1init = poly_value1(a, order, x1init)
-        if (p0 * p1init > 0):
-            raise RuntimeError
-
-        if (x0 <= x1init):
-            x1 = x1init
-            p1 = p1init
-        else:
-            x1 = x0
-            p1 = p0
-            x0 = x1init
-            p0 = p1init
-
-        if (p0 == 0):
-            rt[m] = x0
-            continue
-        elif (p1 == 0):
-            rt[m] = x1
-            continue
-        else:
-            xi = x0 + (x0 - x1) / (p1 - p0) * p0
-
-        n = 0
-        while (x1 > ACCRT+x0) or (x0 > x1+ACCRT):
-            n += 1
-            if (n > 1000):
-                raise RuntimeError
-
-            pi = poly_value1(a, order, xi)
-            if (-ACCRT < pi < ACCRT):
-                break
-            elif (p0 * pi <= 0):
-                x1 = xi
-                p1 = pi
-                xi = x0 * quat1 + xi * quat3
-            else:
-                x0 = xi
-                p0 = pi
-                xi = xi * quat3 + x1 * quat1
-
-            pi = poly_value1(a, order, xi)
-            if (-ACCRT < pi < ACCRT):
-                break
-            elif (p0 * pi <= 0):
-                x1 = xi
-                p1 = pi
-            else:
-                x0 = xi
-                p0 = pi
-
-            xi = x0 + (x0 - x1) / (p1 - p0) * p0
-        rt[m] = xi
-    return rt
-
 def R_dsmit(s, n):
     cs = zeros(s.shape)
     for j in range(n):
         fac = s[j,j]
         v = zeros(j)
         for k in range(j):
-            dot = cs[:j+1,k].dot(s[:j+1,j])
-            v -= dot * cs[:j,k]
+            dot = cs[k,:j+1].dot(s[j,:j+1])
+            v -= dot * cs[k,:j]
             fac = fac - dot * dot
 
         if fac <= 0:
-            raise RuntimeError(str(fac))
+            raise RuntimeError(f'R_dsmit fac = {fac}')
         fac = 1 / mpmath.sqrt(fac)
         cs[j,j] = fac
-        cs[:j,j] = fac * v[:j]
+        cs[j,:j] = fac * v[:j]
     return cs
 
 def rys_roots_weights_partial(nroots, x, low=None):
@@ -247,25 +182,14 @@ def rys_roots_weights_partial(nroots, x, low=None):
             s[i, j] = ff[i + j]
 
     cs = R_dsmit(s, nroots1)
-    rt = np.array([mpmath.mpf(1)] * nroots1)
-
-    half = mpmath.mpf('.5')
-    if nroots == 1:
-        rt[0] = ff[1] / ff[0]
-    else:
-        dum = mpmath.sqrt(cs[1,2] * cs[1,2] - 4 * cs[0,2] * cs[2,2])
-        rt[0] = half * (-cs[1,2] - dum) / cs[2,2]
-        rt[1] = half * (-cs[1,2] + dum) / cs[2,2]
-
-    for k in range(2, nroots):
-        R_dnode(cs[:k+2,k+1], rt)
+    rt = find_polyroots(cs, nroots)
 
     weights = zeros(nroots)
     for i in range(nroots):
         root = rt[i]
         dum = 1 / ff[0]
         for j in range(1, nroots):
-            poly = poly_value1(cs[:j+1,j], j, root)
+            poly = poly_value1(cs[j,:j+1], j, root)
             dum += poly * poly
         weights[i] = 1 / dum
     return rt[:nroots], weights
@@ -275,18 +199,20 @@ def rys_roots_weights(nroots, x, low=None):
     roots = rt / (1 - rt)
     return roots, weights
 
+# when erf(x**.5) ~= 1
 def polyfit_large_x_limits(nroots, x, low=None):
     # polynomial fits for large X
     # roots = rx / (x - rx)
     # weights = mpmath.sqrt(mpmath.pi/4/x) * rat
     #assert x > 1e9
+    assert low is None # No large x limits for sr_rys_roots
     r, w = rys_roots_weights_partial(nroots, x, low)
     rx = r * x
     tt = x**.5
     w0 = mpmath.sqrt(mpmath.pi/4/x)
     if low is not None:
         w0 *= mpmath.erfc(low * tt) - mpmath.erfc(tt)
-    rat = w / w0
+    rat = w / w0 # rat.sum() == 1
     rat[0] = 1 - rat[1:].sum()
     return rx, rat
 

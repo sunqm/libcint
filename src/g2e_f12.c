@@ -16,7 +16,7 @@
 
 FINT CINTg0_2e_stg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
 FINT CINTg0_2e_yp(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
-void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
+void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
 
 void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
@@ -152,7 +152,7 @@ void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
 }
 
 
-void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs)
+void CINTg0_2e_stg_lj2d4d(double *g, struct _BC *bc, CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_lj2d_4d(g, envs);

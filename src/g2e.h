@@ -28,16 +28,18 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 FINT CINTg0_2e(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
-void CINTg0_2e_2d(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_lj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_il2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
-void CINTg0_2e_ik2d4d(double *g, struct _BC *bc, const CINTEnvVars *envs);
+void CINTg0_2e_2d(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTg0_2e_2d4d_unrolled(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTsrg0_2e_2d4d_unrolled(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTg0_2e_lj2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTg0_2e_il2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTg0_2e_ik2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
 
-void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs);
-void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs);
-void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs);
-void CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs);
+void CINTg0_lj2d_4d(double *g, CINTEnvVars *envs);
+void CINTg0_kj2d_4d(double *g, CINTEnvVars *envs);
+void CINTg0_il2d_4d(double *g, CINTEnvVars *envs);
+void CINTg0_ik2d_4d(double *g, CINTEnvVars *envs);
 
 void CINTnabla1i_2e(double *f, const double *g,
                     const FINT li, const FINT lj, const FINT lk, const FINT ll,

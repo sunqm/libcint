@@ -67,14 +67,11 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lj_ceil = envs->j_l + ng[JINC];
         envs->lk_ceil = 0; // to reuse CINTg0_2e_lj2d4d
         envs->ll_ceil = envs->k_l + ng[KINC];
-        envs->nrys_roots =(envs->li_ceil + envs->lj_ceil + envs->ll_ceil)/2 + 1;
+        int nrys_roots =(envs->li_ceil + envs->lj_ceil + envs->ll_ceil)/2 + 1;
+        envs->nrys_roots = nrys_roots;
 
         FINT dli, dlj, dlk;
         FINT ibase = envs->li_ceil > envs->lj_ceil;
-        if (envs->nrys_roots <= 2) { // use the fully optimized lj_4d algorithm
-                ibase = 0;
-        }
-
         if (ibase) {
                 dli = envs->li_ceil + envs->lj_ceil + 1;
                 dlj = envs->lj_ceil + 1;
@@ -84,11 +81,11 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         }
         dlk = envs->ll_ceil + 1;
 
-        envs->g_stride_i = envs->nrys_roots;
-        envs->g_stride_k = envs->nrys_roots * dli;
-        envs->g_stride_l = envs->nrys_roots * dli;
-        envs->g_stride_j = envs->nrys_roots * dli * dlk;
-        envs->g_size     = envs->nrys_roots * dli * dlk * dlj;
+        envs->g_stride_i = nrys_roots;
+        envs->g_stride_k = nrys_roots * dli;
+        envs->g_stride_l = nrys_roots * dli;
+        envs->g_stride_j = nrys_roots * dli * dlk;
+        envs->g_size     = nrys_roots * dli * dlk * dlj;
 
         envs->al[0] = 0;
         envs->rkl[0] = envs->rk[0];
@@ -115,7 +112,9 @@ void CINTinit_int3c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                 envs->rirj[2] = envs->rj[2] - envs->ri[2];
         }
 
-        if (ibase) {
+        if (nrys_roots <= 2) {
+                envs->f_g0_2d4d = &CINTg0_2e_2d4d_unrolled;
+        } else if (ibase) {
                 envs->f_g0_2d4d = &CINTg0_2e_il2d4d;
         } else {
                 envs->f_g0_2d4d = &CINTg0_2e_lj2d4d;

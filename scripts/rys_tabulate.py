@@ -1,10 +1,13 @@
 import os
+import pickle
+from concurrent.futures import ProcessPoolExecutor
 import mpmath
 import numpy as np
 from rys_roots import DECIMALS, rys_roots_weights_partial, rys_roots_weights
 mpmath.mp.dps = DECIMALS
 
 def chebyshev_roots(n):
+    '''np.cos(np.pi / n * (np.arange(n) + .5))'''
     return [mpmath.cos(mpmath.pi * (k + .5) / n) for k in range(n)]
 
 def clenshaw_points(n):
@@ -17,30 +20,43 @@ def clenshaw_points(n):
 ngrids = 14
 chebrt = np.array(chebyshev_roots(ngrids))
 cs = np.array(clenshaw_points(ngrids))
+TBASE = np.arange(0, 51, 2.5)
+print(TBASE)
 
-def get_tabulate_points(tbase, Tp):
-    tabulate_points = []
-    for r in chebrt:
-        if tbase == 0:
-            x = (r/2 + Tp) ** 2
-        else:
-            x = 3 ** (r/2 + Tp - 1)
-        tabulate_points.append(x)
-    return tabulate_points
+def get_cheb_t_points(tbase):
+    if tbase < 1000:
+        interval = TBASE[tbase+1] - TBASE[tbase]
+        return (chebrt+1) * interval/2 + TBASE[tbase]
+    else:
+        b1 = float(TBASE[tbase+1])
+        b0 = float(TBASE[tbase])
+        interval = mpmath.log(b1) - mpmath.log(b0)
+        return np.array([mpmath.exp((x+1)*interval/2) * b0 for x in chebrt])
+
+def cheb_t_interval(x, tbase):
+    '''map to interval [-1, 1]'''
+    if tbase < 1000:
+        interval = TBASE[tbase+1] - TBASE[tbase]
+        tt = (x - TBASE[tbase]) * 2 / interval - 1
+    else:
+        b1 = float(TBASE[tbase+1])
+        b0 = float(TBASE[tbase])
+        interval = mpmath.log(b1) - mpmath.log(b0)
+        tt = (mpmath.log(x) - mpmath.log(b0)) * 2 / interval - 1
+    return tt
+
+def find_tbase(x):
+    return np.searchsorted(TBASE, x) - 1
 
 def tabulate_erf(nroots, tbase):
-    Tmin = mpmath.mpf(tbase)
-    Tmax = Tmin + 1
-    Tp = (Tmin + Tmax) / 2
-
-    tabulate_points = get_tabulate_points(tbase, Tp)
+    tabulate_points = get_cheb_t_points(tbase)
 
     fac = mpmath.mpf(2) / ngrids
 
     rs = []
     ws = []
     for x in tabulate_points:
-        r, w = rys_roots_weights_partial(nroots, x)
+        r, w = rys_roots_weights(nroots, x)
         rs.append(r)
         ws.append(w)
     rs = np.array(rs)
@@ -51,113 +67,77 @@ def tabulate_erf(nroots, tbase):
     tab_ws = ws.T.dot(cs.T) * fac
     return tab_rs, tab_ws
 
-def tabulate_erfc(nroots, tbase):
-    Tmin = mpmath.mpf(tbase)
-    Tmax = Tmin + 1
-    Tp = (Tmin + Tmax) / 2
-
-    tabulate_points = get_tabulate_points(tbase, Tp)
-    boundary_points = [r/2 + 0.5 for r in chebrt]
-
-    fac = mpmath.mpf(2) / ngrids
-
-    rs = []
-    ws = []
-    for x in tabulate_points:
-        for low in boundary_points:
-            r, w = rys_roots_weights_partial(nroots, x, low)
-            rs.append(r)
-            ws.append(w)
-    rs = np.array(rs).reshape(ngrids, ngrids, nroots)
-    ws = np.array(ws).reshape(ngrids, ngrids, nroots)
-
-    # einsum('lkn,il,jk->nji', rs, cs)
-    tab_rs = np.array([cs.dot(rs[:,:,ir]).dot(cs.T).T * fac**2 for ir in range(nroots)])
-    tab_ws = np.array([cs.dot(ws[:,:,ir]).dot(cs.T).T * fac**2 for ir in range(nroots)])
-    return tab_rs, tab_ws
-
 def clenshaw_d1(x, u, nroots):
     rr = []
     u2 = u * 2
     for i in range(nroots):
         xi = x[i]
+        ng = len(xi)
         d0 = 0
-        d1 = xi[ngrids-1]
-        for k in reversed(range(1, ngrids-1)):
+        d1 = xi[ng-1]
+        for k in reversed(range(1, ng-1)):
             d1, d0 = u2 * d1 - d0 + xi[k], d1
         rr.append(u * d1 - d0 + xi[0] * 0.5)
-    return rr
+    return np.array(rr)
 
 
 def polyfit_erf(nroots, x):
-    t = x
-    if t > 19682.99:
-        t = 19682.99
-
-    if t > 1.0:
-        tt = mpmath.log(t) / mpmath.log(3) + 1.0  # log3(t) + 1
-    else:
-        tt = mpmath.sqrt(t)
-
-    it = int(tt)
-    if isinstance(x, float):
-        tt = float(tt) - it
-    else:
-        tt = tt - it
-    tt = 2.0 * tt - 1.0
-
-    tab_rs, tab_ws = tabulate_erf(nroots, it)
+    tbase = find_tbase(x)
+    tt = cheb_t_interval(x, tbase)
+    tab_rs, tab_ws = tabulate_erf(nroots, tbase)
     rr = clenshaw_d1(tab_rs.astype(float), tt, nroots)
     ww = clenshaw_d1(tab_ws.astype(float), tt, nroots)
-    rr = [r/(1-r) for r in rr]
+    #rr = rr/(1-rr)
     return rr, ww
 
-def polyfit_erfc(nroots, x, low):
-    t = x
-    if t > 19682.99:
-        t = 19682.99
-
-    if t > 1.0:
-        tt = mpmath.log(t) / mpmath.log(3) + 1.0  # log3(t) + 1
-    else:
-        tt = mpmath.sqrt(t)
-
-    it = int(tt)
-    tt = tt - it
-    tt = 2.0 * tt - 1.0  # map [0, 1] to [-1, 1]
-    u = low * 2 - 1      # map [0, 1] to [-1, 1]
-
-    tab_rs, tab_ws = tabulate_erfc(nroots, it)
-    im = clenshaw_d1(tab_rs.astype(float), u, nroots)
-    rr = clenshaw_d1(im, tt, nroots)
-    rr = [r/(1-r) for r in rr]
-
-    im = clenshaw_d1(tab_ws.astype(float), u, nroots)
-    ww = clenshaw_d1(im, tt, nroots)
-    if x * low**2 < DECIMALS*.7:
-        factor = mpmath.exp(-x * low**2)
-        ww = [w * factor for w in ww]
-    return rr, ww
-
-def generate_table(path):
-    with open(os.path.join(path, 'roots_x.dat'), 'w') as fx, open(os.path.join(path, 'roots_w.dat'), 'w') as fw:
-        for nroots in range(1, 14):
-            fx.write('/* root=%d */\n' % nroots)
-            fw.write('/* root=%d */\n' % nroots)
-            for tbase in range(10):
-                print('root %d  tbase %d' % (nroots, tbase))
-                tab_rs, tab_ws = tabulate_erfc(nroots, tbase)
+def pkl2table(prefix, pklfile):
+    with open(pklfile, 'rb') as f:
+        TBASE, rys_tab = pickle.load(f)
+    TBASE = TBASE.round(6)
+    with open(f'{prefix}_x.dat', 'w') as fx, open(f'{prefix}_w.dat', 'w') as fw:
+        fw.write(f'// DATA_TBASE[{len(TBASE)}] = ''{' + (', '.join([str(x) for x in TBASE])) + '};\n')
+        fx.write(f'static double DATA_X[] = ''{\n')
+        fw.write(f'static double DATA_W[] = ''{\n')
+        for i, tab in enumerate(rys_tab):
+            nroots = i + 6
+            for it, ttab in enumerate(tab):
+                tbase = TBASE[it]
+                print(f'root {nroots}  tbase[{it}] {tbase}')
+                fx.write(f'/* root={nroots} base[{it}]={tbase} */\n')
+                fw.write(f'/* root={nroots} base[{it}]={tbase} */\n')
+                tab_rs, tab_ws = ttab
                 fmt_r = [('    %.17e' % x)[-26:] for x in tab_rs.ravel()]
                 fmt_w = [('    %.17e' % x)[-26:] for x in tab_ws.ravel()]
                 fx.write(',\n'.join(fmt_r))
                 fx.write(',\n')
                 fw.write(',\n'.join(fmt_w))
                 fw.write(',\n')
+        fx.write('};\n')
+        fw.write('};\n')
 
+def generate_table(path):
+    with ProcessPoolExecutor(8) as pe:
+        tab = []
+        nt = len(TBASE) - 1
+        for nroots in range(6, 15):
+            res = []
+            for tbase in range(nt):
+                print(f'root {nroots}  tbase {tbase}')
+                fut = pe.submit(tabulate_erf, nroots, tbase)
+                res.append(fut)
+            res = [fut.result() for fut in res]
+            res = np.array(res, dtype=float)
+            res = res.reshape(nt,2,nroots,ngrids)
+            tab.append(res)
+    with open(path, 'wb') as f:
+        pickle.dump((TBASE, tab), f)
+
+# when erf(x**.5) ~= 1
 def polyfit_large_x_limits(nroots, x, low=None):
     # polynomial fits for large X
     # roots = rx / (x - rx)
     # weights = mpmath.sqrt(mpmath.pi/4/x) * rat
+    assert low is None # No large x limits for sr_rys_roots
     r, w = rys_roots_weights_partial(nroots, x, low)
     rx = r * x
     w0 = mpmath.sqrt(mpmath.pi/4/x)
@@ -182,4 +162,5 @@ def polyfit_small_x_limits(nroots, x, low=None):
     return pr0, pr1, pw0, pw1
 
 if __name__ == '__main__':
-    generate_table('.')
+    generate_table('rys_rw.pkl')
+    #pkl2table('./rys', 'rys_rw.pkl')

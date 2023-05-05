@@ -58,14 +58,15 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lj_ceil = 0;
         envs->lk_ceil = envs->k_l + ng[KINC];
         envs->ll_ceil = 0;
-        envs->nrys_roots =(envs->li_ceil + envs->lk_ceil)/2 + 1;
+        int nrys_roots =(envs->li_ceil + envs->lk_ceil)/2 + 1;
+        envs->nrys_roots = nrys_roots;
 
         FINT dli = envs->li_ceil + 1;
         FINT dlk = envs->lk_ceil + 1;
-        envs->g_stride_i = envs->nrys_roots;
-        envs->g_stride_k = envs->nrys_roots * dli;
+        envs->g_stride_i = nrys_roots;
+        envs->g_stride_k = nrys_roots * dli;
         envs->g_stride_l = envs->g_stride_k;
-        envs->g_size     = envs->nrys_roots * dli * dlk;
+        envs->g_size     = nrys_roots * dli * dlk;
 
         envs->aj[0] = 0;
         envs->al[0] = 0;
@@ -86,7 +87,11 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->rx_in_rklrx = envs->rk;
         envs->rx_in_rijrx = envs->ri;
 
-        envs->f_g0_2d4d = &CINTg0_2e_2d;
+        if (nrys_roots <= 2) {
+                envs->f_g0_2d4d = &CINTg0_2e_2d4d_unrolled;
+        } else {
+                envs->f_g0_2d4d = &CINTg0_2e_2d;
+        }
         envs->f_g0_2e = &CINTg0_2e;
 
 // initialize j_l, j_ctr, nfj because they are used in c2s_sph_1e and

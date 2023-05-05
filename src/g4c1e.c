@@ -11,10 +11,10 @@
 #include "g1e.h"
 #include "g2e.h"
 
-void CINTg0_lj2d_4d(double *g, const CINTEnvVars *envs);
-void CINTg0_kj2d_4d(double *g, const CINTEnvVars *envs);
-void CINTg0_il2d_4d(double *g, const CINTEnvVars *envs);
-void CINTg0_ik2d_4d(double *g, const CINTEnvVars *envs);
+void CINTg0_lj2d_4d(double *g, CINTEnvVars *envs);
+void CINTg0_kj2d_4d(double *g, CINTEnvVars *envs);
+void CINTg0_il2d_4d(double *g, CINTEnvVars *envs);
+void CINTg0_ik2d_4d(double *g, CINTEnvVars *envs);
 
 FINT CINTinit_int4c1e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                              FINT *atm, FINT natm,

@@ -76,7 +76,7 @@ def xyz2sph_real(lx, ly, lz, m):
     '''
     Factor of xyz component for normalized real spherical harmonic functions
 
-         r^l*Y(l,m) = \sum_{lx+ly+lz=l} x^lx*y^lyz^lz * c(l,m,lx,ly,lz)
+         r^l*Y(l,m) = \sum_{lx+ly+lz=l} x^lx y^ly z^lz c(l,m,lx,ly,lz)
 
     Y(l,m) is a real spherical harmonic function with Condon-Shortley phase
     convention

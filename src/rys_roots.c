@@ -54,7 +54,7 @@ static int segment_solve(int n, double x, double lower, double *u, double *w,
 
 void CINTrys_roots(int nroots, double x, double *u, double *w)
 {
-        if (x < SMALLX_LIMIT) {
+        if (x <= SMALLX_LIMIT) {
                 int off = nroots * (nroots - 1) / 2;
                 int i;
                 for (i = 0; i < nroots; i++)  {
@@ -62,7 +62,7 @@ void CINTrys_roots(int nroots, double x, double *u, double *w)
                         w[i] = POLY_SMALLX_W0[off+i] + POLY_SMALLX_W1[off+i] * x;
                 }
                 return;
-        } else if (x > 500) {
+        } else if (x >= 50.) {
                 int off = nroots * (nroots - 1) / 2;
                 int i;
                 double rt;
@@ -148,6 +148,13 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
 void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 {
         int err;
+        if (lower < 0.6) {
+                err = CINTsr_rys_polyfits(nroots, x, lower, u, w);
+                if (err == 0) {
+                        return;
+                }
+        }
+
         switch (nroots) {
         case 1:
                 err = CINTrys_schmidt(nroots, x, lower, u, w);

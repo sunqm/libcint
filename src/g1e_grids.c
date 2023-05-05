@@ -26,7 +26,8 @@ void CINTinit_int1e_grids_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->common_factor = 2 * M_PI
                 * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->j_l);
 
-        FINT nroots = envs->nrys_roots;
+        int nroots = envs->nrys_roots;
+
         FINT dli, dlj;
         FINT ibase = envs->li_ceil > envs->lj_ceil;
         if (ibase) {
