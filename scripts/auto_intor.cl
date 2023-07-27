@@ -21,6 +21,7 @@
   '("int1e_zz"                  ( \| zc zc \| ))
   '("int1e_r"                   ( \| rc \| ))
   '("int1e_r2"                  ( \| rc dot rc \| ))
+  '("int1e_r4"                  ( \| rc dot rc rc dot rc \| ))
   '("int1e_rr"                  ( \| rc rc \| ))
   '("int1e_rrr"                 ( \| rc rc rc \| ))
   '("int1e_rrrr"                ( \| rc rc rc rc \| ))
@@ -214,6 +215,7 @@
 (gen-cint "int3c1e.c"
   '("int3c1e_p2"                ( \, \, p dot p))
   '("int3c1e_iprinv"            ( p \, \| rinv \| ))
+  '("int3c1e_ip1"               ( nabla \, \,))
 )
 
 (gen-cint "deriv3.c"

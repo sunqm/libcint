@@ -70,6 +70,9 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
         double *ak = env + bas(PTR_EXP, k_sh);
         double *ci = env + bas(PTR_COEFF, i_sh);
         double *ck = env + bas(PTR_COEFF, k_sh);
+        double expcutoff = envs->expcutoff;
+        double *ri = envs->ri;
+        double *rk = envs->rk;
         FINT n_comp = envs->ncomp_tensor;
         double fac1i, fac1k;
         FINT ip, kp;
@@ -128,7 +131,7 @@ FINT CINT2c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
                                 fac1i = fac1k;
                         }
                         envs->fac[0] = fac1i;
-                        if ((*envs->f_g0_2e)(g, envs)) {
+                        if ((*envs->f_g0_2e)(g, ri, rk, expcutoff, envs)) {
                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                 PRIM2CTR(i, gout, len0);
                         }
@@ -159,6 +162,9 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
         double *ak = env + bas(PTR_EXP, k_sh);
         double *ci = env + bas(PTR_COEFF, i_sh);
         double *ck = env + bas(PTR_COEFF, k_sh);
+        double expcutoff = envs->expcutoff;
+        double *ri = envs->ri;
+        double *rk = envs->rk;
         FINT n_comp = envs->ncomp_tensor;
         double fac1i, fac1k;
         FINT ip, kp;
@@ -213,7 +219,7 @@ FINT CINT2c2e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT *empty)
                                 fac1i = fac1k;
                         }
                         envs->fac[0] = fac1i;
-                        if ((*envs->f_g0_2e)(g, envs)) {
+                        if ((*envs->f_g0_2e)(g, ri, rk, expcutoff, envs)) {
                                 (*envs->f_gout)(gout, g, idx, envs, *gempty);
                                 PRIM2CTR(i, gout, len0);
                         }

@@ -1,8 +1,8 @@
 libcint
 =======
 
-version 5.1.2
-2022-05-03
+version 5.4.0
+2023-07-04
 
 
 What is libcint
@@ -226,7 +226,7 @@ Known problems
     Schwarz inequality to estimate upper limit of an integral, the default
     integral cutoff might not be accurate enough. It can be adjusted by the
     parameter ``env[PTR_EXPCUTOFF]`` (since libcint 4.0). This parameter needs to be
-    set to ``abs(log(cutoff_threshold))``.
+    set to ``abs(ln(cutoff_threshold))``.
 
 * On 64-bit systems, ``make test`` stop with error: ::
 

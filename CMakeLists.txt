@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.5)
 project (cint C)
 set(cint_VERSION_MAJOR "5")
-set(cint_VERSION_MINOR "1")
-set(cint_VERSION_PATCH "2")
+set(cint_VERSION_MINOR "4")
+set(cint_VERSION_PATCH "0")
 set(cint_VERSION_TWEAK "0")
 set(cint_VERSION "${cint_VERSION_MAJOR}.${cint_VERSION_MINOR}.${cint_VERSION_PATCH}")
 set(cint_SOVERSION "${cint_VERSION_MAJOR}")
@@ -104,12 +104,13 @@ if(WITH_F12)
   message("Enabled WITH_F12")
 endif(WITH_F12)
 
-if(WITH_GTG)
-  set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c src/cint3c2e_gtg.c
-    src/cint2c2e_gtg.c)
-  add_definitions(-DWITH_GTG)
-  message("Enabled WITH_GTG. Note there are bugs in gtg type integrals")
-endif(WITH_GTG)
+# Gaussian type geminal code are incorrect
+#if(WITH_GTG)
+#  set(cintSrc ${cintSrc} src/g2e_gtg.c src/cint2e_gtg.c src/cint3c2e_gtg.c
+#    src/cint2c2e_gtg.c)
+#  add_definitions(-DWITH_GTG)
+#  message("Enabled WITH_GTG. Note there are bugs in gtg type integrals")
+#endif(WITH_GTG)
 
 if(WITH_4C1E)
   set(cintSrc ${cintSrc} src/cint4c1e.c src/g4c1e.c)

@@ -1,6 +1,6 @@
 /*
  * Rys quadrature
- 
+
  Code is edited based on
  * PyQuante quantum chemistry program suite http://pyquante.sourceforge.net
  * BDF program package
@@ -23,12 +23,13 @@
 #endif
 #define PIE4        0.78539816339744827900
 #define THRESHOLD_ZERO  (DBL_EPSILON * 8)
+#define SMALLX_LIMIT    3e-7
 
-static void rys_root1(double x, double *roots, double *weights);
-static void rys_root2(double x, double *roots, double *weights);
-static void rys_root3(double x, double *roots, double *weights);
-static void rys_root4(double x, double *roots, double *weights);
-static void rys_root5(double x, double *roots, double *weights);
+static int rys_root1(double x, double *roots, double *weights);
+static int rys_root2(double x, double *roots, double *weights);
+static int rys_root3(double x, double *roots, double *weights);
+static int rys_root4(double x, double *roots, double *weights);
+static int rys_root5(double x, double *roots, double *weights);
 typedef int QuadratureFunction(int n, double x, double lower, double *roots, double *weights);
 #ifndef HAVE_QUADMATH_H
 #define CINTqrys_schmidt        CINTlrys_schmidt
@@ -48,61 +49,73 @@ static int segment_solve(int n, double x, double lower, double *u, double *w,
         if (error) {
                 error = CINTqrys_schmidt(n, x, lower, u, w);
         }
-        if (error) {
-                fprintf(stderr, "libcint rys_roots failed. nroots=%d\n", n);
-#ifndef KEEP_GOING
-                exit(1);
-#endif
-        }
         return error;
 }
 
 void CINTrys_roots(int nroots, double x, double *u, double *w)
 {
-        if (x < THRESHOLD_ZERO) {
+        if (x < SMALLX_LIMIT) {
                 int off = nroots * (nroots - 1) / 2;
                 int i;
                 for (i = 0; i < nroots; i++)  {
-                        u[i] = ROOTS_FOR_X0[off + i];
-                        w[i] = WEIGHTS_FOR_X0[off + i];
+                        u[i] = POLY_SMALLX_R0[off+i] + POLY_SMALLX_R1[off+i] * x;
+                        w[i] = POLY_SMALLX_W0[off+i] + POLY_SMALLX_W1[off+i] * x;
+                }
+                return;
+        } else if (x > 500) {
+                int off = nroots * (nroots - 1) / 2;
+                int i;
+                double rt;
+                double t = sqrt(PIE4/x);
+                for (i = 0; i < nroots; i++)  {
+                        rt = POLY_LARGEX_RT[off+i];
+                        u[i] = rt / (x - rt);
+                        w[i] = POLY_LARGEX_WW[off+i] * t;
                 }
                 return;
         }
 
+        int err;
         switch (nroots) {
         case 1:
-                rys_root1(x, u, w);
+                err = rys_root1(x, u, w);
                 break;
         case 2:
-                rys_root2(x, u, w);
+                err = rys_root2(x, u, w);
                 break;
         case 3:
-                rys_root3(x, u, w);
+                err = rys_root3(x, u, w);
                 break;
         case 4:
-                rys_root4(x, u, w);
+                err = rys_root4(x, u, w);
                 break;
         case 5:
-                rys_root5(x, u, w);
+                err = rys_root5(x, u, w);
                 break;
         case 6: case 7:
-                segment_solve(nroots, x, 0., u, w, 11, CINTrys_jacobi, CINTrys_schmidt);
+                err = segment_solve(nroots, x, 0., u, w, 11, CINTrys_jacobi, CINTrys_schmidt);
                 break;
         case 8:
-                segment_solve(nroots, x, 0., u, w, 11, CINTrys_jacobi, CINTlrys_schmidt);
+                err = segment_solve(nroots, x, 0., u, w, 11, CINTrys_jacobi, CINTlrys_schmidt);
                 break;
         case 9:
-                segment_solve(nroots, x, 0., u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                err = segment_solve(nroots, x, 0., u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 break;
         case 10: case 11:
-                segment_solve(nroots, x, 0., u, w, 18, CINTlrys_jacobi, CINTlrys_laguerre);
+                err = segment_solve(nroots, x, 0., u, w, 18, CINTlrys_jacobi, CINTlrys_laguerre);
                 break;
         case 12:
-                segment_solve(nroots, x, 0., u, w, 22, CINTlrys_jacobi, CINTlrys_laguerre);
+                err = segment_solve(nroots, x, 0., u, w, 22, CINTlrys_jacobi, CINTlrys_laguerre);
                 break;
         default:
-                segment_solve(nroots, x, 0., u, w, 50, CINTqrys_jacobi, CINTqrys_laguerre);
-                break;
+                err = segment_solve(nroots, x, 0., u, w, 50, CINTqrys_jacobi, CINTqrys_laguerre);
+        }
+        if (err) {
+                fprintf(stderr, "rys_roots fails: nroots=%d x=%g\n",
+                        nroots, x);
+#ifndef KEEP_GOING
+                exit(err);
+#endif
         }
 }
 
@@ -124,89 +137,79 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
         } else if (lower < lower_bp2) {
                 error = fn3(n, x, lower, u, w);
         } else {
-                fprintf(stderr, "libcint SR-rys_roots does not support nroots=%d x=%g lower=%g\n",
-                        n, x, lower);
-#ifndef KEEP_GOING
-                exit(1);
-#endif
                 return 1;
         }
         if (error) {
                 error = CINTqrys_schmidt(n, x, lower, u, w);
-                if (error) {
-                        fprintf(stderr, "libcint SR-rys_roots failed. nroots=%d\n", n);
-#ifndef KEEP_GOING
-                        exit(1);
-#endif
-                }
         }
         return error;
 }
 
 void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 {
+        int err;
         switch (nroots) {
         case 1:
-                CINTrys_schmidt(nroots, x, lower, u, w);
+                err = CINTrys_schmidt(nroots, x, lower, u, w);
                 break;
         case 2:
                 if (lower < 0.99) {
-                        CINTrys_schmidt(nroots, x, lower, u, w);
+                        err = CINTrys_schmidt(nroots, x, lower, u, w);
                 } else {
-                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                        err = CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 3:
                 if (lower < 0.93) {
-                        CINTrys_schmidt(nroots, x, lower, u, w);
+                        err = CINTrys_schmidt(nroots, x, lower, u, w);
                 } else if (lower < 0.97) {
-                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                        err = segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
-                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                        err = CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 4:
-                if (lower < 0.85) {
-                        CINTrys_schmidt(nroots, x, lower, u, w);
+                if (lower < 0.8) {
+                        err = CINTrys_schmidt(nroots, x, lower, u, w);
                 } else if (lower < 0.9) {
-                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                        err = segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
-                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                        err = CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 5:
-                if (lower < 0.45) {
-                        CINTrys_schmidt(nroots, x, lower, u, w);
+                if (lower < 0.4) {
+                        err = segment_solve(nroots, x, lower, u, w, 50, CINTrys_schmidt, CINTlrys_laguerre);
                 } else if (lower < 0.8) {
-                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                        err = segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
-                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                        err = CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 6:
-                if (lower < 0.35) {
-                        CINTrys_schmidt(nroots, x, lower, u, w);
+                if (lower < 0.25) {
+                        err = segment_solve(nroots, x, lower, u, w, 60, CINTrys_schmidt, CINTlrys_laguerre);
                 } else if (lower < 0.8) {
-                        segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
+                        err = segment_solve(nroots, x, lower, u, w, 10, CINTlrys_jacobi, CINTlrys_laguerre);
                 } else {
-                        CINTqrys_jacobi(nroots, x, lower, u, w);
+                        err = CINTqrys_jacobi(nroots, x, lower, u, w);
                 }
                 break;
         case 7:
-                segment_solve1(nroots, x, lower, u, w, 0.55, 1., 60, CINTlrys_jacobi, CINTlrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.5, 1., 60, CINTlrys_jacobi, CINTlrys_laguerre, CINTqrys_jacobi);
                 break;
         case 8: case 9: case 10:
                 //CINTqrys_jacobi(nroots, x, lower, u, w);
-                segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 11: case 12:
-                segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.15, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 13: case 14:
-                segment_solve1(nroots, x, lower, u, w, 0.25, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.25, 1., 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 15: case 16:
-                segment_solve1(nroots, x, lower, u, w, 0.25, 0.75, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.25, 0.75, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 17:
                 segment_solve1(nroots, x, lower, u, w, 0.25, 0.65, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
@@ -215,13 +218,13 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
                 segment_solve1(nroots, x, lower, u, w, 0.15, 0.65, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 19:
-                segment_solve1(nroots, x, lower, u, w, 0.15, 0.55, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.15, 0.55, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 20: case 21:
-                segment_solve1(nroots, x, lower, u, w, 0.25, 0.45, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.25, 0.45, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         case 22: case 23: case 24:
-                segment_solve1(nroots, x, lower, u, w, 0.25, 0.35, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
+                err = segment_solve1(nroots, x, lower, u, w, 0.25, 0.35, 60, CINTqrys_jacobi, CINTqrys_laguerre, CINTqrys_jacobi);
                 break;
         default:
                 fprintf(stderr, "libcint SR-rys_roots does not support nroots=%d\n", nroots);
@@ -229,21 +232,28 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
                 exit(1);
 #endif
         }
+        if (err) {
+                fprintf(stderr, "sr_rys_roots fails: nroots=%d x=%g lower=%g\n",
+                        nroots, x, lower);
+#ifndef KEEP_GOING
+                exit(err);
+#endif
+        }
 }
 #endif
 
-static void rys_root1(double X, double *roots, double *weights)
+static int rys_root1(double X, double *roots, double *weights)
 {
         double Y, F1;
 
         if (X > 33.) {
                 weights[0] = sqrt(PIE4/X);
                 roots[0] = 0.5E+00/(X-0.5E+00);
-                return;
+                return 0;
         } else if (X < 3.e-7) {
                 weights[0] = 1.0E+00 -X/3.0E+00;
                 roots[0] = 0.5E+00 -X/5.0E+00;
-                return;
+                return 0;
         }
 
         double E = exp(-X);
@@ -292,9 +302,10 @@ static void rys_root1(double X, double *roots, double *weights)
         double WW1 = 2. * X * F1 + E;
         weights[0] = WW1;
         roots[0] = F1 / (WW1 - F1);
+        return 0;
 }
 
-static void rys_root2(double X, double *roots, double *weights)
+static int rys_root2(double X, double *roots, double *weights)
 {
 
         double R12, R22, W22;
@@ -450,13 +461,14 @@ static void rys_root2(double X, double *roots, double *weights)
         roots[1] = RT2;
         weights[0] = WW1;
         weights[1] = WW2;
+        return 0;
 }
 
-static void rys_root3(double X, double *roots, double *weights)
+static int rys_root3(double X, double *roots, double *weights)
 {
 
         double R13, R23, W23, R33, W33;
-        double RT1, RT2, RT3, WW1, WW2, WW3; 
+        double RT1, RT2, RT3, WW1, WW2, WW3;
         double F1, F2, E, T1, T2, T3, A1, A2, Y;
 
         R13 = 1.90163509193487E-01;
@@ -689,7 +701,7 @@ static void rys_root3(double X, double *roots, double *weights)
                 A1 = F1-T1*WW1;
                 WW3 = (A2-T2*A1)/((T3-T2)*(T3-T1));
                 WW2 = (T3*A1-A2)/((T3-T2)*(T2-T1));
-                WW1 = WW1-WW2-WW3; 
+                WW1 = WW1-WW2-WW3;
         } else if (X < 47) {
                 WW1 = sqrt(PIE4/X);
                 E = exp(-X);
@@ -720,9 +732,10 @@ static void rys_root3(double X, double *roots, double *weights)
         weights[0] = WW1;
         weights[1] = WW2;
         weights[2] = WW3;
+        return 0;
 }
 
-static void rys_root4(double X, double *roots, double *weights)
+static int rys_root4(double X, double *roots, double *weights)
 {
         double R14, R24, W24, R34, W34, R44, W44;
         double RT1, RT2, RT3, RT4, WW1, WW2, WW3, WW4;
@@ -1025,7 +1038,7 @@ static void rys_root4(double X, double *roots, double *weights)
                          1.70830039597097E+04)*X-2.90517939780207E+05)*X +
                        (3.49059698304732E+07/X-1.64944522586065E+07)/X +
                        2.96817940164703E+06)*E + R44/(X-R44);
-                if (X <= 25) 
+                if (X <= 25)
                         WW4 = ((((((( 2.33766206773151E-07*X-
                                       3.81542906607063E-05)*X +3.51416601267000E-03)*X-
                                    1.66538571864728E-01)*X +4.80006136831847E+00)*X-
@@ -1085,9 +1098,10 @@ static void rys_root4(double X, double *roots, double *weights)
         weights[1] = WW2;
         weights[2] = WW3;
         weights[3] = WW4;
+        return 0;
 }
 
-static void rys_root5(double X, double *roots, double *weights)
+static int rys_root5(double X, double *roots, double *weights)
 {
         double R15,R25,W25,R35,W35,R45,W45,R55,W55;
         double RT1, RT2, RT3, RT4, RT5, WW1, WW2, WW3, WW4, WW5;
@@ -1588,6 +1602,7 @@ static void rys_root5(double X, double *roots, double *weights)
         weights[2] = WW3;
         weights[3] = WW4;
         weights[4] = WW5;
+        return 0;
 }
 
 #define POLYNOMIAL_VALUE1(p, a, order, x) \
@@ -1617,7 +1632,8 @@ static int R_dnode(double *a, double *roots, int order)
                         continue;
                 }
                 if (p0 * p1init > 0) {
-                        fprintf(stderr, "ROOT NUMBER %d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %d\n", m, order);
+                        fprintf(stderr, "ROOT NUMBER %d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %d\n",
+                                m, order);
                         return 1;
                 }
                 if (x0 <= x1init) {
@@ -1640,7 +1656,7 @@ static int R_dnode(double *a, double *roots, int order)
                         xi = x0 + (x0 - x1) / (p1 - p0) * p0;
                 }
                 n = 0;
-                while (x1 > accrt+x0 || x0 > x1+accrt) {
+                while (fabs(x1 - x0) > x1*accrt) {
                         n++;
                         if (n > 200) {
                                 fprintf(stderr, "libcint::rys_roots NO CONV. IN R_dnode\n");
@@ -1718,9 +1734,12 @@ static int R_dsmit(double *cs, double *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
+                        if (fac == 0) {
+                                return 0;
+                        }
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrt for roots %d (j=%d)\n", n-1, j);
                         return j;
                 }
                 fac = 1 / sqrt(fac);
@@ -1761,15 +1780,9 @@ static int _rdk_rys_roots(int nroots, double *fmt_ints,
         }
 
         int error = R_dsmit(cs, fmt_ints, nroots1);
-#ifndef KEEP_GOING
         if (error) {
-                exit(error);
-        }
-#else
-        if (error == 1) {
                 return 1;
         }
-#endif
 
         dum = sqrt(cs[2*nroots1+1] * cs[2*nroots1+1] - 4 * cs[2*nroots1+0] * cs[2*nroots1+2]);
         rt[0] = .5 * (-cs[2*nroots1+1] - dum) / cs[2*nroots1+2];
@@ -1783,11 +1796,7 @@ static int _rdk_rys_roots(int nroots, double *fmt_ints,
                 a = cs + order * nroots1;
                 error = R_dnode(a, rt, order);
                 if (error) {
-#ifndef KEEP_GOING
-                        exit(error);
-#else
                         return error;
-#endif
                 }
         }
 
@@ -1893,9 +1902,12 @@ static int R_lsmit(long double *cs, long double *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrtl for roots %d (j=%d)\n", n-1, j);
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
+                        if (fac == 0) {
+                                return 0;
+                        }
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrtl for roots %d (j=%d)\n", n-1, j);
                         return j;
                 }
                 fac = 1 / SQRTL(fac);
@@ -1936,15 +1948,9 @@ int CINTlrys_schmidt(int nroots, double x, double lower, double *roots, double *
                 rt[0] = fmt_ints[1] / fmt_ints[0];
         } else {
                 error = R_lsmit(qcs, fmt_ints, nroots1);
-#ifndef KEEP_GOING
                 if (error) {
-                        exit(error);
+                        return error;
                 }
-#else
-                if (error == 1) {
-                        return 1;
-                }
-#endif
                 for (k = 1; k < nroots1; k++) {
                         for (i = 0; i <= k; i++) {
                                 cs[k * nroots1 + i] = qcs[k * nroots1 + i];
@@ -1963,11 +1969,7 @@ int CINTlrys_schmidt(int nroots, double x, double lower, double *roots, double *
                 a = cs + order * nroots1;
                 error = R_dnode(a, rt, order);
                 if (error) {
-#ifndef KEEP_GOING
-                        exit(error);
-#else
                         return error;
-#endif
                 }
         }
 
@@ -2030,9 +2032,12 @@ static int R_qsmit(__float128 *cs, __float128 *fmt_ints, int n)
                 }
 
                 if (fac <= 0) {
-                        fprintf(stderr, "libcint::rys_roots negative value in sqrtq for roots %d (j=%d)\n", n-1, j);
                         // set rest coefficients to 0
                         SET_ZERO(cs, n, j);
+                        if (fac == 0) {
+                                return 0;
+                        }
+                        fprintf(stderr, "libcint::rys_roots negative value in sqrtq for roots %d (j=%d)\n", n-1, j);
                         return j;
                 }
                 fac = 1.q / sqrtq(fac);
@@ -2073,15 +2078,9 @@ int CINTqrys_schmidt(int nroots, double x, double lower, double *roots, double *
                 rt[0] = fmt_ints[1] / fmt_ints[0];
         } else {
                 error = R_qsmit(qcs, fmt_ints, nroots1);
-#ifndef KEEP_GOING
                 if (error) {
-                        exit(error);
+                        return error;
                 }
-#else
-                if (error == 1) {
-                        return 1;
-                }
-#endif
                 for (k = 1; k < nroots1; k++) {
                         for (i = 0; i <= k; i++) {
                                 cs[k * nroots1 + i] = qcs[k * nroots1 + i];
@@ -2100,11 +2099,7 @@ int CINTqrys_schmidt(int nroots, double x, double lower, double *roots, double *
                 a = cs + order * nroots1;
                 error = R_dnode(a, rt, order);
                 if (error) {
-#ifndef KEEP_GOING
-                        exit(error);
-#else
                         return error;
-#endif
                 }
         }
 

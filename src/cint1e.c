@@ -63,7 +63,7 @@ FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT int1e_type
         CINTOpt_log_max_pgto_coeff(log_maxcj, cj, j_prim, j_ctr);
         if (CINTset_pairdata(pdata_base, ai, aj, envs->ri, envs->rj,
                              log_maxci, log_maxcj, envs->li_ceil, envs->lj_ceil,
-                             i_prim, j_prim, SQUARE(envs->rirj), expcutoff)) {
+                             i_prim, j_prim, SQUARE(envs->rirj), expcutoff, env)) {
                 return 0;
         }
 

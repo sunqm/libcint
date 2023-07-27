@@ -8,9 +8,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-18.04]
+        os: [macos-latest, ubuntu-20.04]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
@@ -18,7 +18,7 @@ jobs:
       - name: Compile
         run: |
           env
-          cmake -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -Bbuild -DKEEP_GOING=1 .
+          cmake -DWITH_CINT2_INTERFACE=1 -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -DWITH_4C1E=1 -Bbuild -DKEEP_GOING=1 .
           cmake --build build
       - name: Test for rys-roots
         if: startsWith(matrix.os, 'ubuntu')
@@ -34,3 +34,5 @@ jobs:
           python test_3c2e.py --quick
           python test_cart2sph.py
           python test_c2s.py
+          python test_cint4c1e.py
+          python test_int1e_grids.py

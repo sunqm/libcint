@@ -43,4 +43,4 @@ void fmt1_qerfc_like(__float128 *f, __float128 t, __float128 lower, int m);
 // short-range Coulomb kernel is numerically very instable when the integrals
 // are close to zero (x*lower**2 > 40). Use this cutoff as a temporary solution
 // to avoid the numerical issue in sr_rys_roots
-#define EXPCUTOFF_SR    45
+#define EXPCUTOFF_SR    40

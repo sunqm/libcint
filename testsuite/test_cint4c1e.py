@@ -141,17 +141,19 @@ c_env = env.ctypes.data_as(ctypes.c_void_p)
 opt = ctypes.POINTER(ctypes.c_void_p)()
 _cint.CINTlen_spinor.restype = ctypes.c_int
 
-
-from pyscf import gto
-mol = gto.M()
-mol._atm = atm[:natm.value]
-mol._bas = bas[:nbas.value]
-mol._env = env
-coords = mol.atom_coords()
-ao = mol.eval_gto('GTOval_sph', coords)
-
+try:
+    import pyscf
+except ImportError:
+    pyscf = None
 
 def test_int2c1e_sph():
+    mol = pyscf.M()
+    mol._atm = atm[:natm.value]
+    mol._bas = bas[:nbas.value]
+    mol._env = env
+    coords = mol.atom_coords()
+    ao = mol.eval_gto('GTOval_sph', coords)
+
     fnpp1 = _cint.cint1e_ipiprinv_sph
     fnp1p = _cint.cint1e_iprinvip_sph
     nullptr = ctypes.POINTER(ctypes.c_void_p)()
@@ -171,7 +173,6 @@ def test_int2c1e_sph():
         ref+= (buf[:,:,0] + buf[:,:,4] + buf[:,:,8]).transpose(1,0)
         return ref * (-.25/numpy.pi)
 
-    #intor = _cint.cint4c1e_sph
     ao_loc = mol.ao_loc_nr()
     for nucid in range(mol.natm):
         mol.set_rinv_orig(coords[nucid])
@@ -232,5 +233,7 @@ def test_int4c1e_sph():
                         return
     print('cint4c1e_sph pass')
 
-test_int2c1e_sph()
-#test_int4c1e_sph()
+if __name__ == '__main__':
+    if pyscf:
+        test_int2c1e_sph()
+    test_int4c1e_sph()

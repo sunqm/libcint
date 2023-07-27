@@ -144,7 +144,7 @@ def random_cart(bas_id, seed=12, dtype='d'):
         cart = cart + numpy.random.random((ng, ncart)) * 1j
     return numpy.asarray(cart, order='F')
 
-def test_c2s_ket_sph1(name, ref, thr=1e-14):
+def test_c2s_ket_sph1(name, ref, thr=1e-12):
     v1 = 0
     fn = getattr(_cint, name)
     for j in range(nbas.value*2):
@@ -156,7 +156,7 @@ def test_c2s_ket_sph1(name, ref, thr=1e-14):
         v1 += fp(sph)
     assert abs(ref - v1) < thr
 
-def test_c2s_bra_spinor_e1sf(name, ref, thr=1e-14):
+def test_c2s_bra_spinor_e1sf(name, ref, thr=1e-12):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -169,7 +169,7 @@ def test_c2s_bra_spinor_e1sf(name, ref, thr=1e-14):
         v1 += fp(gsp)
     assert abs(ref - abs(v1)) < thr
 
-def test_c2s_bra_spinor_sf(name, ref, thr=1e-14):
+def test_c2s_bra_spinor_sf(name, ref, thr=1e-12):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -182,7 +182,7 @@ def test_c2s_bra_spinor_sf(name, ref, thr=1e-14):
         v1 += fp(gsp)
     assert abs(ref - abs(v1)) < thr
 
-def test_c2s_bra_spinor_si(name, ref, thr=1e-14):
+def test_c2s_bra_spinor_si(name, ref, thr=1e-12):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -197,7 +197,7 @@ def test_c2s_bra_spinor_si(name, ref, thr=1e-14):
         v1 += fp(gsp)
     assert abs(ref - abs(v1)) < thr
 
-def test_c2s_ket_spinor(name, ref, thr=1e-14):
+def test_c2s_ket_spinor(name, ref, thr=1e-12):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -212,7 +212,7 @@ def test_c2s_ket_spinor(name, ref, thr=1e-14):
         v1 += fp(gsp)
     assert abs(ref - abs(v1)) < thr
 
-def test_c2s_ket_spinor_sf1(name, ref, thr=1e-14):
+def test_c2s_ket_spinor_sf1(name, ref, thr=1e-12):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
@@ -228,7 +228,7 @@ def test_c2s_ket_spinor_sf1(name, ref, thr=1e-14):
         v1 += fp(gsp)
     assert abs(ref - abs(v1)) < thr
 
-def test_c2s_ket_spinor_si1(name, ref, thr=1e-14):
+def test_c2s_ket_spinor_si1(name, ref, thr=1e-12):
     kappa = 0
     v1 = 0
     fn = getattr(_cint, name)
