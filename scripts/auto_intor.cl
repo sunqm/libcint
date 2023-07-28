@@ -236,3 +236,8 @@
   '("int1e_grids_ipvip"         ( nabla \| grids \| nabla ))
   '("int1e_grids_spvsp"         ( sigma dot p \| grids \| sigma dot p ))
 )
+
+
+(gen-cint "lresc.c"
+  '("int1e_iprinvr"          ( nabla \| rinv \| r ))
+)
