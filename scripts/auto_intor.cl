@@ -239,5 +239,8 @@
 
 
 (gen-cint "lresc.c"
-  '("int1e_iprinvr"          ( nabla \| rinv \| r ))
+  '("int1e_iprinvr"             ( nabla \| rinv \| r ))
+  '("int1e_iprinviprip"         ( nabla \| rinv \| nabla r nabla ))
+  '("int1e_rinvipiprip"         ( \| rinv \| nabla nabla r nabla ))
+  '("int1e_ipiprinvrip"         ( nabla nabla \| rinv \| r nabla ))
 )
