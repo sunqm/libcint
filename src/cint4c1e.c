@@ -271,7 +271,7 @@ CACHE_SIZE_T CINT4c1e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 CACHE_SIZE_T leng = envs->g_size*3*((1<<envs->gbits)+1);
                 CACHE_SIZE_T len0 = envs->nf*n_comp;
                 CACHE_SIZE_T cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
-                                      nc*n_comp+envs->nf*4);
+                                      nc*n_comp+envs->nf*32*OF_CMPLX);
                 return cache_size;
         }
         double *stack = NULL;
@@ -280,7 +280,7 @@ CACHE_SIZE_T CINT4c1e_drv(double *out, FINT *dims, CINTEnvVars *envs, CINTOpt *o
                 size_t leng = envs->g_size*3*((1<<envs->gbits)+1);
                 size_t len0 = envs->nf*n_comp;
                 size_t cache_size = MAX(leng+len0+nc*n_comp*3 + pdata_size,
-                                      nc*n_comp+envs->nf*4);
+                                      nc*n_comp+envs->nf*32*OF_CMPLX);
                 stack = malloc(sizeof(double)*cache_size);
                 cache = stack;
         }
