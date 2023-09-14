@@ -20,7 +20,7 @@ def clenshaw_points(n):
 ngrids = 14
 chebrt = np.array(chebyshev_roots(ngrids))
 cs = np.array(clenshaw_points(ngrids))
-TBASE = np.arange(0, 51, 2.5)
+TBASE = np.append(np.arange(0, 39, 2.5), np.arange(40, 104, 4))
 print(TBASE)
 
 def get_cheb_t_points(tbase):
@@ -93,14 +93,17 @@ def polyfit_erf(nroots, x):
 def pkl2table(prefix, pklfile):
     with open(pklfile, 'rb') as f:
         TBASE, rys_tab = pickle.load(f)
+    nt = find_tbase(81)
     TBASE = TBASE.round(6)
+    TBASE = TBASE[:nt+1]
     with open(f'{prefix}_x.dat', 'w') as fx, open(f'{prefix}_w.dat', 'w') as fw:
         fw.write(f'// DATA_TBASE[{len(TBASE)}] = ''{' + (', '.join([str(x) for x in TBASE])) + '};\n')
         fx.write(f'static double DATA_X[] = ''{\n')
         fw.write(f'static double DATA_W[] = ''{\n')
         for i, tab in enumerate(rys_tab):
             nroots = i + 6
-            for it, ttab in enumerate(tab):
+            for it in range(nt):
+                ttab = tab[it]
                 tbase = TBASE[it]
                 print(f'root {nroots}  tbase[{it}] {tbase}')
                 fx.write(f'/* root={nroots} base[{it}]={tbase} */\n')

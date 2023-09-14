@@ -73,7 +73,7 @@ configure_file(
 set(cintSrc
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
-  src/fmt.c src/rys_wheeler.c src/eigh.c src/rys_roots.c
+  src/fmt.c src/rys_wheeler.c src/eigh.c src/rys_roots.c src/find_roots.c
   src/cint2c2e.c src/g2c2e.c src/cint3c2e.c src/g3c2e.c
   src/cint3c1e.c src/g3c1e.c src/breit.c
   src/cint1e_a.c src/cint3c1e_a.c
@@ -90,8 +90,17 @@ if(WITH_RANGE_COULOMB)
 # defined in config.h
 #  add_definitions(-DWITH_RANGE_COULOMB)
   message("Enabled WITH_RANGE_COULOMB")
-  set(cintSrc ${cintSrc} src/polyfits.c src/sr_rys_polyfits.c)
+  if(WITH_POLYNOMIAL_FIT)
+    set(cintSrc ${cintSrc} src/polyfits.c src/sr_rys_polyfits.c)
+    add_definitions(-DWITH_POLYNOMIAL_FIT)
+    message("Enabled WITH_POLYNOMIAL_FIT")
+  endif(WITH_POLYNOMIAL_FIT)
 endif(WITH_RANGE_COULOMB)
+
+if(WITH_EIG_ROOTFINDER)
+  add_definitions(-DWITH_EIG_ROOTFINDER)
+  message("Enabled linear equation solver with eigenvalue algorithm")
+endif(WITH_EIG_ROOTFINDER)
 
 if(WITH_COULOMB_ERF)
   set(cintSrc ${cintSrc} src/g2e_coulerf.c src/cint2e_coulerf.c)

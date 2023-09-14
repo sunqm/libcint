@@ -52,12 +52,14 @@ for nroots in range(1, 6):
             im = clenshaw_d1(tab_ws.astype(float), uu, nroots)
             ww = np.array(clenshaw_d1(im, tt, nroots), dtype=float)
             ref = np.array(rys_roots_weights(nroots, x, low), dtype=float)
+            rr /= rr + 1
+            ref[0] /= ref[0] + 1
             diff1, diff2 = abs((rr - ref[0])/ref[0]).max(), abs((ww - ref[1])).max()
             if diff1 > 1e-12 or diff2 > 1e-13:
                 print(nroots, x, low, diff1, diff2)
 
 np.random.seed(1)
-xs = np.sort(np.append(np.random.rand(100) * 50, 3**((np.random.rand(20)-.3) * 5)))
+xs = np.sort(np.append(np.random.rand(100) * 100, 3**((np.random.rand(30)-.4) * 6)))
 xs[0] = 1e-15
 fil = 'rys_rw.pkl'
 TBASE, tab = pickle.load(open(fil, 'rb'))
@@ -65,7 +67,7 @@ rys_tabulate.TBASE = TBASE
 
 for nroots in range(1, 15):
     for x in xs:
-        if x >= 50:
+        if x >= 100:
             continue
 
         it = np.searchsorted(rys_tabulate.TBASE, x) - 1

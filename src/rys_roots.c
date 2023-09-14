@@ -37,6 +37,8 @@ typedef int QuadratureFunction(int n, double x, double lower, double *roots, dou
 #define CINTqrys_jacobi         CINTlrys_jacobi
 #endif
 
+int _CINT_polynomial_roots(double *roots, double *cs, int nroots);
+
 static int segment_solve(int n, double x, double lower, double *u, double *w,
                          double breakpoint, QuadratureFunction fn1, QuadratureFunction fn2)
 {
@@ -62,7 +64,7 @@ void CINTrys_roots(int nroots, double x, double *u, double *w)
                         w[i] = POLY_SMALLX_W0[off+i] + POLY_SMALLX_W1[off+i] * x;
                 }
                 return;
-        } else if (x >= 50.) {
+        } else if (x >= 35+nroots*5) {
                 int off = nroots * (nroots - 1) / 2;
                 int i;
                 double rt;
@@ -147,14 +149,7 @@ static int segment_solve1(int n, double x, double lower, double *u, double *w,
 
 void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 {
-        int err;
-        if (lower < 0.6) {
-                err = CINTsr_rys_polyfits(nroots, x, lower, u, w);
-                if (err == 0) {
-                        return;
-                }
-        }
-
+        int err = 1;
         switch (nroots) {
         case 1:
                 err = CINTrys_schmidt(nroots, x, lower, u, w);
@@ -167,6 +162,14 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
                 }
                 break;
         case 3:
+#ifdef WITH_POLYNOMIAL_FIT
+                if (lower < 0.6) {
+                        err = CINTsr_rys_polyfits(nroots, x, lower, u, w);
+                        if (err == 0) {
+                                break;;
+                        }
+                }
+#endif
                 if (lower < 0.93) {
                         err = CINTrys_schmidt(nroots, x, lower, u, w);
                 } else if (lower < 0.97) {
@@ -176,6 +179,14 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
                 }
                 break;
         case 4:
+#ifdef WITH_POLYNOMIAL_FIT
+                if (lower < 0.6) {
+                        err = CINTsr_rys_polyfits(nroots, x, lower, u, w);
+                        if (err == 0) {
+                                break;;
+                        }
+                }
+#endif
                 if (lower < 0.8) {
                         err = CINTrys_schmidt(nroots, x, lower, u, w);
                 } else if (lower < 0.9) {
@@ -185,6 +196,14 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
                 }
                 break;
         case 5:
+#ifdef WITH_POLYNOMIAL_FIT
+                if (lower < 0.6) {
+                        err = CINTsr_rys_polyfits(nroots, x, lower, u, w);
+                        if (err == 0) {
+                                break;;
+                        }
+                }
+#endif
                 if (lower < 0.4) {
                         err = segment_solve(nroots, x, lower, u, w, 50, CINTrys_schmidt, CINTlrys_laguerre);
                 } else if (lower < 0.8) {
@@ -240,7 +259,7 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 #endif
         }
         if (err) {
-                fprintf(stderr, "sr_rys_roots fails: nroots=%d x=%g lower=%g\n",
+                fprintf(stderr, "sr_rys_roots fails: nroots=%d x=%.15g lower=%.15g\n",
                         nroots, x, lower);
 #ifndef KEEP_GOING
                 exit(err);
@@ -1618,87 +1637,6 @@ for (i = 1; i <= order; i++) { \
         p = p * x + a[order-i]; \
 }
 
-static int R_dnode(double *a, double *roots, int order)
-{
-        const double accrt = 1e-15;
-        double x0, x1, xi, x1init, p0, p1, pi, p1init;
-        int i, m, n;
-
-        x1init = 0;
-        p1init = a[0];
-        for (m = 0; m < order; ++m) {
-                x0 = x1init;
-                p0 = p1init;
-                x1init = roots[m];
-                POLYNOMIAL_VALUE1(p1init, a, order, x1init);
-
-                // When all coefficients a are 0, short-circuit the rest code to
-                // ensure the roots from the lower order polynomials are preserved
-                if (p1init == 0) {
-                        // roots[m] = x1init;
-                        continue;
-                }
-                if (p0 * p1init > 0) {
-                        fprintf(stderr, "ROOT NUMBER %d WAS NOT FOUND FOR POLYNOMIAL OF ORDER %d\n",
-                                m, order);
-                        return 1;
-                }
-                if (x0 <= x1init) {
-                        x1 = x1init;
-                        p1 = p1init;
-                } else {
-                        x1 = x0;
-                        p1 = p0;
-                        x0 = x1init;
-                        p0 = p1init;
-                }
-                // interpolate/extrapolate between [x0,x1]
-                if (p1 == 0) {
-                        roots[m] = x1;
-                        continue;
-                } else if (p0 == 0) {
-                        roots[m] = x0;
-                        continue;
-                } else {
-                        xi = x0 + (x0 - x1) / (p1 - p0) * p0;
-                }
-                n = 0;
-                while (fabs(x1 - x0) > x1*accrt) {
-                        n++;
-                        if (n > 200) {
-                                fprintf(stderr, "libcint::rys_roots NO CONV. IN R_dnode\n");
-                                return 1;
-                        }
-                        POLYNOMIAL_VALUE1(pi, a, order, xi);
-                        if (pi == 0) {
-                                break;
-                        } else if (p0 * pi <= 0) {
-                                x1 = xi;
-                                p1 = pi;
-                                xi = x0 * .25 + xi * .75;
-                        } else {
-                                x0 = xi;
-                                p0 = pi;
-                                xi = xi * .75 + x1 * .25;
-                        }
-                        POLYNOMIAL_VALUE1(pi, a, order, xi);
-                        if (pi == 0) {
-                                break;
-                        } else if (p0 * pi <= 0) {
-                                x1 = xi;
-                                p1 = pi;
-                        } else {
-                                x0 = xi;
-                                p0 = pi;
-                        }
-
-                        xi = x0 + (x0 - x1) / (p1 - p0) * p0;
-                }
-                roots[m] = xi;
-        }
-        return 0;
-}
-
 #define SET_ZERO(a, n, start) \
         for (k = start; k < n; ++k) { \
                 for (i = 0; i < n; ++i) { \
@@ -1790,21 +1728,9 @@ static int _rdk_rys_roots(int nroots, double *fmt_ints,
         if (error) {
                 return 1;
         }
-
-        dum = sqrt(cs[2*nroots1+1] * cs[2*nroots1+1] - 4 * cs[2*nroots1+0] * cs[2*nroots1+2]);
-        rt[0] = .5 * (-cs[2*nroots1+1] - dum) / cs[2*nroots1+2];
-        rt[1] = .5 * (-cs[2*nroots1+1] + dum) / cs[2*nroots1+2];
-        for (i = 2; i < nroots; i++) {
-                rt[i] = 1;
-        }
-
-        for (k = 2; k < nroots; ++k) {
-                order = k + 1;
-                a = cs + order * nroots1;
-                error = R_dnode(a, rt, order);
-                if (error) {
-                        return error;
-                }
+        error = _CINT_polynomial_roots(rt, cs, nroots);
+        if (error) {
+                return error;
         }
 
         for (k = 0; k < nroots; ++k) {
@@ -1963,18 +1889,8 @@ int CINTlrys_schmidt(int nroots, double x, double lower, double *roots, double *
                                 cs[k * nroots1 + i] = qcs[k * nroots1 + i];
                         }
                 }
-                dum = sqrt(cs[2*nroots1+1] * cs[2*nroots1+1] - 4 * cs[2*nroots1+0] * cs[2*nroots1+2]);
-                rt[0] = .5 * (-cs[2*nroots1+1] - dum) / cs[2*nroots1+2];
-                rt[1] = .5 * (-cs[2*nroots1+1] + dum) / cs[2*nroots1+2];
-                for (i = 2; i < nroots; i++) {
-                        rt[i] = 1;
-                }
-        }
 
-        for (k = 2; k < nroots; ++k) {
-                order = k + 1;
-                a = cs + order * nroots1;
-                error = R_dnode(a, rt, order);
+                error = _CINT_polynomial_roots(rt, cs, nroots);
                 if (error) {
                         return error;
                 }
@@ -2093,18 +2009,7 @@ int CINTqrys_schmidt(int nroots, double x, double lower, double *roots, double *
                                 cs[k * nroots1 + i] = qcs[k * nroots1 + i];
                         }
                 }
-                dum = sqrt(cs[2*nroots1+1] * cs[2*nroots1+1] - 4 * cs[2*nroots1+0] * cs[2*nroots1+2]);
-                rt[0] = .5 * (-cs[2*nroots1+1] - dum) / cs[2*nroots1+2];
-                rt[1] = .5 * (-cs[2*nroots1+1] + dum) / cs[2*nroots1+2];
-                for (i = 2; i < nroots; i++) {
-                        rt[i] = 1;
-                }
-        }
-
-        for (k = 2; k < nroots; ++k) {
-                order = k + 1;
-                a = cs + order * nroots1;
-                error = R_dnode(a, rt, order);
+                error = _CINT_polynomial_roots(rt, cs, nroots);
                 if (error) {
                         return error;
                 }

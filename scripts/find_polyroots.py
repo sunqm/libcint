@@ -21,7 +21,7 @@ def find_polyroots(cs, nroots):
     for m in range(nroots-1):
         A[m+1,m] = mpmath.mpf(1)
     for m in range(nroots):
-        A[0,m] = -cs[nroots,nroots-1-m] / cs[nroots,nroots]
+        A[0,nroots-1-m] = -cs[nroots,m] / cs[nroots,nroots]
     roots = eig(A)
     return np.array(roots[::-1])
 
@@ -230,8 +230,9 @@ def hessenberg_qr(A, eps, maxits=120):
 
         while k + 1 < n1:
             s = abs(A[k,k]) + abs(A[k+1,k+1])
-            if s < eps:
-                s = 1
+            #if s < eps:
+            #    s = 1
+            # Ensure relative error converged
             if abs(A[k+1,k]) < eps * s:
                 break
             k += 1

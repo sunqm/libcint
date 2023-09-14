@@ -20,20 +20,22 @@ void _CINT_matmul_14_14(double *imc, double *im, FINT nroot);
 
 static int searchsorted(const double *a, double v, int n)
 {
-        int m0 = 0;
-        int m1 = n;
+        int i;
         int m = n / 2;
         if (a[m] <= v) {
-                m0 = m;
+                for (i = m + 1; i < n; i++) {
+                        if (v < a[i]) {
+                                break;
+                        }
+                }
         } else {
-                m1 = m;
-        }
-        for (m = m0 + 1; m < m1; m++) {
-                if (v < a[m]) {
-                        break;
+                for (i = 1; i < m; i++) {
+                        if (v < a[i]) {
+                                break;
+                        }
                 }
         }
-        return m - 1;
+        return i - 1;
 }
 
 int CINTsr_rys_polyfits(int nroots, double x, double lower, double *u, double *w)
@@ -95,7 +97,7 @@ int CINTsr_rys_polyfits(int nroots, double x, double lower, double *u, double *w
         }
         double uu = (lower - u0) * 2 / (u1 - u0) - 1;
         double tt = (x - t0) * 2 / (t1 - t0) - 1;
-        double im[14*nroots];
+        double im[14*6];
         _CINT_clenshaw_dc(im, dx, uu, nroots);
         _CINT_clenshaw_d1(u, im, tt, nroots);
         _CINT_clenshaw_dc(im, dw, uu, nroots);
