@@ -1,3 +1,10 @@
+Version 5.5.0 (2023-09-14):
+	* Fix memory leak issue in int4c1e
+	* Add polynomial root finder with eigenvalue algorithm
+	* Fitting Rys roots of SR integrals with Chebyshev polynomials
+	* New integrals related to LRESC
+	* Supports Gaussian model for int1e_grids
+
 Version 5.4.0 (2023-07-04):
 	* Add constant PTR_FRAC_CHARGE for QM/MM interface in pyscf
 
