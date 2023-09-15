@@ -88,10 +88,15 @@ FINT CINTg0_1e_grids(double *g, double cutoff,
         }
 
 #ifdef WITH_RANGE_COULOMB
-        const double omega = envs->env[PTR_RANGE_OMEGA];
-        double theta, sqrt_theta;
+        double omega = envs->env[PTR_RANGE_OMEGA];
+#else
+        double omega = 0.;
+#endif
+        double zeta = envs->env[PTR_RINV_ZETA];
+        double omega2, theta, sqrt_theta, a0, tau2;
 
-        if (omega == 0) {
+        assert(zeta >= 0);
+        if (omega == 0. && zeta == 0.) {
                 fac1 = envs->fac[0] / aij;
                 for (ig = 0; ig < bgrids; ig++) {
                         x = aij * RGSQUARE(rijrg, ig);
@@ -102,17 +107,27 @@ FINT CINTg0_1e_grids(double *g, double cutoff,
                                 w[ig+GRID_BLKSIZE*i] = wbuf[i] * fac1;
                         }
                 }
-        } else if (omega < 0) { // short-range part of range-separated Coulomb
-                theta = omega * omega / (omega * omega + aij);
-                sqrt_theta = sqrt(theta);
+        } else if (omega < 0.) { // short-range part of range-separated Coulomb
+                a0 = aij;
                 fac1 = envs->fac[0] / aij;
-                // FIXME:
+                if (zeta == 0.) {
+                        tau2 = 1.;
+                        omega2 = omega * omega;
+                        theta = omega2 / (omega2 + aij);
+                } else { // zeta > 0.
+                        tau2 = zeta / (zeta + aij);
+                        a0 *= tau2;
+                        fac1 *= sqrt(tau2);
+                        omega2 = omega * omega;
+                        theta = omega2 / (omega2 + a0);
+                }
+                sqrt_theta = sqrt(theta);
                 // very small erfc() leads to ~0 weights. They can cause
-                // numerical issue in sr_rys_roots Use this cutoff as a
-                // temporary solution to avoid the numerical issue
+                // numerical issue in sr_rys_roots. Use this cutoff as a
+                // temporary solution to avoid numerical issues
                 double temp_cutoff = MIN(cutoff, EXPCUTOFF_SR);
                 for (ig = 0; ig < bgrids; ig++) {
-                        x = aij * RGSQUARE(rijrg, ig);
+                        x = a0 * RGSQUARE(rijrg, ig);
                         if (theta * x > temp_cutoff) {
                                 // very small erfc() leads to ~0 weights
                                 for (i = 0; i < nroots; i++) {
@@ -122,16 +137,33 @@ FINT CINTg0_1e_grids(double *g, double cutoff,
                         } else {
                                 CINTsr_rys_roots(nroots, x, sqrt_theta, ubuf, wbuf);
                                 for (i = 0; i < nroots; i++) {
-                                        u[ig+GRID_BLKSIZE*i] = ubuf[i] / (ubuf[i] + 1);
+                                        u[ig+GRID_BLKSIZE*i] = ubuf[i] / (ubuf[i] + 1) * tau2;
                                         w[ig+GRID_BLKSIZE*i] = wbuf[i] * fac1;
                                 }
                         }
                 }
-        } else {  // long-range part of range-separated Coulomb
-                theta = omega * omega / (omega * omega + aij);
-                fac1 = envs->fac[0] * sqrt(theta) / aij;
+        } else {
+                // * long-range part of range-separated Coulomb
+                // * or Gaussian charge model, with rho(r) = Norm exp(-zeta*r^2)
+                a0 = aij;
+                fac1 = envs->fac[0] / aij;
+                if (zeta == 0.) { // omega > 0.
+                        omega2 = omega * omega;
+                        theta = omega2 / (omega2 + aij);
+                        a0 *= theta;
+                        fac1 *= sqrt(theta);
+                } else if (omega == 0.) { // zeta > 0.
+                        theta = zeta / (zeta + aij);
+                        a0 *= theta;
+                        fac1 *= sqrt(theta);
+                } else { // omega > 0. && zeta > 0.
+                        omega2 = omega * omega;
+                        theta = omega2*zeta / (omega2*zeta + (zeta+omega2)*aij);
+                        a0 *= theta;
+                        fac1 *= sqrt(theta);
+                }
                 for (ig = 0; ig < bgrids; ig++) {
-                        x = aij * theta * RGSQUARE(rijrg, ig);
+                        x = a0 * RGSQUARE(rijrg, ig);
                         CINTrys_roots(nroots, x, ubuf, wbuf);
                         for (i = 0; i < nroots; i++) {
                                 // u stores t^2 = tau^2 * theta
@@ -140,17 +172,6 @@ FINT CINTg0_1e_grids(double *g, double cutoff,
                         }
                 }
         }
-#else
-        fac1 = envs->fac[0] / aij;
-        for (ig = 0; ig < bgrids; ig++) {
-                x = aij * RGSQUARE(rijrg, ig);
-                CINTrys_roots(nroots, x, ubuf, wbuf);
-                for (i = 0; i < nroots; i++) {
-                        u[ig+GRID_BLKSIZE*i] = ubuf[i] / (ubuf[i] + 1);
-                        w[ig+GRID_BLKSIZE*i] = wbuf[i] * fac1;
-                }
-        }
-#endif
         FINT nmax = envs->li_ceil + envs->lj_ceil;
         if (nmax == 0) {
                 return 1;

@@ -206,7 +206,7 @@ def test_mol1():
     import time
     import pyscf
     from pyscf import df
-    mol = pyscf.M(atom='''
+    mol0 = pyscf.M(atom='''
 C          0.16146       -4.47867        0.00000
 H         -0.89492        5.29077        0.00000
 H          0.47278        4.59602        0.88488
@@ -216,27 +216,36 @@ H         -1.49009        3.01810       -0.87995
     numpy.random.seed(12)
     ngrids = 201
     grids = numpy.random.random((ngrids, 3)) * 12 - 5
-    fmol = pyscf.gto.fakemol_for_charges(grids)
-    ref = df.incore.aux_e2(mol, fmol, intor='int3c2e').transpose(2,0,1)
-    j3c = mol.intor('int1e_grids', grids=grids)
-    print(abs(j3c - ref).max())
+    for omega in (0, 0.1, -0.1):
+        for zeta in (0, 10, 1e16):
+            print('omega, zeta', omega, zeta)
+            if zeta == 0:
+                expnt = 1e16
+            else:
+                expnt = zeta
+            mol = mol0.copy()
+            mol.omega = omega
+            mol.set_rinv_zeta(zeta)
+            fmol = pyscf.gto.fakemol_for_charges(grids, expnt)
+            ref = df.incore.aux_e2(mol, fmol, intor='int3c2e').transpose(2,0,1)
+            j3c = mol.intor('int1e_grids', grids=grids)
+            print(abs(j3c - ref).max())
 
-    ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1').transpose(0,3,1,2)
-    j3c = mol.intor('int1e_grids_ip', grids=grids)
-    print(abs(j3c - ref).max())
+            ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1').transpose(0,3,1,2)
+            j3c = mol.intor('int1e_grids_ip', grids=grids)
+            print(abs(j3c - ref).max())
 
-    ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1_cart').transpose(0,3,1,2)
-    j3c = mol.intor('int1e_grids_ip_cart', grids=grids)
-    print(abs(j3c - ref).max())
+            ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1_cart').transpose(0,3,1,2)
+            j3c = mol.intor('int1e_grids_ip_cart', grids=grids)
+            print(abs(j3c - ref).max())
 
-    ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1_spinor').transpose(0,3,1,2)
-    j3c = mol.intor('int1e_grids_ip_spinor', grids=grids)
-    print(abs(j3c - ref).max())
+            ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1_spinor').transpose(0,3,1,2)
+            j3c = mol.intor('int1e_grids_ip_spinor', grids=grids)
+            print(abs(j3c - ref).max())
 
-    ref = df.r_incore.aux_e2(mol, fmol, intor='int3c2e_spsp1_spinor').transpose(2,0,1)
-    j3c = mol.intor('int1e_grids_spvsp_spinor', grids=grids)
-    print(abs(j3c - ref).max())
-
+            ref = df.r_incore.aux_e2(mol, fmol, intor='int3c2e_spsp1_spinor').transpose(2,0,1)
+            j3c = mol.intor('int1e_grids_spvsp_spinor', grids=grids)
+            print(abs(j3c - ref).max())
 
 test_int1e_grids_sph1('cint1e_grids_sph', 0, 1, 9)
 test_int1e_grids_sph('cint1e_grids_ip_sph', 0, 1, 9)
