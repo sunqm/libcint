@@ -58,7 +58,13 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->lj_ceil = 0;
         envs->lk_ceil = envs->k_l + ng[KINC];
         envs->ll_ceil = 0;
-        int nrys_roots =(envs->li_ceil + envs->lk_ceil)/2 + 1;
+        int rys_order =(envs->li_ceil + envs->lk_ceil)/2 + 1;
+        int nrys_roots = rys_order;
+        double omega = env[PTR_RANGE_OMEGA];
+        if (omega < 0 && rys_order <= 3) {
+                nrys_roots *= 2;
+        }
+        envs->rys_order = rys_order;
         envs->nrys_roots = nrys_roots;
 
         FINT dli = envs->li_ceil + 1;
@@ -87,8 +93,11 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->rx_in_rklrx = envs->rk;
         envs->rx_in_rijrx = envs->ri;
 
-        if (nrys_roots <= 2) {
+        if (rys_order <= 2) {
                 envs->f_g0_2d4d = &CINTg0_2e_2d4d_unrolled;
+                if (rys_order != nrys_roots) {
+                        envs->f_g0_2d4d = &CINTsrg0_2e_2d4d_unrolled;
+                }
         } else {
                 envs->f_g0_2d4d = &CINTg0_2e_2d;
         }
@@ -100,91 +109,3 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
         envs->nfj = envs->nfk;
         envs->g_stride_j = envs->g_stride_k;
 }
-
-#ifdef WITH_GTG
-FINT CINTg0_2e_gtg(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
-
-void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
-{
-        envs->natm = natm;
-        envs->nbas = nbas;
-        envs->atm = atm;
-        envs->bas = bas;
-        envs->env = env;
-        envs->shls = shls;
-
-        const FINT i_sh = shls[0];
-        const FINT k_sh = shls[1];
-        envs->i_l = bas(ANG_OF, i_sh);
-        envs->j_l = 0;
-        envs->k_l = bas(ANG_OF, k_sh);
-        envs->l_l = 0;
-        envs->x_ctr[0] = bas(NCTR_OF, i_sh);
-        envs->x_ctr[1] = bas(NCTR_OF, k_sh);
-        envs->x_ctr[2] = 1;
-        envs->x_ctr[3] = 1;
-        envs->nfi = (envs->i_l+1)*(envs->i_l+2)/2;
-        envs->nfj = 1;
-        envs->nfk = (envs->k_l+1)*(envs->k_l+2)/2;
-        envs->nfl = 1;
-        envs->nf = envs->nfi * envs->nfk;
-
-        envs->ri = env + atm(PTR_COORD, bas(ATOM_OF, i_sh));
-        envs->rk = env + atm(PTR_COORD, bas(ATOM_OF, k_sh));
-
-        envs->common_factor = (M_PI*M_PI*M_PI)
-                * CINTcommon_fac_sp(envs->i_l) * CINTcommon_fac_sp(envs->k_l);
-        if (env[PTR_EXPCUTOFF] == 0) {
-                envs->expcutoff = EXPCUTOFF;
-        } else {
-                envs->expcutoff = MAX(MIN_EXPCUTOFF, env[PTR_EXPCUTOFF]);
-        }
-
-        envs->gbits = ng[GSHIFT];
-        envs->ncomp_e1 = ng[POS_E1];
-        envs->ncomp_e2 = ng[POS_E2];
-        envs->ncomp_tensor = ng[TENSOR];
-
-        envs->li_ceil = envs->i_l + ng[IINC];
-        envs->lj_ceil = 0;
-        envs->lk_ceil = envs->k_l + ng[KINC];
-        envs->ll_ceil = 0;
-        envs->nrys_roots = 1;
-
-        FINT dli = envs->li_ceil + 1;
-        FINT dlk = envs->lk_ceil + 1;
-        envs->g_stride_i = envs->nrys_roots;
-        envs->g_stride_k = envs->nrys_roots * dli;
-        envs->g_stride_l = envs->g_stride_k;
-        envs->g_size     = envs->nrys_roots * dli * dlk;
-
-        envs->aj[0] = 0;
-        envs->al[0] = 0;
-        envs->rij[0] = envs->ri[0];
-        envs->rij[1] = envs->ri[1];
-        envs->rij[2] = envs->ri[2];
-        envs->rkl[0] = envs->rk[0];
-        envs->rkl[1] = envs->rk[1];
-        envs->rkl[2] = envs->rk[2];
-        envs->g2d_ijmax = envs->g_stride_i;
-        envs->g2d_klmax = envs->g_stride_k;
-        envs->rkrl[0] = envs->rk[0];
-        envs->rkrl[1] = envs->rk[1];
-        envs->rkrl[2] = envs->rk[2];
-        envs->rirj[0] = envs->ri[0];
-        envs->rirj[1] = envs->ri[1];
-        envs->rirj[2] = envs->ri[2];
-        envs->rx_in_rklrx = envs->rk;
-        envs->rx_in_rijrx = envs->ri;
-
-        envs->f_g0_2d4d = &CINTg0_2e_2d;
-        envs->f_g0_2e = &CINTg0_2e_gtg;
-
-// initialize j_l, j_ctr, nfj because they are used in c2s_sph_1e and
-// CINTg1e_index_xyz
-        envs->j_l = envs->k_l;
-        envs->nfj = envs->nfk;
-        envs->g_stride_j = envs->g_stride_k;
-}
-#endif

@@ -4,7 +4,8 @@
  * Parameters and function signature for libcint.
  */
 
-#define CINT_VERSION    @cint_VERSION@
+#define CINT_VERSION            @cint_VERSION@
+#define CINT_SOVERSION          @cint_SOVERSION
 
 #cmakedefine I8
 #ifdef I8
@@ -170,7 +171,7 @@ typedef struct {
         union {FINT nfk; FINT grids_offset;};
         union {FINT nfl; FINT ngrids;};
         FINT nf;  // = nfi*nfj*nfk*nfl;
-        FINT _padding;
+        FINT rys_order; // = nrys_roots for regular ERIs. can be nrys_roots/2 for SR ERIs
         FINT x_ctr[4];
 
         FINT gbits;

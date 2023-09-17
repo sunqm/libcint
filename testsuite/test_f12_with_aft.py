@@ -198,41 +198,6 @@ eri1 *= -1  # (-) sign associated to particle 2 in |r1-r2|
 print('laplacian', abs(eri0-eri1.trace()).max(), abs(eri0).max())
 
 
-#def weighted_gtg_coul(kpt=numpy.zeros(3), exx=False, mesh=None):
-#    if mesh is None:
-#        mesh = self.mesh
-#    Gv, Gvbase, kws = cell.get_Gv_weights(mesh)
-#    G2 = numpy.einsum('gx,gx->g', Gv, Gv)
-#    G = numpy.sqrt(G2)
-#    coulG = 4*numpy.pi / (G*numpy.sqrt(zeta)) * scipy.special.dawsn(G/(2*numpy.sqrt(zeta)))
-#    coulG *= kws
-#    return coulG
-#
-#mydf.weighted_coulG = weighted_gtg_coul
-#eri0 = get_eri(mydf)
-
-zeta = .4
-def weighted_gtg(kpt=numpy.zeros(3), exx=False, mesh=None):
-    if mesh is None:
-        mesh = self.mesh
-    Gv, Gvbase, kws = cell.get_Gv_weights(mesh)
-    G2 = numpy.einsum('gx,gx->g', Gv, Gv)
-    coulG = (numpy.pi/zeta)**1.5 * numpy.exp(G2/(-4*zeta))
-    coulG *= kws
-    return coulG
-mydf.weighted_coulG = weighted_gtg
-cell._env[10] = zeta
-eri0 = get_eri(mydf)
-eri1 = cell.intor('int2e_gtg_sph', aosym='s4', comp=1)
-print('int2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
-eri0 = get_eri_2c2e(mydf)
-eri1 = cell.intor('int2c2e_gtg_sph', aosym='s1', comp=1)
-print('int2c2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
-eri0 = get_eri_3c2e(mydf)
-eri1 = cell.intor('int3c2e_gtg_sph', aosym='s2ij', comp=1)
-print('int3c2e_gtg', abs(eri0-eri1).max(), abs(eri0).max())
-
-
 omega = 0.2
 def weighted_rsh(kpt=numpy.zeros(3), exx=False, mesh=None):
     if mesh is None:
@@ -246,5 +211,5 @@ def weighted_rsh(kpt=numpy.zeros(3), exx=False, mesh=None):
 mydf.weighted_coulG = weighted_rsh
 eri0 = get_eri(mydf)
 with cell.with_range_coulomb(omega):
-    eri1 = cell.intor('int2e_coulerf_sph', aosym='s4', comp=1)
-print('int2e_coulerf', abs(eri0-eri1).max(), abs(eri0).max())
+    eri1 = cell.intor('int2e_sph', aosym='s4', comp=1)
+print('int2e', abs(eri0-eri1).max(), abs(eri0).max())

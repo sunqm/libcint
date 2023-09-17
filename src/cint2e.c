@@ -122,7 +122,6 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         double *rij;
         akl = ak[k_prim-1] + al[l_prim-1];
         log_rr_kl = 1.7 - 1.5 * approx_log(akl);
-#ifdef WITH_RANGE_COULOMB
         double omega = env[PTR_RANGE_OMEGA];
         if (omega < 0) {
                 // Normally the factor
@@ -130,7 +129,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 // is a good approximation for polynomial parts in SR-ERIs.
                 //    <~ (aj*d/aij+theta*R)^li * (ai*d/aij+theta*R)^lj * (pi/aij)^1.5
                 //    <~ (d+theta*R)^li * (d+theta*R)^lj * (pi/aij)^1.5
-                if (envs->nrys_roots > 1) {
+                if (envs->rys_order > 1) {
                         double r_guess = 8.;
                         double omega2 = omega * omega;
                         int lij = envs->li_ceil + envs->lj_ceil;
@@ -152,11 +151,6 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                         log_rr_kl += lkl * approx_log(sqrt(rr_kl) + 1.);
                 }
         }
-#else
-        if (lkl > 0) {
-                log_rr_kl += lkl * approx_log(sqrt(rr_kl) + 1.);
-        }
-#endif
 
         FINT *idx;
         MALLOC_INSTACK(idx, nf * 3);
@@ -360,10 +354,9 @@ k_contracted: ;
                 CINTg2e_index_xyz(idx, envs); \
         }
 
-#ifdef WITH_RANGE_COULOMB
 #define ADJUST_CUTOFF      \
         double omega = env[PTR_RANGE_OMEGA]; \
-        if (omega < 0 && envs->nrys_roots > 1) { \
+        if (omega < 0 && envs->rys_order > 1) { \
                 double r_guess = 8.; \
                 double omega2 = omega * omega; \
                 int lij = envs->li_ceil + envs->lj_ceil; \
@@ -383,9 +376,6 @@ k_contracted: ;
                                 (dist_kl+theta*r_guess+1.)/(dist_kl+1.)); \
                 } \
         }
-#else
-#define ADJUST_CUTOFF
-#endif
 
 #define SET_RIJ(I,J)    \
         if (pdata_##I##J->cceij > e##I##J##cutoff) { \

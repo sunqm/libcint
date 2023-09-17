@@ -105,9 +105,8 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
         double expij, cutoff;
         double *rij;
         double *rkl = envs->rk;
-#ifdef WITH_RANGE_COULOMB
         double omega = env[PTR_RANGE_OMEGA];
-        if (omega < 0 && envs->nrys_roots > 1) {
+        if (omega < 0 && envs->rys_order > 1) {
                 double r_guess = 8.;
                 double omega2 = omega * omega;
                 int lij = envs->li_ceil + envs->lj_ceil;
@@ -123,7 +122,6 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
                         expcutoff += envs->lk_ceil * approx_log(theta*r_guess+1.);
                 }
         }
-#endif
 
         FINT *idx;
         MALLOC_INSTACK(idx, nf * 3);
@@ -279,10 +277,9 @@ i_contracted: ;
                 CINTg2e_index_xyz(idx, envs); \
         }
 
-#ifdef WITH_RANGE_COULOMB
 #define ADJUST_CUTOFF      \
         double omega = env[PTR_RANGE_OMEGA]; \
-        if (omega < 0 && envs->nrys_roots > 1) { \
+        if (omega < 0 && envs->rys_order > 1) { \
                 double r_guess = 8.; \
                 double omega2 = omega * omega; \
                 int lij = envs->li_ceil + envs->lj_ceil; \
@@ -298,9 +295,6 @@ i_contracted: ;
                         expcutoff += envs->lk_ceil * approx_log(theta*r_guess+1.); \
                 } \
         }
-#else
-#define ADJUST_CUTOFF
-#endif
 
 #define SET_RIJ    \
         if (pdata_ij->cceij > expcutoff) { \

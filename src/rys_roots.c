@@ -121,7 +121,6 @@ void CINTrys_roots(int nroots, double x, double *u, double *w)
         }
 }
 
-#ifdef WITH_RANGE_COULOMB
 /*
  * lower is the lower bound of the sr integral
  */
@@ -266,7 +265,6 @@ void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w)
 #endif
         }
 }
-#endif
 
 static int rys_root1(double X, double *roots, double *weights)
 {

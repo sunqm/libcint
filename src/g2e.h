@@ -7,15 +7,19 @@
 #include "config.h"
 #include "g1e.h"
 
-#ifndef HAVE_BC
-#define HAVE_BC
-struct _BC {
-        double c00[MXRYSROOTS*3];
-        double c0p[MXRYSROOTS*3];
+#ifndef HAVE_RYS2E
+#define HAVE_RYS2E
+typedef struct {
+        double c00x[MXRYSROOTS];
+        double c00y[MXRYSROOTS];
+        double c00z[MXRYSROOTS];
+        double c0px[MXRYSROOTS];
+        double c0py[MXRYSROOTS];
+        double c0pz[MXRYSROOTS];
         double b01[MXRYSROOTS];
         double b00[MXRYSROOTS];
         double b10[MXRYSROOTS];
-};
+} Rys2eT;
 #endif
 
 void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs);
@@ -28,13 +32,13 @@ void CINTinit_int2c2e_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                               FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 
 FINT CINTg0_2e(double *g, double *rij, double *rkl, double cutoff, CINTEnvVars *envs);
-void CINTg0_2e_2d(double *g, struct _BC *bc, CINTEnvVars *envs);
-void CINTg0_2e_2d4d_unrolled(double *g, struct _BC *bc, CINTEnvVars *envs);
-void CINTsrg0_2e_2d4d_unrolled(double *g, struct _BC *bc, CINTEnvVars *envs);
-void CINTg0_2e_lj2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
-void CINTg0_2e_kj2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
-void CINTg0_2e_il2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
-void CINTg0_2e_ik2d4d(double *g, struct _BC *bc, CINTEnvVars *envs);
+void CINTg0_2e_2d(double *g, Rys2eT *bc, CINTEnvVars *envs);
+void CINTg0_2e_2d4d_unrolled(double *g, Rys2eT *bc, CINTEnvVars *envs);
+void CINTsrg0_2e_2d4d_unrolled(double *g, Rys2eT *bc, CINTEnvVars *envs);
+void CINTg0_2e_lj2d4d(double *g, Rys2eT *bc, CINTEnvVars *envs);
+void CINTg0_2e_kj2d4d(double *g, Rys2eT *bc, CINTEnvVars *envs);
+void CINTg0_2e_il2d4d(double *g, Rys2eT *bc, CINTEnvVars *envs);
+void CINTg0_2e_ik2d4d(double *g, Rys2eT *bc, CINTEnvVars *envs);
 
 void CINTg0_lj2d_4d(double *g, CINTEnvVars *envs);
 void CINTg0_kj2d_4d(double *g, CINTEnvVars *envs);
@@ -78,15 +82,6 @@ void CINTinit_int2e_stg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 void CINTinit_int2e_yp_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
                            FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
-#endif
-
-#ifdef WITH_GTG
-void CINTinit_int2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
-void CINTinit_int3c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                                  FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
-void CINTinit_int2c2e_gtg_EnvVars(CINTEnvVars *envs, FINT *ng, FINT *shls,
-                                  FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env);
 #endif
 
 

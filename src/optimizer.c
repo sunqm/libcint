@@ -245,38 +245,6 @@ void CINTall_2e_stg_optimizer(CINTOpt **opt, FINT *ng,
 }
 #endif
 
-#ifdef WITH_GTG
-void CINTall_2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
-                              FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
-{
-        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
-        gen_idx(*opt, &CINTinit_int2e_gtg_EnvVars, &CINTg2e_index_xyz,
-                4, 6, ng, atm, natm, bas, nbas, env);
-}
-
-void CINTall_3c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
-                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
-{
-        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_setij(*opt, ng, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
-        gen_idx(*opt, &CINTinit_int3c2e_gtg_EnvVars, &CINTg2e_index_xyz,
-                3, 12, ng, atm, natm, bas, nbas, env);
-}
-
-void CINTall_2c2e_gtg_optimizer(CINTOpt **opt, FINT *ng,
-                                FINT *atm, FINT natm, FINT *bas, FINT nbas, double *env)
-{
-        CINTinit_2e_optimizer(opt, atm, natm, bas, nbas, env);
-        CINTOpt_set_log_maxc(*opt, atm, natm, bas, nbas, env);
-        CINTOpt_set_non0coeff(*opt, atm, natm, bas, nbas, env);
-        gen_idx(*opt, &CINTinit_int2c2e_gtg_EnvVars, &CINTg1e_index_xyz,
-                2, ANG_MAX, ng, atm, natm, bas, nbas, env);
-}
-#endif
-
 void CINTOpt_log_max_pgto_coeff(double *log_maxc, double *coeff, FINT nprim, FINT nctr)
 {
         FINT i, ip;
@@ -332,10 +300,9 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
         //    <~ (d+1/sqrt(aij))^(li+lj) * (pi/aij)^1.5
         aij = ai[iprim-1] + aj[jprim-1];
         double log_rr_ij = 1.7 - 1.5 * approx_log(aij);
-        double dist_ij = sqrt(rr_ij);
         int lij = li_ceil + lj_ceil;
         if (lij > 0) {
-#ifdef WITH_RANGE_COULOMB
+                double dist_ij = sqrt(rr_ij);
                 double omega = env[PTR_RANGE_OMEGA];
                 if (omega < 0) {
                         double r_guess = 8.;
@@ -345,9 +312,6 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
                 } else {
                         log_rr_ij += lij * approx_log(dist_ij + 1.);
                 }
-#else
-                log_rr_ij += lij * approx_log(dist_ij + 1.);
-#endif
         }
         PairData *pdata;
 
