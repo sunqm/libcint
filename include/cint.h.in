@@ -5,7 +5,7 @@
  */
 
 #define CINT_VERSION            @cint_VERSION@
-#define CINT_SOVERSION          @cint_SOVERSION
+#define CINT_SOVERSION          @cint_SOVERSION@
 
 #cmakedefine I8
 #ifdef I8

@@ -93,9 +93,10 @@ def polyfit_erf(nroots, x):
 def pkl2table(prefix, pklfile):
     with open(pklfile, 'rb') as f:
         TBASE, rys_tab = pickle.load(f)
-    nt = find_tbase(81)
     TBASE = TBASE.round(6)
-    TBASE = TBASE[:nt+1]
+    nt = len(TBASE) - 1
+    #nt = find_tbase(81)
+    #TBASE = TBASE[:nt+1]
     with open(f'{prefix}_x.dat', 'w') as fx, open(f'{prefix}_w.dat', 'w') as fw:
         fw.write(f'// DATA_TBASE[{len(TBASE)}] = ''{' + (', '.join([str(x) for x in TBASE])) + '};\n')
         fx.write(f'static double DATA_X[] = ''{\n')
@@ -165,5 +166,5 @@ def polyfit_small_x_limits(nroots, x, low=None):
     return pr0, pr1, pw0, pw1
 
 if __name__ == '__main__':
-    generate_table('rys_rw.pkl')
-    #pkl2table('./rys', 'rys_rw.pkl')
+    #generate_table('rys_rw.pkl')
+    pkl2table('./rys', 'rys_rw.pkl')

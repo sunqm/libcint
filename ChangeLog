@@ -1,8 +1,10 @@
-Version 6.0.0 (2023-09-14):
+Version 6.0.0 (2023-09-17):
 	* Add polynomial root finder using the eigenvalue algorithm
 	* Fitting Rys roots of SR integrals with Chebyshev polynomials
+	* Remove GTG integrals which are erroneous in previous versions
+	* Remove coulerf integrals which has been covered by regular int2e functions
 
-Version 5.5.0 (2023-09-14):
+Version 5.5.0 (2023-09-17):
 	* Fix memory leak issue in int4c1e
 	* New integrals related to LRESC
 	* Supports Gaussian model for int1e_grids
