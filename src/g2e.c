@@ -425,7 +425,7 @@ void CINTg0_2e_2d(double *g, Rys2eT *bc, CINTEnvVars *envs)
  * g0[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
 /* 2d is based on l,j */
-void CINTg0_lj2d_4d(double *restrict g, CINTEnvVars *envs)
+void CINTg0_lj2d_4d(double * g, CINTEnvVars *envs)
 {
         FINT li = envs->li_ceil;
         FINT lk = envs->lk_ceil;
@@ -491,7 +491,7 @@ void CINTg0_lj2d_4d(double *restrict g, CINTEnvVars *envs)
         } } }
 }
 /* 2d is based on k,j */
-void CINTg0_kj2d_4d(double *restrict g, CINTEnvVars *envs)
+void CINTg0_kj2d_4d(double * g, CINTEnvVars *envs)
 {
         FINT li = envs->li_ceil;
         FINT ll = envs->ll_ceil;
@@ -557,7 +557,7 @@ void CINTg0_kj2d_4d(double *restrict g, CINTEnvVars *envs)
         } } }
 }
 /* 2d is based on i,l */
-void CINTg0_il2d_4d(double *restrict g, CINTEnvVars *envs)
+void CINTg0_il2d_4d(double * g, CINTEnvVars *envs)
 {
         FINT lk = envs->lk_ceil;
         FINT lj = envs->lj_ceil;
@@ -623,7 +623,7 @@ void CINTg0_il2d_4d(double *restrict g, CINTEnvVars *envs)
         } } }
 }
 /* 2d is based on i,k */
-void CINTg0_ik2d_4d(double *restrict g, CINTEnvVars *envs)
+void CINTg0_ik2d_4d(double * g, CINTEnvVars *envs)
 {
         FINT lj = envs->lj_ceil;
         FINT ll = envs->ll_ceil;
@@ -692,14 +692,14 @@ void CINTg0_ik2d_4d(double *restrict g, CINTEnvVars *envs)
         } } }
 }
 
-static inline void _g0_2d4d_0000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         g[0] = 1;
         g[1] = 1;
         //g[2] = w[0];
 }
 
-static inline void _g0_2d4d_0001(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0001(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -712,7 +712,7 @@ static inline void _g0_2d4d_0001(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[5] = cpz[0] * g[4];
 }
 
-static inline void _g0_2d4d_0002(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0002(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -738,7 +738,7 @@ static inline void _g0_2d4d_0002(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[17] = cpz[1] * g[15] + b01[1] * g[13];
 }
 
-static inline void _g0_2d4d_0003(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0003(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -770,7 +770,7 @@ static inline void _g0_2d4d_0003(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = cpz[1] * g[21] + 2 * b01[1] * g[19];
 }
 
-static inline void _g0_2d4d_0010(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0010(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -783,7 +783,7 @@ static inline void _g0_2d4d_0010(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[5] = cpz[0] * g[4];
 }
 
-static inline void _g0_2d4d_0011(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0011(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -818,7 +818,7 @@ static inline void _g0_2d4d_0011(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[27] = g[25] * (zkzl + cpz[1]);
 }
 
-static inline void _g0_2d4d_0012(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0012(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -865,7 +865,7 @@ static inline void _g0_2d4d_0012(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = g[33] * (zkzl + cpz[1]);
 }
 
-static inline void _g0_2d4d_0020(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0020(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -891,7 +891,7 @@ static inline void _g0_2d4d_0020(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[17] = cpz[1] * g[15] + b01[1] * g[13];
 }
 
-static inline void _g0_2d4d_0021(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0021(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -938,7 +938,7 @@ static inline void _g0_2d4d_0021(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[45] = g[37] * (zkzl + cpz[1]) + 2 * b01[1] * g[35];
 }
 
-static inline void _g0_2d4d_0030(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0030(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -970,7 +970,7 @@ static inline void _g0_2d4d_0030(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = cpz[1] * g[21] + 2 * b01[1] * g[19];
 }
 
-static inline void _g0_2d4d_0100(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0100(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -983,7 +983,7 @@ static inline void _g0_2d4d_0100(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[5] = c0z[0] * g[4];
 }
 
-static inline void _g0_2d4d_0101(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0101(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1018,7 +1018,7 @@ static inline void _g0_2d4d_0101(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = cpz[1] * g[21] + b00[1] * g[17];
 }
 
-static inline void _g0_2d4d_0102(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0102(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1066,7 +1066,7 @@ static inline void _g0_2d4d_0102(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = cpz[1] * g[33] + b01[1] * g[31] + b00[1] * g[27];
 }
 
-static inline void _g0_2d4d_0110(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0110(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1101,7 +1101,7 @@ static inline void _g0_2d4d_0110(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = cpz[1] * g[21] + b00[1] * g[17];
 }
 
-static inline void _g0_2d4d_0111(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0111(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1164,7 +1164,7 @@ static inline void _g0_2d4d_0111(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[63] = g[61] * (zkzl + cpz[1]) + b00[1] * g[49];
 }
 
-static inline void _g0_2d4d_0120(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0120(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1212,7 +1212,7 @@ static inline void _g0_2d4d_0120(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = cpz[1] * g[33] + b01[1] * g[31] + b00[1] * g[27];
 }
 
-static inline void _g0_2d4d_0200(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0200(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1238,7 +1238,7 @@ static inline void _g0_2d4d_0200(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[17] = c0z[1] * g[15] + b10[1] * g[13];
 }
 
-static inline void _g0_2d4d_0201(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0201(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1286,7 +1286,7 @@ static inline void _g0_2d4d_0201(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = c0z[1] * g[31] + b10[1] * g[27] + b00[1] * g[29];
 }
 
-static inline void _g0_2d4d_0210(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0210(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1334,7 +1334,7 @@ static inline void _g0_2d4d_0210(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = c0z[1] * g[31] + b10[1] * g[27] + b00[1] * g[29];
 }
 
-static inline void _g0_2d4d_0300(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_0300(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1366,7 +1366,7 @@ static inline void _g0_2d4d_0300(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = c0z[1] * g[21] + 2 * b10[1] * g[19];
 }
 
-static inline void _g0_2d4d_1000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1379,7 +1379,7 @@ static inline void _g0_2d4d_1000(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[5] = c0z[0] * g[4];
 }
 
-static inline void _g0_2d4d_1001(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1001(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1414,7 +1414,7 @@ static inline void _g0_2d4d_1001(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = cpz[1] * g[19] + b00[1] * g[17];
 }
 
-static inline void _g0_2d4d_1002(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1002(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1462,7 +1462,7 @@ static inline void _g0_2d4d_1002(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = cpz[1] * g[31] + b01[1] * g[27] + b00[1] * g[29];
 }
 
-static inline void _g0_2d4d_1010(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1010(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1497,7 +1497,7 @@ static inline void _g0_2d4d_1010(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = cpz[1] * g[19] + b00[1] * g[17];
 }
 
-static inline void _g0_2d4d_1011(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1011(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1560,7 +1560,7 @@ static inline void _g0_2d4d_1011(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[55] = g[51] * (zkzl + cpz[1]) + b00[1] * g[49];
 }
 
-static inline void _g0_2d4d_1020(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1020(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1608,7 +1608,7 @@ static inline void _g0_2d4d_1020(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = cpz[1] * g[31] + b01[1] * g[27] + b00[1] * g[29];
 }
 
-static inline void _g0_2d4d_1100(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1100(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1643,7 +1643,7 @@ static inline void _g0_2d4d_1100(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[27] = g[25] * (zizj + c0z[1]);
 }
 
-static inline void _g0_2d4d_1101(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1101(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1706,7 +1706,7 @@ static inline void _g0_2d4d_1101(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[55] = zizj * g[53] + cpz[1] * g[57] + b00[1] * g[49];
 }
 
-static inline void _g0_2d4d_1110(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1110(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1769,7 +1769,7 @@ static inline void _g0_2d4d_1110(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[55] = zizj * g[53] + cpz[1] * g[57] + b00[1] * g[49];
 }
 
-static inline void _g0_2d4d_1200(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_1200(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1816,7 +1816,7 @@ static inline void _g0_2d4d_1200(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = g[33] * (zizj + c0z[1]);
 }
 
-static inline void _g0_2d4d_2000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_2000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1842,7 +1842,7 @@ static inline void _g0_2d4d_2000(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[17] = c0z[1] * g[15] + b10[1] * g[13];
 }
 
-static inline void _g0_2d4d_2001(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_2001(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1890,7 +1890,7 @@ static inline void _g0_2d4d_2001(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = c0z[1] * g[33] + b10[1] * g[31] + b00[1] * g[27];
 }
 
-static inline void _g0_2d4d_2010(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_2010(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1938,7 +1938,7 @@ static inline void _g0_2d4d_2010(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[35] = c0z[1] * g[33] + b10[1] * g[31] + b00[1] * g[27];
 }
 
-static inline void _g0_2d4d_2100(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_2100(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -1985,7 +1985,7 @@ static inline void _g0_2d4d_2100(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[41] = g[33] * (zizj + c0z[1]);
 }
 
-static inline void _g0_2d4d_3000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _g0_2d4d_3000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2017,7 +2017,7 @@ static inline void _g0_2d4d_3000(double *restrict g, Rys2eT *bc, CINTEnvVars *en
         g[23] = c0z[1] * g[21] + 2 * b10[1] * g[19];
 }
 
-void CINTg0_2e_2d4d_unrolled(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+void CINTg0_2e_2d4d_unrolled(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         int type_ijkl = ((envs->li_ceil << 6) | (envs->lj_ceil << 4) |
                          (envs->lk_ceil << 2) | (envs->ll_ceil));
@@ -2063,7 +2063,7 @@ void CINTg0_2e_2d4d_unrolled(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
                (int)envs->ll_ceil, (int)envs->lj_ceil);
 }
 
-static inline void _srg0_2d4d_0000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         g[0] = 1;
         g[1] = 1;
@@ -2073,7 +2073,7 @@ static inline void _srg0_2d4d_0000(double *restrict g, Rys2eT *bc, CINTEnvVars *
         //g[5] = w[0];
 }
 
-static inline void _srg0_2d4d_0001(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0001(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2092,7 +2092,7 @@ static inline void _srg0_2d4d_0001(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[11] = cpz[1] * g[9];
 }
 
-static inline void _srg0_2d4d_0002(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0002(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2136,7 +2136,7 @@ static inline void _srg0_2d4d_0002(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[35] = cpz[3] * g[31] + b01[3] * g[27];
 }
 
-static inline void _srg0_2d4d_0003(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0003(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2192,7 +2192,7 @@ static inline void _srg0_2d4d_0003(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = cpz[3] * g[43] + 2 * b01[3] * g[39];
 }
 
-static inline void _srg0_2d4d_0010(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0010(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2211,7 +2211,7 @@ static inline void _srg0_2d4d_0010(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[11] = cpz[1] * g[9];
 }
 
-static inline void _srg0_2d4d_0011(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0011(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2270,7 +2270,7 @@ static inline void _srg0_2d4d_0011(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[55] = g[51] * (zkzl + cpz[3]);
 }
 
-static inline void _srg0_2d4d_0012(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0012(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2353,7 +2353,7 @@ static inline void _srg0_2d4d_0012(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = g[67] * (zkzl + cpz[3]);
 }
 
-static inline void _srg0_2d4d_0020(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0020(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2397,7 +2397,7 @@ static inline void _srg0_2d4d_0020(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[35] = cpz[3] * g[31] + b01[3] * g[27];
 }
 
-static inline void _srg0_2d4d_0021(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0021(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2480,7 +2480,7 @@ static inline void _srg0_2d4d_0021(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[91] = g[75] * (zkzl + cpz[3]) + 2 * b01[3] * g[71];
 }
 
-static inline void _srg0_2d4d_0030(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0030(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *cpx = bc->c0px;
         double *cpy = bc->c0py;
@@ -2536,7 +2536,7 @@ static inline void _srg0_2d4d_0030(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = cpz[3] * g[43] + 2 * b01[3] * g[39];
 }
 
-static inline void _srg0_2d4d_0100(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0100(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2555,7 +2555,7 @@ static inline void _srg0_2d4d_0100(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[11] = c0z[1] * g[9];
 }
 
-static inline void _srg0_2d4d_0101(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0101(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2614,7 +2614,7 @@ static inline void _srg0_2d4d_0101(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = cpz[3] * g[43] + b00[3] * g[35];
 }
 
-static inline void _srg0_2d4d_0102(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0102(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2698,7 +2698,7 @@ static inline void _srg0_2d4d_0102(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = cpz[3] * g[67] + b01[3] * g[63] + b00[3] * g[55];
 }
 
-static inline void _srg0_2d4d_0110(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0110(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2757,7 +2757,7 @@ static inline void _srg0_2d4d_0110(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = cpz[3] * g[43] + b00[3] * g[35];
 }
 
-static inline void _srg0_2d4d_0111(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0111(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2868,7 +2868,7 @@ static inline void _srg0_2d4d_0111(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[127] = g[123] * (zkzl + cpz[3]) + b00[3] * g[99];
 }
 
-static inline void _srg0_2d4d_0120(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0120(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2952,7 +2952,7 @@ static inline void _srg0_2d4d_0120(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = cpz[3] * g[67] + b01[3] * g[63] + b00[3] * g[55];
 }
 
-static inline void _srg0_2d4d_0200(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0200(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -2996,7 +2996,7 @@ static inline void _srg0_2d4d_0200(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[35] = c0z[3] * g[31] + b10[3] * g[27];
 }
 
-static inline void _srg0_2d4d_0201(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0201(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3080,7 +3080,7 @@ static inline void _srg0_2d4d_0201(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = c0z[3] * g[63] + b10[3] * g[55] + b00[3] * g[59];
 }
 
-static inline void _srg0_2d4d_0210(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0210(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3164,7 +3164,7 @@ static inline void _srg0_2d4d_0210(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = c0z[3] * g[63] + b10[3] * g[55] + b00[3] * g[59];
 }
 
-static inline void _srg0_2d4d_0300(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_0300(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3220,7 +3220,7 @@ static inline void _srg0_2d4d_0300(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = c0z[3] * g[43] + 2 * b10[3] * g[39];
 }
 
-static inline void _srg0_2d4d_1000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3239,7 +3239,7 @@ static inline void _srg0_2d4d_1000(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[11] = c0z[1] * g[9];
 }
 
-static inline void _srg0_2d4d_1001(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1001(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3298,7 +3298,7 @@ static inline void _srg0_2d4d_1001(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = cpz[3] * g[39] + b00[3] * g[35];
 }
 
-static inline void _srg0_2d4d_1002(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1002(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3382,7 +3382,7 @@ static inline void _srg0_2d4d_1002(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = cpz[3] * g[63] + b01[3] * g[55] + b00[3] * g[59];
 }
 
-static inline void _srg0_2d4d_1010(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1010(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3441,7 +3441,7 @@ static inline void _srg0_2d4d_1010(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = cpz[3] * g[39] + b00[3] * g[35];
 }
 
-static inline void _srg0_2d4d_1011(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1011(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3552,7 +3552,7 @@ static inline void _srg0_2d4d_1011(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[111] = g[103] * (zkzl + cpz[3]) + b00[3] * g[99];
 }
 
-static inline void _srg0_2d4d_1020(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1020(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3636,7 +3636,7 @@ static inline void _srg0_2d4d_1020(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = cpz[3] * g[63] + b01[3] * g[55] + b00[3] * g[59];
 }
 
-static inline void _srg0_2d4d_1100(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1100(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3695,7 +3695,7 @@ static inline void _srg0_2d4d_1100(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[55] = g[51] * (zizj + c0z[3]);
 }
 
-static inline void _srg0_2d4d_1101(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1101(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3806,7 +3806,7 @@ static inline void _srg0_2d4d_1101(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[111] = zizj * g[107] + cpz[3] * g[115] + b00[3] * g[99];
 }
 
-static inline void _srg0_2d4d_1110(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1110(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -3917,7 +3917,7 @@ static inline void _srg0_2d4d_1110(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[111] = zizj * g[107] + cpz[3] * g[115] + b00[3] * g[99];
 }
 
-static inline void _srg0_2d4d_1200(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_1200(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -4000,7 +4000,7 @@ static inline void _srg0_2d4d_1200(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = g[67] * (zizj + c0z[3]);
 }
 
-static inline void _srg0_2d4d_2000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_2000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -4044,7 +4044,7 @@ static inline void _srg0_2d4d_2000(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[35] = c0z[3] * g[31] + b10[3] * g[27];
 }
 
-static inline void _srg0_2d4d_2001(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_2001(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -4128,7 +4128,7 @@ static inline void _srg0_2d4d_2001(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = c0z[3] * g[67] + b10[3] * g[63] + b00[3] * g[55];
 }
 
-static inline void _srg0_2d4d_2010(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_2010(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -4212,7 +4212,7 @@ static inline void _srg0_2d4d_2010(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[71] = c0z[3] * g[67] + b10[3] * g[63] + b00[3] * g[55];
 }
 
-static inline void _srg0_2d4d_2100(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_2100(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -4295,7 +4295,7 @@ static inline void _srg0_2d4d_2100(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[83] = g[67] * (zizj + c0z[3]);
 }
 
-static inline void _srg0_2d4d_3000(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+static inline void _srg0_2d4d_3000(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         double *c0x = bc->c00x;
         double *c0y = bc->c00y;
@@ -4351,7 +4351,7 @@ static inline void _srg0_2d4d_3000(double *restrict g, Rys2eT *bc, CINTEnvVars *
         g[47] = c0z[3] * g[43] + 2 * b10[3] * g[39];
 }
 
-void CINTsrg0_2e_2d4d_unrolled(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+void CINTsrg0_2e_2d4d_unrolled(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         int type_ijkl = ((envs->li_ceil << 6) | (envs->lj_ceil << 4) |
                          (envs->lk_ceil << 2) | (envs->ll_ceil));
@@ -4397,23 +4397,23 @@ void CINTsrg0_2e_2d4d_unrolled(double *restrict g, Rys2eT *bc, CINTEnvVars *envs
                (int)envs->ll_ceil, (int)envs->lj_ceil);
 }
 
-void CINTg0_2e_lj2d4d(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+void CINTg0_2e_lj2d4d(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_lj2d_4d(g, envs);
 }
 
-void CINTg0_2e_kj2d4d(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+void CINTg0_2e_kj2d4d(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_kj2d_4d(g, envs);
 }
-void CINTg0_2e_ik2d4d(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+void CINTg0_2e_ik2d4d(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_ik2d_4d(g, envs);
 }
-void CINTg0_2e_il2d4d(double *restrict g, Rys2eT *bc, CINTEnvVars *envs)
+void CINTg0_2e_il2d4d(double * g, Rys2eT *bc, CINTEnvVars *envs)
 {
         CINTg0_2e_2d(g, bc, envs);
         CINTg0_il2d_4d(g, envs);
