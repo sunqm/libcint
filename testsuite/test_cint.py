@@ -13,7 +13,8 @@ import os
 import ctypes
 import numpy
 
-_cint = numpy.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
+_cint = ctypes.CDLL(os.path.abspath(os.path.join(__file__, '../../build/libcint.so')),
+                    mode=os.RTLD_GLOBAL|os.RTLD_NOW)
 
 
 PTR_EXPCUTOFF      = 0

@@ -24,7 +24,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           cd ${{ github.workspace }}/testsuite
-          pip install numpy mpmath
+          pip install numpy mpmath pyscf
           python test_rys_roots.py
       - name: Unittest
         if: startsWith(matrix.os, 'ubuntu')
@@ -35,4 +35,8 @@ jobs:
           python test_cart2sph.py
           python test_c2s.py
           python test_cint4c1e.py
+          python test_int1e.py
           python test_int1e_grids.py
+          python test_int2c2e.py
+          python test_int3c1e.py
+          #python test_int2e.py

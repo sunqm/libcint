@@ -10,9 +10,8 @@ import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, '../../scripts')))
 import cart2sph
 
-_cint = np.ctypeslib.load_library('libcint', os.path.abspath(os.path.join(__file__, '../../build')))
-#_cint = np.ctypeslib.load_library(
-#    'libcint', os.path.abspath(os.path.join(__file__, '../../../qcint/build')))
+_cint = ctypes.CDLL(os.path.abspath(os.path.join(__file__, '../../build/libcint.so')),
+                    mode=os.RTLD_GLOBAL|os.RTLD_NOW)
 
 pauli = np.array([[[0., 1.],
                    [1., 0.]],  # x

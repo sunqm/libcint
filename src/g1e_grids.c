@@ -154,8 +154,8 @@ FINT CINTg0_1e_grids(double *g, double cutoff,
                                 for (i = 0; i < rorder; i++) {
                                         u[ig+GRID_BLKSIZE*i] = ubuf[i] / (ubuf[i] + 1) * tau2;
                                         w[ig+GRID_BLKSIZE*i] = wbuf[i] * fac1;
-                                        u[ig+GRID_BLKSIZE*(i+rorder)] = ubuf[i] / (ubuf[i] + 1) * tau_theta;
-                                        w[ig+GRID_BLKSIZE*(i+rorder)] = wbuf[i] * fac_theta;
+                                        u[ig+GRID_BLKSIZE*(i+rorder)] = ubuf[i+rorder] / (ubuf[i+rorder] + 1) * tau_theta;
+                                        w[ig+GRID_BLKSIZE*(i+rorder)] = wbuf[i+rorder] * fac_theta;
                                 }
                         }
                 }
