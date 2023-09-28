@@ -3,8 +3,7 @@ import os
 import ctypes
 import numpy
 
-_cint = ctypes.CDLL(os.path.abspath(os.path.join(__file__, '../../build/libcint.so')),
-                    mode=os.RTLD_GLOBAL|os.RTLD_NOW)
+_cint = ctypes.CDLL(os.path.abspath(os.path.join(__file__, '../../build/libcint.so')))
 
 from pyscf import gto, lib
 
@@ -59,7 +58,7 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
         intor3 = 'c%s%s'%(intor,suffix)
     intor2 = 'c%s%s'%(intor,suffix)
     print(intor)
-    fn1 = getattr(_cint, intor)
+    fn1 = getattr(_cint, intor3)
     #fn2 = getattr(_cint, intor4)
     #cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
     cintopt = lib.c_null_ptr()
