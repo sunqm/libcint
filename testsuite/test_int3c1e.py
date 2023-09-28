@@ -69,6 +69,7 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
     args = (mol._atm.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.natm),
             mol._bas.ctypes.data_as(ctypes.c_void_p), ctypes.c_int(mol.nbas),
             mol._env.ctypes.data_as(ctypes.c_void_p), cintopt)
+    failed = False
     for i in range(mol.nbas):
         for j in range(mol.nbas):
             for k in range(mol.nbas):
@@ -86,10 +87,16 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
                     mol._env.ctypes.data_as(ctypes.c_void_p), lib.c_null_ptr())
                 if numpy.linalg.norm(ref-buf) > thr:
                     print(intor, '| nopt', i, j, k, numpy.linalg.norm(ref-buf))#, ref, buf
+                    failed = True
                 fn1(buf.ctypes.data_as(ctypes.c_void_p),
                     (ctypes.c_int*3)(i,j,k), *args)
                 if numpy.linalg.norm(ref-buf) > thr:
                     print(intor, '|', i, j, k, numpy.linalg.norm(ref-buf))
+                    failed = True
+    if failed:
+        print('failed')
+    else:
+        print('pass')
 
 run('int3c1e')
 #run('int3c1e_p2')

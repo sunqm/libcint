@@ -20,11 +20,11 @@ jobs:
           env
           cmake -DWITH_CINT2_INTERFACE=1 -DWITH_RANGE_COULOMB=1 -DWITH_COULOMB_ERF=1 -DWITH_F12=1 -DWITH_4C1E=1 -Bbuild -DKEEP_GOING=1 .
           cmake --build build
+          pip install numpy mpmath pyscf
       - name: Test for rys-roots
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           cd ${{ github.workspace }}/testsuite
-          pip install numpy mpmath pyscf
           python test_rys_roots.py
       - name: Unittest
         if: startsWith(matrix.os, 'ubuntu')

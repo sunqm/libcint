@@ -175,7 +175,11 @@ def test_int1e_grids_sph1(name, vref, dim, place):
             dat = op[:ref.size].reshape(dj, di).T
             if abs(dat - ref).max() > 1e-12:
                 print(i, j, abs(dat - ref).max())
-    print('sum', v1)
+    print('sum', v1, 'diff', v1 - vref)
+    if abs(v1 - vref) < 1e-10:
+        print('pass')
+    else:
+        print('failed')
 
 def test_int1e_grids_sph(name, vref, dim, place):
     intor = getattr(_cint, name)
@@ -199,7 +203,11 @@ def test_int1e_grids_sph(name, vref, dim, place):
                   env_g.ctypes.data_as(ctypes.c_void_p), opt)
             v1 += abs(op[:ngrids*di*dj*dim]).sum()
             cnt += ngrids*di*dj*dim
-    print('sum', v1)
+    print('sum', v1, 'diff', v1 - vref)
+    if abs(v1 - vref) < 1e-10:
+        print('pass')
+    else:
+        print('failed')
 
 def test_mol1():
     import time
@@ -215,6 +223,14 @@ H         -1.49009        3.01810       -0.87995
     numpy.random.seed(12)
     ngrids = 201
     grids = numpy.random.random((ngrids, 3)) * 12 - 5
+
+    def check(intor, ref):
+        j3c = mol.intor(intor, grids=grids)
+        diff = abs(j3c - ref).max()
+        print(diff)
+        return diff > 1e-12
+
+    failed = False
     for omega in (0, 0.1, -0.1):
         for zeta in (0, 10, 1e16):
             print('omega, zeta', omega, zeta)
@@ -227,27 +243,26 @@ H         -1.49009        3.01810       -0.87995
             mol.set_rinv_zeta(zeta)
             fmol = pyscf.gto.fakemol_for_charges(grids, expnt)
             ref = df.incore.aux_e2(mol, fmol, intor='int3c2e').transpose(2,0,1)
-            j3c = mol.intor('int1e_grids', grids=grids)
-            print(abs(j3c - ref).max())
+            failed = check('int1e_grids', ref) or failed
 
             ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1').transpose(0,3,1,2)
-            j3c = mol.intor('int1e_grids_ip', grids=grids)
-            print(abs(j3c - ref).max())
+            failed = check('int1e_grids_ip', ref) or failed
 
             ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1_cart').transpose(0,3,1,2)
-            j3c = mol.intor('int1e_grids_ip_cart', grids=grids)
-            print(abs(j3c - ref).max())
+            failed = check('int1e_grids_ip_cart', ref) or failed
 
             ref = df.incore.aux_e2(mol, fmol, intor='int3c2e_ip1_spinor').transpose(0,3,1,2)
-            j3c = mol.intor('int1e_grids_ip_spinor', grids=grids)
-            print(abs(j3c - ref).max())
+            failed = check('int1e_grids_ip_spinor', ref) or failed
 
             ref = df.r_incore.aux_e2(mol, fmol, intor='int3c2e_spsp1_spinor').transpose(2,0,1)
-            j3c = mol.intor('int1e_grids_spvsp_spinor', grids=grids)
-            print(abs(j3c - ref).max())
+            failed = check('int1e_grids_spvsp_spinor', ref) or failed
+    if failed:
+        print('failed')
+    else:
+        print('pass')
 
-test_int1e_grids_sph1('cint1e_grids_sph', 0, 1, 9)
-test_int1e_grids_sph('cint1e_grids_ip_sph', 0, 1, 9)
+test_int1e_grids_sph1('cint1e_grids_sph', 36.81452996003706, 1, 9)
+test_int1e_grids_sph('cint1e_grids_ip_sph', 3279.92861109671, 1, 9)
 try:
     test_mol1()
 except ImportError:
