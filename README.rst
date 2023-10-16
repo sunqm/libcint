@@ -228,15 +228,6 @@ Known problems
     parameter ``env[PTR_EXPCUTOFF]`` (since libcint 4.0). This parameter needs to be
     set to ``abs(ln(cutoff_threshold))``.
 
-* On 64-bit systems, ``make test`` stop with error: ::
-
-    MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
-
-  This problem is caused by the conflict between Python and MKL library.
-  It can be fixed by adding ``-lmkl_avx`` or ``-lmkl_mc -lmkl_def`` to MKL link
-  flags to replace the default BLAS link flags.  Be careful with the
-  **order** of ``-lmkl_mc`` and ``-lmkl_def``.
-
 * For basic ERIs, the code can handle highest angular momentum up to 7
   (present Rys-roots functions might be numerically unstable for
   nroots > 10 or l > 5).  But it has to be reduced to 5 or less for
