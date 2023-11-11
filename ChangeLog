@@ -1,3 +1,6 @@
+Version 6.1.0 (2023-11-10):
+	* New second order derivative integrals int1e_grids_ipip
+
 Version 6.0.0 (2023-09-17):
 	* Add polynomial root finder using the eigenvalue algorithm
 	* Fitting Rys roots of SR integrals with Chebyshev polynomials

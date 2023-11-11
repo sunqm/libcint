@@ -235,6 +235,7 @@
   '("int1e_grids_ip"            ( nabla \| grids \| ))
   '("int1e_grids_ipvip"         ( nabla \| grids \| nabla ))
   '("int1e_grids_spvsp"         ( sigma dot p \| grids \| sigma dot p ))
+  '("int1e_grids_ipip"          ( nabla nabla \| grids \| ))
 )
 
 
