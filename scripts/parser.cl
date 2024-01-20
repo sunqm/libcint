@@ -30,10 +30,12 @@
 (defparameter *one-componet-operator* '(rinv nuc grids r12))
 (defparameter *nabla-not-comutable* '(rinv nuc grids nabla-rinv r12 nabla-r12 gaunt breit-r1 breit-r2))
 (defparameter *act-left-right* '(nabla-rinv nabla-r12 breit-r1 breit-r2))
+(defparameter *basic-operators* (append *one-electron-operator* *two-electron-operator*))
 
 ;;; *operator*: precedence from high to low
 ;;; translate these keys in function dress-vec and dress-comp ..
 (defparameter *operator* '(vec comp-x comp-y comp-z cross dot))
+(defparameter *vec-operator* '(cross dot))
 ;;; p = -i \nabla
 ;;; ip = \nabla
 ;;; r0 = r - (0,0,0)
@@ -45,10 +47,10 @@
 ;;; r = ri/rj/rk/rl; associate with the basis it acts on
 ;;; g = i/2 (R_m - R_n) cross r0
 ;;;
-;;; sticker symbol *, which sticks the decorated operator to op or ket-ops
+;;; sticker symbol *, means the operator should be combined to ket-ops
 ;;;         (bra-ops ... p* |op| ket-ops)
-;;; the p* in the bra (| will be evaluated with |op| or |ket-ops) (if they
-;;; have cross or dot operators). Using the sticker symbol for p/nabla
+;;; here p* will be evaluated with op or ket-ops if they
+;;; have cross or dot operators. Using the sticker symbol for p/nabla
 ;;; to prevent p/nabla operators comutating with the next p/nabla operators
 
 ;;; rscalar?
@@ -58,6 +60,7 @@
                          x x0 xc xi xj xk xl
                          y y0 yc yi yj yk yl
                          z z0 zc zi zj zk zl))
+(defparameter *var-nabla* '(p ip nabla px py pz))
 (defparameter *var-sticker* '(p* ip* nabla* px* py* pz*))
 (defparameter *var-vec* '(p ip nabla p* ip* nabla* r r0 rc ri rj rk rl g))
 
@@ -428,28 +431,69 @@
         (nvec (count-if #'(lambda (x) (member x *var-vec*)) ops)))
     (- nvec ncross (* 2 ndot))))
 
-(defun remove-sticker-next (expr) ; remove the operator behind sticker
+(defun attach-sticker (op)
+  (if (member op *var-nabla*)
+      (cond ((eql op 'p)     'p*)
+            ((eql op 'ip)    'ip*)
+            ((eql op 'nabla) 'nabla*)
+            ((eql op 'px)    'px*)
+            ((eql op 'py)    'py*)
+            ((eql op 'pz)    'pz*)
+            (t (error (format nil "Unknown var-nabla op ~a%" op))))
+      op))
+
+(defun deattach-sticker (op)
+  (if (member op *var-sticker*)
+      (cond ((eql op 'p*)     'p)
+            ((eql op 'ip*)    'ip)
+            ((eql op 'nabla*) 'nabla)
+            ((eql op 'px*)    'px)
+            ((eql op 'py*)    'py)
+            ((eql op 'pz*)    'pz)
+            (t (error (format nil "Unknown var-sticker op ~a%" op))))
+      op))
+
+(defun normal-order-vec-r12 (expr)
+  ; change the expression (p dot rinv xxx) to (p rinv dot xxx)
+  (cond ((last-one? expr) expr)
+        ((and (member (car expr) *operator*)
+              (member (cadr expr) *one-componet-operator*))
+         (cons (cadr expr) (cons (car expr) (cddr expr))))
+        (t (cons (car expr) (normal-order-vec-r12 (cdr expr))))))
+
+(defun remove-sticker-next-op (expr) ; remove the operator behind sticker
   (cond ((last-one? expr) expr)
         ((and (member (car expr) *var-sticker*)
-              (member (cadr expr) *nabla-not-comutable*))
-         (cons (car expr) (remove-sticker-next (cddr expr))))
-        (t (cons (car expr) (remove-sticker-next (cdr expr))))))
+              (member (cadr expr) *nabla-not-comutable*)
+              (member (caddr expr) *vec-operator*))
+         (if (member (cadr expr) *one-componet-operator*)
+             (cons (car expr) (cddr expr))
+             (error (format nil "Unsupported pattern ~a ~a%" (car expr) (cadr expr)))))
+        ((and (member (car expr) *var-nabla*)
+              (member (cadr expr) *nabla-not-comutable*)
+              (member (caddr expr) *vec-operator*))
+           ; prevent the case p rinv cross p = 0
+           (cons (attach-sticker (car expr)) (cddr expr)))
+        ((eql (cadr expr) 'ovlp)
+         ; ensure the case p ovlp cross p = 0
+         (cons (deattach-sticker (car expr)) (cddr expr)))
+        (t (cons (car expr) (remove-sticker-next-op (cdr expr))))))
+
+(defun dagger-append (bra ket)
+  (cond ((null bra) ket)
+        (t (dagger-append (cdr bra)
+                          (cons (car bra) ket)))))
 
 (defun cons-bra-ket (bra ket &optional op)
-  (labels ((dagger-append (bra ket)
-             (cond ((null bra) ket)
-                   ;((eql (car bra) 'p)
-                   ; (dagger-append (cdr bra)
-                   ;                `(-1 p ,@ket)))
-                   (t (dagger-append (cdr bra)
-                                     (cons (car bra) ket))))))
-    ; when bra is reversed, every 'cross gives -1 and p^* = -p
-    (let ((fac (* (expt -1 (count-if (lambda (x)
-                                       (member x '(p p* px py pz px* py* pz*)))
-                                     bra))
-                  (expt -1 (count 'cross bra)))))
-      (cons fac (remove-sticker-next
-                  (dagger-append bra (append op ket)))))))
+  ; when bra is reversed, every 'cross gives -1 and p^* maps to -p
+  (let ((fac (* (expt -1 (count-if (lambda (x)
+                                     (member x '(p p* px py pz px* py* pz*)))
+                                   bra))
+                (expt -1 (count 'cross bra))))
+        (terms (remove-sticker-next-op
+                 (normal-order-vec-r12
+                   (dagger-append bra (append op ket))))))
+      (cons fac terms)))
 
 (defun reverse-tensor-ordering (ts &optional (depth 0))
   (labels ((leafpend (xnode ynode znode depth)
