@@ -1,3 +1,6 @@
+Version 6.1.1 (2024-01-24):
+	* Explicit SSE3 instructions for int2e
+
 Version 6.1.0 (2023-11-10):
 	* New second order derivative integrals int1e_grids_ipip
 
