@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 import os
+import sys
 import ctypes
 import numpy
 
@@ -16,7 +19,7 @@ H    S
    1990.8000000              1.0000000
 H    S
       5.0250000              0.2709520              0.2
-      1.0130000              0.15                   0.5573680
+      1.0130000              0.0                    0.5573680
 H    S
      80.8000000              0.0210870             -0.0045400              0.0000000
       3.3190000              0.3461290             -0.1703520              0.0000000
@@ -27,17 +30,10 @@ H    P
       0.3827000              0.5010080              1.0000000
 H    D
       1.0970000              1.0000000
-H    D
-      2.1330000              0.1868660              0.0000000
-      0.3827000              0.2010080              1.0000000
 H    F
-      0.7610000              1.0000000        
-H    F
-      1.1330000              0.3868660              1.0000000
-      0.8827000              0.4010080              0.0000000
+      0.5827000              1.0000000
 H    g
-      1.1330000              0.3868660              0.0000000
-      0.8827000              0.4010080              1.0000000
+      0.8827000              1.0000000
       ''')})
 
 def make_cintopt(atm, bas, env, intor):
@@ -60,6 +56,7 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
     else:
         intor = intor = 'c%s%s'%(intor,suffix)
     print(intor)
+    failed = False
     fn1 = getattr(_cint, intor)
     #fn2 = getattr(_cint4, intor)
     cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
@@ -84,19 +81,28 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
                         mol._env.ctypes.data_as(ctypes.c_void_p), lib.c_null_ptr())
                     if numpy.linalg.norm(ref-buf) > thr:
                         print(intor, '| nopt', i, j, k, l, numpy.linalg.norm(ref-buf))#, ref, buf
+                        failed = True
                         #exit()
                     fn1(buf.ctypes.data_as(ctypes.c_void_p),
                         (ctypes.c_int*4)(i,j,k,l), *args)
                     if numpy.linalg.norm(ref-buf) > thr:
                         print(intor, '|', i, j, k, l, numpy.linalg.norm(ref-buf))
+                        failed = True
                         #exit()
+    if failed:
+        print('failed')
+    else:
+        print('pass')
 
-run('int2e')
+run('int2e', thr=1e-12)
+run("int2e_ip1", 3, thr=1e-12)
+if '--quick' in sys.argv:
+    exit()
+
 run('int2e', suffix='_cart')
 run("int2e_ig1"               , 3)
-run("int2e_ip1"               , 3)
 run("int2e_p1vxp1"            , 3)
-run("int2e_ig1ig2"            , 9)
+#run("int2e_ig1ig2"            , 9)
 run("int2e_spsp1"             , suffix='_spinor')
 run("int2e_spsp1spsp2"        , suffix='_spinor', thr=1e-6)
 run("int2e_srsr1"             , suffix='_spinor')

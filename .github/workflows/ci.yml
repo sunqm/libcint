@@ -39,4 +39,4 @@ jobs:
           python test_int1e_grids.py
           python test_int2c2e.py
           python test_int3c1e.py
-          #python test_int2e.py
+          python test_int2e.py --quick
