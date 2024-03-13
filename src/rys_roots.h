@@ -1,4 +1,4 @@
-#include "config.h"
+#include "cint_config.h"
 
 void CINTrys_roots(int nroots, double x, double *u, double *w);
 void CINTsr_rys_roots(int nroots, double x, double lower, double *u, double *w);
