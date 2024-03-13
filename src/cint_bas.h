@@ -4,7 +4,8 @@
  * basic cGTO function
  */
 
-#include "config.h"
+#include "cint_config.h"
+#include "cint.h"
 
 FINT CINTlen_cart(const FINT l);
 FINT CINTlen_spinor(const FINT bas_id, const FINT *bas);

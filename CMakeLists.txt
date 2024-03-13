@@ -57,18 +57,19 @@ check_function_exists(sqrtl HAVE_SQRTL)
 #set(CMAKE_REQUIRED_LIBRARIES quadmath)
 #check_function_exists(fabsq HAVE_QUADMATH_H)
 
-include_directories(
-  ${PROJECT_BINARY_DIR}/include
-  ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_BINARY_DIR}/src)
 
 configure_file(
-  "${PROJECT_SOURCE_DIR}/src/config.h.in"
-  "${PROJECT_BINARY_DIR}/src/config.h")
+  "${PROJECT_SOURCE_DIR}/src/cint_config.h.in"
+  "${PROJECT_BINARY_DIR}/src/cint_config.h")
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/cint.h.in"
   "${PROJECT_BINARY_DIR}/include/cint.h")
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/include/cint_funcs.h"
+  "${PROJECT_BINARY_DIR}/include/cint_funcs.h" COPYONLY)
+
 
 set(cintSrc
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
@@ -87,7 +88,7 @@ set(cintSrc
 
 #option(WITH_RANGE_COULOMB "Range separated Coulomb" on)
 if(WITH_RANGE_COULOMB)
-# defined in config.h
+# defined in cint_config.h
 #  add_definitions(-DWITH_RANGE_COULOMB)
 #  message("Enabled WITH_RANGE_COULOMB")
 endif(WITH_RANGE_COULOMB)
@@ -167,7 +168,24 @@ if(ENABLE_STATIC)
   set(BUILD_SHARED_LIBS 0)
 endif()
 
+
+set(CintHeaders
+  ${PROJECT_SOURCE_DIR}/include/cint_funcs.h
+  ${PROJECT_BINARY_DIR}/include/cint.h)
+
+
 add_library(cint ${cintSrc})
+
+target_include_directories(cint
+  PUBLIC 
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/src
+  ${PROJECT_SOURCE_DIR}/src
+)
+
+
 set_target_properties(cint PROPERTIES
   VERSION ${cint_VERSION}
   SOVERSION ${cint_SOVERSION}
@@ -178,9 +196,6 @@ endif()
 target_link_libraries(cint "-lm")
 
 
-set(CintHeaders
-  ${PROJECT_SOURCE_DIR}/include/cint_funcs.h
-  ${PROJECT_BINARY_DIR}/include/cint.h)
 
 install(TARGETS cint DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" COMPONENT "lib")
 install(FILES ${CintHeaders} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR} COMPONENT "dev")
@@ -217,9 +232,9 @@ set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
 set(CPACK_PACKAGE_VENDOR "Qiming @sunqm Sun")
 set(CPACK_PACKAGE_CONTACT "https://github.com/sunqm/libcint")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/sunqm/libcint")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.rst")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/doc/libcint.CPack.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/README.rst")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/doc/libcint.CPack.txt")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${cint_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${cint_VERSION_MINOR}")

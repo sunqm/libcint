@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
-#include "config.h"
+#include "cint_config.h"
 #include "cint_bas.h"
 #include "rys_roots.h"
 #include "misc.h"
