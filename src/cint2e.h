@@ -5,7 +5,7 @@
 
 #include <complex.h>
 #include "g1e.h"
-#include "config.h"
+#include "cint_config.h"
 
 void CINTgout2e(double *g, double *gout, FINT *idx,
                 CINTEnvVars *envs, FINT gout_empty);

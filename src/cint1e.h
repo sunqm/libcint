@@ -4,7 +4,7 @@
  */
 
 #include <complex.h>
-#include "config.h"
+#include "cint_config.h"
 
 FINT CINT1e_loop(double *gctr, CINTEnvVars *envs, double *cache, FINT int1e_type);
 

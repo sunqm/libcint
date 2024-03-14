@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <complex.h>
-#include "config.h"
+#include "cint_config.h"
 #include "cint_bas.h"
 #include "cart2sph.h"
 #include "misc.h"
