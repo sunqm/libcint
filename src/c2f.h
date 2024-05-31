@@ -4,7 +4,7 @@
  */
 
 #ifdef WITH_FORTRAN
-#include "config.h"
+#include "cint_config.h"
 
 #define ALL_CINT_FORTRAN_(NAME) \
 FINT c##NAME##_sph_(double *out, FINT *shls, FINT *atm, FINT *natm, \
