@@ -66,11 +66,6 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/include/cint.h.in"
   "${PROJECT_BINARY_DIR}/include/cint.h")
 
-configure_file(
-  "${PROJECT_SOURCE_DIR}/include/cint_funcs.h"
-  "${PROJECT_BINARY_DIR}/include/cint_funcs.h" COPYONLY)
-
-
 set(cintSrc
   src/c2f.c src/cart2sph.c src/cint1e.c src/cint2e.c src/cint_bas.c
   src/fblas.c src/g1e.c src/g2e.c src/misc.c src/optimizer.c
