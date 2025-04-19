@@ -3646,9 +3646,9 @@ static double *p_ket_cart2spheric(double *gsph, double *gcart,
 #ifdef PYPZPX
         FINT i;
         for (i = 0; i < nbra; i++) {
-                gsph[0*nbra+i] = gcart[1*nbra+i];  // py
-                gsph[1*nbra+i] = gcart[2*nbra+i];  // pz
-                gsph[2*nbra+i] = gcart[0*nbra+i];  // px
+                gsph[0*lds+i] = gcart[1*nbra+i];  // py
+                gsph[1*lds+i] = gcart[2*nbra+i];  // pz
+                gsph[2*lds+i] = gcart[0*nbra+i];  // px
         }
         return gsph;
 #else
@@ -3661,9 +3661,9 @@ static double *p_ket_cart2spheric_copy(double *gsph, double *gcart,
         FINT i;
 #ifdef PYPZPX
         for (i = 0; i < nbra; i++) {
-                gsph[0*nbra+i] = gcart[1*nbra+i];  // py
-                gsph[1*nbra+i] = gcart[2*nbra+i];  // pz
-                gsph[2*nbra+i] = gcart[0*nbra+i];  // px
+                gsph[0*lds+i] = gcart[1*nbra+i];  // py
+                gsph[1*lds+i] = gcart[2*nbra+i];  // pz
+                gsph[2*lds+i] = gcart[0*nbra+i];  // px
         }
 #else
         for (i = 0; i < nbra; i++) {
@@ -3701,21 +3701,14 @@ static double *d_ket_cart2spheric(double *gsph, double *gcart,
         double *coeff_c2s = g_c2s[2].cart2sph;
         double *pgsph = gsph;
         FINT i;
+#pragma GCC ivdep
         for (i = 0; i < nbra; i++) {
                 gsph[0*lds+i] = coeff_c2s[ 1] * gcart[1*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[1*lds+i] = coeff_c2s[10] * gcart[4*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[2*lds+i] = coeff_c2s[12] * gcart[0*nbra+i]
                               + coeff_c2s[15] * gcart[3*nbra+i]
                               + coeff_c2s[17] * gcart[5*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[3*lds+i] = coeff_c2s[20] * gcart[2*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[4*lds+i] = coeff_c2s[24] * gcart[0*nbra+i]
                               + coeff_c2s[27] * gcart[3*nbra+i];
         }
@@ -3756,33 +3749,22 @@ static double *f_ket_cart2spheric(double *gsph, double *gcart,
         double *coeff_c2s = g_c2s[3].cart2sph;
         double *pgsph = gsph;
         FINT i;
+#pragma GCC ivdep
         for (i = 0; i < nbra; i++) {
                 gsph[0*lds+i] = coeff_c2s[ 1] * gcart[1*nbra+i]
                               + coeff_c2s[ 6] * gcart[6*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[1*lds+i] = coeff_c2s[14] * gcart[4*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[2*lds+i] = coeff_c2s[21] * gcart[1*nbra+i]
                               + coeff_c2s[26] * gcart[6*nbra+i]
                               + coeff_c2s[28] * gcart[8*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[3*lds+i] = coeff_c2s[32] * gcart[2*nbra+i]
                               + coeff_c2s[37] * gcart[7*nbra+i]
                               + coeff_c2s[39] * gcart[9*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[4*lds+i] = coeff_c2s[40] * gcart[0*nbra+i]
                               + coeff_c2s[43] * gcart[3*nbra+i]
                               + coeff_c2s[45] * gcart[5*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[5*lds+i] = coeff_c2s[52] * gcart[2*nbra+i]
                               + coeff_c2s[57] * gcart[7*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[6*lds+i] = coeff_c2s[60] * gcart[0*nbra+i]
                               + coeff_c2s[63] * gcart[3*nbra+i];
         }
@@ -3835,48 +3817,33 @@ static double *g_ket_cart2spheric(double *gsph, double *gcart,
         double *coeff_c2s = g_c2s[4].cart2sph;
         double *pgsph = gsph;
         FINT i;
+#pragma GCC ivdep
         for (i = 0; i < nbra; i++) {
                 gsph[0*lds+i] = coeff_c2s[  1] * gcart[ 1*nbra+i]
                               + coeff_c2s[  6] * gcart[ 6*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[1*lds+i] = coeff_c2s[ 19] * gcart[ 4*nbra+i]
                               + coeff_c2s[ 26] * gcart[11*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[2*lds+i] = coeff_c2s[ 31] * gcart[ 1*nbra+i]
                               + coeff_c2s[ 36] * gcart[ 6*nbra+i]
                               + coeff_c2s[ 38] * gcart[ 8*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[3*lds+i] = coeff_c2s[ 49] * gcart[ 4*nbra+i]
                               + coeff_c2s[ 56] * gcart[11*nbra+i]
                               + coeff_c2s[ 58] * gcart[13*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[4*lds+i] = coeff_c2s[ 60] * gcart[ 0*nbra+i]
                               + coeff_c2s[ 63] * gcart[ 3*nbra+i]
                               + coeff_c2s[ 65] * gcart[ 5*nbra+i]
                               + coeff_c2s[ 70] * gcart[10*nbra+i]
                               + coeff_c2s[ 72] * gcart[12*nbra+i]
                               + coeff_c2s[ 74] * gcart[14*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[5*lds+i] = coeff_c2s[ 77] * gcart[ 2*nbra+i]
                               + coeff_c2s[ 82] * gcart[ 7*nbra+i]
                               + coeff_c2s[ 84] * gcart[ 9*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[6*lds+i] = coeff_c2s[ 90] * gcart[ 0*nbra+i]
                               + coeff_c2s[ 95] * gcart[ 5*nbra+i]
                               + coeff_c2s[100] * gcart[10*nbra+i]
                               + coeff_c2s[102] * gcart[12*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[7*lds+i] = coeff_c2s[107] * gcart[ 2*nbra+i]
                               + coeff_c2s[112] * gcart[ 7*nbra+i];
-        }
-        for (i = 0; i < nbra; i++) {
                 gsph[8*lds+i] = coeff_c2s[120] * gcart[ 0*nbra+i]
                               + coeff_c2s[123] * gcart[ 3*nbra+i]
                               + coeff_c2s[130] * gcart[10*nbra+i];
