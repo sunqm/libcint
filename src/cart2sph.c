@@ -3855,7 +3855,7 @@ static double *g_ket_cart2spheric(double *gsph, double *gcart,
  * return the address of gemm results, for s,p function, results ==
  * input, so return the input address optimize
  */
-double *(*c2s_bra_sph[])() = {
+double *(*c2s_bra_sph[])(double *gsph, FINT nket, double *gcart, FINT l) = {
         s_bra_cart2spheric,
         p_bra_cart2spheric,
         d_bra_cart2spheric,
