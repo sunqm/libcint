@@ -34,6 +34,8 @@ endif()
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -DNDEBUG")
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu17")
+
 cmake_policy(SET CMP0042 NEW)
 include(GNUInstallDirs)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
