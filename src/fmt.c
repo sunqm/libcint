@@ -493,7 +493,7 @@ void qgamma_inc_like(__float128 *f, __float128 t, int m)
         }
 }
 
-inline __float128 powq_(__float128 base, int exponent)
+static inline __float128 powq_(__float128 base, int exponent)
 {
         int i;
         __float128 result = 1.q;
