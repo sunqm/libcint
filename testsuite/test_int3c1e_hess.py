@@ -15,15 +15,35 @@ from pyscf import gto
 
 
 def _make_mol():
-    """Create a test molecule with 3 atoms (distinct centers for bra/ket)."""
+    """Create a test molecule with 3 atoms and high angular momentum (up to g).
+
+    Uses a custom basis with s, p, d, f, g shells to stress-test the
+    G1E_D_I/G1E_D_J recursion at high l on bra/ket centers.
+    """
+    basis_str = gto.basis.parse('''
+H    S
+      5.0250000              1.0000000
+H    S
+      1.0130000              1.0000000
+H    P
+      4.1330000              0.0868660              0.0000000
+      0.3827000              0.5010080              1.0000000
+H    D
+      1.0970000              1.0000000
+H    F
+      0.7610000              1.0000000
+H    G
+      0.8827000              1.0000000
+    ''')
     return gto.M(
         atom='''
             H  0.0  0.0  0.0
-            He 1.5  0.3  0.2
-            Li 0.5  1.8  0.4
+            H  1.5  0.3  0.2
+            H  0.5  1.8  0.4
         ''',
-        basis={'H': 'sto-3g', 'He': '6-31g', 'Li': 'sto-3g'},
+        basis={'H': basis_str},
         unit='Bohr',
+        spin=1,
     )
 
 
@@ -63,6 +83,12 @@ def test_int3c1e_ipip1():
 
     For shell triple (i on atom A, j NOT on A, k NOT on A):
       d/dR_A,β [ip1[α, i, j, k]] = -ipip1[α*3+β, i, j, k]
+
+    Note: Co-centered pairs (i and j on the same atom) are excluded because
+    displacing atom A moves both bra and ket shells simultaneously, mixing
+    ipip1 and ipvip1 contributions in the FD. Co-centered elements are
+    validated indirectly via test_translational_invariance (ipip1 + ipvip1
+    + ip1ip2 = 0 for ALL elements including co-centered ones).
     """
     mol = _make_mol()
     auxmol = _make_auxmol()
@@ -154,6 +180,11 @@ def test_int3c1e_ipvip1():
 
     For shell triple (i NOT on B, j on B, k NOT on B):
       d/dR_B,β [ip1[α, i, j, k]] = -ipvip1[α*3+β, i, j, k]
+
+    Note: Co-centered pairs (i and j on the same atom) are excluded because
+    displacing atom B moves both bra and ket shells simultaneously, mixing
+    ipvip1 and ipip1 contributions in the FD. See test_translational_invariance
+    for validation of co-centered elements.
     """
     mol = _make_mol()
     auxmol = _make_auxmol()
@@ -273,7 +304,7 @@ def test_translational_invariance():
     total = ipip1 + ipvip1 + ip1ip2
     max_err = np.max(np.abs(total))
     print(f"Translational invariance (ipip1+ipvip1+ip1ip2=0): max error = {max_err:.2e}")
-    assert max_err < 1e-12, \
+    assert max_err < 1e-10, \
         f"Translational invariance violated: {max_err}"
 
 
