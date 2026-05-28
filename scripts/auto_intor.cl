@@ -216,6 +216,10 @@
   '("int3c1e_p2"                ( \, \, p dot p))
   '("int3c1e_iprinv"            ( p \, \| rinv \| ))
   '("int3c1e_ip1"               ( nabla \, \,))
+  '("int3c1e_ipip1"             ( nabla nabla \, \,))
+  '("int3c1e_ip1ip2"            ( nabla \, \, nabla))
+  '("int3c1e_ipvip1"            ( nabla \, nabla \,))
+  '("int3c1e_ipip2"             ( \, \, nabla nabla))
 )
 
 (gen-cint "deriv3.c"
