@@ -172,6 +172,8 @@ target_include_directories(cint
   PUBLIC 
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   PRIVATE
   ${PROJECT_BINARY_DIR}/src
   ${PROJECT_SOURCE_DIR}/src
@@ -187,10 +189,66 @@ if(QUADMATH_FOUND)
 endif()
 target_link_libraries(cint "-lm")
 
+# for consistency between FetchContent / add_subdirectory
+# and find_package, so one can always link to cint::cint.
+add_library(cint::cint ALIAS cint)
 
-
-install(TARGETS cint COMPONENT "lib")
+# install headers
 install(FILES ${CintHeaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT "dev")
+
+# install the library and associate the installed targets
+# with export set "cint-targets"
+install(TARGETS cint
+        EXPORT cint-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# generate cintTargets.cmake and prepend the namespace "cint::"
+# to exported targets.
+export(EXPORT cint-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/cintTargets.cmake
+        NAMESPACE cint::
+)
+
+# install cintTargets.cmake and associate this file with
+# the export set "cint-targets"
+install(EXPORT cint-targets
+        FILE cintTargets.cmake
+        NAMESPACE cint::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cint
+)
+
+include(CMakePackageConfigHelpers)
+
+# configure cintConfig.cmake
+configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/cintConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/cintConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cint)
+
+# generate cintConfigVersion.cmake
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/cintConfigVersion.cmake"
+    VERSION ${cint_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+# and install both of these two files...
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cintConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/cintConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cint
+)
+
+# configure the pkg-config file...
+configure_file(${PROJECT_SOURCE_DIR}/cmake/cint.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/cint.pc @ONLY)
+
+# and install it.
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cint.pc"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
 
 
 if(ENABLE_EXAMPLE)
