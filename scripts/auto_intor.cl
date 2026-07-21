@@ -124,6 +124,10 @@
 (gen-cint "grad1.c"
   '("int1e_ipovlp"              (nabla \|))
   '("int1e_ovlpip"              (\| nabla))
+  '("int1e_ipr_origj"           (-1 nabla \| r))
+  '("int1e_r_origj_ip"          (-1 \| nabla r))
+  '("int1e_iprr_origj"          (-1 nabla \| r r))
+  '("int1e_rr_origj_ip"         (-1 \| nabla r r))
   '("int1e_ipkin"               (.5 nabla \| p dot p))
   '("int1e_kinip"               (.5 \| p dot p nabla))
   '("int1e_ipnuc"               (nabla \| nuc \|))
