@@ -976,6 +976,11 @@ extern CINTIntegralFunction int2e_ipvip1ipvip2_cart;
 extern CINTIntegralFunction int2e_ipvip1ipvip2_sph;
 extern CINTIntegralFunction int2e_ipvip1ipvip2_spinor;
 
+/* (i j|R12 |k) */
+extern CINTOptimizerFunction int3c2e_optimizer;
+extern CINTIntegralFunction int3c2e_cart;
+extern CINTIntegralFunction int3c2e_sph;
+
 /* (NABLA i j|R12 |k) */
 extern CINTOptimizerFunction int3c2e_ip1_optimizer;
 extern CINTIntegralFunction int3c2e_ip1_cart;
