@@ -628,6 +628,30 @@ extern CINTIntegralFunction int1e_ovlpip_cart;
 extern CINTIntegralFunction int1e_ovlpip_sph;
 extern CINTIntegralFunction int1e_ovlpip_spinor;
 
+/* <NABLA i|OVLP |R j> */
+extern CINTOptimizerFunction int1e_ipr_origj_optimizer;
+extern CINTIntegralFunction int1e_ipr_origj_cart;
+extern CINTIntegralFunction int1e_ipr_origj_sph;
+extern CINTIntegralFunction int1e_ipr_origj_spinor;
+
+/* <i|OVLP |NABLA R j> */
+extern CINTOptimizerFunction int1e_r_origj_ip_optimizer;
+extern CINTIntegralFunction int1e_r_origj_ip_cart;
+extern CINTIntegralFunction int1e_r_origj_ip_sph;
+extern CINTIntegralFunction int1e_r_origj_ip_spinor;
+
+/* <NABLA i|OVLP |R R j> */
+extern CINTOptimizerFunction int1e_iprr_origj_optimizer;
+extern CINTIntegralFunction int1e_iprr_origj_cart;
+extern CINTIntegralFunction int1e_iprr_origj_sph;
+extern CINTIntegralFunction int1e_iprr_origj_spinor;
+
+/* <i|OVLP |NABLA R R j> */
+extern CINTOptimizerFunction int1e_rr_origj_ip_optimizer;
+extern CINTIntegralFunction int1e_rr_origj_ip_cart;
+extern CINTIntegralFunction int1e_rr_origj_ip_sph;
+extern CINTIntegralFunction int1e_rr_origj_ip_spinor;
+
 /* <NABLA i|OVLP |P DOT P j> */
 extern CINTOptimizerFunction int1e_ipkin_optimizer;
 extern CINTIntegralFunction int1e_ipkin_cart;
@@ -951,6 +975,11 @@ extern CINTOptimizerFunction int2e_ipvip1ipvip2_optimizer;
 extern CINTIntegralFunction int2e_ipvip1ipvip2_cart;
 extern CINTIntegralFunction int2e_ipvip1ipvip2_sph;
 extern CINTIntegralFunction int2e_ipvip1ipvip2_spinor;
+
+/* (i j|R12 |k) */
+extern CINTOptimizerFunction int3c2e_optimizer;
+extern CINTIntegralFunction int3c2e_cart;
+extern CINTIntegralFunction int3c2e_sph;
 
 /* (NABLA i j|R12 |k) */
 extern CINTOptimizerFunction int3c2e_ip1_optimizer;
