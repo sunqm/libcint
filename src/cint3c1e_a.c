@@ -611,6 +611,7 @@ static void CINTgout1e_int3c1e_ip1_r6_origk(double *gout,
         G1E_R_K(g63, g31, envs->i_l+1, envs->j_l+0, envs->k_l+0);
         G1E_D_I(g64, g0, envs->i_l+0, envs->j_l, envs->k_l);
         G1E_D_I(g67, g3, envs->i_l+0, envs->j_l, envs->k_l);
+        G1E_D_I(g76, g12, envs->i_l+0, envs->j_l, envs->k_l);
         G1E_D_I(g79, g15, envs->i_l+0, envs->j_l, envs->k_l);
         G1E_D_I(g112, g48, envs->i_l+0, envs->j_l, envs->k_l);
         G1E_D_I(g124, g60, envs->i_l+0, envs->j_l, envs->k_l);
