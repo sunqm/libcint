@@ -310,7 +310,10 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
                         double theta = omega2 / (omega2 + aij);
                         log_rr_ij += lij * approx_log(dist_ij + theta*r_guess + 1.);
                 } else {
-                        log_rr_ij += lij * approx_log(dist_ij + 1.);
+                        // 1/sqrt(aij) from the estimate above. For diffuse
+                        // pairs (aij < 1) it exceeds 1, and using 1 instead
+                        // drops significant integrals of high angular momentum.
+                        log_rr_ij += lij * approx_log(dist_ij + MAX(1., 1./sqrt(aij)));
                 }
         }
         PairData *pdata;

@@ -148,7 +148,8 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                 }
         } else {
                 if (lkl > 0) {
-                        log_rr_kl += lkl * approx_log(sqrt(rr_kl) + 1.);
+                        // as in CINTset_pairdata
+                        log_rr_kl += lkl * approx_log(sqrt(rr_kl) + MAX(1., 1./sqrt(akl)));
                 }
         }
 
