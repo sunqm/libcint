@@ -23,6 +23,7 @@ void CINTOpt_non0coeff_byshell(FINT *sortedidx, FINT *non0ctr, double *ci,
                                FINT iprim, FINT ictr);
 void CINTOpt_set_non0coeff(CINTOpt *opt, FINT *atm, FINT natm,
                            FINT *bas, FINT nbas, double *env);
+double CINTmin_exponent(double *a, FINT nprim);
 FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, double *rj,
                       double *log_maxci, double *log_maxcj,
                       FINT li_ceil, FINT lj_ceil, FINT iprim, FINT jprim,

@@ -285,6 +285,19 @@ void CINTOpt_set_log_maxc(CINTOpt *opt, FINT *atm, FINT natm,
         }
 }
 
+/*
+ * The smallest exponent of a shell. Exponents are not required to be sorted.
+ */
+double CINTmin_exponent(double *a, FINT nprim)
+{
+        FINT i;
+        double amin = a[0];
+        for (i = 1; i < nprim; i++) {
+                amin = MIN(amin, a[i]);
+        }
+        return amin;
+}
+
 FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, double *rj,
                      double *log_maxci, double *log_maxcj,
                      FINT li_ceil, FINT lj_ceil, FINT iprim, FINT jprim,
@@ -298,7 +311,9 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
         // is a good approximation for overlap integrals.
         //    <~ (aj*d/aij+1/sqrt(aij))^li * (ai*d/aij+1/sqrt(aij))^lj * (pi/aij)^1.5
         //    <~ (d+1/sqrt(aij))^(li+lj) * (pi/aij)^1.5
-        aij = ai[iprim-1] + aj[jprim-1];
+        // The estimate is used for all primitive pairs, so it is evaluated
+        // with the smallest aij.
+        aij = CINTmin_exponent(ai, iprim) + CINTmin_exponent(aj, jprim);
         double log_rr_ij = 1.7 - 1.5 * approx_log(aij);
         int lij = li_ceil + lj_ceil;
         if (lij > 0) {

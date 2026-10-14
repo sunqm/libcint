@@ -120,7 +120,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         double akl, ekl, expijkl, ccekl, log_rr_kl, eijcutoff, cutoff;
         double rkl[3];
         double *rij;
-        akl = ak[k_prim-1] + al[l_prim-1];
+        akl = CINTmin_exponent(ak, k_prim) + CINTmin_exponent(al, l_prim);
         log_rr_kl = 1.7 - 1.5 * approx_log(akl);
         double omega = env[PTR_RANGE_OMEGA];
         double dist_kl = 0;
@@ -139,7 +139,7 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                         double omega2 = omega * omega;
                         int lij = envs->li_ceil + envs->lj_ceil;
                         if (lij > 0) {
-                                double aij = ai[i_prim-1] + aj[j_prim-1];
+                                double aij = CINTmin_exponent(ai, i_prim) + CINTmin_exponent(aj, j_prim);
                                 double dist_ij = sqrt(rr_ij);
                                 double theta = omega2 / (omega2 + aij);
                                 expcutoff += lij * approx_log(
@@ -366,14 +366,14 @@ k_contracted: ;
                 int lkl = envs->lk_ceil + envs->ll_ceil; \
                 if (lij > 0) { \
                         double dist_ij = sqrt(rr_ij); \
-                        double aij = ai[i_prim-1] + aj[j_prim-1]; \
+                        double aij = CINTmin_exponent(ai, i_prim) + CINTmin_exponent(aj, j_prim); \
                         double theta = omega2 / (omega2 + aij); \
                         expcutoff += lij * approx_log( \
                                 (dist_ij+theta*r_guess+1.)/(dist_ij+1.)); \
                 } \
                 if (lkl > 0) { \
                         double dist_kl = sqrt(rr_kl); \
-                        double akl = ak[k_prim-1] + al[l_prim-1]; \
+                        double akl = CINTmin_exponent(ak, k_prim) + CINTmin_exponent(al, l_prim); \
                         double theta = omega2 / (omega2 + akl); \
                         expcutoff += lkl * approx_log( \
                                 (dist_kl+theta*r_guess+1.)/(dist_kl+1.)); \
