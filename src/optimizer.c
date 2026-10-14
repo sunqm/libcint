@@ -303,17 +303,18 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
         int lij = li_ceil + lj_ceil;
         if (lij > 0) {
                 double dist_ij = sqrt(rr_ij);
+                // 1/sqrt(aij) from the estimate above. For diffuse
+                // pairs (aij < 1) it exceeds 1, and using 1 instead
+                // drops significant integrals of high angular momentum.
+                double rsize = MAX(1., 1./sqrt(aij));
                 double omega = env[PTR_RANGE_OMEGA];
                 if (omega < 0) {
                         double r_guess = 8.;
                         double omega2 = omega * omega;
                         double theta = omega2 / (omega2 + aij);
-                        log_rr_ij += lij * approx_log(dist_ij + theta*r_guess + 1.);
+                        log_rr_ij += lij * approx_log(dist_ij + theta*r_guess + rsize);
                 } else {
-                        // 1/sqrt(aij) from the estimate above. For diffuse
-                        // pairs (aij < 1) it exceeds 1, and using 1 instead
-                        // drops significant integrals of high angular momentum.
-                        log_rr_ij += lij * approx_log(dist_ij + MAX(1., 1./sqrt(aij)));
+                        log_rr_ij += lij * approx_log(dist_ij + rsize);
                 }
         }
         PairData *pdata;
