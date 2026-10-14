@@ -271,6 +271,8 @@ if(BUILD_SHARED_LIBS AND ENABLE_TEST)
       COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_cint.py ${RUN_QUICK_TEST})
     add_test(NAME cint3c2etest
       COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_3c2e.py ${RUN_QUICK_TEST})
+    add_test(NAME diffuse_screening
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testsuite/test_diffuse_screening.py)
   endif()
 endif()
 
