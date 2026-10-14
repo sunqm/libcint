@@ -123,6 +123,11 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
         akl = ak[k_prim-1] + al[l_prim-1];
         log_rr_kl = 1.7 - 1.5 * approx_log(akl);
         double omega = env[PTR_RANGE_OMEGA];
+        double dist_kl = 0;
+        if (lkl > 0) {
+                // See the estimate in CINTset_pairdata
+                dist_kl = sqrt(rr_kl) + MAX(1., 1./sqrt(akl));
+        }
         if (omega < 0) {
                 // Normally the factor
                 //    (aj*d/aij+theta*R)^li * (ai*d/aij+theta*R)^lj * pi^1.5/aij^{(li+lj+3)/2}
@@ -142,14 +147,12 @@ FINT CINT2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *empt
                         }
                         if (lkl > 0) {
                                 double theta = omega2 / (omega2 + akl);
-                                log_rr_kl += lkl * approx_log(
-                                        sqrt(rr_kl) + theta*r_guess + 1.);
+                                dist_kl += theta*r_guess;
                         }
                 }
-        } else {
-                if (lkl > 0) {
-                        log_rr_kl += lkl * approx_log(sqrt(rr_kl) + 1.);
-                }
+        }
+        if (lkl > 0) {
+                log_rr_kl += lkl * approx_log(dist_kl);
         }
 
         FINT *idx;

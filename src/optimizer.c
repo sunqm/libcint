@@ -298,19 +298,29 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
         // is a good approximation for overlap integrals.
         //    <~ (aj*d/aij+1/sqrt(aij))^li * (ai*d/aij+1/sqrt(aij))^lj * (pi/aij)^1.5
         //    <~ (d+1/sqrt(aij))^(li+lj) * (pi/aij)^1.5
+        // The factor 1/sqrt(aij) is replaced by max(1, 1/sqrt(aij)). This keeps
+        // the screening of compact pairs as it was, while the factor
+        // aij^{-(li+lj)/2} cannot be dropped for diffuse pairs: the normalized
+        // coefficients of diffuse primitives are large, and the estimate
+        // would otherwise screen away large integrals of high angular momentum.
+        // The estimate is used for all primitive pairs, so it must be evaluated
+        // with the smallest aij. This assumes that the most diffuse exponents are
+        // ai[iprim-1] and aj[jprim-1], i.e. that exponents are sorted in
+        // decreasing order.
         aij = ai[iprim-1] + aj[jprim-1];
         double log_rr_ij = 1.7 - 1.5 * approx_log(aij);
         int lij = li_ceil + lj_ceil;
         if (lij > 0) {
                 double dist_ij = sqrt(rr_ij);
+                double rsize = MAX(1., 1./sqrt(aij));
                 double omega = env[PTR_RANGE_OMEGA];
                 if (omega < 0) {
                         double r_guess = 8.;
                         double omega2 = omega * omega;
                         double theta = omega2 / (omega2 + aij);
-                        log_rr_ij += lij * approx_log(dist_ij + theta*r_guess + 1.);
+                        log_rr_ij += lij * approx_log(dist_ij + theta*r_guess + rsize);
                 } else {
-                        log_rr_ij += lij * approx_log(dist_ij + 1.);
+                        log_rr_ij += lij * approx_log(dist_ij + rsize);
                 }
         }
         PairData *pdata;
