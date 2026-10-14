@@ -34,25 +34,29 @@ PTR_COEFF = 6
 SCALES = [1e-1, 1e-2, 1e-3, 5e-4, 3e-4, 1e-4, 1e-5, 1e-6]
 
 def make_env(shells, scale, omega=0):
-    '''shells: list of (l, exponent) on one center at the origin. The
+    '''shells: list of (l, exponent) on one center at the origin, where
+    exponent may be a tuple for a contraction of normalized primitives. The
     exponents are multiplied by scale, and omega by sqrt(scale).'''
     atm = numpy.zeros((1, ATM_SLOTS), dtype=numpy.int32)
     atm[0,0] = 1
     atm[0,1] = PTR_ENV_START
     bas = numpy.zeros((len(shells), BAS_SLOTS), dtype=numpy.int32)
-    env = numpy.zeros(PTR_ENV_START + 3 + 2*len(shells))
+    nprim = [numpy.size(a) for l, a in shells]
+    env = numpy.zeros(PTR_ENV_START + 3 + 2*sum(nprim))
     env[PTR_RANGE_OMEGA] = omega * numpy.sqrt(scale)
     off = PTR_ENV_START + 3
     for i, (l, a) in enumerate(shells):
-        a = a * scale
-        env[off] = a
-        env[off+1] = _cint.CINTgto_norm(ctypes.c_int(l), ctypes.c_double(a))
+        n = nprim[i]
+        a = numpy.ravel(a) * scale
+        env[off:off+n] = a
+        env[off+n:off+2*n] = [_cint.CINTgto_norm(ctypes.c_int(l), ctypes.c_double(x))
+                              for x in a]
         bas[i,ANG_OF] = l
-        bas[i,NPRIM_OF] = 1
+        bas[i,NPRIM_OF] = n
         bas[i,NCTR_OF] = 1
         bas[i,PTR_EXP] = off
-        bas[i,PTR_COEFF] = off + 1
-        off += 2
+        bas[i,PTR_COEFF] = off + n
+        off += 2*n
     return atm, bas, env
 
 def eval_intor(intor, shls, atm, bas, env, with_opt):
@@ -113,6 +117,15 @@ for shls in ((0, 1, 1), (1, 1, 0)):
 failed |= check('int1e_ovlp', 0., shells, (1, 1))
 failed |= check('int1e_kin', 1., shells, (1, 1))
 failed |= check('int1e_nuc', .5, shells, (1, 1))
+
+# contracted shells whose exponents are not sorted in decreasing order
+for exps in ((1., 1e4), (1e4, 1., 100.)):
+    shells = [(4, exps)]
+    for with_opt in (False, True):
+        failed |= check('int2e', .5, shells, (0, 0, 0, 0), with_opt=with_opt)
+        failed |= check('int2e', .5, shells, (0, 0, 0, 0), -.5, with_opt)
+    failed |= check('int3c2e', -.25, shells + [(2, 1.)], (0, 0, 1))
+    failed |= check('int1e_nuc', .5, shells, (0, 0))
 
 if failed:
     sys.exit(1)

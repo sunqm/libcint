@@ -285,6 +285,19 @@ void CINTOpt_set_log_maxc(CINTOpt *opt, FINT *atm, FINT natm,
         }
 }
 
+/*
+ * The smallest exponent of a shell. Exponents are not required to be sorted.
+ */
+double CINTmin_exponent(double *a, FINT nprim)
+{
+        FINT i;
+        double amin = a[0];
+        for (i = 1; i < nprim; i++) {
+                amin = MIN(amin, a[i]);
+        }
+        return amin;
+}
+
 FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, double *rj,
                      double *log_maxci, double *log_maxcj,
                      FINT li_ceil, FINT lj_ceil, FINT iprim, FINT jprim,
@@ -303,11 +316,9 @@ FINT CINTset_pairdata(PairData *pairdata, double *ai, double *aj, double *ri, do
         // aij^{-(li+lj)/2} cannot be dropped for diffuse pairs: the normalized
         // coefficients of diffuse primitives are large, and the estimate
         // would otherwise screen away large integrals of high angular momentum.
-        // The estimate is used for all primitive pairs, so it must be evaluated
-        // with the smallest aij. This assumes that the most diffuse exponents are
-        // ai[iprim-1] and aj[jprim-1], i.e. that exponents are sorted in
-        // decreasing order.
-        aij = ai[iprim-1] + aj[jprim-1];
+        // The estimate is used for all primitive pairs, so it is evaluated
+        // with the smallest aij.
+        aij = CINTmin_exponent(ai, iprim) + CINTmin_exponent(aj, jprim);
         double log_rr_ij = 1.7 - 1.5 * approx_log(aij);
         int lij = li_ceil + lj_ceil;
         if (lij > 0) {
