@@ -62,6 +62,10 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
         intor3 = 'c%s%s'%(intor,suffix)
     intor2 = 'c%s%s'%(intor,suffix)
     print(intor)
+    from pyscf.gto.moleintor import libcgto
+    if not hasattr(libcgto, intor2):
+        print('skip: %s not provided by the installed pyscf' % intor2)
+        return
     fn1 = getattr(_cint, intor3)
     #fn2 = getattr(_cint4, intor2)
     cintopt = make_cintopt(mol._atm, mol._bas, mol._env, intor)
@@ -98,6 +102,64 @@ def run(intor, comp=1, suffix='_sph', thr=1e-7):
     else:
         print('pass')
 
+def run_fd(intor, intor0, thr=1e-5, h=1e-5):
+    '''Check the bra derivative <nabla i|...> against central differences of
+    the base integral intor0.  Only shell triplets whose bra atom carries
+    neither j nor k are used, so that -d/dR_i intor0 == intor exactly.
+    This does not rely on the integral being available (or correct) in the
+    installed pyscf.'''
+    print(intor, '(finite differences of %s)' % intor0)
+    fn1 = getattr(_cint, 'c%s_sph' % intor)
+    fn0 = getattr(_cint, 'c%s_sph' % intor0)
+    atm = mol._atm
+    bas = mol._bas
+    env = mol._env.copy()
+    c_atm = atm.ctypes.data_as(ctypes.c_void_p)
+    c_bas = bas.ctypes.data_as(ctypes.c_void_p)
+    c_env = env.ctypes.data_as(ctypes.c_void_p)
+    c_natm = ctypes.c_int(mol.natm)
+    c_nbas = ctypes.c_int(mol.nbas)
+    PTR_COORD = 1
+    failed = False
+    # keep the cost moderate: bra shells on atom 0, j on atom 1, k on atoms 2,3
+    ibas = [n for n in range(mol.nbas) if bas[n,0] == 0]
+    jbas = [n for n in range(mol.nbas) if bas[n,0] == 1]
+    kbas = [n for n in range(mol.nbas) if bas[n,0] in (2, 3)]
+    for i in ibas:
+        di = (bas[i,1]*2+1) * bas[i,3]
+        for j in jbas:
+            dj = (bas[j,1]*2+1) * bas[j,3]
+            for k in kbas:
+                dk = (bas[k,1]*2+1) * bas[k,3]
+                buf = numpy.empty((3,dk,dj,di))
+                fn1(buf.ctypes.data_as(ctypes.c_void_p),
+                    (ctypes.c_int*3)(i,j,k),
+                    c_atm, c_natm, c_bas, c_nbas, c_env, lib.c_null_ptr())
+                bp = numpy.empty((dk,dj,di))
+                bm = numpy.empty((dk,dj,di))
+                fd = numpy.empty_like(buf)
+                ptr = atm[0,PTR_COORD]
+                for d in range(3):
+                    x0 = env[ptr+d]
+                    env[ptr+d] = x0 + h
+                    fn0(bp.ctypes.data_as(ctypes.c_void_p),
+                        (ctypes.c_int*3)(i,j,k),
+                        c_atm, c_natm, c_bas, c_nbas, c_env, lib.c_null_ptr())
+                    env[ptr+d] = x0 - h
+                    fn0(bm.ctypes.data_as(ctypes.c_void_p),
+                        (ctypes.c_int*3)(i,j,k),
+                        c_atm, c_natm, c_bas, c_nbas, c_env, lib.c_null_ptr())
+                    env[ptr+d] = x0
+                    fd[d] = -(bp - bm) / (2*h)
+                if numpy.abs(buf-fd).max() > thr:
+                    print(intor, '| fd', i, j, k, numpy.abs(buf-fd).max())
+                    failed = True
+    if failed:
+        print('failed')
+        exit(1)
+    else:
+        print('pass')
+
 run('int3c1e')
 #run('int3c1e_p2')
 run('int3c1e_r2_origk')
@@ -107,3 +169,12 @@ run('int3c1e_ipip1', comp=9)
 run('int3c1e_ip1ip2', comp=9)
 run('int3c1e_ipvip1', comp=9)
 run('int3c1e_ipip2', comp=9)
+run('int3c1e_ip1_r2_origk', comp=3)
+run('int3c1e_ip1_r4_origk', comp=3, thr=1e-6)
+# int3c1e_ip1_r6_origk is deliberately NOT compared against pyscf: released
+# libcint <= 6.1.3 computes its y component from an uninitialized buffer, so
+# a pyscf built against it is not a valid reference.  The finite-difference
+# checks below are self-contained.
+run_fd('int3c1e_ip1_r2_origk', 'int3c1e_r2_origk')
+run_fd('int3c1e_ip1_r4_origk', 'int3c1e_r4_origk')
+run_fd('int3c1e_ip1_r6_origk', 'int3c1e_r6_origk', thr=2e-4)
