@@ -112,13 +112,13 @@ FINT CINT3c2e_loop_nopt(double *gctr, CINTEnvVars *envs, double *cache, FINT *em
                 int lij = envs->li_ceil + envs->lj_ceil;
                 if (lij > 0) {
                         double dist_ij = sqrt(rr_ij);
-                        double aij = ai[i_prim-1] + aj[j_prim-1];
+                        double aij = CINTmin_exponent(ai, i_prim) + CINTmin_exponent(aj, j_prim);
                         double theta = omega2 / (omega2 + aij);
                         expcutoff += lij * approx_log(
                                 (dist_ij+theta*r_guess+1.)/(dist_ij+1.));
                 }
                 if (envs->lk_ceil > 0) {
-                        double theta = omega2 / (omega2 + ak[k_prim-1]);
+                        double theta = omega2 / (omega2 + CINTmin_exponent(ak, k_prim));
                         expcutoff += envs->lk_ceil * approx_log(theta*r_guess+1.);
                 }
         }
@@ -285,13 +285,13 @@ i_contracted: ;
                 int lij = envs->li_ceil + envs->lj_ceil; \
                 if (lij > 0) { \
                         double dist_ij = sqrt(rr_ij); \
-                        double aij = ai[i_prim-1] + aj[j_prim-1]; \
+                        double aij = CINTmin_exponent(ai, i_prim) + CINTmin_exponent(aj, j_prim); \
                         double theta = omega2 / (omega2 + aij); \
                         expcutoff += lij * approx_log( \
                                 (dist_ij+theta*r_guess+1.)/(dist_ij+1.)); \
                 } \
                 if (envs->lk_ceil > 0) { \
-                        double theta = omega2 / (omega2 + ak[k_prim-1]); \
+                        double theta = omega2 / (omega2 + CINTmin_exponent(ak, k_prim)); \
                         expcutoff += envs->lk_ceil * approx_log(theta*r_guess+1.); \
                 } \
         }
