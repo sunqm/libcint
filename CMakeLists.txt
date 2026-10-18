@@ -184,10 +184,12 @@ set_target_properties(cint PROPERTIES
   VERSION ${cint_VERSION}
   SOVERSION ${cint_SOVERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+# PRIVATE: a shared libcint resolves these itself, so consumers of cint::cint
+# shouldn't link them. (A static libcint still passes them on, as LINK_ONLY.)
 if(QUADMATH_FOUND)
-  target_link_libraries(cint quadmath)
+  target_link_libraries(cint PRIVATE quadmath)
 endif()
-target_link_libraries(cint "-lm")
+target_link_libraries(cint PRIVATE m)
 
 # for consistency between FetchContent / add_subdirectory
 # and find_package, so one can always link to cint::cint.
