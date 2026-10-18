@@ -1500,6 +1500,28 @@ return 0; }~%")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun check-binary-operands (intname raw-infix)
+  "cross/dot must have operands on both sides within one electron"
+  (destructuring-bind (op bra-i ket-j bra-k ket-l)
+    (split-int-expression raw-infix)
+    (let ((e1 (append bra-i op ket-j))
+          (e2 (append bra-k ket-l)))
+      (when (and (two-electron-int? raw-infix)
+                 (binary-op? (car e2))
+                 (or bra-i ket-j))
+        (error "~a: ~a between electron 1 and electron 2 operators in ~a is not supported; cross and dot can only combine operators of the same electron"
+               intname (car e2) raw-infix))
+      (dolist (e (list e1 e2))
+        (when (binary-op? (car e))
+          (error "~a: ~a in ~a has no left operand" intname (car e) raw-infix))
+        (when (binary-op? (last1 e))
+          (error "~a: ~a in ~a has no right operand" intname (last1 e) raw-infix))))))
+
+(defun check-nonzero (intname raw-infix)
+  (when (every #'null (flatten-raw-script (last1 (eval-int raw-infix))))
+    (error "~a: ~a is identically zero (every component cancels), so no code is generated for it"
+           intname raw-infix)))
+
 (defun gen-cint (filename &rest items)
   "sp can be one of 'spinor 'spheric 'cart"
   (with-open-file (fout (mkstr filename)
@@ -1508,6 +1530,8 @@ return 0; }~%")))
     (flet ((gen-code (item)
              (let ((intname (mkstr (car item)))
                    (raw-infix (cadr item)))
+               (check-binary-operands intname raw-infix)
+               (check-nonzero intname raw-infix)
                (cond ((int3c1e? raw-infix)
                       (gen-code-int3c1e fout intname raw-infix))
                      ((int1e-grids? raw-infix)
