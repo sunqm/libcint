@@ -248,32 +248,95 @@
   (loop
     for i upto 31
     thereis (if (oddp (ash n (- i))) i)))
+;;; Pruning of unused g intermediates.
+;;; Every intermediate g<ig> is computed from exactly one parent g<ig0>.  An
+;;; integral usually reads only some of the 3^tot-bits products s[...] (e.g.
+;;; p dot p needs only the xx, yy, zz terms), so only the intermediates those
+;;; s[] terms read, plus their chains of parents, need to be generated.
+;;; *g-parents*: hash table ig -> ig0, filled while dry-running the dumpers.
+;;; *g-needed*:  nil to emit everything, else the list of ig to emit.
+;;; *s-needed*:  nil to emit every s[], else the list of s indices to emit.
+(defvar *g-parents* nil)
+(defvar *g-needed* nil)
+(defvar *s-needed* nil)
+
+(defun emit-g? (ig ig0)
+  (when *g-parents*
+    (setf (gethash ig *g-parents*) ig0))
+  (or (null *g-needed*) (member ig *g-needed*)))
+
+(defun emit-s? (i)
+  (or (null *s-needed*) (member i *s-needed*)))
+
+(defun used-s-indices (flat-script)
+  "indices of s[] referenced by the flattened script (see cell-converter)"
+  (let ((ids '()))
+    (flet ((add (cell)
+             (pushnew (or (ternary-subscript (ops-of cell)) 0) ids)))
+      (dolist (cs flat-script)
+        (cond ((null cs))
+              ((cell? cs) (add cs))
+              (t (mapc #'add cs)))))
+    (sort ids #'<)))
+
+(defun s-to-g-ids (i tot-bits)
+  (let* ((ybin (dec-to-ybin i))
+         (zbin (dec-to-zbin i))
+         (xbin (- (ash 1 tot-bits) 1 ybin zbin)))
+    (list xbin ybin zbin)))
+
+(defun needed-g-ids (s-ids tot-bits parents)
+  (let ((needed '()))
+    (labels ((need (ig)
+               (unless (member ig needed)
+                 (push ig needed)
+                 (multiple-value-bind (ig0 found) (gethash ig parents)
+                   (when found (need ig0))))))
+      (dolist (i s-ids)
+        (mapc #'need (s-to-g-ids i tot-bits))))
+    needed))
+
+(defmacro with-pruned-g ((fout tot-bits) &body body)
+  "BODY dumps the g intermediates to FOUT.  Run it once on a null stream to
+learn each intermediate's parent, then again emitting only the intermediates
+needed by *s-needed*."
+  `(let ((parents (make-hash-table)))
+     (let ((,fout (make-broadcast-stream))
+           (*g-parents* parents))
+       ,@body)
+     (let ((*g-needed* (needed-g-ids *s-needed* ,tot-bits parents)))
+       ,@body)))
+
 (defun combo-bra (fout fmt ops-rev n-ops ig mask)
   (let* ((right (first-bit1 (ash ig (- mask))))
          (left (- n-ops right 1))
          (ig0 (- ig (ash 1 (+ mask right))))
          (op (nth right ops-rev)))
-    (format fout fmt (g?e-of op) ig ig0 left)))
+    (when (emit-g? ig ig0)
+      (format fout fmt (g?e-of op) ig ig0 left))))
 (defun combo-ket (fout fmt ops-rev i-len ig mask)
   (let* ((right (last-bit1 (ash ig (- mask))))
          (ig0 (- ig (ash 1 (+ mask right))))
          (op (nth right ops-rev)))
-    (format fout fmt (g?e-of op) ig ig0 i-len right)))
+    (when (emit-g? ig ig0)
+      (format fout fmt (g?e-of op) ig ig0 i-len right))))
 (defun combo-opj (fout fmt-op fmt-j opj-rev i-len j-len ig mask)
   (let ((right (last-bit1 (ash ig (- mask)))))
     (if (< right j-len) ; does not reach op yet
       (combo-ket fout fmt-j opj-rev i-len ig mask)
       (let ((ig0 (- ig (ash 1 (+ mask right))))
             (op (nth right opj-rev)))
-        (if (member op *act-left-right*)
-          (format fout fmt-op
-                  (g?e-of op) ig ig0 i-len right
-                  (g?e-of op) (1+ ig) ig0 i-len right
-                  ig (1+ ig))
-          (if (and (intersection *act-left-right* opj-rev)
-                   (< (1+ right) (length opj-rev))) ; ops have *act-left-right* but the rightmost op is not
-              (format fout fmt-j (g?e-of op) ig ig0 (1+ i-len) right)
-              (format fout fmt-j (g?e-of op) ig ig0 i-len right)))))))
+        (cond
+          ((not (emit-g? ig ig0)))
+          ((member op *act-left-right*)
+           (format fout fmt-op
+                   (g?e-of op) ig ig0 i-len right
+                   (g?e-of op) (1+ ig) ig0 i-len right
+                   ig (1+ ig)))
+          ((and (intersection *act-left-right* opj-rev)
+                (< (1+ right) (length opj-rev))) ; ops have *act-left-right* but the rightmost op is not
+           (format fout fmt-j (g?e-of op) ig ig0 (1+ i-len) right))
+          (t (format fout fmt-j (g?e-of op) ig ig0 i-len right)))))))
 
 (defun power2-range (n &optional (shift 0))
   (range (+ shift (ash 1 n)) (+ shift (ash 1 (1+ n)))))
@@ -312,8 +375,9 @@ iz = idx[2];~%")
     (let* ((ybin (dec-to-ybin i))
            (zbin (dec-to-zbin i))
            (xbin (- (ash 1 n) 1 ybin zbin)))
-      (format fout "s[~a] = g~a[ix] * g~a[iy] * g~a[iz];~%"
-              i xbin ybin zbin))))
+      (when (emit-s? i)
+        (format fout "s[~a] = g~a[ix] * g~a[iy] * g~a[iz];~%"
+                i xbin ybin zbin)))))
 
 (defun name-c2sor (sfx sp sf ts)
   (cond ((eql sp 'spinor)
@@ -359,7 +423,8 @@ extern CINTIntegralFunction ~a_spinor;~%~%" intname intname intname intname))
            (j-len (length j-rev))
            (op-len (length op-rev))
            (tot-bits (+ i-len j-len op-len))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "void CINTgout1e_~a" intname)
       (format fout "(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
 FINT nf = envs->nf;
@@ -375,12 +440,13 @@ double *g0 = g;~%")
 ;;; generate g_(bin)
 ;;; for the operators act on the |ket>, the reversed scan order and r_combinator
 ;;; is required; for the operators acto on the <bra|, the normal scan order and
-      (let ((fmt-i "G1E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, 0);~%")
-            (fmt-op (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);
+      (with-pruned-g (fout tot-bits)
+        (let ((fmt-i "G1E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, 0);~%")
+              (fmt-op (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);
 G1E_~aI(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
+              (fmt-j (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0)))
       (format fout "for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
 iy = idx[1+n*3];
@@ -400,7 +466,8 @@ iz = idx[2+n*3];~%")
            (j-len (length j-rev))
            (op-len (length op-rev))
            (tot-bits (+ i-len j-len op-len))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "void CINTgout1e_~a" intname)
       (format fout "(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
 FINT nf = envs->nf;
@@ -416,12 +483,13 @@ double *g0 = g;~%")
 ;;; generate g_(bin)
 ;;; for the operators act on the |ket>, the reversed scan order and r_combinator
 ;;; is required; for the operators acto on the <bra|, the normal scan order and
-      (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, 0, 0);~%")
-            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);
+      (with-pruned-g (fout tot-bits)
+        (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, 0, 0);~%")
+              (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);
 G2E_~aI(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
+              (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0, 0);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0)))
       (dump-s-2e fout tot-bits 0)
       (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
@@ -579,23 +647,25 @@ return 0; }~%")))
     (let* ((ybin (dec-to-ybin i))
            (zbin (dec-to-zbin i))
            (xbin (- (ash 1 tot-bits) 1 ybin zbin)))
-      (format fout "s[~a] = " i)
-      (loop
-        for k upto (1- nroots) do
-        (format fout "+ g~a[ix+~a]*g~a[iy+~a]*g~a[iz+~a]"
-                xbin k ybin k zbin k))
-      (format fout ";~%"))))
+      (when (emit-s? i)
+        (format fout "s[~a] = " i)
+        (loop
+          for k upto (1- nroots) do
+          (format fout "+ g~a[ix+~a]*g~a[iy+~a]*g~a[iz+~a]"
+                  xbin k ybin k zbin k))
+        (format fout ";~%")))))
 (defun dump-s-loop (fout tot-bits &optional (with-grids nil))
   (loop
     for i upto (1- (expt 3 tot-bits)) do
     (let* ((ybin (dec-to-ybin i))
            (zbin (dec-to-zbin i))
            (xbin (- (ash 1 tot-bits) 1 ybin zbin)))
-      (if with-grids
-        (format fout "s[ig+GRID_BLKSIZE*~a] += g~a[ix+ig+i*GRID_BLKSIZE] * g~a[iy+ig+i*GRID_BLKSIZE] * g~a[iz+ig+i*GRID_BLKSIZE];~%"
-                i xbin ybin zbin)
-        (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
-                i xbin ybin zbin))))) ; end do i = 1, envs->nrys_roots
+      (when (emit-s? i)
+        (if with-grids
+          (format fout "s[ig+GRID_BLKSIZE*~a] += g~a[ix+ig+i*GRID_BLKSIZE] * g~a[iy+ig+i*GRID_BLKSIZE] * g~a[iz+ig+i*GRID_BLKSIZE];~%"
+                  i xbin ybin zbin)
+          (format fout "s[~a] += g~a[ix+i] * g~a[iy+i] * g~a[iz+i];~%"
+                  i xbin ybin zbin)))))) ; end do i = 1, envs->nrys_roots
 (defun dump-s-2e (fout tot-bits &optional (deriv-max 2))
   (format fout "double s[~a];~%" (expt 3 tot-bits))
   (format fout "for (n = 0; n < nf; n++) {
@@ -636,7 +706,8 @@ for (i = 0; i < nrys_roots; i++) {~%" (expt 3 tot-bits))
            (k-len (length k-rev))
            (l-len (length l-rev))
            (tot-bits (+ i-len j-len op-len k-len l-len))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "void CINTgout2e_~a(double *gout,
 double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "FINT nf = envs->nf;
@@ -651,25 +722,26 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout bra-k "k")
       (dump-declare-dri-for-rc fout ket-l "l")
       (dump-declare-giao-ijkl fout bra-i ket-j bra-k ket-l)
-      (if (intersection *act-left-right* op)
-        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
-                            ", envs->k_l+~a, envs->l_l);~%"))
-              (fmt-op "")
-              (fmt-l (mkstr "G2E_~aL(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
-                            ", envs->k_l+~a, envs->l_l+~a);~%")))
-          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() l-rev 0))
-        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
-                            ", envs->k_l+~a, envs->l_l);~%"))
-              (fmt-op "")
-              (fmt-l (mkstr "G2E_~aL(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
-                            ", envs->k_l+~a, envs->l_l+~a);~%")))
-          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() l-rev 0)))
-      (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l, envs->l_l);~%")
-            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, envs->l_l);
+      (with-pruned-g (fout tot-bits)
+        (if (intersection *act-left-right* op)
+          (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
+                              ", envs->k_l+~a, envs->l_l);~%"))
+                (fmt-op "")
+                (fmt-l (mkstr "G2E_~aL(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
+                              ", envs->k_l+~a, envs->l_l+~a);~%")))
+            (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() l-rev 0))
+          (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
+                              ", envs->k_l+~a, envs->l_l);~%"))
+                (fmt-op "")
+                (fmt-l (mkstr "G2E_~aL(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
+                              ", envs->k_l+~a, envs->l_l+~a);~%")))
+            (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() l-rev 0)))
+        (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l, envs->l_l);~%")
+              (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, envs->l_l);
 G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l+~a, envs->k_l, envs->l_l);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, envs->l_l);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len)))
+              (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, envs->l_l);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev (+ k-len l-len))))
       (dump-s-2e fout tot-bits)
       (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
@@ -838,7 +910,8 @@ return 0; }~%")))
            (j-len (length j-rev))
            (k-len (length k-rev))
            (tot-bits (+ i-len j-len op-len k-len))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "void CINTgout2e_~a(double *gout,
 double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "FINT nf = envs->nf;
@@ -852,23 +925,24 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout ket-j "j")
       (dump-declare-dri-for-rc fout bra-k "k")
       (dump-declare-giao-ij fout bra-i ket-j)
-      (if (intersection *act-left-right* op)
-        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
-                            ", envs->k_l+~a, 0);~%"))
-              (fmt-op "")
-              (fmt-l ""))
-          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0))
-        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
-                            ", envs->k_l+~a, 0);~%"))
-              (fmt-op "")
-              (fmt-l ""))
-          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0)))
-      (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l, 0);~%")
-            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);
+      (with-pruned-g (fout tot-bits)
+        (if (intersection *act-left-right* op)
+          (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", envs->j_l+" (1+ j-len)
+                              ", envs->k_l+~a, 0);~%"))
+                (fmt-op "")
+                (fmt-l ""))
+            (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0))
+          (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
+                              ", envs->k_l+~a, 0);~%"))
+                (fmt-op "")
+                (fmt-l ""))
+            (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0)))
+        (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l, 0);~%")
+              (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);
 G2E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l+~a, envs->k_l, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len))
+              (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l, 0);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len)))
       (dump-s-2e fout tot-bits)
       (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
@@ -993,7 +1067,8 @@ return 0; }~%")))
            (i-len (length i-rev))
            (k-len (length k-rev))
            (tot-bits (+ i-len op-len k-len))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "static void CINTgout2e_~a(double *gout,
 double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "FINT nf = envs->nf;
@@ -1005,21 +1080,22 @@ double *g0 = g;~%")
         (format fout "double *g~a = g~a + envs->g_size * 3;~%" (1+ i) i))
       (dump-declare-dri-for-rc fout bra-i "i")
       (dump-declare-dri-for-rc fout bra-k "k")
-      (if (intersection *act-left-right* op)
-        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", 0, envs->k_l+~a, 0);~%"))
-              (fmt-op "")
-              (fmt-l ""))
-          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0))
-        (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" i-len ", 0, envs->k_l+~a, 0);~%"))
-              (fmt-op "")
-              (fmt-l ""))
-          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0)))
-      (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, 0, envs->k_l, 0);~%")
-            (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, 0+~a, envs->k_l, 0);
+      (with-pruned-g (fout tot-bits)
+        (if (intersection *act-left-right* op)
+          (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" (1+ i-len) ", 0, envs->k_l+~a, 0);~%"))
+                (fmt-op "")
+                (fmt-l ""))
+            (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0))
+          (let ((fmt-k (mkstr "G2E_~aK(g~a, g~a, envs->i_l+" i-len ", 0, envs->k_l+~a, 0);~%"))
+                (fmt-op "")
+                (fmt-l ""))
+            (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0)))
+        (let ((fmt-i "G2E_~aI(g~a, g~a, envs->i_l+~a, 0, envs->k_l, 0);~%")
+              (fmt-op (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, 0+~a, envs->k_l, 0);
 G2E_~aI(g~a, g~a, envs->i_l+~a, 0+~a, envs->k_l, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, 0, envs->k_l, 0);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev '() k-len))
+              (fmt-j (mkstr "G2E_~aJ(g~a, g~a, envs->i_l+~d, 0, envs->k_l, 0);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev '() k-len)))
       (dump-s-2e fout tot-bits)
       (gen-c-block-with-empty fout flat-script)
       (format fout "}}~%")
@@ -1106,7 +1182,8 @@ return 0;
            (j-len (length j-rev))
            (k-len (length k-rev))
            (tot-bits (+ i-len j-len op-len k-len))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "static void CINTgout1e_~a(double *gout,
 double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {~%" intname)
       (format fout "FINT nf = envs->nf;
@@ -1120,17 +1197,18 @@ double *g0 = g;~%")
       (dump-declare-dri-for-rc fout bra-k "k")
       (dump-declare-giao-ij fout bra-i (append op ket-j))
       (format fout "double s[~a];~%" (expt 3 tot-bits))
-      (let ((fmt-k (mkstr "G1E_~aK(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
-                          ", envs->k_l+~a);~%"))
-            (fmt-op "")
-            (fmt-l ""))
-        (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0))
-      (let ((fmt-i "G1E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l);~%")
-            (fmt-op (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l);
+      (with-pruned-g (fout tot-bits)
+        (let ((fmt-k (mkstr "G1E_~aK(g~a, g~a, envs->i_l+" i-len ", envs->j_l+" (+ op-len j-len)
+                            ", envs->k_l+~a);~%"))
+              (fmt-op "")
+              (fmt-l ""))
+          (dump-combo-braket fout fmt-k fmt-op fmt-l k-rev '() '() 0))
+        (let ((fmt-i "G1E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l, envs->k_l);~%")
+              (fmt-op (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l);
 G1E_~aI(g~a, g~a, envs->i_l+~a, envs->j_l+~a, envs->k_l);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len))
+              (fmt-j (mkstr "G1E_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a, envs->k_l);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev k-len)))
       (format fout "for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
 iy = idx[1+n*3];
@@ -1271,7 +1349,8 @@ return 0; }~%")))
            (op-len (length op-rev))
            (tot-bits (+ i-len j-len op-len))
            (comp (expt 3 tot-bits))
-           (goutinc (length flat-script)))
+           (goutinc (length flat-script))
+           (*s-needed* (used-s-indices flat-script)))
       (format fout "void CINTgout1e_~a" intname)
       (format fout "(double *gout, double *g, FINT *idx, CINTEnvVars *envs, FINT gout_empty) {
 FINT ngrids = envs->ngrids;
@@ -1290,12 +1369,13 @@ double *g0 = g;~%")
 ;;; generate g_(bin)
 ;;; for the operators act on the |ket>, the reversed scan order and r_combinator
 ;;; is required; for the operators acto on the <bra|, the normal scan order and
-      (let ((fmt-i "G1E_GRIDS_~aI(g~a, g~a, envs->i_l+~a, envs->j_l);~%")
-            (fmt-op (mkstr "G1E_GRIDS_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a);
+      (with-pruned-g (fout tot-bits)
+        (let ((fmt-i "G1E_GRIDS_~aI(g~a, g~a, envs->i_l+~a, envs->j_l);~%")
+              (fmt-op (mkstr "G1E_GRIDS_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a);
 G1E_~aI(g~a, g~a, envs->i_l+~d, envs->j_l+~a, 0);
 for (ix = 0; ix < envs->g_size * 3; ix++) {g~a[ix] += g~a[ix];}~%"))
-            (fmt-j (mkstr "G1E_GRIDS_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a);~%")))
-        (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0))
+              (fmt-j (mkstr "G1E_GRIDS_~aJ(g~a, g~a, envs->i_l+~d, envs->j_l+~a);~%")))
+          (dump-combo-braket fout fmt-i fmt-op fmt-j i-rev op-rev j-rev 0)))
       (format fout "for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
 iy = idx[1+n*3];
