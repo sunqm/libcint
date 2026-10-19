@@ -146,33 +146,40 @@ void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
         const double *ri = envs->ri;
         const double *rj = envs->rj;
         const double *rk = envs->rk;
-        FINT i, j, k, off;
-        const double *rirj = envs->rirj;
-        double rjrk[3], rjrijk[3];
+        FINT i, j, k, n, off;
+        double rijk[3], rpri[3], rprj[3], rprk[3];
 
-        rjrk[0] = rj[0] - rk[0];
-        rjrk[1] = rj[1] - rk[1];
-        rjrk[2] = rj[2] - rk[2];
+        // Expand around the product center P instead of rj. With rj as the
+        // origin, the transfer to i and k cancels catastrophically when P is
+        // far from rj (e.g. diffuse j on another atom than tight i and k).
+        rijk[0] = (ai * ri[0] + aj * rj[0] + ak * rk[0]) / aijk;
+        rijk[1] = (ai * ri[1] + aj * rj[1] + ak * rk[1]) / aijk;
+        rijk[2] = (ai * ri[2] + aj * rj[2] + ak * rk[2]) / aijk;
+        rpri[0] = rijk[0] - ri[0];
+        rpri[1] = rijk[1] - ri[1];
+        rpri[2] = rijk[2] - ri[2];
+        rprj[0] = rijk[0] - rj[0];
+        rprj[1] = rijk[1] - rj[1];
+        rprj[2] = rijk[2] - rj[2];
+        rprk[0] = rijk[0] - rk[0];
+        rprk[1] = rijk[1] - rk[1];
+        rprk[2] = rijk[2] - rk[2];
 
-        rjrijk[0] = rj[0] - (ai * ri[0] + aj * rj[0] + ak * rk[0]) / aijk;
-        rjrijk[1] = rj[1] - (ai * ri[1] + aj * rj[1] + ak * rk[1]) / aijk;
-        rjrijk[2] = rj[2] - (ai * ri[2] + aj * rj[2] + ak * rk[2]) / aijk;
-
-        gx[dj] = -rjrijk[0] * gx[0];
-        gy[dj] = -rjrijk[1] * gy[0];
-        gz[dj] = -rjrijk[2] * gz[0];
-
+        // moments of (x-P)^j
+        gx[dj] = 0;
+        gy[dj] = 0;
+        gz[dj] = 0;
         for (j = 1; j < nmax; j++) {
-                gx[(j+1)*dj] = aijk1 * j * gx[(j-1)*dj] - rjrijk[0] * gx[j*dj];
-                gy[(j+1)*dj] = aijk1 * j * gy[(j-1)*dj] - rjrijk[1] * gy[j*dj];
-                gz[(j+1)*dj] = aijk1 * j * gz[(j-1)*dj] - rjrijk[2] * gz[j*dj];
+                gx[(j+1)*dj] = aijk1 * j * gx[(j-1)*dj];
+                gy[(j+1)*dj] = aijk1 * j * gy[(j-1)*dj];
+                gz[(j+1)*dj] = aijk1 * j * gz[(j-1)*dj];
         }
 
         for (i = 1; i <= li; i++) {
                 for (j = 0; j <= nmax-i; j++) { // upper limit lj+lk
-                        gx[i+j*dj] = gx[i-1+(j+1)*dj] - rirj[0] * gx[i-1+j*dj];
-                        gy[i+j*dj] = gy[i-1+(j+1)*dj] - rirj[1] * gy[i-1+j*dj];
-                        gz[i+j*dj] = gz[i-1+(j+1)*dj] - rirj[2] * gz[i-1+j*dj];
+                        gx[i+j*dj] = gx[i-1+(j+1)*dj] + rpri[0] * gx[i-1+j*dj];
+                        gy[i+j*dj] = gy[i-1+(j+1)*dj] + rpri[1] * gy[i-1+j*dj];
+                        gz[i+j*dj] = gz[i-1+(j+1)*dj] + rpri[2] * gz[i-1+j*dj];
                 }
         }
 
@@ -181,12 +188,24 @@ void CINTg3c1e_ovlp(double *g, double ai, double aj, double ak,
                 for (j = 0; j <= mmax-k; j++) {
                         off = k * dk + j * dj;
                         for (i = off; i <= off+li; i++) {
-                                gx[i] = gx[i+dj-dk] + rjrk[0] * gx[i-dk];
-                                gy[i] = gy[i+dj-dk] + rjrk[1] * gy[i-dk];
-                                gz[i] = gz[i+dj-dk] + rjrk[2] * gz[i-dk];
+                                gx[i] = gx[i+dj-dk] + rprk[0] * gx[i-dk];
+                                gy[i] = gy[i+dj-dk] + rprk[1] * gy[i-dk];
+                                gz[i] = gz[i+dj-dk] + rprk[2] * gz[i-dk];
                         }
                 }
         }
+
+        // Taylor shift of the j index from (x-P)^j to (x-rj)^j
+        for (k = 0; k <= lk; k++) {
+        for (i = 0; i <= li; i++) {
+                off = k * dk + i;
+                for (n = 0; n < lj; n++) {
+                for (j = lj; j > n; j--) {
+                        gx[off+j*dj] += rprj[0] * gx[off+(j-1)*dj];
+                        gy[off+j*dj] += rprj[1] * gy[off+(j-1)*dj];
+                        gz[off+j*dj] += rprj[2] * gz[off+(j-1)*dj];
+                } }
+        } }
 }
 
 void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
@@ -210,36 +229,42 @@ void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
         FINT dj = li + 1;
         const FINT dk = envs->g_stride_k;
         const double aijk = ai + aj + ak;
+        const double *ri = envs->ri;
         const double *rj = envs->rj;
         const double *rk = envs->rk;
-        FINT i, j, k, off;
-        const double *rirj = envs->rirj;
-        double rjrk[3], rjr0[3];
+        FINT i, j, k, n, off;
+        double r0[3], r0ri[3], r0rj[3], r0rk[3];
 
-        rjrk[0] = rj[0] - rk[0];
-        rjrk[1] = rj[1] - rk[1];
-        rjrk[2] = rj[2] - rk[2];
+        // Expand around the Rys point r0 instead of rj, see CINTg3c1e_ovlp
+        r0[0] = rijk[0] + t2 * (cr[0] - rijk[0]);
+        r0[1] = rijk[1] + t2 * (cr[1] - rijk[1]);
+        r0[2] = rijk[2] + t2 * (cr[2] - rijk[2]);
+        r0ri[0] = r0[0] - ri[0];
+        r0ri[1] = r0[1] - ri[1];
+        r0ri[2] = r0[2] - ri[2];
+        r0rj[0] = r0[0] - rj[0];
+        r0rj[1] = r0[1] - rj[1];
+        r0rj[2] = r0[2] - rj[2];
+        r0rk[0] = r0[0] - rk[0];
+        r0rk[1] = r0[1] - rk[1];
+        r0rk[2] = r0[2] - rk[2];
 
-        rjr0[0] = rj[0] - (rijk[0] + t2 * (cr[0] - rijk[0]));
-        rjr0[1] = rj[1] - (rijk[1] + t2 * (cr[1] - rijk[1]));
-        rjr0[2] = rj[2] - (rijk[2] + t2 * (cr[2] - rijk[2]));
-
-        gx[dj] = -rjr0[0] * gx[0];
-        gy[dj] = -rjr0[1] * gy[0];
-        gz[dj] = -rjr0[2] * gz[0];
-
+        // moments of (x-r0)^j
+        gx[dj] = 0;
+        gy[dj] = 0;
+        gz[dj] = 0;
         const double aijk1 = .5 * (1 - t2) / aijk;
         for (j = 1; j < nmax; j++) {
-                gx[(j+1)*dj] = aijk1 * j * gx[(j-1)*dj] - rjr0[0] * gx[j*dj];
-                gy[(j+1)*dj] = aijk1 * j * gy[(j-1)*dj] - rjr0[1] * gy[j*dj];
-                gz[(j+1)*dj] = aijk1 * j * gz[(j-1)*dj] - rjr0[2] * gz[j*dj];
+                gx[(j+1)*dj] = aijk1 * j * gx[(j-1)*dj];
+                gy[(j+1)*dj] = aijk1 * j * gy[(j-1)*dj];
+                gz[(j+1)*dj] = aijk1 * j * gz[(j-1)*dj];
         }
 
         for (i = 1; i <= li; i++) {
                 for (j = 0; j <= nmax-i; j++) { // upper limit lj+lk
-                        gx[i+j*dj] = gx[i-1+(j+1)*dj] - rirj[0] * gx[i-1+j*dj];
-                        gy[i+j*dj] = gy[i-1+(j+1)*dj] - rirj[1] * gy[i-1+j*dj];
-                        gz[i+j*dj] = gz[i-1+(j+1)*dj] - rirj[2] * gz[i-1+j*dj];
+                        gx[i+j*dj] = gx[i-1+(j+1)*dj] + r0ri[0] * gx[i-1+j*dj];
+                        gy[i+j*dj] = gy[i-1+(j+1)*dj] + r0ri[1] * gy[i-1+j*dj];
+                        gz[i+j*dj] = gz[i-1+(j+1)*dj] + r0ri[2] * gz[i-1+j*dj];
                 }
         }
 
@@ -248,12 +273,24 @@ void CINTg3c1e_nuc(double *g, double ai, double aj, double ak, double *rijk,
                 for (j = 0; j <= mmax-k; j++) {
                         off = k * dk + j * dj;
                         for (i = off; i <= off+li; i++) {
-                                gx[i] = gx[i+dj-dk] + rjrk[0] * gx[i-dk];
-                                gy[i] = gy[i+dj-dk] + rjrk[1] * gy[i-dk];
-                                gz[i] = gz[i+dj-dk] + rjrk[2] * gz[i-dk];
+                                gx[i] = gx[i+dj-dk] + r0rk[0] * gx[i-dk];
+                                gy[i] = gy[i+dj-dk] + r0rk[1] * gy[i-dk];
+                                gz[i] = gz[i+dj-dk] + r0rk[2] * gz[i-dk];
                         }
                 }
         }
+
+        // Taylor shift of the j index from (x-r0)^j to (x-rj)^j
+        for (k = 0; k <= lk; k++) {
+        for (i = 0; i <= li; i++) {
+                off = k * dk + i;
+                for (n = 0; n < lj; n++) {
+                for (j = lj; j > n; j--) {
+                        gx[off+j*dj] += r0rj[0] * gx[off+(j-1)*dj];
+                        gy[off+j*dj] += r0rj[1] * gy[off+(j-1)*dj];
+                        gz[off+j*dj] += r0rj[2] * gz[off+(j-1)*dj];
+                } }
+        } }
 }
 
 /*
