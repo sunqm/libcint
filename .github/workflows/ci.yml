@@ -40,5 +40,6 @@ jobs:
           python test_int2c2e.py
           python test_diffuse_screening.py
           python test_screening_scaling.py
+          python test_int3c1e_shell_order.py
           python test_int3c1e.py
           python test_int2e.py --quick
