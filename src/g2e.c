@@ -267,20 +267,191 @@ void CINTg2e_index_xyz(FINT *idx, const CINTEnvVars *envs)
 
 
 /*
+ * The g0_xx2d_4d functions are instantiated for small constant nroots to unroll inner loops
+ */
+#if defined(__GNUC__) || defined(__clang__)
+#define ALWAYS_INLINE   inline __attribute__((always_inline))
+#else
+#define ALWAYS_INLINE   inline
+#endif
+
+/*
+ * g(nroots,0:nmax,0:mmax)
+ */
+static ALWAYS_INLINE void _g0_2d_roots(double *g, Rys2eT *bc, CINTEnvVars *envs,
+                                       const FINT i0, const FINT nr)
+{
+        const FINT nmax = envs->li_ceil + envs->lj_ceil;
+        const FINT mmax = envs->lk_ceil + envs->ll_ceil;
+        const FINT dm = envs->g2d_klmax;
+        const FINT dn = envs->g2d_ijmax;
+        FINT i, j, m, n, r;
+        DEF_GXYZ(double, g, gx, gy, gz);
+
+        double s0x[2], s1x[2], s2x;
+        double s0y[2], s1y[2], s2y;
+        double s0z[2], s1z[2], s2z;
+        double c00x[2], c00y[2], c00z[2], c0px[2], c0py[2], c0pz[2];
+        double b10[2], b01[2], b00[2];
+        for (r = 0; r < nr; r++) {
+                i = i0 + r;
+                c00x[r] = bc->c00x[i];
+                c00y[r] = bc->c00y[i];
+                c00z[r] = bc->c00z[i];
+                c0px[r] = bc->c0px[i];
+                c0py[r] = bc->c0py[i];
+                c0pz[r] = bc->c0pz[i];
+                b10[r] = bc->b10[i];
+                b01[r] = bc->b01[i];
+                b00[r] = bc->b00[i];
+        }
+        if (nmax > 0) {
+                // gx(irys,0,1) = c00(irys) * gx(irys,0,0)
+                // gx(irys,0,n+1) = c00(irys)*gx(irys,0,n)
+                // + n*b10(irys)*gx(irys,0,n-1)
+                for (r = 0; r < nr; r++) {
+                        i = i0 + r;
+                        s0x[r] = gx[i];
+                        s0y[r] = gy[i];
+                        s0z[r] = gz[i];
+                        s1x[r] = c00x[r] * s0x[r];
+                        s1y[r] = c00y[r] * s0y[r];
+                        s1z[r] = c00z[r] * s0z[r];
+                        gx[i+dn] = s1x[r];
+                        gy[i+dn] = s1y[r];
+                        gz[i+dn] = s1z[r];
+                }
+                for (n = 1; n < nmax; ++n) {
+                        for (r = 0; r < nr; r++) {
+                                i = i0 + r;
+                                s2x = c00x[r] * s1x[r] + n * b10[r] * s0x[r];
+                                s2y = c00y[r] * s1y[r] + n * b10[r] * s0y[r];
+                                s2z = c00z[r] * s1z[r] + n * b10[r] * s0z[r];
+                                gx[i+(n+1)*dn] = s2x;
+                                gy[i+(n+1)*dn] = s2y;
+                                gz[i+(n+1)*dn] = s2z;
+                                s0x[r] = s1x[r];
+                                s0y[r] = s1y[r];
+                                s0z[r] = s1z[r];
+                                s1x[r] = s2x;
+                                s1y[r] = s2y;
+                                s1z[r] = s2z;
+                        }
+                }
+        }
+
+        if (mmax > 0) {
+                // gx(irys,1,0) = c0p(irys) * gx(irys,0,0)
+                // gx(irys,m+1,0) = c0p(irys)*gx(irys,m,0)
+                // + m*b01(irys)*gx(irys,m-1,0)
+                for (r = 0; r < nr; r++) {
+                        i = i0 + r;
+                        s0x[r] = gx[i];
+                        s0y[r] = gy[i];
+                        s0z[r] = gz[i];
+                        s1x[r] = c0px[r] * s0x[r];
+                        s1y[r] = c0py[r] * s0y[r];
+                        s1z[r] = c0pz[r] * s0z[r];
+                        gx[i+dm] = s1x[r];
+                        gy[i+dm] = s1y[r];
+                        gz[i+dm] = s1z[r];
+                }
+                for (m = 1; m < mmax; ++m) {
+                        for (r = 0; r < nr; r++) {
+                                i = i0 + r;
+                                s2x = c0px[r] * s1x[r] + m * b01[r] * s0x[r];
+                                s2y = c0py[r] * s1y[r] + m * b01[r] * s0y[r];
+                                s2z = c0pz[r] * s1z[r] + m * b01[r] * s0z[r];
+                                gx[i+(m+1)*dm] = s2x;
+                                gy[i+(m+1)*dm] = s2y;
+                                gz[i+(m+1)*dm] = s2z;
+                                s0x[r] = s1x[r];
+                                s0y[r] = s1y[r];
+                                s0z[r] = s1z[r];
+                                s1x[r] = s2x;
+                                s1y[r] = s2y;
+                                s1z[r] = s2z;
+                        }
+                }
+
+                if (nmax > 0) {
+                        // gx(irys,1,1) = c0p(irys)*gx(irys,0,1) + b00(irys)*gx(irys,0,0)
+                        // gx(irys,m+1,1) = c0p(irys)*gx(irys,m,1)
+                        // + m*b01(irys)*gx(irys,m-1,1)
+                        // + b00(irys)*gx(irys,m,0)
+                        for (r = 0; r < nr; r++) {
+                                i = i0 + r;
+                                s0x[r] = gx[i+dn];
+                                s0y[r] = gy[i+dn];
+                                s0z[r] = gz[i+dn];
+                                s1x[r] = c0px[r] * s0x[r] + b00[r] * gx[i];
+                                s1y[r] = c0py[r] * s0y[r] + b00[r] * gy[i];
+                                s1z[r] = c0pz[r] * s0z[r] + b00[r] * gz[i];
+                                gx[i+dn+dm] = s1x[r];
+                                gy[i+dn+dm] = s1y[r];
+                                gz[i+dn+dm] = s1z[r];
+                        }
+                        for (m = 1; m < mmax; ++m) {
+                                for (r = 0; r < nr; r++) {
+                                        i = i0 + r;
+                                        s2x = c0px[r]*s1x[r] + m*b01[r]*s0x[r] + b00[r]*gx[i+m*dm];
+                                        s2y = c0py[r]*s1y[r] + m*b01[r]*s0y[r] + b00[r]*gy[i+m*dm];
+                                        s2z = c0pz[r]*s1z[r] + m*b01[r]*s0z[r] + b00[r]*gz[i+m*dm];
+                                        gx[i+dn+(m+1)*dm] = s2x;
+                                        gy[i+dn+(m+1)*dm] = s2y;
+                                        gz[i+dn+(m+1)*dm] = s2z;
+                                        s0x[r] = s1x[r];
+                                        s0y[r] = s1y[r];
+                                        s0z[r] = s1z[r];
+                                        s1x[r] = s2x;
+                                        s1y[r] = s2y;
+                                        s1z[r] = s2z;
+                                }
+                        }
+                }
+        }
+
+        // gx(irys,m,n+1) = c00(irys)*gx(irys,m,n)
+        // + n*b10(irys)*gx(irys,m,n-1)
+        // + m*b00(irys)*gx(irys,m-1,n)
+        for (m = 1; m <= mmax; ++m) {
+                for (r = 0; r < nr; r++) {
+                        j = m * dm + i0 + r;
+                        s0x[r] = gx[j];
+                        s0y[r] = gy[j];
+                        s0z[r] = gz[j];
+                        s1x[r] = gx[j + dn];
+                        s1y[r] = gy[j + dn];
+                        s1z[r] = gz[j + dn];
+                }
+                for (n = 1; n < nmax; ++n) {
+                        for (r = 0; r < nr; r++) {
+                                j = m * dm + i0 + r;
+                                s2x = c00x[r]*s1x[r] + n*b10[r]*s0x[r] + m*b00[r]*gx[j+n*dn-dm];
+                                s2y = c00y[r]*s1y[r] + n*b10[r]*s0y[r] + m*b00[r]*gy[j+n*dn-dm];
+                                s2z = c00z[r]*s1z[r] + n*b10[r]*s0z[r] + m*b00[r]*gz[j+n*dn-dm];
+                                gx[j+(n+1)*dn] = s2x;
+                                gy[j+(n+1)*dn] = s2y;
+                                gz[j+(n+1)*dn] = s2z;
+                                s0x[r] = s1x[r];
+                                s0y[r] = s1y[r];
+                                s0z[r] = s1z[r];
+                                s1x[r] = s2x;
+                                s1y[r] = s2y;
+                                s1z[r] = s2z;
+                        }
+                }
+        }
+}
+
+/*
  * g(nroots,0:nmax,0:mmax)
  */
 void CINTg0_2e_2d(double *g, Rys2eT *bc, CINTEnvVars *envs)
 {
         const FINT nroots = envs->nrys_roots;
-        const FINT nmax = envs->li_ceil + envs->lj_ceil;
-        const FINT mmax = envs->lk_ceil + envs->ll_ceil;
-        const FINT dm = envs->g2d_klmax;
-        const FINT dn = envs->g2d_ijmax;
-        FINT i, j, m, n, off;
+        FINT i;
         DEF_GXYZ(double, g, gx, gy, gz);
-        double *p0x, *p0y, *p0z;
-        double *p1x, *p1y, *p1z;
-        double nb1, mb0;
 
         for (i = 0; i < nroots; i++) {
                 gx[i] = 1;
@@ -288,135 +459,11 @@ void CINTg0_2e_2d(double *g, Rys2eT *bc, CINTEnvVars *envs)
                 //gz[i] = w[i];
         }
 
-        double s0x, s1x, s2x, t0x, t1x;
-        double s0y, s1y, s2y, t0y, t1y;
-        double s0z, s1z, s2z, t0z, t1z;
-        double c00x, c00y, c00z, c0px, c0py, c0pz, b10, b01, b00;
-        for (i = 0; i < nroots; i++) {
-                c00x = bc->c00x[i];
-                c00y = bc->c00y[i];
-                c00z = bc->c00z[i];
-                c0px = bc->c0px[i];
-                c0py = bc->c0py[i];
-                c0pz = bc->c0pz[i];
-                b10 = bc->b10[i];
-                b01 = bc->b01[i];
-                b00 = bc->b00[i];
-                if (nmax > 0) {
-                        // gx(irys,0,1) = c00(irys) * gx(irys,0,0)
-                        // gx(irys,0,n+1) = c00(irys)*gx(irys,0,n)
-                        // + n*b10(irys)*gx(irys,0,n-1)
-                        s0x = gx[i];
-                        s0y = gy[i];
-                        s0z = gz[i];
-                        s1x = c00x * s0x;
-                        s1y = c00y * s0y;
-                        s1z = c00z * s0z;
-                        gx[i+dn] = s1x;
-                        gy[i+dn] = s1y;
-                        gz[i+dn] = s1z;
-                        for (n = 1; n < nmax; ++n) {
-                                s2x = c00x * s1x + n * b10 * s0x;
-                                s2y = c00y * s1y + n * b10 * s0y;
-                                s2z = c00z * s1z + n * b10 * s0z;
-                                gx[i+(n+1)*dn] = s2x;
-                                gy[i+(n+1)*dn] = s2y;
-                                gz[i+(n+1)*dn] = s2z;
-                                s0x = s1x;
-                                s0y = s1y;
-                                s0z = s1z;
-                                s1x = s2x;
-                                s1y = s2y;
-                                s1z = s2z;
-                        }
-                }
-
-                if (mmax > 0) {
-                        // gx(irys,1,0) = c0p(irys) * gx(irys,0,0)
-                        // gx(irys,m+1,0) = c0p(irys)*gx(irys,m,0)
-                        // + m*b01(irys)*gx(irys,m-1,0)
-                        s0x = gx[i];
-                        s0y = gy[i];
-                        s0z = gz[i];
-                        s1x = c0px * s0x;
-                        s1y = c0py * s0y;
-                        s1z = c0pz * s0z;
-                        gx[i+dm] = s1x;
-                        gy[i+dm] = s1y;
-                        gz[i+dm] = s1z;
-                        for (m = 1; m < mmax; ++m) {
-                                s2x = c0px * s1x + m * b01 * s0x;
-                                s2y = c0py * s1y + m * b01 * s0y;
-                                s2z = c0pz * s1z + m * b01 * s0z;
-                                gx[i+(m+1)*dm] = s2x;
-                                gy[i+(m+1)*dm] = s2y;
-                                gz[i+(m+1)*dm] = s2z;
-                                s0x = s1x;
-                                s0y = s1y;
-                                s0z = s1z;
-                                s1x = s2x;
-                                s1y = s2y;
-                                s1z = s2z;
-                        }
-
-                        if (nmax > 0) {
-                                // gx(irys,1,1) = c0p(irys)*gx(irys,0,1) + b00(irys)*gx(irys,0,0)
-                                // gx(irys,m+1,1) = c0p(irys)*gx(irys,m,1)
-                                // + m*b01(irys)*gx(irys,m-1,1)
-                                // + b00(irys)*gx(irys,m,0)
-                                s0x = gx[i+dn];
-                                s0y = gy[i+dn];
-                                s0z = gz[i+dn];
-                                s1x = c0px * s0x + b00 * gx[i];
-                                s1y = c0py * s0y + b00 * gy[i];
-                                s1z = c0pz * s0z + b00 * gz[i];
-                                gx[i+dn+dm] = s1x;
-                                gy[i+dn+dm] = s1y;
-                                gz[i+dn+dm] = s1z;
-                                for (m = 1; m < mmax; ++m) {
-                                        s2x = c0px*s1x + m*b01*s0x + b00*gx[i+m*dm];
-                                        s2y = c0py*s1y + m*b01*s0y + b00*gy[i+m*dm];
-                                        s2z = c0pz*s1z + m*b01*s0z + b00*gz[i+m*dm];
-                                        gx[i+dn+(m+1)*dm] = s2x;
-                                        gy[i+dn+(m+1)*dm] = s2y;
-                                        gz[i+dn+(m+1)*dm] = s2z;
-                                        s0x = s1x;
-                                        s0y = s1y;
-                                        s0z = s1z;
-                                        s1x = s2x;
-                                        s1y = s2y;
-                                        s1z = s2z;
-                                }
-                        }
-                }
-
-                // gx(irys,m,n+1) = c00(irys)*gx(irys,m,n)
-                // + n*b10(irys)*gx(irys,m,n-1)
-                // + m*b00(irys)*gx(irys,m-1,n)
-                for (m = 1; m <= mmax; ++m) {
-                        off = m * dm;
-                        j = off + i;
-                        s0x = gx[j];
-                        s0y = gy[j];
-                        s0z = gz[j];
-                        s1x = gx[j + dn];
-                        s1y = gy[j + dn];
-                        s1z = gz[j + dn];
-                        for (n = 1; n < nmax; ++n) {
-                                s2x = c00x*s1x + n*b10*s0x + m*b00*gx[j+n*dn-dm];
-                                s2y = c00y*s1y + n*b10*s0y + m*b00*gy[j+n*dn-dm];
-                                s2z = c00z*s1z + n*b10*s0z + m*b00*gz[j+n*dn-dm];
-                                gx[j+(n+1)*dn] = s2x;
-                                gy[j+(n+1)*dn] = s2y;
-                                gz[j+(n+1)*dn] = s2z;
-                                s0x = s1x;
-                                s0y = s1y;
-                                s0z = s1z;
-                                s1x = s2x;
-                                s1y = s2y;
-                                s1z = s2z;
-                        }
-                }
+        for (i = 0; i + 1 < nroots; i += 2) {
+                _g0_2d_roots(g, bc, envs, i, 2);
+        }
+        if (i < nroots) {
+                _g0_2d_roots(g, bc, envs, i, 1);
         }
 }
 
@@ -425,7 +472,8 @@ void CINTg0_2e_2d(double *g, Rys2eT *bc, CINTEnvVars *envs)
  * g0[i,k,l,j] = < ik | lj > = ( i j | k l )
  */
 /* 2d is based on l,j */
-void CINTg0_lj2d_4d(double * g, CINTEnvVars *envs)
+static ALWAYS_INLINE void _g0_lj2d_4d(double * g, CINTEnvVars *envs,
+                                       const FINT nroots)
 {
         FINT li = envs->li_ceil;
         FINT lk = envs->lk_ceil;
@@ -436,7 +484,6 @@ void CINTg0_lj2d_4d(double * g, CINTEnvVars *envs)
         FINT mmax = envs->lk_ceil + envs->ll_ceil;
         //FINT ll = envs->ll_ceil;
         FINT lj = envs->lj_ceil;
-        FINT nroots = envs->nrys_roots;
         FINT i, j, k, l, ptr, n;
         FINT di = envs->g_stride_i;
         FINT dk = envs->g_stride_k;
@@ -490,8 +537,21 @@ void CINTg0_lj2d_4d(double * g, CINTEnvVars *envs)
                 }
         } } }
 }
+void CINTg0_lj2d_4d(double * g, CINTEnvVars *envs)
+{
+        switch (envs->nrys_roots) {
+        case 1: _g0_lj2d_4d(g, envs, 1); break;
+        case 2: _g0_lj2d_4d(g, envs, 2); break;
+        case 3: _g0_lj2d_4d(g, envs, 3); break;
+        case 4: _g0_lj2d_4d(g, envs, 4); break;
+        case 5: _g0_lj2d_4d(g, envs, 5); break;
+        case 6: _g0_lj2d_4d(g, envs, 6); break;
+        default: _g0_lj2d_4d(g, envs, envs->nrys_roots);
+        }
+}
 /* 2d is based on k,j */
-void CINTg0_kj2d_4d(double * g, CINTEnvVars *envs)
+static ALWAYS_INLINE void _g0_kj2d_4d(double * g, CINTEnvVars *envs,
+                                       const FINT nroots)
 {
         FINT li = envs->li_ceil;
         FINT ll = envs->ll_ceil;
@@ -502,7 +562,6 @@ void CINTg0_kj2d_4d(double * g, CINTEnvVars *envs)
         FINT mmax = envs->lk_ceil + envs->ll_ceil;
         //FINT lk = envs->lk_ceil;
         FINT lj = envs->lj_ceil;
-        FINT nroots = envs->nrys_roots;
         FINT i, j, k, l, ptr, n;
         FINT di = envs->g_stride_i;
         FINT dk = envs->g_stride_k;
@@ -556,8 +615,21 @@ void CINTg0_kj2d_4d(double * g, CINTEnvVars *envs)
                 }
         } } }
 }
+void CINTg0_kj2d_4d(double * g, CINTEnvVars *envs)
+{
+        switch (envs->nrys_roots) {
+        case 1: _g0_kj2d_4d(g, envs, 1); break;
+        case 2: _g0_kj2d_4d(g, envs, 2); break;
+        case 3: _g0_kj2d_4d(g, envs, 3); break;
+        case 4: _g0_kj2d_4d(g, envs, 4); break;
+        case 5: _g0_kj2d_4d(g, envs, 5); break;
+        case 6: _g0_kj2d_4d(g, envs, 6); break;
+        default: _g0_kj2d_4d(g, envs, envs->nrys_roots);
+        }
+}
 /* 2d is based on i,l */
-void CINTg0_il2d_4d(double * g, CINTEnvVars *envs)
+static ALWAYS_INLINE void _g0_il2d_4d(double * g, CINTEnvVars *envs,
+                                       const FINT nroots)
 {
         FINT lk = envs->lk_ceil;
         FINT lj = envs->lj_ceil;
@@ -568,7 +640,6 @@ void CINTg0_il2d_4d(double * g, CINTEnvVars *envs)
         FINT mmax = envs->lk_ceil + envs->ll_ceil;
         //FINT li = envs->li_ceil;
         FINT ll = envs->ll_ceil;
-        FINT nroots = envs->nrys_roots;
         FINT i, j, k, l, ptr, n;
         FINT di = envs->g_stride_i;
         FINT dk = envs->g_stride_k;
@@ -622,8 +693,21 @@ void CINTg0_il2d_4d(double * g, CINTEnvVars *envs)
                 }
         } } }
 }
+void CINTg0_il2d_4d(double * g, CINTEnvVars *envs)
+{
+        switch (envs->nrys_roots) {
+        case 1: _g0_il2d_4d(g, envs, 1); break;
+        case 2: _g0_il2d_4d(g, envs, 2); break;
+        case 3: _g0_il2d_4d(g, envs, 3); break;
+        case 4: _g0_il2d_4d(g, envs, 4); break;
+        case 5: _g0_il2d_4d(g, envs, 5); break;
+        case 6: _g0_il2d_4d(g, envs, 6); break;
+        default: _g0_il2d_4d(g, envs, envs->nrys_roots);
+        }
+}
 /* 2d is based on i,k */
-void CINTg0_ik2d_4d(double * g, CINTEnvVars *envs)
+static ALWAYS_INLINE void _g0_ik2d_4d(double * g, CINTEnvVars *envs,
+                                       const FINT nroots)
 {
         FINT lj = envs->lj_ceil;
         FINT ll = envs->ll_ceil;
@@ -634,7 +718,6 @@ void CINTg0_ik2d_4d(double * g, CINTEnvVars *envs)
         FINT mmax = envs->lk_ceil + envs->ll_ceil;
         //FINT li = envs->li_ceil;
         FINT lk = envs->lk_ceil;
-        FINT nroots = envs->nrys_roots;
         FINT i, j, k, l, ptr, n;
         FINT di = envs->g_stride_i;
         FINT dk = envs->g_stride_k;
@@ -690,6 +773,18 @@ void CINTg0_ik2d_4d(double * g, CINTEnvVars *envs)
                         gz[n] = rz * p1z[n] + p2z[n];
                 }
         } } }
+}
+void CINTg0_ik2d_4d(double * g, CINTEnvVars *envs)
+{
+        switch (envs->nrys_roots) {
+        case 1: _g0_ik2d_4d(g, envs, 1); break;
+        case 2: _g0_ik2d_4d(g, envs, 2); break;
+        case 3: _g0_ik2d_4d(g, envs, 3); break;
+        case 4: _g0_ik2d_4d(g, envs, 4); break;
+        case 5: _g0_ik2d_4d(g, envs, 5); break;
+        case 6: _g0_ik2d_4d(g, envs, 6); break;
+        default: _g0_ik2d_4d(g, envs, envs->nrys_roots);
+        }
 }
 
 static inline void _g0_2d4d_0000(double * g, Rys2eT *bc, CINTEnvVars *envs)

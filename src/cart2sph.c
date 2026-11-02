@@ -3676,7 +3676,7 @@ static double *p_ket_cart2spheric_copy(double *gsph, double *gcart,
 }
 
 // transform d function from cartesian to spheric
-static double *d_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
+static double *d_bra_cart2spheric(double *restrict gsph, FINT nket, double *gcart, FINT l)
 {
         double *coeff_c2s = g_c2s[2].cart2sph;
         double *pgsph = gsph;
@@ -3695,7 +3695,7 @@ static double *d_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l
         }
         return pgsph;
 }
-static double *d_ket_cart2spheric(double *gsph, double *gcart,
+static double *d_ket_cart2spheric(double *restrict gsph, double *gcart,
                                   FINT lds, FINT nbra, FINT l)
 {
         double *coeff_c2s = g_c2s[2].cart2sph;
@@ -3716,7 +3716,7 @@ static double *d_ket_cart2spheric(double *gsph, double *gcart,
 }
 
 // transform f function from cartesian to spheric
-static double *f_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
+static double *f_bra_cart2spheric(double *restrict gsph, FINT nket, double *gcart, FINT l)
 {
         double *coeff_c2s = g_c2s[3].cart2sph;
         double *pgsph = gsph;
@@ -3743,7 +3743,7 @@ static double *f_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l
         }
         return pgsph;
 }
-static double *f_ket_cart2spheric(double *gsph, double *gcart,
+static double *f_ket_cart2spheric(double *restrict gsph, double *gcart,
                                   FINT lds, FINT nbra, FINT l)
 {
         double *coeff_c2s = g_c2s[3].cart2sph;
@@ -3772,7 +3772,7 @@ static double *f_ket_cart2spheric(double *gsph, double *gcart,
 }
 
 // transform g function from cartesian to spheric
-static double *g_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l)
+static double *g_bra_cart2spheric(double *restrict gsph, FINT nket, double *gcart, FINT l)
 {
         double *coeff_c2s = g_c2s[4].cart2sph;
         double *pgsph = gsph;
@@ -3811,7 +3811,7 @@ static double *g_bra_cart2spheric(double *gsph, FINT nket, double *gcart, FINT l
         }
         return pgsph;
 }
-static double *g_ket_cart2spheric(double *gsph, double *gcart,
+static double *g_ket_cart2spheric(double *restrict gsph, double *gcart,
                                   FINT lds, FINT nbra, FINT l)
 {
         double *coeff_c2s = g_c2s[4].cart2sph;
