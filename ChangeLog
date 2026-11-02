@@ -1,3 +1,10 @@
+Version 6.2.1 (2026-11-01):
+	* Improve generated integral performance by skipping unused intermediates and products
+	* Fix numerical instability in int3c1e overlap and nuclear attraction recursions for widely separated tight and diffuse shells
+	* Fix uninitialized error status in CINTsr_rys_roots for 17 and 18 roots
+	* Fix CMake linkage for shared library consumers by making quadmath and libm dependencies private
+	* Declare and document the I8 and CACHE_SIZE_I8 CMake options for 64-bit integers
+
 Version 6.2.0 (2026-10-16):
 	* New dipole and quadrupole gradient integrals
 	* New second order derivative integrals for int3c1e
