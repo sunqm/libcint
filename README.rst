@@ -190,6 +190,19 @@ Installation
     cmake -DI8=1 ..
     make install
 
+  This makes ``FINT``, the integer type of the whole API (the ``atm``,
+  ``bas``, ``shls`` and ``dims`` arrays, ``natm``, ``nbas`` and the return
+  values), ``int64_t`` instead of ``int``, e.g. to match Fortran codes
+  compiled with 8-byte default integers. Callers must then pass 64-bit
+  integer arrays; the library is not ABI compatible with a default build.
+  The installed ``cint.h`` records the choice.
+
+  ``-DCACHE_SIZE_I8=1`` instead makes only ``CACHE_SIZE_T``, the return type
+  of the integral functions (which return the required cache size when
+  ``out`` is NULL), ``int64_t``, leaving ``FINT`` as ``int``. With ``-DI8=1``,
+  ``CACHE_SIZE_T`` is ``int64_t`` anyway, and ``CACHE_SIZE_I8`` is set
+  automatically.
+
 * Long range part of range-separated Coulomb operator (optional)::
 
     mkdir build; cd build
