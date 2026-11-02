@@ -187,7 +187,6 @@ double *g1 = g0 + envs->g_size * 3;
 double *g2 = g1 + envs->g_size * 3;
 double *g3 = g2 + envs->g_size * 3;
 G2E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, envs->k_l, 0);
-G2E_D_I(g2, g0, envs->i_l+0, envs->j_l, envs->k_l, 0);
 G2E_D_I(g3, g1, envs->i_l+0, envs->j_l, envs->k_l, 0);
 double s[9];
 for (n = 0; n < nf; n++) {
@@ -197,13 +196,7 @@ iz = idx[2+n*3];
 for (i = 0; i < 9; i++) { s[i] = 0; }
 for (i = 0; i < nrys_roots; i++) {
 s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
-s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
-s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
-s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
 s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
-s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
-s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
-s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
 s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
 if (gout_empty) {
@@ -253,7 +246,6 @@ double *g2 = g1 + envs->g_size * 3;
 double *g3 = g2 + envs->g_size * 3;
 G2E_D_J(g1, g0, envs->i_l+1, envs->j_l+0, envs->k_l, 0);
 G2E_D_I(g2, g0, envs->i_l+0, envs->j_l, envs->k_l, 0);
-G2E_D_I(g3, g1, envs->i_l+0, envs->j_l, envs->k_l, 0);
 double s[9];
 for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
@@ -261,15 +253,12 @@ iy = idx[1+n*3];
 iz = idx[2+n*3];
 for (i = 0; i < 9; i++) { s[i] = 0; }
 for (i = 0; i < nrys_roots; i++) {
-s[0] += g3[ix+i] * g0[iy+i] * g0[iz+i];
 s[1] += g2[ix+i] * g1[iy+i] * g0[iz+i];
 s[2] += g2[ix+i] * g0[iy+i] * g1[iz+i];
 s[3] += g1[ix+i] * g2[iy+i] * g0[iz+i];
-s[4] += g0[ix+i] * g3[iy+i] * g0[iz+i];
 s[5] += g0[ix+i] * g2[iy+i] * g1[iz+i];
 s[6] += g1[ix+i] * g0[iy+i] * g2[iz+i];
 s[7] += g0[ix+i] * g1[iy+i] * g2[iz+i];
-s[8] += g0[ix+i] * g0[iy+i] * g3[iz+i];
 }
 if (gout_empty) {
 gout[n*3+0] = + s[5] - s[7];

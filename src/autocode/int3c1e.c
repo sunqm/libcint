@@ -24,20 +24,13 @@ double *g2 = g1 + envs->g_size * 3;
 double *g3 = g2 + envs->g_size * 3;
 double s[9];
 G1E_D_K(g1, g0, envs->i_l+0, envs->j_l+0, envs->k_l+1);
-G1E_D_K(g2, g0, envs->i_l+0, envs->j_l+0, envs->k_l+0);
 G1E_D_K(g3, g1, envs->i_l+0, envs->j_l+0, envs->k_l+0);
 for (n = 0; n < nf; n++) {
 ix = idx[0+n*3];
 iy = idx[1+n*3];
 iz = idx[2+n*3];
 s[0] = + g3[ix+0]*g0[iy+0]*g0[iz+0];
-s[1] = + g2[ix+0]*g1[iy+0]*g0[iz+0];
-s[2] = + g2[ix+0]*g0[iy+0]*g1[iz+0];
-s[3] = + g1[ix+0]*g2[iy+0]*g0[iz+0];
 s[4] = + g0[ix+0]*g3[iy+0]*g0[iz+0];
-s[5] = + g0[ix+0]*g2[iy+0]*g1[iz+0];
-s[6] = + g1[ix+0]*g0[iy+0]*g2[iz+0];
-s[7] = + g0[ix+0]*g1[iy+0]*g2[iz+0];
 s[8] = + g0[ix+0]*g0[iy+0]*g3[iz+0];
 if (gout_empty) {
 gout[n*1+0] = - s[0] - s[4] - s[8];
